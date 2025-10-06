@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    /* === Sortie === */
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "rootDir": ".",
+
+    /* === Qualité du code === */
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+
+    /* === Modules === */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    /* === Types === */
+    "declaration": true,
+    "declarationMap": true,
+
+    /* === Alias internes === */
+    "baseUrl": ".",
+    "paths": {
+      "@cleanarch/domain/*": ["domain/src/*"],
+      "@cleanarch/application/*": ["application/src/*"],
+      "@cleanarch/infrastructure-adapters/*": ["infrastructure/adapters/src/*"],
+      "@cleanarch/api/*": ["infrastructure/api/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}
