@@ -4,9 +4,8 @@ import { Money } from "@domain/values/Money";
 
 export class AccountEntity {
   private constructor(
-    public id: string,
-    public userId: UserEntity["id"],
     public iban: IBAN,
+    public userId: UserEntity["id"],
     public name: string,
     public type: "courant" | "epargne",
     public balance: Money,
@@ -15,9 +14,8 @@ export class AccountEntity {
   ) {}
 
   public static from({
-    id,
-    userId,
     iban,
+    userId,
     name,
     type,
     balance,
@@ -25,9 +23,8 @@ export class AccountEntity {
     updatedAt,
   }: AccountEntity) {
     return new AccountEntity(
-      id,
-      userId,
       iban,
+      userId,
       name,
       type,
       balance,
