@@ -1,10 +1,11 @@
+import { Email } from "@domain/values/Email";
+
 export class UserEntity {
   private constructor(
     public id: string,
     public firstname: string,
     public lastname: string,
-    // TODO : Add value object
-    public email: string,
+    public email: Email,
     public passwordHash: string,
     public role: "client" | "conseiller" | "directeur",
     public isActive: boolean,

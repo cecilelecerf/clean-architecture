@@ -1,11 +1,11 @@
+import { IBAN } from "@domain/values/IBAN";
 import { UserEntity } from "./UserEntity";
 
 export class AccountEntity {
   private constructor(
     public id: string,
     public userId: UserEntity["id"],
-    // TODO add Iban
-    public iban: number,
+    public iban: IBAN,
     public name: string,
     public type: "courant" | "epargne",
     public balance: number,
