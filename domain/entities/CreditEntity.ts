@@ -37,4 +37,31 @@ export class CreditEntity {
       remainingBalance
     );
   }
+
+  // Calcul de la mensualité (mensualité constante)
+  public calculateMonthlyPayment(): Money {
+    const P = this.principal.amount;
+    const n = this.months;
+    const r = this.interestRate / 12 / 100; // taux mensuel
+    const basePayment = (P * r) / (1 - Math.pow(1 + r, -n));
+    const insurance = ((this.insuranceRate / 100) * P) / n;
+    return new Money(basePayment + insurance);
+  }
+
+  // Payer une mensualité
+  public payMonthly(): void {
+    if (this.isFullyPaid()) {
+      throw new Error("Credit already fully paid");
+    }
+    const payment = this.calculateMonthlyPayment();
+    this.remainingBalance = this.remainingBalance.subtract(payment);
+  }
+  public isFullyPaid(): boolean {
+    return this.remainingBalance.amount <= 0;
+  }
+
+  // Retourne le capital restant
+  public getRemainingBalance(): Money {
+    return this.remainingBalance;
+  }
 }

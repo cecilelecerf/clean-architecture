@@ -34,4 +34,21 @@ export class AccountEntity {
       updatedAt
     );
   }
+
+  public deposit(amount: Money): void {
+    this.balance = this.balance.add(amount);
+  }
+
+  // Retirer de l'argent
+  public withdraw(amount: Money): void {
+    if (this.balance.amount < amount.amount) {
+      throw new Error("Insufficient funds");
+    }
+    this.balance = this.balance.subtract(amount);
+  }
+
+  // Obtenir le solde actuel
+  public getBalance(): Money {
+    return this.balance;
+  }
 }

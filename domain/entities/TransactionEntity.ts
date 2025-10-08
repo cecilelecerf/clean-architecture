@@ -5,6 +5,7 @@ export class TransactionEntity {
     public id: string,
     public fromAccountId: UserEntity["id"],
     public toAccountId: UserEntity["id"],
+    // TODO : add Money VO
     public amount: number,
     public date: Date,
     public type: "credit" | "debit"
