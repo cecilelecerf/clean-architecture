@@ -1,3 +1,4 @@
+import { Money } from "@domain/values/Money";
 import { ActionEntity } from "./ActionEntity";
 // import { UserEntity } from "./UserEntity";
 
@@ -8,8 +9,8 @@ export class OrderEntity {
     public actionId: ActionEntity["ISIN"],
     public type: "buy" | "sell",
     public quantity: number,
-    public price: number,
-    public fee: number,
+    public price: Money,
+    public fee: Money,
     public date: Date,
     public status: "pending" | "executed" | "cancelled"
   ) {}
