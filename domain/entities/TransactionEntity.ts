@@ -16,14 +16,7 @@ export class TransactionEntity {
     amount,
     date,
     type,
-  }: {
-    id: string;
-    fromAccountId: UserEntity["id"];
-    toAccountId: UserEntity["id"];
-    amount: number;
-    date: Date;
-    type: "credit" | "debit";
-  }) {
+  }: TransactionEntity) {
     return new TransactionEntity(
       id,
       fromAccountId,

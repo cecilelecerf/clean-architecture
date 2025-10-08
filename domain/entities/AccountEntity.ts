@@ -12,6 +12,7 @@ export class AccountEntity {
     public createdAt: Date,
     public updatedAt?: Date
   ) {}
+
   public static from({
     id,
     userId,
@@ -21,17 +22,7 @@ export class AccountEntity {
     balance,
     createdAt,
     updatedAt,
-  }: {
-    id: string;
-    userId: UserEntity["id"];
-    // TODO add Iban
-    iban: number;
-    name: string;
-    type: "courant" | "epargne";
-    balance: number;
-    createdAt: Date;
-    updatedAt?: Date;
-  }) {
+  }: AccountEntity) {
     return new AccountEntity(
       id,
       userId,

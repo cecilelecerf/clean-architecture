@@ -24,19 +24,7 @@ export class CreditEntity {
     monthlyPayment,
     months,
     remainingBalance,
-  }: {
-    id: string;
-    userId: UserEntity["id"];
-    principal: number;
-    // ? annuel
-    interestRate: number;
-    // ? sur le tota;
-    insuranceRate: number;
-    months: number;
-    startDate: Date;
-    monthlyPayment: number;
-    remainingBalance: number;
-  }) {
+  }: CreditEntity) {
     return new CreditEntity(
       id,
       userId,

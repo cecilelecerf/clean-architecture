@@ -21,17 +21,7 @@ export class UserEntity {
     isActive,
     confirmedAt,
     createdAt,
-  }: {
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    passwordHash: string;
-    role: "client" | "conseiller" | "directeur";
-    isActive: boolean;
-    confirmedAt?: Date;
-    createdAt: Date;
-  }) {
+  }: UserEntity) {
     return new UserEntity(
       id,
       firstname,
