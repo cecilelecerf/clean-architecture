@@ -1,5 +1,6 @@
 import { IBAN } from "@domain/values/IBAN";
 import { UserEntity } from "./UserEntity";
+import { Money } from "@domain/values/Money";
 
 export class AccountEntity {
   private constructor(
@@ -8,7 +9,7 @@ export class AccountEntity {
     public iban: IBAN,
     public name: string,
     public type: "courant" | "epargne",
-    public balance: number,
+    public balance: Money,
     public createdAt: Date,
     public updatedAt?: Date
   ) {}

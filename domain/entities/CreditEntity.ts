@@ -1,18 +1,22 @@
+import { Money } from "@domain/values/Money";
 import { UserEntity } from "./UserEntity";
+import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
+import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
+import { Percentage } from "@domain/values/Percentage";
 
 export class CreditEntity {
   private constructor(
     public id: string,
     public userId: UserEntity["id"],
-    public principal: number,
+    public principal: Money,
     // ? annuel
-    public interestRate: number,
+    public interestRate: Percentage,
     // ? sur le tota;
-    public insuranceRate: number,
+    public insuranceRate: Percentage,
     public months: number,
     public startDate: Date,
-    public monthlyPayment: number,
-    public remainingBalance: number
+    public monthlyPayment: Money,
+    public remainingBalance: Money
   ) {}
   public static from({
     id,
@@ -38,23 +42,48 @@ export class CreditEntity {
     );
   }
 
-  // Calcul de la mensualité (mensualité constante)
   public calculateMonthlyPayment(): Money {
     const P = this.principal.amount;
     const n = this.months;
-    const r = this.interestRate / 12 / 100; // taux mensuel
+    const r = this.interestRate.value / 12 / 100;
     const basePayment = (P * r) / (1 - Math.pow(1 + r, -n));
-    const insurance = ((this.insuranceRate / 100) * P) / n;
-    return new Money(basePayment + insurance);
+    const insurance = ((this.insuranceRate.value / 100) * P) / n;
+
+    const paymentOrError = Money.create(
+      basePayment + insurance,
+      this.principal.currency
+    );
+    if (paymentOrError instanceof Error) {
+      throw paymentOrError;
+    }
+    return paymentOrError;
   }
 
-  // Payer une mensualité
-  public payMonthly(): void {
+  /**
+   * 💸 Effectue le paiement d’une mensualité.
+   * Retourne soit le crédit mis à jour, soit une erreur métier.
+   */
+  public payMonthly():
+    | CreditEntity
+    | CreditAlreadyPaidError
+    | MoneyAmountNegativeError
+    | Error {
     if (this.isFullyPaid()) {
-      throw new Error("Credit already fully paid");
+      return new CreditAlreadyPaidError(this.id);
     }
+
     const payment = this.calculateMonthlyPayment();
-    this.remainingBalance = this.remainingBalance.subtract(payment);
+    if (payment instanceof Error) {
+      return payment;
+    }
+
+    const newRemainingBalance = this.remainingBalance.subtract(payment);
+    if (newRemainingBalance instanceof Error) {
+      return newRemainingBalance;
+    }
+
+    this.remainingBalance = newRemainingBalance;
+    return this;
   }
   public isFullyPaid(): boolean {
     return this.remainingBalance.amount <= 0;

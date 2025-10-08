@@ -1,11 +1,12 @@
 import { Money } from "@domain/values/Money";
 import { ActionEntity } from "./ActionEntity";
-// import { UserEntity } from "./UserEntity";
+import { UserEntity } from "./UserEntity";
+import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
 
 export class OrderEntity {
   private constructor(
     public id: string,
-    // public USERId: UserEntity["id"],
+    public userId: UserEntity["id"],
     public actionId: ActionEntity["ISIN"],
     public type: "buy" | "sell",
     public quantity: number,
@@ -15,10 +16,20 @@ export class OrderEntity {
     public status: "pending" | "executed" | "cancelled"
   ) {}
 
-  // TODO: Ajouter userId
-  public static from({ id, actionId, type, quantity, price, fee, date, status}: OrderEntity) {
+  public static from({
+    id,
+    userId,
+    actionId,
+    type,
+    quantity,
+    price,
+    fee,
+    date,
+    status,
+  }: OrderEntity) {
     return new OrderEntity(
       id,
+      userId,
       actionId,
       type,
       quantity,
@@ -27,5 +38,32 @@ export class OrderEntity {
       date,
       status
     );
+  }
+  public getTotal(): Money | MoneyCurrencyMismatchError {
+    const totalPrice = this.price.multiply(this.quantity);
+    if (totalPrice instanceof Error) {
+      return totalPrice;
+    }
+    return totalPrice.add(this.fee);
+  }
+  public markExecuted(): void {
+    if (this.status !== "pending") {
+      throw new Error("Only pending orders can be executed");
+    }
+    this.status = "executed";
+  }
+
+  public markCancelled(): void {
+    if (this.status !== "pending") {
+      throw new Error("Only pending orders can be cancelled");
+    }
+    this.status = "cancelled";
+  }
+  public isBuy(): boolean {
+    return this.type === "buy";
+  }
+
+  public isSell(): boolean {
+    return this.type === "sell";
   }
 }

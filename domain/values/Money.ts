@@ -1,6 +1,8 @@
+import { FactorNegativeError } from "@domain/errors/money/MoneyFactorNegativeError";
 import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
 import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
 import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
+import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
 
 export class Money {
   private static readonly SCALE = 2;
@@ -17,7 +19,11 @@ export class Money {
   public static create(
     amount: number,
     currency: string
-  ): Money | Error {
+  ):
+    | Money
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError {
     if (!currency || currency.trim() === "") {
       return new MoneyCurrencyMissingError(currency);
     }
@@ -34,32 +40,44 @@ export class Money {
     return new Money(scaledAmount, currency.toUpperCase());
   }
 
-  public add(other: Money): Money {
-    this.ensureSameCurrency(other);
+  public add(other: Money): Money | MoneyCurrencyMismatchError {
+    const currencyError = this.ensureSameCurrency(other);
+    if (currencyError) return currencyError;
     return new Money(this.amount + other.amount, this.currency);
   }
 
-  public subtract(other: Money): Money {
-    this.ensureSameCurrency(other);
+  public subtract(
+    other: Money
+  ): Money | MoneyCurrencyMismatchError | MoneyAmountNegativeError {
+    const currencyError = this.ensureSameCurrency(other);
+    if (currencyError) return currencyError;
     const result = this.amount - other.amount;
-    if (result < 0) throw new MoneyAmountNegativeError(result);
+    if (result < 0) return new MoneyAmountNegativeError(result);
     return new Money(result, this.currency);
   }
 
-  private ensureSameCurrency(other: Money): void {
+  private ensureSameCurrency(other: Money): MoneyCurrencyMismatchError | void {
     if (this.currency !== other.currency) {
-      throw new Error("Les devises doivent être identiques");
+      return new MoneyCurrencyMismatchError();
     }
   }
 
   public equals(other: Money): boolean {
-    return (
-      this.currency === other.currency &&
-      this.amount === other.amount
-    );
+    return this.currency === other.currency && this.amount === other.amount;
   }
 
   public toString(): string {
     return `${this.amount.toFixed(Money.SCALE)} ${this.currency}`;
+  }
+  public multiply(factor: number): Money | Error {
+    if (factor < 0) {
+      return new FactorNegativeError();
+    }
+
+    const resultAmount = Number((this.amount * factor).toFixed(Money.SCALE));
+
+    const resultOrError = Money.create(resultAmount, this.currency);
+
+    return resultOrError;
   }
 }

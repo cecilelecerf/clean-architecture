@@ -1,3 +1,5 @@
+import { Money } from "@domain/values/Money";
+
 export class ActionEntity {
   private constructor(
     public ISIN: string,
@@ -5,13 +7,23 @@ export class ActionEntity {
     public symbol: string,
     public market: string,
     public activitySector: string,
-    public currentPrice: number,
+    public currentPrice: Money,
     public isAvailable: boolean,
     public createdAt: Date,
     public updatedAt?: Date
   ) {}
 
-  public static from({ ISIN, name, symbol, market, activitySector, currentPrice, isAvailable, createdAt, updatedAt}: ActionEntity) {
+  public static from({
+    ISIN,
+    name,
+    symbol,
+    market,
+    activitySector,
+    currentPrice,
+    isAvailable,
+    createdAt,
+    updatedAt,
+  }: ActionEntity) {
     return new ActionEntity(
       ISIN,
       name,
@@ -23,5 +35,19 @@ export class ActionEntity {
       createdAt,
       updatedAt
     );
+  }
+  public enable(): void {
+    this.isAvailable = true;
+    this.updatedAt = new Date();
+  }
+
+  public disable(): void {
+    this.isAvailable = false;
+    this.updatedAt = new Date();
+  }
+
+  public updatePrice(newPrice: Money): void {
+    this.currentPrice = newPrice;
+    this.updatedAt = new Date();
   }
 }
