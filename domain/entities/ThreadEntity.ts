@@ -6,7 +6,7 @@ export class ThreadEntity {
     public lastUpdatedAt: Date
   ) {}
 
-  public static from({ id, participants, createdAt, lastUpdatedAt}: { id: string, participants: [], createdAt: Date, lastUpdatedAt: Date }) {
+  public static from({ id, participants, createdAt, lastUpdatedAt}: ThreadEntity) {
     return new ThreadEntity(
       id,
       participants,

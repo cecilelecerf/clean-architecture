@@ -15,10 +15,10 @@ export class OrderEntity {
   ) {}
 
   // TODO: Ajouter userId
-  public static from({ id, action, type, quantity, price, fee, date, status}: { id: string, action: ActionEntity["ISIN"], type: "buy" | "sell" , quantity: number, price: number, fee: number, date: Date, status: "pending" | "executed" | "cancelled"}) {
+  public static from({ id, actionId, type, quantity, price, fee, date, status}: OrderEntity) {
     return new OrderEntity(
       id,
-      action,
+      actionId,
       type,
       quantity,
       price,

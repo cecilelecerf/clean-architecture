@@ -5,7 +5,7 @@ export class SavingsRateEntity {
     public effectiveDate: Date
   ) {}
 
-  public static from({ id, rate, effectiveDate}: { id: string, rate: number, effectiveDate: Date }) {
+  public static from({ id, rate, effectiveDate}: SavingsRateEntity) {
     return new SavingsRateEntity(
       id,
       rate,

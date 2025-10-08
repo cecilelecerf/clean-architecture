@@ -11,7 +11,7 @@ export class MessageEntity {
   ) {}
 
   //TODO: Ajouter senderId
-  public static from({ id, threadId, content, sentAt}: { id: string, threadId: ThreadEntity["id"], content: string, sentAt: Date }) {
+  public static from({ id, threadId, content, sentAt}: MessageEntity) {
     return new MessageEntity(
       id,
       threadId,

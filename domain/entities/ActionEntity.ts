@@ -11,7 +11,7 @@ export class ActionEntity {
     public updatedAt?: Date
   ) {}
 
-  public static from({ ISIN, name, symbol, market, activitySector, currentPrice, isAvailable, createdAt, updatedAt}: { ISIN: string, name: string, symbol: string, market: string, activitySector: string, currentPrice: number, isAvailable: boolean, createdAt: Date, updatedAt?: Date }) {
+  public static from({ ISIN, name, symbol, market, activitySector, currentPrice, isAvailable, createdAt, updatedAt}: ActionEntity) {
     return new ActionEntity(
       ISIN,
       name,
