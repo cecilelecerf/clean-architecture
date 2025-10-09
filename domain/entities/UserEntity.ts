@@ -8,7 +8,7 @@ export class UserEntity {
     public email: Email,
     public passwordHash: string,
     public role: "client" | "conseiller" | "directeur",
-    private isActiveField: boolean,
+    public isActiveField: boolean,
     public createdAt: Date,
     public confirmedAt?: Date
   ) {}
@@ -23,7 +23,18 @@ export class UserEntity {
     isActiveField,
     confirmedAt,
     createdAt,
-  }: UserEntity) {
+  }: Pick<
+    UserEntity,
+    | "id"
+    | "email"
+    | "firstname"
+    | "lastname"
+    | "passwordHash"
+    | "role"
+    | "confirmedAt"
+    | "createdAt"
+    | "isActiveField"
+  >) {
     return new UserEntity(
       id,
       firstname,
@@ -39,6 +50,10 @@ export class UserEntity {
 
   public isActive(): boolean {
     return this.isActiveField && !!this.confirmedAt;
+  }
+
+  public ban(): void {
+    this.isActiveField = false;
   }
 
   public hasRole({ role }: Pick<UserEntity, "role">): boolean {
