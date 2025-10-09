@@ -1,9 +1,13 @@
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
+import { UserEntity } from "@domain/entities/UserEntity";
 
 export interface ThreadRepository {
   saveThread(thread: ThreadEntity): Promise<void>;
-  findThreadById(id: string): Promise<ThreadEntity>;
-  findThreadsByUserId(userId: string): Promise<ThreadEntity[]>;
-  findThreadsByAdvisorId(advisorId: string): Promise<ThreadEntity[]>;
-  transferThread(advisorId: string, thread: ThreadEntity): Promise<void>;
+  findThreadById(id: ThreadEntity["id"]): Promise<ThreadEntity>;
+  findThreadsByUserId(userId: UserEntity["id"]): Promise<ThreadEntity[]>;
+  findThreadsByAdvisorId(advisorId: UserEntity["id"]): Promise<ThreadEntity[]>;
+  transferThread(
+    advisorId: UserEntity["id"],
+    thread: ThreadEntity
+  ): Promise<void>;
 }

@@ -1,8 +1,9 @@
 import { CreditEntity } from "@domain/entities/CreditEntity";
+import { UserEntity } from "@domain/entities/UserEntity";
 
 export interface CreditRepository {
-  findById(id: string): Promise<CreditEntity>;
-  findByUserId(userId: string): Promise<CreditEntity[]>;
+  findById(id: CreditEntity["id"]): Promise<CreditEntity>;
+  findByUserId(userId: UserEntity["id"]): Promise<CreditEntity[]>;
   findActiveCredits(): Promise<CreditEntity[]>;
   saveCredit(credit: CreditEntity): Promise<void>;
   updateCredit(credit: CreditEntity): Promise<void>;
