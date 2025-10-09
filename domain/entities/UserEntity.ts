@@ -13,26 +13,6 @@ export class UserEntity {
     public confirmedAt?: Date
   ) {}
 
-  public static create(props: {
-    firstname: string;
-    lastname: string;
-    email: Email;
-    passwordHash: string;
-    role: "client" | "conseiller" | "directeur";
-  }): UserEntity {
-    const now = new Date();
-    return new UserEntity(
-      crypto.randomUUID(),
-      props.firstname,
-      props.lastname,
-      props.email,
-      props.passwordHash,
-      props.role,
-      true,
-      now
-    );
-  }
-
   public static from({
     id,
     firstname,
