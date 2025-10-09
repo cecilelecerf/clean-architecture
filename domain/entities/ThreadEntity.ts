@@ -23,7 +23,7 @@ export class ThreadEntity {
     createdAt,
     lastUpdatedAt,
   }: ThreadEntity) {
-    return new ThreadEntity(id, participants, createdAt, lastUpdatedAt);
+    return new ThreadEntity(crypto.randomUUID(), participants, createdAt, lastUpdatedAt);
   }
   public addParticipant(userId: UserEntity["id"]): void {
     if (!this.participants.includes(userId)) {

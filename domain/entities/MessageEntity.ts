@@ -19,7 +19,7 @@ export class MessageEntity {
     sentAt,
     readAt,
   }: MessageEntity) {
-    return new MessageEntity(id, threadId, senderId, content, sentAt, readAt);
+    return new MessageEntity(crypto.randomUUID(), threadId, senderId, content, sentAt, readAt);
   }
 
   public markAsRead(): void {

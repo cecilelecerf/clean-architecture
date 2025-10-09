@@ -1,11 +1,11 @@
 import { Money } from "@domain/values/Money";
-import { UserEntity } from "./UserEntity";
+import { AccountEntity } from "./AccountEntity";
 
 export class TransactionEntity {
   private constructor(
     public id: string,
-    public fromAccountId: UserEntity["id"],
-    public toAccountId: UserEntity["id"],
+    public fromAccountId: AccountEntity["iban"],
+    public toAccountId: AccountEntity["iban"],
     public amount: Money,
     public date: Date,
     public type: "credit" | "debit"

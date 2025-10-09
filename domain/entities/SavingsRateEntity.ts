@@ -8,6 +8,6 @@ export class SavingsRateEntity {
   ) {}
 
   public static from({ id, rate, effectiveDate }: SavingsRateEntity) {
-    return new SavingsRateEntity(id, rate, effectiveDate);
+    return new SavingsRateEntity(crypto.randomUUID(), rate, effectiveDate);
   }
 }

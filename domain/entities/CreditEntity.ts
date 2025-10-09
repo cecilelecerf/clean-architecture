@@ -30,7 +30,7 @@ export class CreditEntity {
     remainingBalance,
   }: CreditEntity) {
     return new CreditEntity(
-      id,
+      crypto.randomUUID(),
       userId,
       principal,
       interestRate,

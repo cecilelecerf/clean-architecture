@@ -28,7 +28,7 @@ export class OrderEntity {
     status,
   }: OrderEntity) {
     return new OrderEntity(
-      id,
+      crypto.randomUUID(),
       userId,
       actionId,
       type,
