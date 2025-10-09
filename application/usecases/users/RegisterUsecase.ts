@@ -1,6 +1,4 @@
 import { EmailAlreadyExistsError } from "@application/errors/users/EmailAlreadyExistsError";
-import { InvalidCredentialsError } from "@application/errors/users/InvalidCredentialsError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { EmailService } from "@application/ports/services/EmailService";

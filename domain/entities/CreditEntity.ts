@@ -8,12 +8,12 @@ export class CreditEntity {
   private constructor(
     public id: string,
     public userId: UserEntity["id"],
-    public principal: Money,
-    // ? annuel
+    public initialAmount: Money,
+    // ? taux d'interet annuel
     public interestRate: Percentage,
     // ? sur le tota;
     public insuranceRate: Percentage,
-    public months: number,
+    public durationMonths: number,
     public startDate: Date,
     public monthlyPayment: Money,
     public remainingBalance: Money
@@ -21,37 +21,52 @@ export class CreditEntity {
   public static from({
     id,
     userId,
-    principal,
+    initialAmount,
     insuranceRate,
     interestRate,
     startDate,
     monthlyPayment,
-    months,
+    durationMonths,
     remainingBalance,
-  }: CreditEntity) {
+  }: Pick<
+    CreditEntity,
+    | "id"
+    | "userId"
+    | "initialAmount"
+    | "insuranceRate"
+    | "interestRate"
+    | "startDate"
+    | "monthlyPayment"
+    | "durationMonths"
+    | "remainingBalance"
+  >) {
     return new CreditEntity(
-      crypto.randomUUID(),
+      id,
       userId,
-      principal,
+      initialAmount,
       interestRate,
       insuranceRate,
-      months,
+      durationMonths,
       startDate,
       monthlyPayment,
       remainingBalance
     );
   }
 
+  public calculateInterestRateMonthly(interestRateMonthly: Percentage): number {
+    return interestRateMonthly.value / 12 / 100;
+  }
+
   public calculateMonthlyPayment(): Money {
-    const P = this.principal.amount;
-    const n = this.months;
-    const r = this.interestRate.value / 12 / 100;
+    const P = this.initialAmount.amount;
+    const n = this.durationMonths;
+    const r = this.calculateInterestRateMonthly(this.interestRate);
     const basePayment = (P * r) / (1 - Math.pow(1 + r, -n));
     const insurance = ((this.insuranceRate.value / 100) * P) / n;
 
     const paymentOrError = Money.create(
       basePayment + insurance,
-      this.principal.currency
+      this.initialAmount.currency
     );
     if (paymentOrError instanceof Error) {
       throw paymentOrError;
@@ -85,6 +100,7 @@ export class CreditEntity {
     this.remainingBalance = newRemainingBalance;
     return this;
   }
+
   public isFullyPaid(): boolean {
     return this.remainingBalance.amount <= 0;
   }
