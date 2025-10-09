@@ -30,6 +30,7 @@ export class RegisterUsecase {
     if (user.confirmedAt) return user;
 
     user.confirmedAt = this.clockService.now();
+    user.isActiveField = true;
 
     this.userRepository.updateUser(user);
     return user;

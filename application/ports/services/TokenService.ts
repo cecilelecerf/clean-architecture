@@ -10,4 +10,5 @@ export interface TokenService {
     token: string,
     expectedType?: "auth" | "confirmation"
   ): Promise<any>;
+  invalidateToken(token: string): Promise<void>;
 }
