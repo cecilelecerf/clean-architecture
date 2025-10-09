@@ -3,41 +3,46 @@ import { UserEntity } from "./UserEntity";
 export class ThreadEntity {
   private constructor(
     public id: string,
-    public participants: UserEntity["id"][],
+    public clientId: UserEntity["id"],
+    public advisorId: UserEntity["id"],
+    public title: string,
     public createdAt: Date,
-    public lastUpdatedAt: Date
+    public lastUpdatedAt: Date,
+    public isClose: boolean
   ) {}
-  public static create({
-    participants,
-  }: Pick<ThreadEntity, "participants">): ThreadEntity | Error {
-    if (participants.length < 2) {
-      return new Error("A thread must have at least two participants");
-    }
 
-    const now = new Date();
-    return new ThreadEntity(crypto.randomUUID(), participants, now, now);
-  }
   public static from({
     id,
-    participants,
+    clientId,
+    advisorId,
+    title,
     createdAt,
     lastUpdatedAt,
+    isClose,
   }: ThreadEntity) {
-    return new ThreadEntity(crypto.randomUUID(), participants, createdAt, lastUpdatedAt);
-  }
-  public addParticipant(userId: UserEntity["id"]): void {
-    if (!this.participants.includes(userId)) {
-      this.participants.push(userId);
-      this.lastUpdatedAt = new Date();
-    }
+    return new ThreadEntity(
+      id,
+      clientId,
+      advisorId,
+      title,
+      createdAt,
+      lastUpdatedAt,
+      isClose
+    );
   }
 
-  public removeParticipant(userId: UserEntity["id"]): void {
-    this.participants = this.participants.filter((id) => id !== userId);
+  public transferTo(newAdvisorId: UserEntity["id"]): void {
+    if (this.advisorId === newAdvisorId) return;
+    this.advisorId = newAdvisorId;
     this.lastUpdatedAt = new Date();
   }
 
-  public hasParticipant(userId: UserEntity["id"]): boolean {
-    return this.participants.includes(userId);
+  // Met à jour la date de dernier message / activité
+  public touch(): void {
+    this.lastUpdatedAt = new Date();
+  }
+
+  public close(): void {
+    this.isClose = true;
   }
 }
