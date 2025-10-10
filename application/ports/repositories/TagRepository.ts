@@ -2,7 +2,7 @@ import { TagEntity } from "@domain/entities/TagEntity";
 
 export interface TagRepository {
   /** 📬 Créer un nouveau tag */
-  create(tag: TagEntity): Promise<void>;
+  save(tag: TagEntity): Promise<void>;
 
   /** 🔍 Trouver un tag par son ID */
   findById(id: TagEntity["id"]): Promise<TagEntity | null>;

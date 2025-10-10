@@ -32,7 +32,7 @@ export class RegisterUsecase {
     user.confirmedAt = this.clockService.now();
     user.isActiveField = true;
 
-    this.userRepository.updateUser(user);
+    this.userRepository.update(user);
     return user;
   }
 }

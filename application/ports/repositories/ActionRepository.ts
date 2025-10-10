@@ -5,7 +5,7 @@ export interface ActionRepository {
   findAll(): Promise<ActionEntity[]>;
   findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]>;
   setAvailability(action: ActionEntity): Promise<void>;
-  saveAction(action: ActionEntity): Promise<void>;
-  updateAction(action: ActionEntity): Promise<void>;
-  deleteAction(action: ActionEntity): Promise<void>;
+  save(action: ActionEntity): Promise<void>;
+  update(action: ActionEntity): Promise<void>;
+  delete(action: ActionEntity): Promise<void>;
 }

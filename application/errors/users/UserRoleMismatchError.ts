@@ -5,7 +5,7 @@ export class UserRoleMismatchError extends Error {
 
   constructor(
     public readonly expectedRoles: UserEntity["role"][],
-    public readonly actualRole: string
+    public readonly actualRole: UserEntity["role"]
   ) {
     super(
       `Expected role "${expectedRoles.join(", ")}", but got "${actualRole}"`

@@ -63,7 +63,7 @@ export class RegisterAdvisorStatus {
       isActiveField: false,
     });
 
-    await this.userRepository.saveUser(user);
+    await this.userRepository.save(user);
 
     const token = await this.tokenService.generateConfirmationToken({
       userId: user.id,

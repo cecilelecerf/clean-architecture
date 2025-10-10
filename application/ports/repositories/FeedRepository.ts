@@ -4,7 +4,7 @@ import { UserEntity } from "@domain/entities/UserEntity";
 
 export interface FeedRepository {
   /** 📬 Créer un nouveau itemFeed */
-  create(feed: FeedItemEntity): Promise<void>;
+  save(feed: FeedItemEntity): Promise<void>;
 
   /** 🔍 Trouver un itemFeed par son ID */
   findById(id: FeedItemEntity["id"]): Promise<FeedItemEntity | null>;

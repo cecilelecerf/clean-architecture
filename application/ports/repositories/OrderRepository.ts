@@ -4,11 +4,11 @@ import { OrderEntity } from "@domain/entities/OrderEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 
 export interface OrderRepository {
-  findById(id: OrderEntity["id"]): Promise<OrderEntity>;
-  findByUserId(userId: UserEntity["id"]): Promise<OrderEntity[]>;
-  findByActionId(actionISIN: ActionEntity["ISIN"]): Promise<OrderEntity[]>;
-  findOpenOrders(): Promise<OrderEntity[]>;
-  saveOrder(order: OrderEntity): Promise<void>;
-  updateOrder(order: OrderEntity): Promise<void>;
-  deleteOrder(order: OrderEntity): Promise<void>;
+  findById(id: OrderEntity["id"]): Promise<OrderEntity | null>;
+  findAllByUserId(userId: UserEntity["id"]): Promise<OrderEntity[]>;
+  findAllByActionId(actionISIN: ActionEntity["ISIN"]): Promise<OrderEntity[]>;
+  findAllOpen(): Promise<OrderEntity[]>;
+  save(order: OrderEntity): Promise<void>;
+  update(order: OrderEntity): Promise<void>;
+  delete(order: OrderEntity): Promise<void>;
 }

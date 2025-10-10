@@ -22,6 +22,6 @@ export class BanClientUsecase {
       throw new UserRoleMismatchError(["client"], user.role);
 
     user.ban();
-    await this.userRepository.saveUser(user);
+    await this.userRepository.save(user);
   }
 }

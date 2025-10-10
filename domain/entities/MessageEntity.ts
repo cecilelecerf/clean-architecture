@@ -1,3 +1,4 @@
+import { ContentEmptyError } from "@domain/errors/message/ContentEmptyError";
 import { ThreadEntity } from "./ThreadEntity";
 import { UserEntity } from "./UserEntity";
 
@@ -8,7 +9,7 @@ export class MessageEntity {
     public senderId: UserEntity["id"],
     public content: string,
     public sentAt: Date,
-    public readAt?: Date
+    public readBy: UserEntity["id"][]
   ) {}
 
   public static from({
@@ -17,25 +18,26 @@ export class MessageEntity {
     senderId,
     content,
     sentAt,
-    readAt,
-  }: MessageEntity) {
-    return new MessageEntity(crypto.randomUUID(), threadId, senderId, content, sentAt, readAt);
+    readBy,
+  }: Pick<
+    MessageEntity,
+    "id" | "threadId" | "senderId" | "content" | "sentAt" | "readBy"
+  >) {
+    return new MessageEntity(id, threadId, senderId, content, sentAt, readBy);
   }
 
-  public markAsRead(): void {
-    if (!this.readAt) {
-      this.readAt = new Date();
-    }
+  public userRead(userId: UserEntity["id"]): void {
+    this.readBy = [...this.readBy, userId];
   }
-  public isUnread(): boolean {
-    return !this.readAt;
+  public isUnread(userId: UserEntity["id"]): boolean {
+    return this.readBy.includes(userId);
   }
   public isSentBy(userId: string): boolean {
     return this.senderId === userId;
   }
-  public validateContent(): void {
+  public validateContent(): void | ContentEmptyError {
     if (!this.content || this.content.trim() === "") {
-      throw new Error("Message content cannot be empty");
+      return new ContentEmptyError();
     }
   }
 }

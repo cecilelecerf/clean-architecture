@@ -5,7 +5,7 @@ export interface CreditRepository {
   findById(id: CreditEntity["id"]): Promise<CreditEntity | null>;
   findAllByUserId(userId: UserEntity["id"]): Promise<CreditEntity[]>;
   findActiveCredits(): Promise<CreditEntity[]>;
-  saveCredit(credit: CreditEntity): Promise<void>;
-  updateCredit(credit: CreditEntity): Promise<void>;
-  deleteCredit(credit: CreditEntity): Promise<void>;
+  save(credit: CreditEntity): Promise<void>;
+  update(credit: CreditEntity): Promise<void>;
+  delete(credit: CreditEntity): Promise<void>;
 }

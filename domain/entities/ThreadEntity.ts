@@ -3,13 +3,13 @@ import { UserEntity } from "./UserEntity";
 export class ThreadEntity {
   private constructor(
     public id: string,
-    public participantsId: UserEntity["id"][],
     public administratorId: UserEntity["id"],
+    public participantsId: UserEntity["id"][],
     public title: string,
     public createdAt: Date,
-    public lastUpdatedAt: Date,
     public isClose: boolean,
-    public type: "external" | "internal"
+    public type: "external" | "internal",
+    public lastUpdatedAt?: Date
   ) {}
 
   public static from({
@@ -34,13 +34,13 @@ export class ThreadEntity {
   >) {
     return new ThreadEntity(
       id,
-      participantsId,
       administratorId,
+      participantsId,
       title,
       createdAt,
-      lastUpdatedAt,
       isClose,
-      type
+      type,
+      lastUpdatedAt
     );
   }
 
@@ -52,5 +52,43 @@ export class ThreadEntity {
 
   public close(): void {
     this.isClose = true;
+  }
+  /** Vérifie si un utilisateur est participant du thread */
+  public isParticipant(userId: UserEntity["id"]): boolean {
+    return this.participantsId.includes(userId);
+  }
+
+  /** Vérifie si un utilisateur est l’administrateur du thread */
+  public isAdministrator(userId: UserEntity["id"]): boolean {
+    return this.administratorId === userId;
+  }
+
+  /** Vérifie si un utilisateur a accès au thread (admin ou participant) */
+  public hasAccess(userId: UserEntity["id"]): boolean {
+    return this.isAdministrator(userId) || this.isParticipant(userId);
+  }
+
+  public addParticipant(
+    userId: UserEntity["id"],
+    now: Date
+  ): ThreadEntity | Error {
+    if (this.hasAccess(userId)) return new Error();
+    this.participantsId = [...this.participantsId, userId];
+    this.lastUpdatedAt = now;
+    return this;
+  }
+
+  public removeParticipant(
+    userId: UserEntity["id"],
+    now: Date
+  ): ThreadEntity | Error {
+    if (!this.isParticipant(userId)) return new Error();
+    const index = this.participantsId.indexOf(userId);
+    if (index === -1) return new Error("User is not a participant");
+
+    this.participantsId.splice(index, 1);
+    this.lastUpdatedAt = now;
+
+    return this;
   }
 }

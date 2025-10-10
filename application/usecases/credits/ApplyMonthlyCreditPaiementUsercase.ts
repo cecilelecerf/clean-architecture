@@ -16,6 +16,6 @@ export class GrantCreditUsecase {
 
     const updatedCredit = credit.payMonthly();
     if (updatedCredit instanceof Error) throw updatedCredit;
-    await this.creditRepository.updateCredit(credit);
+    await this.creditRepository.update(credit);
   }
 }

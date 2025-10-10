@@ -87,7 +87,7 @@ export class GrantCreditUsecase {
       remainingBalance: initialAmountVO,
     });
 
-    await this.creditRepository.saveCredit(credit);
+    await this.creditRepository.save(credit);
     return credit;
   }
 }

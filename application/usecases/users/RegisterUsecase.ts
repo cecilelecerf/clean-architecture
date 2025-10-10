@@ -54,7 +54,7 @@ export class RegisterUsecase {
       isActiveField: false,
     });
 
-    this.userRepository.saveUser(user);
+    this.userRepository.save(user);
 
     const token = await this.tokenService.generateConfirmationToken({
       userId: user.id,

@@ -2,7 +2,7 @@ import { NotificationEntity } from "@domain/entities/NotificationEntity";
 
 export interface NotificationRepository {
   /** 📬 Créer une nouvelle notification */
-  create(notification: NotificationEntity): Promise<void>;
+  save(notification: NotificationEntity): Promise<void>;
 
   /** 🔍 Trouver une notification par son ID */
   findById(id: string): Promise<NotificationEntity | null>;
