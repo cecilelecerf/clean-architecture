@@ -14,6 +14,7 @@ export class ClientCreditsUsecase {
     private readonly creditRepository: CreditRepository,
     private readonly userRepository: UserRepository
   ) {}
+
   public async execute({ clientId }: Props): Promise<CreditEntity[]> {
     const client = await this.userRepository.findById(clientId);
     if (!client) throw new UserNotFoundError();

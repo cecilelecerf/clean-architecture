@@ -53,14 +53,10 @@ export class CreditEntity {
     );
   }
 
-  public calculateInterestRateMonthly(interestRateMonthly: Percentage): number {
-    return interestRateMonthly.value / 12 / 100;
-  }
-
   public calculateMonthlyPayment(): Money {
     const P = this.initialAmount.amount;
     const n = this.durationMonths;
-    const r = this.calculateInterestRateMonthly(this.interestRate);
+    const r = this.interestRate.value / 12 / 100;
     const basePayment = (P * r) / (1 - Math.pow(1 + r, -n));
     const insurance = ((this.insuranceRate.value / 100) * P) / n;
 
