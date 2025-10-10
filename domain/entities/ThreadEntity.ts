@@ -3,43 +3,51 @@ import { UserEntity } from "./UserEntity";
 export class ThreadEntity {
   private constructor(
     public id: string,
-    public clientId: UserEntity["id"],
-    public advisorId: UserEntity["id"],
+    public participantsId: UserEntity["id"][],
+    public administratorId: UserEntity["id"],
     public title: string,
     public createdAt: Date,
     public lastUpdatedAt: Date,
-    public isClose: boolean
+    public isClose: boolean,
+    public type: "external" | "internal"
   ) {}
 
   public static from({
     id,
-    clientId,
-    advisorId,
+    participantsId,
+    administratorId,
     title,
     createdAt,
     lastUpdatedAt,
     isClose,
-  }: ThreadEntity) {
+    type,
+  }: Pick<
+    ThreadEntity,
+    | "id"
+    | "administratorId"
+    | "createdAt"
+    | "lastUpdatedAt"
+    | "participantsId"
+    | "title"
+    | "isClose"
+    | "type"
+  >) {
     return new ThreadEntity(
       id,
-      clientId,
-      advisorId,
+      participantsId,
+      administratorId,
       title,
       createdAt,
       lastUpdatedAt,
-      isClose
+      isClose,
+      type
     );
   }
 
-  public transferTo(newAdvisorId: UserEntity["id"]): void {
-    if (this.advisorId === newAdvisorId) return;
-    this.advisorId = newAdvisorId;
-    this.lastUpdatedAt = new Date();
-  }
-
-  // Met à jour la date de dernier message / activité
-  public touch(): void {
-    this.lastUpdatedAt = new Date();
+  public transferTo(newAdvisorId: UserEntity["id"], now: Date): void {
+    if (this.administratorId === newAdvisorId) return;
+    this.administratorId = newAdvisorId;
+    this.lastUpdatedAt = now;
   }
 
   public close(): void {
