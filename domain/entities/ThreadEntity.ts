@@ -4,6 +4,7 @@ import { InvalidThreadAccessError } from "@domain/errors/thread/InvalidThreadAcc
 import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
 import { AdministratorCannotLeaveThreadError } from "@domain/errors/thread/AdministratorCannotLeaveThreadError";
 import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
+import { ThreadTransferToSameAdministratorError } from "@domain/errors/thread/ThreadTransferToSameAdministratorError";
 
 export class ThreadEntity {
   private constructor(
@@ -16,6 +17,40 @@ export class ThreadEntity {
     public type: "external" | "internal",
     public lastUpdatedAt?: Date
   ) {}
+
+  public static create({
+    id,
+    participantsId,
+    administratorId,
+    title,
+    createdAt,
+    lastUpdatedAt,
+    isClose,
+    type,
+  }: Pick<
+    ThreadEntity,
+    | "id"
+    | "administratorId"
+    | "createdAt"
+    | "lastUpdatedAt"
+    | "participantsId"
+    | "title"
+    | "isClose"
+    | "type"
+  >): ThreadEntity | InvalidTitleError {
+    const verifiedTitle = this.validateTitle(title);
+    if (verifiedTitle instanceof Error) return verifiedTitle;
+    return new ThreadEntity(
+      id,
+      administratorId,
+      participantsId,
+      verifiedTitle,
+      createdAt,
+      isClose,
+      type,
+      lastUpdatedAt
+    );
+  }
 
   public static from({
     id,
@@ -52,9 +87,13 @@ export class ThreadEntity {
   public transferTo(
     newAdvisorId: UserEntity["id"],
     now: Date
-  ): ThreadEntity | ThreadClosedError | Error {
+  ): ThreadEntity | ThreadClosedError | ThreadTransferToSameAdministratorError {
     if (this.isClose) return new ThreadClosedError(this.id);
-    if (this.administratorId === newAdvisorId) return new Error();
+    if (this.administratorId === newAdvisorId)
+      return new ThreadTransferToSameAdministratorError(
+        this.id,
+        this.administratorId
+      );
     this.administratorId = newAdvisorId;
     this.lastUpdatedAt = now;
     return this;
@@ -108,14 +147,24 @@ export class ThreadEntity {
     return this;
   }
 
+  public static validateTitle(
+    newTitle: ThreadEntity["title"]
+  ): InvalidTitleError | ThreadEntity["title"] {
+    const trimedTitle = newTitle.trim();
+    if (trimedTitle.length < 3 || trimedTitle.length > 50)
+      return new InvalidTitleError(newTitle);
+    return trimedTitle;
+  }
+
   public updateTitle(
     newTitle: string,
     now: Date
   ): ThreadEntity | InvalidTitleError | ThreadClosedError {
     if (this.isClose) return new ThreadClosedError(this.id);
-    if (newTitle.trim().length < 3) return new InvalidTitleError(newTitle);
+    const validatedTitle = ThreadEntity.validateTitle(newTitle);
+    if (validatedTitle instanceof Error) return validatedTitle;
+    this.title = validatedTitle;
 
-    this.title = newTitle.trim();
     this.lastUpdatedAt = now;
     return this;
   }

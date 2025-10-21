@@ -5,6 +5,7 @@ import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidE
 import { Percentage } from "@domain/values/Percentage";
 import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
 import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
+import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
 
 export class CreditEntity {
   private constructor(
@@ -80,12 +81,13 @@ export class CreditEntity {
    * 💸 Effectue le paiement d’une mensualité.
    * Retourne soit le crédit mis à jour, soit une erreur métier.
    */
-  // TODO : fixe Error
   public payMonthly():
     | CreditEntity
     | CreditAlreadyPaidError
-    | MoneyAmountNegativeError
-    | Error {
+    | MoneyCurrencyMissingError
+    | MoneyCurrencyMismatchError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError {
     if (this.isFullyPaid()) {
       return new CreditAlreadyPaidError(this.id);
     }

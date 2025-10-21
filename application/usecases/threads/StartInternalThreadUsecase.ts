@@ -15,7 +15,7 @@ type Props = {} & Pick<
   "title" | "participantsId" | "administratorId"
 >;
 
-export class StartExternalThreadUsecase {
+export class StartInternalThreadUsecase {
   constructor(
     private readonly threadRepository: ThreadRepository,
     private readonly userRepository: UserRepository,
@@ -34,19 +34,25 @@ export class StartExternalThreadUsecase {
     | UserNotActiveError
     | InvalidTitleError
   > {
-    const advisor = await findActiveUser(this.userRepository, administratorId);
-    if (advisor instanceof Error) return advisor;
+    const administrator = await findActiveUser(
+      this.userRepository,
+      administratorId
+    );
+    if (administrator instanceof Error) return administrator;
 
-    if (!advisor?.hasRole({ role: "conseiller" }))
-      return new UserRoleMismatchError(["conseiller"], advisor.role);
+    if (!administrator?.hasRole({ role: "directeur" }))
+      return new UserRoleMismatchError(["directeur"], administrator.role);
 
-    if (participantsId.length !== 1)
-      return new InvalidThreadParticipantsError();
+    participantsId.map(async (participantId) => {
+      const participant = await findActiveUser(
+        this.userRepository,
+        participantId
+      );
+      if (participant instanceof Error) return participant;
 
-    const client = await findActiveUser(this.userRepository, participantsId[0]);
-    if (client instanceof Error) return client;
-
-    if (!client?.hasRole({ role: "client" })) return new UserNotFoundError();
+      if (!participant?.hasRole({ role: "conseiller" }))
+        return new UserRoleMismatchError(["conseiller"], participant.role);
+    });
 
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
@@ -54,15 +60,16 @@ export class StartExternalThreadUsecase {
     const thread = ThreadEntity.create({
       id,
       createdAt,
-      type: "external",
+      type: "internal",
       participantsId,
       administratorId,
       title,
       isClose: false,
     });
+
     if (thread instanceof Error) return thread;
 
-    await this.threadRepository.save(thread);
+    this.threadRepository.save(thread);
     return thread;
   }
 }

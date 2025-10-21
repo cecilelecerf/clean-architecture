@@ -34,7 +34,6 @@ export class GrantCreditUsecase {
     private readonly creadiAmortizationService: CreditAmortizationService,
     private readonly clockService: ClockService
   ) {}
-  // TODO : Fixe error
   public async execute({
     clientId,
     actorId,
@@ -53,7 +52,6 @@ export class GrantCreditUsecase {
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
     | InvalidPercentageError
-    | Error
   > {
     const actor = await findActiveUser(this.userRepository, actorId);
     if (actor instanceof Error) return actor;

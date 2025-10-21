@@ -1,3 +1,5 @@
+import { InvalidCreditDurationError } from "@application/errors/credits/InvalidCreditDurationError";
+import { InvalidPercentageError } from "@domain/errors/percentage/InvalidPercentageError";
 import { Money } from "@domain/values/Money";
 import { Percentage } from "@domain/values/Percentage";
 
@@ -16,5 +18,5 @@ export interface CreditAmortizationService {
     annualInterestRate: Percentage,
     insuranceRate: Percentage,
     durationMonths: number
-  ): Promise<Money | Error>;
+  ): Promise<Money | InvalidCreditDurationError | InvalidPercentageError>;
 }

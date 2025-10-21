@@ -3,12 +3,13 @@ import { CreditRepository } from "@application/ports/repositories/CreditReposito
 import { CreditEntity } from "@domain/entities/CreditEntity";
 import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
 import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
+import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
+import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
 
 type Props = {} & Pick<CreditEntity, "id">;
 
 export class GrantCreditUsecase {
   constructor(private readonly creditRepository: CreditRepository) {}
-  // TODO Fix Error
   public async execute({
     id,
   }: Props): Promise<
@@ -16,7 +17,8 @@ export class GrantCreditUsecase {
     | CreditNotFoundError
     | CreditAlreadyPaidError
     | MoneyAmountNegativeError
-    | Error
+    | MoneyCurrencyMissingError
+    | MoneyCurrencyMismatchError
   > {
     const credit = await this.creditRepository.findById(id);
     if (!credit) return new CreditNotFoundError();

@@ -48,7 +48,7 @@ export class UpdateThreadTitleUsecase {
     const updatedThread = thread.updateTitle(title, this.clockService.now());
     if (updatedThread instanceof Error) return updatedThread;
 
-    this.threadRepository.save(updatedThread);
+    await this.threadRepository.update(updatedThread);
     return updatedThread;
   }
 }

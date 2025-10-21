@@ -42,14 +42,10 @@ export class AccountEntity {
     return this;
   }
 
-  // TODO : fixe Error
   // Retirer de l'argent
   public withdraw(
     amount: Money
   ): MoneyCurrencyMismatchError | MoneyAmountNegativeError | AccountEntity {
-    if (this.balance.amount < amount.amount) {
-      return new Error("Insufficient funds");
-    }
     const newBalence = this.balance.subtract(amount);
     if (newBalence instanceof Error) return newBalence;
 

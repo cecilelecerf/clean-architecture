@@ -2,6 +2,7 @@ import { Money } from "@domain/values/Money";
 import { ActionEntity } from "./ActionEntity";
 import { UserEntity } from "./UserEntity";
 import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
+import { InvalidOrderStatusTransitionError } from "@domain/errors/order/InvalidOrderStatusTransitionError";
 
 export class OrderEntity {
   private constructor(
@@ -46,17 +47,25 @@ export class OrderEntity {
     }
     return totalPrice.add(this.fee);
   }
-  public markExecuted(): OrderEntity | Error {
+  public markExecuted(): OrderEntity | InvalidOrderStatusTransitionError {
     if (this.status !== "pending") {
-      return new Error("Only pending orders can be executed");
+      return new InvalidOrderStatusTransitionError(
+        this.id,
+        this.status,
+        "pending"
+      );
     }
     this.status = "executed";
     return this;
   }
 
-  public markCancelled(): OrderEntity | Error {
+  public markCancelled(): OrderEntity | InvalidOrderStatusTransitionError {
     if (this.status !== "pending") {
-      return new Error("Only pending orders can be cancelled");
+      return new InvalidOrderStatusTransitionError(
+        this.id,
+        this.status,
+        "pending"
+      );
     }
     this.status = "cancelled";
     return this;
