@@ -1,20 +1,20 @@
 import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
 import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
-import { FeedRepository } from "@application/ports/repositories/FeedRepository";
+import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { FeedItemEntity } from "@domain/entities/FeedItemEntity";
+import { PostEntity } from "@domain/entities/PostEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 type Props = { tagsId: TagEntity["id"][]; published?: boolean } & Pick<
-  FeedItemEntity,
+  PostEntity,
   "content" | "title" | "advisorId"
 >;
-export class AddMessageInFeedUsecase {
+export class AddMessageInPostUsecase {
   constructor(
-    private readonly feedRepository: FeedRepository,
+    private readonly feedRepository: PostRepository,
     private readonly tagRepository: TagRepository,
     private readonly userRepository: UserRepository,
     private readonly uuidService: UuidService,
@@ -46,7 +46,7 @@ export class AddMessageInFeedUsecase {
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
 
-    const feedItem = FeedItemEntity.create({
+    const post = PostEntity.create({
       id,
       createdAt,
       advisorId: advisor.id,
@@ -55,8 +55,8 @@ export class AddMessageInFeedUsecase {
       tagsId: tags.map((tag) => tag.id),
       publishedAt: published ? createdAt : undefined,
     });
-    if (feedItem instanceof Error) return feedItem;
-    await this.feedRepository.save(feedItem);
+    if (post instanceof Error) return post;
+    await this.feedRepository.save(post);
   }
 }
 

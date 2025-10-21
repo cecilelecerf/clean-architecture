@@ -1,20 +1,20 @@
-import { FeedItemNotFoundError } from "@application/errors/feed/FeedItemNotFoundError";
-import { InvalidFeedItemAccessError } from "@application/errors/feed/InvalidFeedItemAccessError";
+import { PostNotFoundError } from "@application/errors/posts/PostNotFoundError";
+import { InvalidPostAccessError } from "@application/errors/posts/InvalidPostAccessError";
 import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
 import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
-import { FeedRepository } from "@application/ports/repositories/FeedRepository";
+import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { FeedItemEntity } from "@domain/entities/FeedItemEntity";
-type Props = { userId: FeedItemEntity["advisorId"] } & Pick<
-  FeedItemEntity,
+import { PostEntity } from "@domain/entities/PostEntity";
+type Props = { userId: PostEntity["advisorId"] } & Pick<
+  PostEntity,
   "content" | "title" | "id"
 >;
-export class EditMessageInFeedUsecase {
+export class EditMessageInPostUsecase {
   constructor(
-    private readonly feedRepository: FeedRepository,
+    private readonly feedRepository: PostRepository,
     private readonly userRepository: UserRepository,
     private readonly clockService: ClockService
   ) {}
@@ -22,30 +22,30 @@ export class EditMessageInFeedUsecase {
     userId,
     title,
     content,
-    id: feedItemId,
+    id: postId,
   }: Props): Promise<
-    | FeedItemEntity
+    | PostEntity
     | UserNotFoundError
     | UserNotActiveError
-    | FeedItemNotFoundError
+    | PostNotFoundError
     | UserRoleMismatchError
-    | InvalidFeedItemAccessError
+    | InvalidPostAccessError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    const feedItem = await this.feedRepository.findById(feedItemId);
-    if (!feedItem) return new FeedItemNotFoundError();
+    const post = await this.feedRepository.findById(postId);
+    if (!post) return new PostNotFoundError();
 
-    const access = feedItem.permissionToModify(user);
+    const access = post.permissionToModify(user);
     if (access instanceof Error) return access;
 
     const updatedAt = this.clockService.now();
 
-    feedItem.editContent(content, updatedAt);
-    feedItem.editTitle(title, updatedAt);
+    post.editContent(content, updatedAt);
+    post.editTitle(title, updatedAt);
 
-    await this.feedRepository.update(feedItem);
-    return feedItem;
+    await this.feedRepository.update(post);
+    return post;
   }
 }

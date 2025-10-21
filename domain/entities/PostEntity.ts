@@ -1,11 +1,11 @@
-import { InvalidFeedTitleError } from "@domain/errors/feed/InvalidFeedTitleError";
+import { InvalidPostTitleError as InvalidPostTitleError } from "@domain/errors/posts/InvalidPostTitleError";
 import { TagEntity } from "./TagEntity";
 import { UserEntity } from "./UserEntity";
-import { InvalidFeedContentError } from "@domain/errors/feed/InvalidFeedContentError";
 import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
-import { InvalidFeedItemAccessError } from "@application/errors/feed/InvalidFeedItemAccessError";
+import { InvalidPostAccessError } from "@application/errors/posts/InvalidPostAccessError";
+import { InvalidPostContentError } from "@domain/errors/posts/InvalidPostContentError";
 
-export class FeedItemEntity {
+export class PostEntity {
   private constructor(
     public id: string,
     public advisorId: UserEntity["id"],
@@ -28,7 +28,7 @@ export class FeedItemEntity {
     modifiedAt,
     publishedAt,
   }: Pick<
-    FeedItemEntity,
+    PostEntity,
     | "id"
     | "advisorId"
     | "title"
@@ -37,13 +37,13 @@ export class FeedItemEntity {
     | "createdAt"
     | "modifiedAt"
     | "publishedAt"
-  >): FeedItemEntity | InvalidFeedContentError | InvalidFeedTitleError {
+  >): PostEntity | InvalidPostContentError | InvalidPostTitleError {
     const verifiedContent = this.verifyContent(content);
     if (verifiedContent instanceof Error) return verifiedContent;
 
     const verifiedTitle = this.verifyTitle(title);
     if (verifiedTitle instanceof Error) return verifiedTitle;
-    return new FeedItemEntity(
+    return new PostEntity(
       id,
       advisorId,
       verifiedTitle,
@@ -67,7 +67,7 @@ export class FeedItemEntity {
     publishedAt,
     readBy,
   }: Pick<
-    FeedItemEntity,
+    PostEntity,
     | "id"
     | "advisorId"
     | "title"
@@ -78,7 +78,7 @@ export class FeedItemEntity {
     | "publishedAt"
     | "readBy"
   >) {
-    return new FeedItemEntity(
+    return new PostEntity(
       id,
       advisorId,
       title,
@@ -92,10 +92,10 @@ export class FeedItemEntity {
   }
 
   public editContent(
-    newContent: FeedItemEntity["content"],
+    newContent: PostEntity["content"],
     now: Date
-  ): FeedItemEntity | InvalidFeedContentError {
-    const verifiedContent = FeedItemEntity.verifyContent(newContent);
+  ): PostEntity | InvalidPostContentError {
+    const verifiedContent = PostEntity.verifyContent(newContent);
     if (verifiedContent instanceof Error) return verifiedContent;
     this.content = verifiedContent;
     this.modifiedAt = now;
@@ -103,10 +103,10 @@ export class FeedItemEntity {
   }
 
   public editTitle(
-    newTitle: FeedItemEntity["title"],
+    newTitle: PostEntity["title"],
     now: Date
-  ): FeedItemEntity | InvalidFeedTitleError {
-    const verifiedTitle = FeedItemEntity.verifyTitle(newTitle);
+  ): PostEntity | InvalidPostTitleError {
+    const verifiedTitle = PostEntity.verifyTitle(newTitle);
     if (verifiedTitle instanceof Error) return verifiedTitle;
     this.title = verifiedTitle;
     this.modifiedAt = now;
@@ -114,19 +114,19 @@ export class FeedItemEntity {
   }
 
   public static verifyContent(
-    content: FeedItemEntity["content"]
-  ): InvalidFeedContentError | FeedItemEntity["content"] {
+    content: PostEntity["content"]
+  ): InvalidPostContentError | PostEntity["content"] {
     const trimedContent = content.trim();
     if (trimedContent.length < 10 || trimedContent.length > 200)
-      return new InvalidFeedContentError();
+      return new InvalidPostContentError();
     return trimedContent;
   }
   public static verifyTitle(
-    title: FeedItemEntity["title"]
-  ): InvalidFeedTitleError | FeedItemEntity["title"] {
+    title: PostEntity["title"]
+  ): InvalidPostTitleError | PostEntity["title"] {
     const trimedTitle = title.trim();
     if (trimedTitle.length < 10 || trimedTitle.length > 100)
-      return new InvalidFeedTitleError();
+      return new InvalidPostTitleError();
     return trimedTitle;
   }
 
@@ -136,15 +136,15 @@ export class FeedItemEntity {
 
   public permissionToModify(
     user: UserEntity
-  ): UserRoleMismatchError | InvalidFeedItemAccessError | undefined {
+  ): UserRoleMismatchError | InvalidPostAccessError | undefined {
     if (user.hasRole({ role: "client" }))
       return new UserRoleMismatchError(["conseiller", "directeur"], user.role);
     if (user.hasRole({ role: "conseiller" }) && user.id === this.advisorId) {
-      return new InvalidFeedItemAccessError(user.id, this.id);
+      return new InvalidPostAccessError(user.id, this.id);
     }
   }
 
-  public markAsRead(userId: UserEntity["id"]): FeedItemEntity {
+  public markAsRead(userId: UserEntity["id"]): PostEntity {
     if (!this.isReadBy(userId) && !!this.publishedAt) {
       this.readBy.push(userId);
     }
