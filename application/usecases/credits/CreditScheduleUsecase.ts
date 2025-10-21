@@ -1,9 +1,11 @@
 import { CreditNotBelongsToClientError } from "@application/errors/credits/CreditNotBelongsToClientError";
 import { CreditNotFoundError } from "@application/errors/credits/CreditNotFoundError";
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
 import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { findActiveUser } from "@application/utils/userValidators";
 import { CreditEntity } from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { Money } from "@domain/values/Money";
@@ -28,17 +30,24 @@ export class CreditScheduleUsecase {
   public async execute({
     clientId,
     creditId,
-  }: Props): Promise<MonthlySchedule[] | Error> {
-    const client = await this.userRepository.findById(clientId);
-    if (!client) throw new UserNotFoundError();
+  }: Props): Promise<
+    | UserNotFoundError
+    | UserNotActiveError
+    | MonthlySchedule[]
+    | UserRoleMismatchError
+    | CreditNotFoundError
+    | CreditNotBelongsToClientError
+  > {
+    const client = await findActiveUser(this.userRepository, clientId);
+    if (client instanceof Error) return client;
     if (!client.hasRole({ role: "client" }))
-      throw new UserRoleMismatchError(["client"], client.role);
+      return new UserRoleMismatchError(["client"], client.role);
 
     const credit = await this.creditRepository.findById(creditId);
 
-    if (!credit) throw new CreditNotFoundError();
+    if (!credit) return new CreditNotFoundError();
     if (credit.userId !== client.id)
-      throw new CreditNotBelongsToClientError(credit.id, client.id);
+      return new CreditNotBelongsToClientError(credit.id, client.id);
 
     const simulatedCredit = CreditEntity.from({
       ...credit,
@@ -50,7 +59,7 @@ export class CreditScheduleUsecase {
       const after = simulatedCredit.getRemainingBalance();
 
       const capitalPaid = before.subtract(after);
-      if (capitalPaid instanceof Error) throw capitalPaid;
+      if (capitalPaid instanceof Error) return capitalPaid;
 
       return monthlySchedule.push({
         capitalPaid,

@@ -8,51 +8,60 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
+import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
 
-type Props = { userId: UserEntity["id"] } & Pick<
-  ThreadEntity,
-  "id" | "administratorId"
->;
+type Props = {
+  userId: UserEntity["id"];
+  threadId: ThreadEntity["id"];
+  title: string;
+};
 
-export class RemoveParticipantUsecase {
+export class UpdateThreadTitleUsecase {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly threadRepository: ThreadRepository,
     private readonly clockService: ClockService
   ) {}
   public async execute({
-    id,
+    threadId,
     userId,
-    administratorId,
+    title,
   }: Props): Promise<
     | ThreadEntity
     | ThreadNotFoundError
     | InvalidThreadAccessError
     | UserNotFoundError
+    | InvalidTitleError
+    | ThreadClosedError
     | UserNotActiveError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    const administrator = await findActiveUser(
-      this.userRepository,
-      administratorId
-    );
-    if (administrator instanceof Error) return administrator;
-
-    const thread = await this.threadRepository.findById(id);
+    const thread = await this.threadRepository.findById(threadId);
     if (!thread) return new ThreadNotFoundError();
 
-    if (!thread.isAdministrator(administrator.id))
-      return new InvalidThreadAccessError(administrator.id, thread.id);
+    if (!thread.isAdministrator(user.id))
+      return new InvalidThreadAccessError(user.id, thread.id);
 
-    const updateThread = thread.removeParticipant(
-      user.id,
-      this.clockService.now()
-    );
-    if (updateThread instanceof Error) return updateThread;
+    const updatedThread = thread.updateTitle(title, this.clockService.now());
+    if (updatedThread instanceof Error) return updatedThread;
 
-    this.threadRepository.save(updateThread);
-    return updateThread;
+    this.threadRepository.save(updatedThread);
+    return updatedThread;
   }
 }
+/* 
+Règle métier 
+  - Nombre de caractère max
+  - Nombre de caractère min
+  - Tim
+  - Vérfier si close
+  - Update la date de modification
+
+Règle applicative 
+  - Que l'admin peut le faire
+  - Le user existe
+  - Le thread existe
+*/

@@ -1,18 +1,20 @@
 import { InvalidThreadAccessError } from "@application/errors/threads/InvalidThreadAccessError";
 import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
+import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { ThreadParticipantAlreadyExistError } from "@domain/errors/thread/ThreadParticipantAlreadyExistError";
 
 type Props = { userId: UserEntity["id"] } & Pick<
   ThreadEntity,
   "id" | "administratorId"
 >;
 
-export class AddParticipant {
+export class AddParticipantUsecase {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly threadRepository: ThreadRepository,
@@ -23,13 +25,20 @@ export class AddParticipant {
     userId,
     administratorId,
   }: Props): Promise<
-    ThreadEntity | ThreadNotFoundError | InvalidThreadAccessError | Error
+    | ThreadEntity
+    | ThreadNotFoundError
+    | InvalidThreadAccessError
+    | ThreadParticipantAlreadyExistError
+    | UserNotActiveError
   > {
-    const user = await this.userRepository.findById(userId);
-    if (!user) return new UserNotFoundError();
+    const user = await findActiveUser(this.userRepository, userId);
+    if (user instanceof Error) return user;
 
-    const administrator = await this.userRepository.findById(administratorId);
-    if (!administrator) return new UserNotFoundError();
+    const administrator = await findActiveUser(
+      this.userRepository,
+      administratorId
+    );
+    if (administrator instanceof Error) return administrator;
 
     const thread = await this.threadRepository.findById(id);
     if (!thread) return new ThreadNotFoundError();

@@ -46,18 +46,20 @@ export class OrderEntity {
     }
     return totalPrice.add(this.fee);
   }
-  public markExecuted(): void {
+  public markExecuted(): OrderEntity | Error {
     if (this.status !== "pending") {
-      throw new Error("Only pending orders can be executed");
+      return new Error("Only pending orders can be executed");
     }
     this.status = "executed";
+    return this;
   }
 
-  public markCancelled(): void {
+  public markCancelled(): OrderEntity | Error {
     if (this.status !== "pending") {
-      throw new Error("Only pending orders can be cancelled");
+      return new Error("Only pending orders can be cancelled");
     }
     this.status = "cancelled";
+    return this;
   }
   public isBuy(): boolean {
     return this.type === "buy";

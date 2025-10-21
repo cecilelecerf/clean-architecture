@@ -1,4 +1,5 @@
 import { EmailAlreadyExistsError } from "@application/errors/users/EmailAlreadyExistsError";
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
 import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
@@ -8,7 +9,9 @@ import { EncryptionService } from "@application/ports/services/EncryptionService
 import { PasswordGenerateService } from "@application/ports/services/PasswordGenerateService";
 import { TokenService } from "@application/ports/services/TokenService";
 import { UuidService } from "@application/ports/services/UuidService";
+import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import { Email } from "@domain/values/Email";
 
 type Props = {
@@ -34,17 +37,25 @@ export class RegisterAdvisorStatus {
     email,
     confirmationUrl,
     directorId,
-  }: Props) {
-    const actor = await this.userRepository.findById(directorId);
-    if (!actor) throw new UserNotFoundError();
+  }: Props): Promise<
+    | UserNotFoundError
+    | UserNotActiveError
+    | EmailInvalidFormatError
+    | EmailAlreadyExistsError
+    | UserRoleMismatchError
+    | UserEntity
+  > {
+    const actor = await findActiveUser(this.userRepository, directorId);
+    if (actor instanceof Error) return actor;
+
     if (!actor.hasRole({ role: "directeur" }))
-      throw new UserRoleMismatchError(["directeur"], actor.role);
+      return new UserRoleMismatchError(["directeur"], actor.role);
 
     const emailVO = Email.create(email);
-    if (emailVO instanceof Error) throw emailVO;
+    if (emailVO instanceof Error) return emailVO;
 
     const existingUser = await this.userRepository.findByEmail(emailVO);
-    if (existingUser) throw new EmailAlreadyExistsError(emailVO);
+    if (existingUser) return new EmailAlreadyExistsError(emailVO);
 
     const plainedPassword = this.passwordGenerateService.generate();
     const passwordHash = await this.encryptionService.hash(plainedPassword);
@@ -80,5 +91,6 @@ export class RegisterAdvisorStatus {
       Pense à changer de mot de passe lors de ta première connexion.
       `,
     });
+    return user;
   }
 }

@@ -3,6 +3,8 @@ import { UserEntity } from "./UserEntity";
 import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
 import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
 import { Percentage } from "@domain/values/Percentage";
+import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
+import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
 
 export class CreditEntity {
   private constructor(
@@ -53,7 +55,11 @@ export class CreditEntity {
     );
   }
 
-  public calculateMonthlyPayment(): Money {
+  public calculateMonthlyPayment():
+    | Money
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError {
     const P = this.initialAmount.amount;
     const n = this.durationMonths;
     const r = this.interestRate.value / 12 / 100;
@@ -65,7 +71,7 @@ export class CreditEntity {
       this.initialAmount.currency
     );
     if (paymentOrError instanceof Error) {
-      throw paymentOrError;
+      return paymentOrError;
     }
     return paymentOrError;
   }
@@ -74,6 +80,7 @@ export class CreditEntity {
    * 💸 Effectue le paiement d’une mensualité.
    * Retourne soit le crédit mis à jour, soit une erreur métier.
    */
+  // TODO : fixe Error
   public payMonthly():
     | CreditEntity
     | CreditAlreadyPaidError

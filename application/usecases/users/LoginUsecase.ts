@@ -19,14 +19,18 @@ export class LoginUsecase {
   public async execute({
     email,
     plainedPassword,
-  }: Props): Promise<{ user: UserEntity; token: string }> {
+  }: Props): Promise<
+    | { user: UserEntity; token: string }
+    | UserNotFoundError
+    | InvalidCredentialsError
+  > {
     const user = await this.userRepository.findByEmail(email);
-    if (!user) throw new UserNotFoundError();
+    if (!user) return new UserNotFoundError();
     const isValidPassword = await this.encryptionService.compare(
       plainedPassword,
       user.passwordHash
     );
-    if (!isValidPassword) throw new InvalidCredentialsError();
+    if (!isValidPassword) return new InvalidCredentialsError();
     const token = await this.tokenService.generateAuthToken({
       userId: user.id,
     });

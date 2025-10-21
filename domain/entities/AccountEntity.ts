@@ -1,6 +1,8 @@
 import { IBAN } from "@domain/values/IBAN";
 import { UserEntity } from "./UserEntity";
 import { Money } from "@domain/values/Money";
+import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
+import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
 
 export class AccountEntity {
   private constructor(
@@ -33,16 +35,26 @@ export class AccountEntity {
     );
   }
 
-  public deposit(amount: Money): void {
-    this.balance = this.balance.add(amount);
+  public deposit(amount: Money): AccountEntity | MoneyCurrencyMismatchError {
+    const newBalence = this.balance.add(amount);
+    if (newBalence instanceof Error) return newBalence;
+    this.balance = newBalence;
+    return this;
   }
 
+  // TODO : fixe Error
   // Retirer de l'argent
-  public withdraw(amount: Money): void {
+  public withdraw(
+    amount: Money
+  ): MoneyCurrencyMismatchError | MoneyAmountNegativeError | AccountEntity {
     if (this.balance.amount < amount.amount) {
-      throw new Error("Insufficient funds");
+      return new Error("Insufficient funds");
     }
-    this.balance = this.balance.subtract(amount);
+    const newBalence = this.balance.subtract(amount);
+    if (newBalence instanceof Error) return newBalence;
+
+    this.balance = newBalence;
+    return this;
   }
 
   // Obtenir le solde actuel

@@ -16,16 +16,18 @@ export class RegisterUsecase {
     private readonly tokenService: TokenService
   ) {}
 
-  public async execute({ token }: Props): Promise<UserEntity | Error> {
+  public async execute({
+    token,
+  }: Props): Promise<UserEntity | InvalidTokenError | UserNotFoundError> {
     const payload = await this.tokenService.validateToken(
       token,
       "confirmation"
     );
-    if (!payload || payload.id) throw new InvalidTokenError();
+    if (!payload || payload.id) return new InvalidTokenError();
 
     const user = await this.userRepository.findById(payload.id);
 
-    if (!user) throw UserNotFoundError;
+    if (!user) return new UserNotFoundError();
 
     if (user.confirmedAt) return user;
 

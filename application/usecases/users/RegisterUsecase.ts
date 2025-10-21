@@ -6,6 +6,7 @@ import { EncryptionService } from "@application/ports/services/EncryptionService
 import { TokenService } from "@application/ports/services/TokenService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import { Email } from "@domain/values/Email";
 
 type Props = {
@@ -30,12 +31,14 @@ export class RegisterUsecase {
     email,
     plainedPassword,
     confirmationUrl,
-  }: Props) {
+  }: Props): Promise<
+    UserEntity | EmailInvalidFormatError | EmailAlreadyExistsError
+  > {
     const emailVO = Email.create(email);
-    if (emailVO instanceof Error) throw emailVO;
+    if (emailVO instanceof Error) return emailVO;
 
     const existingUser = await this.userRepository.findByEmail(emailVO);
-    if (existingUser) throw new EmailAlreadyExistsError(emailVO);
+    if (existingUser) return new EmailAlreadyExistsError(emailVO);
 
     const passwordHash = await this.encryptionService.hash(plainedPassword);
 
@@ -66,5 +69,6 @@ export class RegisterUsecase {
       subject: "Bienvenue sur notre plateform",
       text: `Clique ici pour valider ton inscription : ${confirmationLink}`,
     });
+    return user;
   }
 }

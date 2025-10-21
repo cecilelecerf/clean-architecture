@@ -1,13 +1,16 @@
 import { InvalidThreadAccessError } from "@application/errors/threads/InvalidThreadAccessError";
 import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
 import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { MessageRepository } from "@application/ports/repositories/MessageRepository";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
+import { findActiveUser } from "@application/utils/userValidators";
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ContentEmptyError } from "@domain/errors/message/ContentEmptyError";
+import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
 
 type Props = {} & Pick<MessageEntity, "content" | "senderId" | "threadId">;
 
@@ -29,12 +32,15 @@ export class SendMessage {
     | ThreadNotFoundError
     | InvalidThreadAccessError
     | ContentEmptyError
+    | ThreadClosedError
+    | UserNotActiveError
   > {
-    const user = await this.userRepository.findById(senderId);
-    if (!user) return new UserNotFoundError();
+    const user = await findActiveUser(this.userRepository, senderId);
+    if (user instanceof Error) return user;
 
     const thread = await this.threadRepository.findById(threadId);
     if (!thread) return new ThreadNotFoundError();
+    if (thread.isClose) return new ThreadClosedError(thread.id);
 
     if (!thread.hasAccess(user.id))
       return new InvalidThreadAccessError(user.id, thread.id);

@@ -1,4 +1,9 @@
+import { ThreadParticipantAlreadyExistError } from "@domain/errors/thread/ThreadParticipantAlreadyExistError";
 import { UserEntity } from "./UserEntity";
+import { InvalidThreadAccessError } from "@domain/errors/thread/InvalidThreadAccessError";
+import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
+import { AdministratorCannotLeaveThreadError } from "@domain/errors/thread/AdministratorCannotLeaveThreadError";
+import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
 
 export class ThreadEntity {
   private constructor(
@@ -44,13 +49,19 @@ export class ThreadEntity {
     );
   }
 
-  public transferTo(newAdvisorId: UserEntity["id"], now: Date): void {
-    if (this.administratorId === newAdvisorId) return;
+  public transferTo(
+    newAdvisorId: UserEntity["id"],
+    now: Date
+  ): ThreadEntity | ThreadClosedError | Error {
+    if (this.isClose) return new ThreadClosedError(this.id);
+    if (this.administratorId === newAdvisorId) return new Error();
     this.administratorId = newAdvisorId;
     this.lastUpdatedAt = now;
+    return this;
   }
 
-  public close(): void {
+  public close(now: Date): void {
+    this.lastUpdatedAt = now;
     this.isClose = true;
   }
   /** Vérifie si un utilisateur est participant du thread */
@@ -71,8 +82,10 @@ export class ThreadEntity {
   public addParticipant(
     userId: UserEntity["id"],
     now: Date
-  ): ThreadEntity | Error {
-    if (this.hasAccess(userId)) return new Error();
+  ): ThreadEntity | ThreadParticipantAlreadyExistError | ThreadClosedError {
+    if (this.isClose) return new ThreadClosedError(this.id);
+    if (this.hasAccess(userId))
+      return new ThreadParticipantAlreadyExistError(userId);
     this.participantsId = [...this.participantsId, userId];
     this.lastUpdatedAt = now;
     return this;
@@ -81,14 +94,29 @@ export class ThreadEntity {
   public removeParticipant(
     userId: UserEntity["id"],
     now: Date
-  ): ThreadEntity | Error {
-    if (!this.isParticipant(userId)) return new Error();
+  ): ThreadEntity | InvalidThreadAccessError {
+    if (this.isClose) return new ThreadClosedError(this.id);
+    if (this.administratorId === userId) {
+      return new AdministratorCannotLeaveThreadError(this.id, userId);
+    }
+    if (!this.isParticipant(userId))
+      return new InvalidThreadAccessError(userId, this.id);
     const index = this.participantsId.indexOf(userId);
-    if (index === -1) return new Error("User is not a participant");
-
     this.participantsId.splice(index, 1);
     this.lastUpdatedAt = now;
 
+    return this;
+  }
+
+  public updateTitle(
+    newTitle: string,
+    now: Date
+  ): ThreadEntity | InvalidTitleError | ThreadClosedError {
+    if (this.isClose) return new ThreadClosedError(this.id);
+    if (newTitle.trim().length < 3) return new InvalidTitleError(newTitle);
+
+    this.title = newTitle.trim();
+    this.lastUpdatedAt = now;
     return this;
   }
 }

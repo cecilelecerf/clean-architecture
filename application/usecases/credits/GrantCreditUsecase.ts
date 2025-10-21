@@ -1,4 +1,5 @@
 import { InvalidCreditDurationError } from "@application/errors/credits/InvalidCreditDurationError";
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
 import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
@@ -6,8 +7,13 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { CreditAmortizationService } from "@application/ports/services/CreditAmortizationService";
 import { UuidService } from "@application/ports/services/UuidService";
+import { findActiveUser } from "@application/utils/userValidators";
 import { CreditEntity } from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
+import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
+import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
+import { InvalidPercentageError } from "@domain/errors/percentage/InvalidPercentageError";
 import { Money } from "@domain/values/Money";
 import { Percentage } from "@domain/values/Percentage";
 
@@ -28,6 +34,7 @@ export class GrantCreditUsecase {
     private readonly creadiAmortizationService: CreditAmortizationService,
     private readonly clockService: ClockService
   ) {}
+  // TODO : Fixe error
   public async execute({
     clientId,
     actorId,
@@ -36,24 +43,35 @@ export class GrantCreditUsecase {
     insuranceRate,
     interestRate,
     durationMonths,
-  }: Props): Promise<CreditEntity | Error> {
-    const actor = await this.userRepository.findById(actorId);
-    if (!actor) throw new UserNotFoundError();
+  }: Props): Promise<
+    | CreditEntity
+    | UserNotFoundError
+    | UserNotActiveError
+    | UserRoleMismatchError
+    | InvalidCreditDurationError
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
+    | InvalidPercentageError
+    | Error
+  > {
+    const actor = await findActiveUser(this.userRepository, actorId);
+    if (actor instanceof Error) return actor;
     if (!actor.hasRole({ role: "conseiller" }))
-      throw new UserRoleMismatchError(["conseiller"], actor.role);
+      return new UserRoleMismatchError(["conseiller"], actor.role);
 
-    const client = await this.userRepository.findById(clientId);
-    if (!client) throw new UserNotFoundError();
+    const client = await findActiveUser(this.userRepository, clientId);
+    if (client instanceof Error) return client;
     if (!client.hasRole({ role: "client" }))
-      throw new UserRoleMismatchError(["client"], client.role);
+      return new UserRoleMismatchError(["client"], client.role);
 
     const initialAmountVO = Money.create(principal, currency);
-    if (initialAmountVO instanceof Error) throw initialAmountVO;
+    if (initialAmountVO instanceof Error) return initialAmountVO;
 
     const insuranceRateVO = Percentage.create(insuranceRate);
-    if (insuranceRateVO instanceof Error) throw insuranceRateVO;
+    if (insuranceRateVO instanceof Error) return insuranceRateVO;
     const interestRateVO = Percentage.create(interestRate);
-    if (interestRateVO instanceof Error) throw interestRateVO;
+    if (interestRateVO instanceof Error) return interestRateVO;
 
     const id = this.uuidService.generate();
 
@@ -62,7 +80,7 @@ export class GrantCreditUsecase {
       !Number.isInteger(durationMonths) ||
       durationMonths > 400
     )
-      throw new InvalidCreditDurationError(durationMonths);
+      return new InvalidCreditDurationError(durationMonths);
 
     const monthlyPayment =
       await this.creadiAmortizationService.calculateSchedule(
@@ -71,7 +89,7 @@ export class GrantCreditUsecase {
         insuranceRateVO,
         durationMonths
       );
-    if (monthlyPayment instanceof Error) throw monthlyPayment;
+    if (monthlyPayment instanceof Error) return monthlyPayment;
 
     const startDate = this.clockService.now();
 
