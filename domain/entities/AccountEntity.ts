@@ -21,7 +21,10 @@ export class AccountEntity {
     balance,
     createdAt,
     updatedAt,
-  }: AccountEntity) {
+  }: Pick<
+    AccountEntity,
+    "iban" | "userId" | "name" | "type" | "balance" | "createdAt" | "updatedAt"
+  >) {
     return new AccountEntity(
       iban,
       userId,
@@ -34,7 +37,11 @@ export class AccountEntity {
   }
 
   public deposit(amount: Money): void {
-    this.balance = this.balance.add(amount);
+    const result = this.balance.add(amount);
+
+    if (result instanceof Money) {
+      this.balance = result;
+    }
   }
 
   // Retirer de l'argent
@@ -42,7 +49,11 @@ export class AccountEntity {
     if (this.balance.amount < amount.amount) {
       throw new Error("Insufficient funds");
     }
-    this.balance = this.balance.subtract(amount);
+
+    const result = this.balance.subtract(amount);
+    if (result instanceof Money) {
+      this.balance = result;
+    }
   }
 
   // Obtenir le solde actuel

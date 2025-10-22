@@ -3,9 +3,10 @@ import { UserEntity } from "@domain/entities/UserEntity";
 import { IBAN } from "@domain/values/IBAN";
 
 export interface AccountRepository {
-  findByUserId(userId: UserEntity["id"]): Promise<AccountEntity[]>;
-  findByIBAN(iban: IBAN): Promise<AccountEntity>;
+  findByUserId(userId: UserEntity["id"]): Promise<AccountEntity[]|null>;
+  findByIBAN(iban: IBAN): Promise<AccountEntity|null>;
+  findAllSavingsAccounts(): Promise<AccountEntity[]|null>;
   saveAccount(account: AccountEntity): Promise<void>;
-  updateAccount(account: AccountEntity): Promise<void>;
-  deleteAccount(account: AccountEntity): Promise<void>;
+  updateAccount(iban: IBAN, account: AccountEntity): Promise<void>;
+  deleteAccount(iban: IBAN, account: AccountEntity): Promise<void>;
 }

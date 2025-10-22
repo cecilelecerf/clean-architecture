@@ -4,12 +4,13 @@ import { AccountEntity } from "./AccountEntity";
 export class TransactionEntity {
   private constructor(
     public id: string,
-    public fromAccountId: AccountEntity["iban"],
+    public fromAccountId: AccountEntity["iban"] | string,
     public toAccountId: AccountEntity["iban"],
     public amount: Money,
     public date: Date,
     public type: "credit" | "debit"
   ) {}
+
   public static create({
     fromAccountId,
     toAccountId,
@@ -37,6 +38,7 @@ export class TransactionEntity {
       type
     );
   }
+  
   public static from({
     id,
     fromAccountId,
