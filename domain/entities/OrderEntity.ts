@@ -26,7 +26,10 @@ export class OrderEntity {
     fee,
     date,
     status,
-  }: OrderEntity) {
+  }: Pick<
+    OrderEntity,
+    "id" | "userId" | "actionId" | "type" | "quantity" | "price" | "fee" | "date" | "status"
+  >) {
     return new OrderEntity(
       crypto.randomUUID(),
       userId,
@@ -39,6 +42,7 @@ export class OrderEntity {
       status
     );
   }
+
   public getTotal(): Money | MoneyCurrencyMismatchError {
     const totalPrice = this.price.multiply(this.quantity);
     if (totalPrice instanceof Error) {
