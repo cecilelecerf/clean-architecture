@@ -4,6 +4,7 @@ export class ActionEntity {
   private constructor(
     public ISIN: string,
     public name: string,
+    public totalNb: number,
     public symbol: string,
     public market: string,
     public activitySector: string,
@@ -16,17 +17,19 @@ export class ActionEntity {
   public static from({
     ISIN,
     name,
+    totalNb,
     symbol,
     market,
     activitySector,
     currentPrice,
     isAvailable,
     createdAt,
-    updatedAt,
+    updatedAt
   }: ActionEntity) {
     return new ActionEntity(
       ISIN,
       name,
+      totalNb,
       symbol,
       market,
       activitySector,
