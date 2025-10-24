@@ -44,8 +44,8 @@ export class ApplyDailyInterestUseCase {
           date: today,
         });
 
-        await this.transactionRepository.saveTransaction(transaction);
-        await this.accountRepository.saveAccount(account);
+        await this.transactionRepository.save(transaction);
+        await this.accountRepository.save(account);
       }
     }
   }

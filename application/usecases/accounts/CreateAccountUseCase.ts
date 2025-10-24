@@ -11,7 +11,7 @@ export class CreateAccountUsecase {
   public async execute(account: AccountEntity) {
     // On ne reçoit pas un accountEntity mais des élements où et on créer une account entities
     // + création des vérifications et des errors
-    await this.accountRepository.saveAccount(account);
+    await this.accountRepository.save(account);
 
     // email à récupérer à ne pas mettre en dur
     await this.emailService.sendEmail({

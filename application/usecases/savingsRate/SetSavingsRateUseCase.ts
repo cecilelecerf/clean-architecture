@@ -7,6 +7,6 @@ export class SetSavingsRateUsecase {
   // Enregistrement du taux d'interêt que pour les user ayant le rôle de directeur
   // TODO : aucune vérification de faite
   public async execute(saving: SavingsRateEntity) {
-    await this.configRepository.saveSavingsRate(saving);
+    await this.configRepository.save(saving);
   }
 }

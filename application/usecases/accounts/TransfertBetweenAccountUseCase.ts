@@ -45,10 +45,10 @@ export class TransfertBetweenAccountUsecase {
       date: new Date(),
     });
 
-    await this.transactionRepository.saveTransaction(debitTransaction);
-    await this.transactionRepository.saveTransaction(creditTransaction);
+    await this.transactionRepository.save(debitTransaction);
+    await this.transactionRepository.save(creditTransaction);
 
-    await this.accountRepository.saveAccount(fromAccount);
-    await this.accountRepository.saveAccount(toAccount);
+    await this.accountRepository.save(fromAccount);
+    await this.accountRepository.save(toAccount);
   }
 }

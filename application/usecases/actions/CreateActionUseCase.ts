@@ -9,6 +9,6 @@ export class CreateActionUsecase {
     // Plein de vérification à faire -> tu dois récupérer l'id du user
     // faire les vérifications de rôle
     // TU ne récupère pas une ActionEntity
-    await this.actionRepository.saveAction(action);
+    await this.actionRepository.save(action);
   }
 }
