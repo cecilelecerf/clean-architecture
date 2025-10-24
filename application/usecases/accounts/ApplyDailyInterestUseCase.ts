@@ -12,37 +12,41 @@ export class ApplyDailyInterestUseCase {
 
   async execute(): Promise<void> {
     const rate = await this.configRepository.findCurrentRate();
+    // TODO : faire un fichier d'error
     if (!rate) throw new Error("Aucun taux d’épargne défini");
 
-    const savingsAccounts = await this.accountRepository.findAllSavingsAccounts();
+    const savingsAccounts =
+      await this.accountRepository.findAllSavingsAccounts();
+    // TODO: utiliser le service clock
     const today = new Date();
 
-    if(savingsAccounts){
-        for (const account of savingsAccounts) {
+    if (savingsAccounts) {
+      for (const account of savingsAccounts) {
+        // TODO : déjà vérifier car balance et de type Money
         if (account.balance.amount <= 0) continue;
 
         const dailyRateDecimal = rate.rate.toDecimal() / 365;
         const interestResult = account.balance.multiply(dailyRateDecimal);
 
-       
         if (interestResult instanceof Error) continue;
         const interestMoney = interestResult;
 
         account.deposit(interestMoney);
 
         const transaction = TransactionEntity.from({
-            id: crypto.randomUUID(),
-            fromAccountId: "BANK",
-            toAccountId: account.iban,
-            amount: interestMoney,
-            type: "credit",
-            date: today
+          // TODO: utiliser le service uuid
+          id: crypto.randomUUID(),
+          // TODO : il faut passer un id de user en ay  ant faire les verifs necesaire au prélable
+          fromAccountId: "BANK",
+          toAccountId: account.iban,
+          amount: interestMoney,
+          type: "credit",
+          date: today,
         });
 
         await this.transactionRepository.saveTransaction(transaction);
         await this.accountRepository.saveAccount(account);
-        }
+      }
     }
-    
   }
 }
