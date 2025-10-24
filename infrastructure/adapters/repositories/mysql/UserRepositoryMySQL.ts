@@ -61,7 +61,7 @@ export class UserRepositoryMySQL implements UserRepository {
 
   async update(user: UserEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `UPDATE user 
+      `UPDATE users 
        SET firstname = ?, lastname = ?, email = ?, passwordHash = ?, role = ?, isActiveField = ?, createdAt = ?, confirmedAt = ?, modifiedAt = ? 
        WHERE id = ?`,
       [
@@ -81,7 +81,7 @@ export class UserRepositoryMySQL implements UserRepository {
 
   async delete(id: UserEntity["id"]): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      "DELETE FROM user WHERE iban = ?",
+      "DELETE FROM users WHERE iban = ?",
       [id]
     );
   }
