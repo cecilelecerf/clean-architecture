@@ -1,7 +1,9 @@
+import { Email } from "@domain/values/Email";
+
 export interface SendEmailOptions {
-  to: string,
-  subject: string,
-  text: string
+  to: Email;
+  subject: string;
+  text: string;
 }
 
 export interface EmailService {

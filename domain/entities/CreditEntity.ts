@@ -3,17 +3,20 @@ import { UserEntity } from "./UserEntity";
 import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
 import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
 import { Percentage } from "@domain/values/Percentage";
+import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
+import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
+import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
 
 export class CreditEntity {
   private constructor(
     public id: string,
     public userId: UserEntity["id"],
-    public principal: Money,
-    // ? annuel
+    public initialAmount: Money,
+    // ? taux d'interet annuel
     public interestRate: Percentage,
     // ? sur le tota;
     public insuranceRate: Percentage,
-    public months: number,
+    public durationMonths: number,
     public startDate: Date,
     public monthlyPayment: Money,
     public remainingBalance: Money
@@ -21,40 +24,55 @@ export class CreditEntity {
   public static from({
     id,
     userId,
-    principal,
+    initialAmount,
     insuranceRate,
     interestRate,
     startDate,
     monthlyPayment,
-    months,
+    durationMonths,
     remainingBalance,
-  }: CreditEntity) {
+  }: Pick<
+    CreditEntity,
+    | "id"
+    | "userId"
+    | "initialAmount"
+    | "insuranceRate"
+    | "interestRate"
+    | "startDate"
+    | "monthlyPayment"
+    | "durationMonths"
+    | "remainingBalance"
+  >) {
     return new CreditEntity(
-      crypto.randomUUID(),
+      id,
       userId,
-      principal,
+      initialAmount,
       interestRate,
       insuranceRate,
-      months,
+      durationMonths,
       startDate,
       monthlyPayment,
       remainingBalance
     );
   }
 
-  public calculateMonthlyPayment(): Money {
-    const P = this.principal.amount;
-    const n = this.months;
+  public calculateMonthlyPayment():
+    | Money
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError {
+    const P = this.initialAmount.amount;
+    const n = this.durationMonths;
     const r = this.interestRate.value / 12 / 100;
     const basePayment = (P * r) / (1 - Math.pow(1 + r, -n));
     const insurance = ((this.insuranceRate.value / 100) * P) / n;
 
     const paymentOrError = Money.create(
       basePayment + insurance,
-      this.principal.currency
+      this.initialAmount.currency
     );
     if (paymentOrError instanceof Error) {
-      throw paymentOrError;
+      return paymentOrError;
     }
     return paymentOrError;
   }
@@ -66,8 +84,10 @@ export class CreditEntity {
   public payMonthly():
     | CreditEntity
     | CreditAlreadyPaidError
-    | MoneyAmountNegativeError
-    | Error {
+    | MoneyCurrencyMissingError
+    | MoneyCurrencyMismatchError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError {
     if (this.isFullyPaid()) {
       return new CreditAlreadyPaidError(this.id);
     }
@@ -85,6 +105,7 @@ export class CreditEntity {
     this.remainingBalance = newRemainingBalance;
     return this;
   }
+
   public isFullyPaid(): boolean {
     return this.remainingBalance.amount <= 0;
   }

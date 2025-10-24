@@ -1,5 +1,7 @@
 import { MessageEntity } from "@domain/entities/MessageEntity";
+import { ThreadEntity } from "@domain/entities/ThreadEntity";
 
 export interface MessageRepository {
-  addMessage(message: MessageEntity): Promise<void>;
+  save(message: MessageEntity): Promise<void>;
+  findAllByThread(id: ThreadEntity["id"]): Promise<MessageEntity[]>;
 }
