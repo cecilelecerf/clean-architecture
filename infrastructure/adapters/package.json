@@ -8,6 +8,10 @@
     "build": "tsc -p tsconfig.json"
   },
   "devDependencies": {
+    "@types/node": "^24.9.1",
     "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "mysql2": "^3.15.3"
   }
 }
