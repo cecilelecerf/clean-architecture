@@ -48,12 +48,16 @@ export class Money {
 
   public subtract(
     other: Money
-  ): Money | MoneyCurrencyMismatchError | MoneyAmountNegativeError {
+  ):
+    | Money
+    | MoneyCurrencyMismatchError
+    | MoneyAmountNegativeError
+    | MoneyAmountInvalidError {
     const currencyError = this.ensureSameCurrency(other);
-    if (currencyError) return currencyError;
+    if (currencyError instanceof Error) return currencyError;
     const result = this.amount - other.amount;
-    if (result < 0) return new MoneyAmountNegativeError(result);
-    return new Money(result, this.currency);
+    const money = Money.create(result, this.currency);
+    return money;
   }
 
   private ensureSameCurrency(other: Money): MoneyCurrencyMismatchError | void {
@@ -69,7 +73,14 @@ export class Money {
   public toString(): string {
     return `${this.amount.toFixed(Money.SCALE)} ${this.currency}`;
   }
-  public multiply(factor: number): Money | Error {
+  public multiply(
+    factor: number
+  ):
+    | Money
+    | FactorNegativeError
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError {
     if (factor < 0) {
       return new FactorNegativeError();
     }
@@ -77,7 +88,7 @@ export class Money {
     const resultAmount = Number((this.amount * factor).toFixed(Money.SCALE));
 
     const resultOrError = Money.create(resultAmount, this.currency);
-
+    if (resultOrError instanceof Error) return resultOrError;
     return resultOrError;
   }
 }

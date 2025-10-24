@@ -10,7 +10,7 @@ export class DeleteAccountUsecase {
 
   public async execute(account: AccountEntity) {
     // TODO: vérification que la personne à quie appartient l'account qui fait bien la requête
-    await this.accountRepository.deleteAccount(account.iban, account);
+    await this.accountRepository.delete(account.iban, account);
     // email à récupérer à ne pas mettre en dur
 
     await this.emailService.sendEmail({

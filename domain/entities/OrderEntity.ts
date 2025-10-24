@@ -2,6 +2,7 @@ import { Money } from "@domain/values/Money";
 import { ActionEntity } from "./ActionEntity";
 import { UserEntity } from "./UserEntity";
 import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
+import { InvalidOrderStatusTransitionError } from "@domain/errors/order/InvalidOrderStatusTransitionError";
 
 export class OrderEntity {
   private constructor(
@@ -31,7 +32,7 @@ export class OrderEntity {
     "id" | "userId" | "actionId" | "type" | "quantity" | "price" | "fee" | "date" | "status"
   >) {
     return new OrderEntity(
-      crypto.randomUUID(),
+      id,
       userId,
       actionId,
       type,
@@ -50,18 +51,28 @@ export class OrderEntity {
     }
     return totalPrice.add(this.fee);
   }
-  public markExecuted(): void {
+  public markExecuted(): OrderEntity | InvalidOrderStatusTransitionError {
     if (this.status !== "pending") {
-      throw new Error("Only pending orders can be executed");
+      return new InvalidOrderStatusTransitionError(
+        this.id,
+        this.status,
+        "pending"
+      );
     }
     this.status = "executed";
+    return this;
   }
 
-  public markCancelled(): void {
+  public markCancelled(): OrderEntity | InvalidOrderStatusTransitionError {
     if (this.status !== "pending") {
-      throw new Error("Only pending orders can be cancelled");
+      return new InvalidOrderStatusTransitionError(
+        this.id,
+        this.status,
+        "pending"
+      );
     }
     this.status = "cancelled";
+    return this;
   }
   public isBuy(): boolean {
     return this.type === "buy";

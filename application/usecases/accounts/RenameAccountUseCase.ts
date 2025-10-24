@@ -11,7 +11,7 @@ export class RenameAccountUsecase {
   public async execute(account: AccountEntity) {
     // On ne reçoit pas un accountEntity mais des élements où et on créer une account entities
     // + création des vérifications et des errors
-    await this.accountRepository.updateAccount(account.iban, account);
+    await this.accountRepository.update(account.iban, account);
     // email à récupérer à ne pas mettre en dur
 
     await this.emailService.sendEmail({

@@ -11,7 +11,7 @@ export class ApplyDailyInterestUseCase {
   ) {}
 
   async execute(): Promise<void> {
-    const rate = await this.configRepository.findCurrentRate();
+    const rate = await this.configRepository.findCurrent();
     // TODO : faire un fichier d'error
     if (!rate) throw new Error("Aucun taux d’épargne défini");
 

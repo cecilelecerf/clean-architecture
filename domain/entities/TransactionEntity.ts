@@ -20,10 +20,12 @@ export class TransactionEntity {
     TransactionEntity,
     "fromAccountId" | "toAccountId" | "amount" | "type"
   >): TransactionEntity | Error {
+    // Création d'une vraie error
     if (fromAccountId === toAccountId) {
       return new Error("Transaction cannot be made to the same account");
     }
 
+    // Error impossible car déjà vérifier avec le type Date
     if (amount.amount <= 0) {
       return new Error("Transaction amount must be positive");
     }
@@ -38,7 +40,7 @@ export class TransactionEntity {
       type
     );
   }
-  
+
   public static from({
     id,
     fromAccountId,
