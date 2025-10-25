@@ -8,5 +8,4 @@ export interface ThreadRepository {
   findById(id: ThreadEntity["id"]): Promise<ThreadEntity | null>;
   findAllByUserId(userId: UserEntity["id"]): Promise<ThreadEntity[]>;
   findAllByAdvisorId(advisorId: UserEntity["id"]): Promise<ThreadEntity[]>;
-  transfer(advisorId: UserEntity["id"], thread: ThreadEntity): Promise<void>;
 }

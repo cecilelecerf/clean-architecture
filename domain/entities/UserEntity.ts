@@ -10,7 +10,8 @@ export class UserEntity {
     public role: "client" | "conseiller" | "directeur",
     public isActiveField: boolean,
     public createdAt: Date,
-    public confirmedAt?: Date
+    public confirmedAt?: Date,
+    public modifiedAt?: Date
   ) {}
 
   public static from({
@@ -23,6 +24,7 @@ export class UserEntity {
     isActiveField,
     confirmedAt,
     createdAt,
+    modifiedAt,
   }: Pick<
     UserEntity,
     | "id"
@@ -34,6 +36,7 @@ export class UserEntity {
     | "confirmedAt"
     | "createdAt"
     | "isActiveField"
+    | "modifiedAt"
   >) {
     return new UserEntity(
       id,
@@ -44,7 +47,8 @@ export class UserEntity {
       role,
       isActiveField,
       createdAt,
-      confirmedAt
+      confirmedAt,
+      modifiedAt
     );
   }
 

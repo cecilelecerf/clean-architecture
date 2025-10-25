@@ -6,8 +6,7 @@ export interface UserRepository {
   findByEmail(email: Email): Promise<UserEntity | null>;
   findAll(): Promise<UserEntity[]>;
   findAllByRole(role: UserEntity["role"]): Promise<UserEntity[]>;
-  banUser(user: UserEntity): Promise<void>;
   save(user: UserEntity): Promise<void>;
   update(user: UserEntity): Promise<void>;
-  delete(user: UserEntity): Promise<void>;
+  delete(user: UserEntity["id"]): Promise<void>;
 }

@@ -15,19 +15,32 @@ export class TagRepositoryMySQL implements TagRepository {
   }
 
   async findById(id: TagEntity["id"]): Promise<TagEntity | null> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM tags WHERE id = ?`,
       [id]
     );
     if (rows.length === 0) return null;
-    return TagEntity.from(rows[0]);
+    const row = rows[0];
+    return TagEntity.from({
+      id: row.id,
+      label: row.label,
+      color: row.color,
+      createdAt: row.createdAt,
+      modifiedAt: row.modifiedAt,
+    });
   }
 
   async findAll(): Promise<TagEntity[]> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM tags`
+    const rows = await this.client.query<RowDataPacket[]>(`SELECT * FROM tags`);
+    return rows.map((row) =>
+      TagEntity.from({
+        id: row.id,
+        label: row.label,
+        color: row.color,
+        createdAt: row.createdAt,
+        modifiedAt: row.modifiedAt,
+      })
     );
-    return rows.map((row: any) => TagEntity.from(row));
   }
 
   async update(tag: TagEntity): Promise<void> {

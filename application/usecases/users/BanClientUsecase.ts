@@ -2,6 +2,7 @@ import { UserNotActiveError } from "@application/errors/users/UserNotActiveError
 import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 
@@ -10,7 +11,10 @@ type Props = {
   actorId: UserEntity["id"];
 };
 export class BanClientUsecase {
-  public constructor(private readonly userRepository: UserRepository) {}
+  public constructor(
+    private readonly userRepository: UserRepository,
+    private readonly clockService: ClockService
+  ) {}
 
   public async execute({
     clientId,
@@ -29,7 +33,9 @@ export class BanClientUsecase {
       return new UserRoleMismatchError(["client"], user.role);
 
     user.ban();
-    await this.userRepository.save(user);
+    user.modifiedAt = this.clockService.now();
+
+    await this.userRepository.update(user);
     return user;
   }
 }

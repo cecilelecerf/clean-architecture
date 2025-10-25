@@ -23,7 +23,10 @@ export class AccountEntity {
     balance,
     createdAt,
     updatedAt,
-  }: AccountEntity) {
+  }: Pick<
+    AccountEntity,
+    "iban" | "userId" | "name" | "type" | "balance" | "createdAt" | "updatedAt"
+  >) {
     return new AccountEntity(
       iban,
       userId,

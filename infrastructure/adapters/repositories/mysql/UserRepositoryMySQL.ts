@@ -8,37 +8,87 @@ export class UserRepositoryMySQL implements UserRepository {
   constructor(private readonly client: MySQLClient) {}
 
   async findById(id: UserEntity["id"]): Promise<UserEntity | null> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM users WHERE id = ?",
       [id]
     );
 
     if (rows.length === 0) return null;
-    return UserEntity.from(rows[0]);
+    const row = rows[0];
+    return UserEntity.from({
+      id: row.id,
+      firstname: row.firstname,
+      lastname: row.lastname,
+      email: row.email,
+      passwordHash: row.passwordHash,
+      role: row.role,
+      isActiveField: row.isActiveField,
+      createdAt: row.creadtedAt,
+      confirmedAt: row.confirmedAt,
+      modifiedAt: row.modifiedAt,
+    });
   }
 
   async findByEmail(email: Email): Promise<UserEntity | null> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM users WHERE email = ?",
       [email.value]
     );
     if (rows.length === 0) return null;
-    return UserEntity.from(rows[0]);
+    const row = rows[0];
+    return UserEntity.from({
+      id: row.id,
+      firstname: row.firstname,
+      lastname: row.lastname,
+      email: row.email,
+      passwordHash: row.passwordHash,
+      role: row.role,
+      isActiveField: row.isActiveField,
+      createdAt: row.creadtedAt,
+      confirmedAt: row.confirmedAt,
+      modifiedAt: row.modifiedAt,
+    });
   }
 
   async findAll(): Promise<UserEntity[]> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM users"
     );
-    return rows.map((row: any) => UserEntity.from(row));
+    return rows.map((row) =>
+      UserEntity.from({
+        id: row.id,
+        firstname: row.firstname,
+        lastname: row.lastname,
+        email: row.email,
+        passwordHash: row.passwordHash,
+        role: row.role,
+        isActiveField: row.isActiveField,
+        createdAt: row.creadtedAt,
+        confirmedAt: row.confirmedAt,
+        modifiedAt: row.modifiedAt,
+      })
+    );
   }
 
   async findAllByRole(role: UserEntity["role"]): Promise<UserEntity[]> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM users WHERE role = ?",
       [role]
     );
-    return rows.map((row: any) => UserEntity.from(row));
+    return rows.map((row) =>
+      UserEntity.from({
+        id: row.id,
+        firstname: row.firstname,
+        lastname: row.lastname,
+        email: row.email,
+        passwordHash: row.passwordHash,
+        role: row.role,
+        isActiveField: row.isActiveField,
+        createdAt: row.creadtedAt,
+        confirmedAt: row.confirmedAt,
+        modifiedAt: row.modifiedAt,
+      })
+    );
   }
 
   async save(user: UserEntity): Promise<void> {

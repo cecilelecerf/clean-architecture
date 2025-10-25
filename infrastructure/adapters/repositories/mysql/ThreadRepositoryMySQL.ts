@@ -78,18 +78,18 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
 
   /** 🔍 Trouver un thread par son ID avec participants */
   async findById(id: ThreadEntity["id"]): Promise<ThreadEntity | null> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM threads WHERE id = ?`,
       [id]
     );
     if (rows.length === 0) return null;
     const threadRow = rows[0];
 
-    const [participantRows] = await this.client.query<RowDataPacket[]>(
+    const participantRows = await this.client.query<RowDataPacket[]>(
       `SELECT userId FROM thread_participant WHERE threadId = ?`,
       [id]
     );
-    const participantsId = participantRows.map((row: any) => row.userId);
+    const participantsId = participantRows.map((row) => row.userId);
 
     return ThreadEntity.from({
       id: threadRow.id,
@@ -105,7 +105,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
 
   /** 🔍 Tous les threads d’un user */
   async findAllByUserId(userId: UserEntity["id"]): Promise<ThreadEntity[]> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       `SELECT t.* 
        FROM threads t
        JOIN thread_participant tp ON tp.threadId = t.id
@@ -115,11 +115,11 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
 
     const threads: ThreadEntity[] = [];
     for (const row of rows) {
-      const [participantRows] = await this.client.query<RowDataPacket[]>(
+      const participantRows = await this.client.query<RowDataPacket[]>(
         `SELECT userId FROM thread_participant WHERE threadId = ?`,
         [row.id]
       );
-      const participantsId = participantRows.map((r: any) => r.userId);
+      const participantsId = participantRows.map((r) => r.userId);
       threads.push(
         ThreadEntity.from({
           id: row.id,
@@ -140,18 +140,18 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
   async findAllByAdvisorId(
     advisorId: UserEntity["id"]
   ): Promise<ThreadEntity[]> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM threads WHERE administratorId = ?`,
       [advisorId]
     );
 
     return Promise.all(
-      rows.map(async (row: any) => {
-        const [participantRows] = await this.client.query<RowDataPacket[]>(
+      rows.map(async (row) => {
+        const participantRows = await this.client.query<RowDataPacket[]>(
           `SELECT userId FROM thread_participant WHERE threadId = ?`,
           [row.id]
         );
-        const participantsId = participantRows.map((r: any) => r.userId);
+        const participantsId = participantRows.map((r) => r.userId);
         return ThreadEntity.from({
           id: row.id,
           administratorId: row.administratorId,
