@@ -27,7 +27,18 @@ export class OrderEntity {
     fee,
     date,
     status,
-  }: OrderEntity) {
+  }: Pick<
+    OrderEntity,
+    | "id"
+    | "userId"
+    | "actionId"
+    | "type"
+    | "quantity"
+    | "price"
+    | "fee"
+    | "date"
+    | "status"
+  >) {
     return new OrderEntity(
       id,
       userId,

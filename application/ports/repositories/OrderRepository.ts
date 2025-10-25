@@ -1,4 +1,3 @@
-import { AccountEntity } from "@domain/entities/AccountEntity";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { OrderEntity } from "@domain/entities/OrderEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
@@ -10,5 +9,5 @@ export interface OrderRepository {
   findAllOpen(): Promise<OrderEntity[]>;
   save(order: OrderEntity): Promise<void>;
   update(order: OrderEntity): Promise<void>;
-  delete(order: OrderEntity): Promise<void>;
+  delete(id: OrderEntity["id"]): Promise<void>;
 }

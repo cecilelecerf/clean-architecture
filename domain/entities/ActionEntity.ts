@@ -23,7 +23,18 @@ export class ActionEntity {
     isAvailable,
     createdAt,
     updatedAt,
-  }: ActionEntity) {
+  }: Pick<
+    ActionEntity,
+    | "ISIN"
+    | "name"
+    | "symbol"
+    | "market"
+    | "activitySector"
+    | "currentPrice"
+    | "isAvailable"
+    | "createdAt"
+    | "updatedAt"
+  >) {
     return new ActionEntity(
       ISIN,
       name,

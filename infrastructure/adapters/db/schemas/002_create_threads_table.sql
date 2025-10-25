@@ -1,4 +1,4 @@
-CREATE TABLE threads (
+CREATE TABLE IF NOT EXISTS threads (
     id VARCHAR(36) PRIMARY KEY,
     administratorId VARCHAR(36) NOT NULL,
     title VARCHAR(50),

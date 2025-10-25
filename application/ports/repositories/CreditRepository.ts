@@ -7,5 +7,5 @@ export interface CreditRepository {
   findActiveCredits(): Promise<CreditEntity[]>;
   save(credit: CreditEntity): Promise<void>;
   update(credit: CreditEntity): Promise<void>;
-  delete(credit: CreditEntity): Promise<void>;
+  delete(id: CreditEntity["id"]): Promise<void>;
 }

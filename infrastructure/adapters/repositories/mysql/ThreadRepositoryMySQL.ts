@@ -49,27 +49,35 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       ]
     );
 
-    // Supprimer tous les participants actuels et ré-insérer
-    await this.client.query<ResultSetHeader>(
-      `DELETE FROM thread_participant WHERE threadId = ?`,
+    const existingParticipantRows = await this.client.query<RowDataPacket[]>(
+      `SELECT userId FROM thread_participant WHERE threadId = ?`,
       [thread.id]
     );
+    const existingParticipantIds = existingParticipantRows.map((r) => r.userId);
 
-    for (const participantId of thread.participantsId) {
+    const participantsToAdd = thread.participantsId.filter(
+      (id) => !existingParticipantIds.includes(id)
+    );
+    for (const participantId of participantsToAdd) {
       await this.client.query<ResultSetHeader>(
-        `INSERT INTO thread_participant (threadId, userId) VALUES (?, ?)`,
+        `INSERT INTO post_tag (threadId, participantId) VALUES (?, ?)`,
         [thread.id, participantId]
+      );
+    }
+
+    const tagsToRemove = existingParticipantIds.filter(
+      (id) => !thread.participantsId.includes(id)
+    );
+    for (const userId of tagsToRemove) {
+      await this.client.query<ResultSetHeader>(
+        `DELETE FROM post_tag WHERE threadId = ? AND userId = ?`,
+        [thread.id, userId]
       );
     }
   }
 
   /** ❌ Supprimer un thread et ses participants */
   async delete(threadId: ThreadEntity["id"]): Promise<void> {
-    // ON DELETE CASCADE devrait déjà gérer les participants, mais on peut faire explicitement
-    await this.client.query<ResultSetHeader>(
-      `DELETE FROM thread_participant WHERE threadId = ?`,
-      [threadId]
-    );
     await this.client.query<ResultSetHeader>(
       `DELETE FROM threads WHERE id = ?`,
       [threadId]

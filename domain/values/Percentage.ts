@@ -3,6 +3,10 @@ import { InvalidPercentageError } from "@domain/errors/percentage/InvalidPercent
 export class Percentage {
   private constructor(public readonly value: number) {}
 
+  public static from({ value }: Pick<Percentage, "value">): Percentage {
+    return new Percentage(value);
+  }
+
   /**
    * Factory de création — valide le pourcentage
    */

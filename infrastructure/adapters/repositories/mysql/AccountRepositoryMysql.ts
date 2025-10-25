@@ -3,6 +3,7 @@ import { AccountRepository } from "@application/ports/repositories/AccountReposi
 import { AccountEntity } from "@domain/entities/AccountEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { IBAN } from "@domain/values/IBAN";
+import { Money } from "@domain/values/Money";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
 export class AccountRepositoryMySQL implements AccountRepository {
@@ -19,7 +20,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
         userId: row.userId,
         name: row.name,
         type: row.type,
-        balance: row.balance,
+        balance: Money.from({ amount: row.balence, currency: row.currency }),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       })
@@ -38,7 +39,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
       userId: row.userId,
       name: row.name,
       type: row.type,
-      balance: row.balance,
+      balance: Money.from({ amount: row.balence, currency: row.currency }),
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     });
@@ -47,14 +48,15 @@ export class AccountRepositoryMySQL implements AccountRepository {
   async save(account: AccountEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO accounts 
-        (iban, user_id, name, type, balance, createdAt) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
+        (iban, user_id, name, type, balance, cuurency, createdAt) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         account.iban,
         account.userId,
         account.name,
         account.type,
-        account.balance,
+        account.balance.amount,
+        account.balance.currency,
         account.createdAt,
       ]
     );

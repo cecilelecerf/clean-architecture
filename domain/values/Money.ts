@@ -12,14 +12,21 @@ export class Money {
     public readonly currency: string
   ) {}
 
+  public static from({
+    amount,
+    currency,
+  }: Pick<Money, "amount" | "currency">): Money {
+    return new Money(amount, currency);
+  }
+
   /**
    * Fabrique un objet Money.
    * Retourne soit une instance valide, soit une erreur métier.
    */
-  public static create(
-    amount: number,
-    currency: string
-  ):
+  public static create({
+    amount,
+    currency,
+  }: Pick<Money, "amount" | "currency">):
     | Money
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError

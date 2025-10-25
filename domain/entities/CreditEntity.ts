@@ -67,10 +67,10 @@ export class CreditEntity {
     const basePayment = (P * r) / (1 - Math.pow(1 + r, -n));
     const insurance = ((this.insuranceRate.value / 100) * P) / n;
 
-    const paymentOrError = Money.create(
-      basePayment + insurance,
-      this.initialAmount.currency
-    );
+    const paymentOrError = Money.create({
+      amount: basePayment + insurance,
+      currency: this.initialAmount.currency,
+    });
     if (paymentOrError instanceof Error) {
       return paymentOrError;
     }

@@ -8,5 +8,5 @@ export interface UserRepository {
   findAllByRole(role: UserEntity["role"]): Promise<UserEntity[]>;
   save(user: UserEntity): Promise<void>;
   update(user: UserEntity): Promise<void>;
-  delete(user: UserEntity["id"]): Promise<void>;
+  delete(id: UserEntity["id"]): Promise<void>;
 }
