@@ -5,15 +5,11 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "run": "ts-node -r tsconfig-paths/register ./express/server.ts"
   },
   "devDependencies": {
-    "@types/node": "^24.9.1",
     "typescript": "^5.6.3"
   },
-  "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "mysql2": "^3.15.3",
-    "socket.io": "^4.8.1"
-  }
+  "dependencies": {}
 }

@@ -6,20 +6,18 @@ import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatc
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { CreditEntity } from "@domain/entities/CreditEntity";
+import { CreditEntity, MonthlySchedule } from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
+import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
+import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
+import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
+import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
 import { Money } from "@domain/values/Money";
 
 type Props = {
   clientId: UserEntity["id"];
   creditId: CreditEntity["id"];
-};
-
-type MonthlySchedule = {
-  capitalPaid: Money;
-  currentMonth: number;
-  remainingBalanceBefore: Money;
-  remainingBalanceAfter: Money;
 };
 
 export class CreditScheduleUsecase {
@@ -37,6 +35,11 @@ export class CreditScheduleUsecase {
     | UserRoleMismatchError
     | CreditNotFoundError
     | CreditNotBelongsToClientError
+    | MoneyCurrencyMissingError
+    | CreditAlreadyPaidError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
+    | MoneyCurrencyMismatchError
   > {
     const client = await findActiveUser(this.userRepository, clientId);
     if (client instanceof Error) return client;
@@ -49,25 +52,7 @@ export class CreditScheduleUsecase {
     if (credit.userId !== client.id)
       return new CreditNotBelongsToClientError(credit.id, client.id);
 
-    const simulatedCredit = CreditEntity.from({
-      ...credit,
-    });
-    const monthlySchedule: MonthlySchedule[] = [];
-    Array.from({ length: simulatedCredit.durationMonths }).map((_, i) => {
-      const before = simulatedCredit.getRemainingBalance();
-      simulatedCredit.payMonthly();
-      const after = simulatedCredit.getRemainingBalance();
-
-      const capitalPaid = before.subtract(after);
-      if (capitalPaid instanceof Error) return capitalPaid;
-
-      return monthlySchedule.push({
-        capitalPaid,
-        currentMonth: i,
-        remainingBalanceBefore: before,
-        remainingBalanceAfter: after,
-      });
-    });
+    const monthlySchedule = credit.calculateAmortizationSchedule();
     return monthlySchedule;
   }
 }

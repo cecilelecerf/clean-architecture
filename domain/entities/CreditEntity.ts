@@ -6,7 +6,12 @@ import { Percentage } from "@domain/values/Percentage";
 import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
 import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
 import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
-
+export type MonthlySchedule = {
+  capitalPaid: Money;
+  month: number;
+  before: Money;
+  after: Money;
+};
 export class CreditEntity {
   private constructor(
     public id: string,
@@ -14,7 +19,7 @@ export class CreditEntity {
     public initialAmount: Money,
     // ? taux d'interet annuel
     public interestRate: Percentage,
-    // ? sur le tota;
+    // ? sur le total;
     public insuranceRate: Percentage,
     public durationMonths: number,
     public startDate: Date,
@@ -56,6 +61,7 @@ export class CreditEntity {
     );
   }
 
+  /** 🧮 Calcule la mensualité */
   public calculateMonthlyPayment():
     | Money
     | MoneyCurrencyMissingError
@@ -110,8 +116,35 @@ export class CreditEntity {
     return this.remainingBalance.amount <= 0;
   }
 
-  // Retourne le capital restant
+  /** Retourne le capital restant */
   public getRemainingBalance(): Money {
     return this.remainingBalance;
+  }
+
+  /** 📆 Calcule le plan d’amortissement complet */
+  public calculateAmortizationSchedule():
+    | MonthlySchedule[]
+    | MoneyCurrencyMissingError
+    | CreditAlreadyPaidError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
+    | MoneyCurrencyMismatchError {
+    const schedule: MonthlySchedule[] = [];
+
+    const simulated = CreditEntity.from({ ...this });
+
+    for (let month = 1; month <= simulated.durationMonths; month++) {
+      const before = simulated.getRemainingBalance();
+      const payResult = simulated.payMonthly();
+      if (payResult instanceof Error) return payResult;
+      const after = simulated.getRemainingBalance();
+
+      const capitalPaid = before.subtract(after);
+      if (capitalPaid instanceof Error) return capitalPaid;
+
+      schedule.push({ month, before, after, capitalPaid });
+    }
+
+    return schedule;
   }
 }
