@@ -4,12 +4,16 @@ import { Money } from "@domain/values/Money";
 import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
 import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
 
+// TODO : Add in adapter
+// ? add color
+
 export class AccountEntity {
   private constructor(
     public iban: IBAN,
     public userId: UserEntity["id"],
     public name: string,
     public type: "courant" | "epargne",
+    public color: "yellow" | "red" | "blue",
     public balance: Money,
     public createdAt: Date,
     public updatedAt?: Date
@@ -21,17 +25,26 @@ export class AccountEntity {
     name,
     type,
     balance,
+    color,
     createdAt,
     updatedAt,
   }: Pick<
     AccountEntity,
-    "iban" | "userId" | "name" | "type" | "balance" | "createdAt" | "updatedAt"
+    | "iban"
+    | "userId"
+    | "name"
+    | "type"
+    | "color"
+    | "balance"
+    | "createdAt"
+    | "updatedAt"
   >) {
     return new AccountEntity(
       iban,
       userId,
       name,
       type,
+      color,
       balance,
       createdAt,
       updatedAt

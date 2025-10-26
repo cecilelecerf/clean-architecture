@@ -1,9 +1,13 @@
 import { Money } from "@domain/values/Money";
 import { AccountEntity } from "./AccountEntity";
 
+// TODO add label and icon
+
 export class TransactionEntity {
   private constructor(
     public id: string,
+    public label: string,
+    public icon: string,
     public fromAccountId: AccountEntity["iban"],
     public toAccountId: AccountEntity["iban"],
     public amount: Money,
@@ -13,14 +17,28 @@ export class TransactionEntity {
 
   public static from({
     id,
+    label,
+    icon,
     fromAccountId,
     toAccountId,
     amount,
     date,
     type,
-  }: TransactionEntity) {
+  }: Pick<
+    TransactionEntity,
+    | "id"
+    | "fromAccountId"
+    | "toAccountId"
+    | "label"
+    | "icon"
+    | "amount"
+    | "date"
+    | "type"
+  >) {
     return new TransactionEntity(
       id,
+      label,
+      icon,
       fromAccountId,
       toAccountId,
       amount,

@@ -1,26 +1,26 @@
-import { Account } from "../types/accounts";
+import { Account, AccountId } from "../types/account";
 import { v4 as uuid } from "uuid";
 
 export const mockAccounts: Account[] = [
   {
-    id: uuid(),
     name: "Compte courant principal",
-    IBAN: "FR76 1234 5678 9012 3456 7890 123",
+    IBAN: "FR76 1234 5678 9012 3456 7890 123" as AccountId,
     balance: 1523.5,
-    type: "checking",
+    type: "courant",
+    color: "blue",
   },
   {
-    id: uuid(),
     name: "Épargne vacances",
-    IBAN: "FR76 0987 6543 2109 8765 4321 098",
+    IBAN: "FR76 0987 6543 2109 8765 4321 098" as AccountId,
     balance: 5420.0,
-    type: "savings",
+    type: "epargne",
+    color: "purple",
   },
   {
-    id: uuid(),
     name: "Compte courant secondaire",
-    IBAN: "FR76 1122 3344 5566 7788 9900 112",
+    IBAN: "FR76 1122 3344 5566 7788 9900 112" as AccountId,
     balance: 240.75,
-    type: "checking",
+    type: "courant",
+    color: "gray",
   },
 ];
