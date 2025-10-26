@@ -16,9 +16,9 @@ export default function AccountsPage() {
             <div className="flex flex-col gap-4">
                 {mockAccounts.map((account) => (
                     <Card
-                        key={account.id}
-                        className={`p-4 flex justify-between items-center rounded-2xl border-0 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer flex-row`}
-                        onClick={() => router.push(`/accounts/${account.id}`)}
+                        key={account.IBAN}
+                        className={`p-4 flex justify-between items-center rounded-lg border-0 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer flex-row`}
+                        onClick={() => router.push(`/accounts/${account.IBAN}`)}
                     >
                         {/* Left side */}
 
@@ -49,7 +49,7 @@ export default function AccountsPage() {
                 ))}
             </div>
             <div className="mt-6">
-                <Button className="w-full rounded-full py-5 text-base font-semibold" >
+                <Button className="w-full rounded-full py-5 text-base font-semibold" onClick={() => router.push("/accounts/new")} >
                     + Ajouter un compte
                 </Button>
             </div>
