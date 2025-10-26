@@ -2,10 +2,17 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "scripts": {
+    "dev:api": "pnpm --filter interfaces/api/express dev",
+    "dev:web": "pnpm --filter interfaces/web/react dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint"
+  },
   "workspaces": [
     "application",
     "domain",
-    "infrastructure/adapters",
-    "infrastructure/api"
+    "infrastructure",
+    "interfaces/api/*",
+    "interfaces/web/*"
   ]
 }
