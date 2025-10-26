@@ -6,6 +6,9 @@
     "esModuleInterop": true,
     "moduleResolution": "Node",
     "baseUrl": ".",
+    "composite": true,
+    "declaration": true,
+    "sourceMap": true,
     "paths": {
       "@domain/*": ["domain/*"],
       "@application/*": ["application/*"],
