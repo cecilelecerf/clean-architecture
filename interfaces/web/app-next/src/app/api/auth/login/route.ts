@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { loginFactory } from "@infrastructure/factories/users/loginFactory";
+import { NextRequest, NextResponse } from 'next/server';
+import { loginFactory } from '@infrastructure/factories/users/loginFactory';
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,10 +9,7 @@ export async function POST(req: NextRequest) {
       plainedPassword: password,
     });
     return NextResponse.json(result);
-  } catch (err: any) {
-    return NextResponse.json(
-      { message: err.message || "Erreur" },
-      { status: 400 }
-    );
+  } catch (err) {
+    return NextResponse.json({ message: err.message || 'Erreur' }, { status: 400 });
   }
 }
