@@ -10,16 +10,16 @@
     "declaration": true,
     "declarationMap": true,
     "incremental": true,
-    "rootDir": ".",
+    "rootDir": "src",
     "outDir": "dist",
     "sourceMap": true,
     "paths": {
-      "@domain/*": ["domain/*"],
+      "@domain/*": ["domain/src/*"],
       "@application/*": ["application/*"],
       "@infrastructure/*": ["infrastructure/*"],
       "@api/*": ["interfaces/api/*"],
       "@web/*": ["interfaces/web/*"]
-    },
-    "exclude": ["node_modules", "dist"]
-  }
+    }
+  },
+  "exclude": ["node_modules", "dist"]
 }

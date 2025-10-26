@@ -1,0 +1,40 @@
+import { InvalidTokenError } from "@application/src/errors/users/InvalidTokenError";
+import { UserNotFoundError } from "@application/src/errors/users/UserNotFoundError";
+import { UserRepository } from "@application/src/ports/repositories/UserRepository";
+import { ClockService } from "@application/src/ports/services/ClockService";
+import { TokenService } from "@application/src/ports/services/TokenService";
+import { UserEntity } from "@domain/entities/UserEntity";
+
+type Props = {
+  token: string;
+};
+
+export class RegisterUsecase {
+  public constructor(
+    private readonly userRepository: UserRepository,
+    private readonly clockService: ClockService,
+    private readonly tokenService: TokenService
+  ) {}
+
+  public async execute({
+    token,
+  }: Props): Promise<UserEntity | InvalidTokenError | UserNotFoundError> {
+    const payload = await this.tokenService.validateToken(
+      token,
+      "confirmation"
+    );
+    if (!payload || payload.id) return new InvalidTokenError();
+
+    const user = await this.userRepository.findById(payload.id);
+
+    if (!user) return new UserNotFoundError();
+
+    if (user.confirmedAt) return user;
+
+    user.confirmedAt = this.clockService.now();
+    user.isActiveField = true;
+
+    this.userRepository.update(user);
+    return user;
+  }
+}
