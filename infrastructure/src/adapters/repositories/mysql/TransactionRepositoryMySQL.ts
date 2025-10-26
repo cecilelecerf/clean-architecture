@@ -23,6 +23,8 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
         fromAccountId: row.fromAccountId as IBAN,
         toAccountId: row.toAccountId as IBAN,
         amount: Money.from({ amount: row.amount, currency: row.currency }),
+        label: row.label,
+        icon: row.icon,
         date: row.date,
         type: row.type,
       })
@@ -41,6 +43,8 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
         fromAccountId: row.fromAccountId,
         toAccountId: row.toAccountId,
         amount: Money.from({ amount: row.amount, currency: row.currency }),
+        label: row.label,
+        icon: row.icon,
         date: row.date,
         type: row.type,
       })

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     name VARCHAR(255) NOT NULL,
     type VARCHAR(50) NOT NULL,
     balance DECIMAL(15,2) NOT NULL DEFAULT 0,
+    color ENUM('blue','red','pink','yellow') NOT NULL,
     currency CHAR(3) NOT NULL,
     createdAt DATETIME NOT NULL,
     updatedAt DATETIME,

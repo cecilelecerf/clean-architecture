@@ -1,8 +1,8 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
-import { UserEntity } from "@domain/entities/UserEntity";
 import { Email } from "@domain/values/Email";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { UserEntity } from "@domain/entities/UserEntity";
 
 export class UserRepositoryMySQL implements UserRepository {
   constructor(private readonly client: MySQLClient) {}

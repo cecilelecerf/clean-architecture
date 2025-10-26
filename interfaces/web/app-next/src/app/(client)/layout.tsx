@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import { CircleX, Menu } from "lucide-react";
 import { Metadata } from "next";
@@ -59,6 +59,9 @@ export default function RootLayout({
               </Button>
 
             </div>
+            <DrawerFooter>
+              <Button>Déconnexion</Button>
+            </DrawerFooter>
           </DrawerContent>
         </Drawer>
       </div>

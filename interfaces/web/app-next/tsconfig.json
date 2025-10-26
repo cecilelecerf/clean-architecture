@@ -18,7 +18,9 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@infrastructure/*": ["../../../infrastructure/src/*"]
+      "@infrastructure/*": ["../../../infrastructure/src/*"],
+      "@application/*": ["../../../application/src/*"],
+      "@domain/*": ["../../../domain/src/*"]
     }
   },
   "include": [
@@ -29,7 +31,11 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "references": [{ "path": "../../../infrastructure/" }],
+  "references": [
+    { "path": "../../../infrastructure/" },
+    { "path": "../../../application/" },
+    { "path": "../../../domain" }
+  ],
 
   "exclude": ["node_modules"]
 }
