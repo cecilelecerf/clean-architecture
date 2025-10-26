@@ -63,7 +63,7 @@ export class Money {
     const currencyError = this.ensureSameCurrency(other);
     if (currencyError instanceof Error) return currencyError;
     const result = this.amount - other.amount;
-    const money = Money.create(result, this.currency);
+    const money = Money.create({ amount: result, currency: this.currency });
     return money;
   }
 
@@ -94,7 +94,10 @@ export class Money {
 
     const resultAmount = Number((this.amount * factor).toFixed(Money.SCALE));
 
-    const resultOrError = Money.create(resultAmount, this.currency);
+    const resultOrError = Money.create({
+      amount: resultAmount,
+      currency: this.currency,
+    });
     if (resultOrError instanceof Error) return resultOrError;
     return resultOrError;
   }

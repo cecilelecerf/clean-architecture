@@ -5,7 +5,6 @@ import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatc
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
-import { CreditAmortizationService } from "@application/ports/services/CreditAmortizationService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { CreditEntity } from "@domain/entities/CreditEntity";
@@ -31,9 +30,9 @@ export class GrantCreditUsecase {
     private readonly creditRepository: CreditRepository,
     private readonly userRepository: UserRepository,
     private readonly uuidService: UuidService,
-    private readonly creadiAmortizationService: CreditAmortizationService,
     private readonly clockService: ClockService
   ) {}
+
   public async execute({
     clientId,
     actorId,
@@ -53,6 +52,7 @@ export class GrantCreditUsecase {
     | MoneyAmountNegativeError
     | InvalidPercentageError
   > {
+    // Vérification des utilisateurs
     const actor = await findActiveUser(this.userRepository, actorId);
     if (actor instanceof Error) return actor;
     if (!actor.hasRole({ role: "conseiller" }))
@@ -63,16 +63,17 @@ export class GrantCreditUsecase {
     if (!client.hasRole({ role: "client" }))
       return new UserRoleMismatchError(["client"], client.role);
 
-    const initialAmountVO = Money.create(principal, currency);
+    // Création des value objects
+    const initialAmountVO = Money.create({ amount: principal, currency });
     if (initialAmountVO instanceof Error) return initialAmountVO;
 
     const insuranceRateVO = Percentage.create(insuranceRate);
     if (insuranceRateVO instanceof Error) return insuranceRateVO;
+
     const interestRateVO = Percentage.create(interestRate);
     if (interestRateVO instanceof Error) return interestRateVO;
 
-    const id = this.uuidService.generate();
-
+    // Validation durée
     if (
       !(durationMonths > 0) ||
       !Number.isInteger(durationMonths) ||
@@ -80,27 +81,29 @@ export class GrantCreditUsecase {
     )
       return new InvalidCreditDurationError(durationMonths);
 
-    const monthlyPayment =
-      await this.creadiAmortizationService.calculateSchedule(
-        initialAmountVO,
-        interestRateVO,
-        insuranceRateVO,
-        durationMonths
-      );
-    if (monthlyPayment instanceof Error) return monthlyPayment;
-
+    const id = this.uuidService.generate();
     const startDate = this.clockService.now();
 
-    const credit = CreditEntity.from({
+    // Création du crédit temporaire pour calculer la mensualité
+    const tempCredit = CreditEntity.from({
       id,
       userId: clientId,
-      insuranceRate: insuranceRateVO,
-      interestRate: interestRateVO,
       initialAmount: initialAmountVO,
+      interestRate: interestRateVO,
+      insuranceRate: insuranceRateVO,
       durationMonths,
-      monthlyPayment,
       startDate,
+      monthlyPayment: initialAmountVO, // placeholder
       remainingBalance: initialAmountVO,
+    });
+
+    const monthlyPayment = tempCredit.calculateMonthlyPayment();
+    if (monthlyPayment instanceof Error) return monthlyPayment;
+
+    // Création du crédit final
+    const credit = CreditEntity.from({
+      ...tempCredit,
+      monthlyPayment,
     });
 
     await this.creditRepository.save(credit);

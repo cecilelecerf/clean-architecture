@@ -3,5 +3,7 @@
   "compilerOptions": {
     "outDir": "dist"
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
+
+  "references": [{ "path": "../domain" }]
 }

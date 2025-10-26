@@ -8,6 +8,10 @@
     "baseUrl": ".",
     "composite": true,
     "declaration": true,
+    "declarationMap": true,
+    "incremental": true,
+    "rootDir": ".",
+    "outDir": "dist",
     "sourceMap": true,
     "paths": {
       "@domain/*": ["domain/*"],
@@ -15,6 +19,7 @@
       "@infrastructure/*": ["infrastructure/*"],
       "@api/*": ["interfaces/api/*"],
       "@web/*": ["interfaces/web/*"]
-    }
+    },
+    "exclude": ["node_modules", "dist"]
   }
 }

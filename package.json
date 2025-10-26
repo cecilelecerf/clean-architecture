@@ -6,7 +6,8 @@
     "dev:api": "pnpm --filter interfaces/api/express dev",
     "dev:web": "pnpm --filter interfaces/web/react dev",
     "build": "pnpm -r build",
-    "lint": "pnpm -r lint"
+    "lint": "pnpm -r lint",
+    "mono-build": "pnpm tsc -b tsconfig.build.json"
   },
   "workspaces": [
     "application",
@@ -14,5 +15,8 @@
     "infrastructure",
     "interfaces/api/*",
     "interfaces/web/*"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
 }
