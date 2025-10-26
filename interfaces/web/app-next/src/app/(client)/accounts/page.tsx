@@ -1,30 +1,58 @@
+"use client";
 
-import { Button, Card } from "@radix-ui/themes";
-import mockAccounts from "@infrastructure/data/accounts";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { textColorClasses } from "@/utils/color";
+import { toStringTypeAccount } from "@/utils/toStringTypeAccount";
+import { mockAccounts } from "@infrastructure/data/accounts"
+import { useRouter } from "next/navigation";
 
 export default function AccountsPage() {
-    return (
-        <div className="p-8 space-y-4">
-            <h1 className="text-3xl font-bold">Mes comptes</h1>
+    const router = useRouter();
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    return (
+        <>
+            <h1 className="text-3xl font-bold mb-2">Mes comptes</h1>
+            <div className="flex flex-col gap-4">
                 {mockAccounts.map((account) => (
-                    <Card key={account.id} className="p-4 shadow-md rounded-md border border-gray-200">
-                        <h2 className="text-xl font-semibold">{account.name}</h2>
-                        <p className="text-sm text-gray-500">{account.type === "checking" ? "Compte courant" : "Épargne"}</p>
-                        <p className="mt-2 text-lg font-medium">IBAN : {account.IBAN}</p>
-                        <p className="mt-2 text-lg font-bold">Solde : {account.balance.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</p>
-                        <div className="mt-4 flex space-x-2">
-                            <Button onClick={() => alert(`Modifier ${account.name}`)}>Modifier</Button>
-                            <Button onClick={() => alert(`Supprimer ${account.name}`)}>Supprimer</Button>
+                    <Card
+                        key={account.id}
+                        className={`p-4 flex justify-between items-center rounded-2xl border-0 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer flex-row`}
+                        onClick={() => router.push(`/accounts/${account.id}`)}
+                    >
+                        {/* Left side */}
+
+                        <div>
+                            <p className={`font-semibold text-lg leading-5`}  >
+                                {account.name}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                                {toStringTypeAccount(account)}
+                            </p>
+                        </div>
+
+                        {/* Right side */}
+                        <div className="text-right">
+                            <p className={`font-bold text-gray-800 ${textColorClasses[700][account.color]}`}>
+                                {account.balance.toLocaleString("fr-FR", {
+                                    style: "currency",
+                                    currency: "EUR",
+                                })}
+                            </p>
+                            <p
+                                className={`text-xs font-medium mt-0.5`}
+                            >
+                                Disponible
+                            </p>
                         </div>
                     </Card>
                 ))}
             </div>
-
             <div className="mt-6">
-                <Button onClick={() => alert("Créer un nouveau compte")}>Ajouter un compte</Button>
+                <Button className="w-full rounded-full py-5 text-base font-semibold" >
+                    + Ajouter un compte
+                </Button>
             </div>
-        </div>
+        </>
     );
 }
