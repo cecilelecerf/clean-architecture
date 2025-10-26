@@ -1,9 +1,9 @@
-import { PostNotFoundError } from "@application/src/errors/posts/PostNotFoundError";
-import { UserNotActiveError } from "@application/src/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/src/errors/users/UserNotFoundError";
-import { PostRepository } from "@application/src/ports/repositories/PostRepository";
-import { UserRepository } from "@application/src/ports/repositories/UserRepository";
-import { findActiveUser } from "@application/src/utils/userValidators";
+import { PostNotFoundError } from "@application/errors/posts/PostNotFoundError";
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { PostRepository } from "@application/ports/repositories/PostRepository";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 
 type Props = { userId: string; postId: string };

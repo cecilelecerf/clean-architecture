@@ -1,5 +1,5 @@
-import { CreditNotFoundError } from "@application/src/errors/credits/CreditNotFoundError";
-import { CreditRepository } from "@application/src/ports/repositories/CreditRepository";
+import { CreditNotFoundError } from "@application/errors/credits/CreditNotFoundError";
+import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { CreditEntity } from "@domain/entities/CreditEntity";
 import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
 import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";

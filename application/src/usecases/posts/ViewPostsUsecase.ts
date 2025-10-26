@@ -1,4 +1,4 @@
-import { PostRepository } from "@application/src/ports/repositories/PostRepository";
+import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { PostEntity } from "@domain/entities/PostEntity";
 
 export class ViewPostUsecase {

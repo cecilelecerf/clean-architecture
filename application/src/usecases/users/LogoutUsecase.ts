@@ -1,4 +1,4 @@
-import { TokenService } from "@application/src/ports/services/TokenService";
+import { TokenService } from "@application/ports/services/TokenService";
 
 type Props = {
   token: string;

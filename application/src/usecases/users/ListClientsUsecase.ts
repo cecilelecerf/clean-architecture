@@ -1,4 +1,4 @@
-import { UserRepository } from "@application/src/ports/repositories/UserRepository";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { UserEntity } from "@domain/entities/UserEntity";
 
 export class ListClientsUsecase {

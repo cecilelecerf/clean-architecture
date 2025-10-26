@@ -1,13 +1,13 @@
-import { PostNotFoundError } from "@application/src/errors/posts/PostNotFoundError";
-import { InvalidPostAccessError } from "@application/src/errors/posts/InvalidPostAccessError";
-import { TagNotFoundError } from "@application/src/errors/tags/TagNotFoundError";
-import { UserNotActiveError } from "@application/src/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/src/errors/users/UserNotFoundError";
-import { UserRoleMismatchError } from "@application/src/errors/users/UserRoleMismatchError";
-import { PostRepository } from "@application/src/ports/repositories/PostRepository";
-import { TagRepository } from "@application/src/ports/repositories/TagRepository";
-import { UserRepository } from "@application/src/ports/repositories/UserRepository";
-import { findActiveUser } from "@application/src/utils/userValidators";
+import { PostNotFoundError } from "@application/errors/posts/PostNotFoundError";
+import { InvalidPostAccessError } from "@application/errors/posts/InvalidPostAccessError";
+import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+import { PostRepository } from "@application/ports/repositories/PostRepository";
+import { TagRepository } from "@application/ports/repositories/TagRepository";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 type Props = {
   userId: PostEntity["advisorId"];

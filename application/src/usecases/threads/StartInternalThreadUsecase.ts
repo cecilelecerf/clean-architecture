@@ -1,12 +1,12 @@
-import { InvalidThreadParticipantsError } from "@application/src/errors/threads/InvalidThreadParticipantsError";
-import { UserNotActiveError } from "@application/src/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/src/errors/users/UserNotFoundError";
-import { UserRoleMismatchError } from "@application/src/errors/users/UserRoleMismatchError";
-import { ThreadRepository } from "@application/src/ports/repositories/ThreadRepository";
-import { UserRepository } from "@application/src/ports/repositories/UserRepository";
-import { ClockService } from "@application/src/ports/services/ClockService";
-import { UuidService } from "@application/src/ports/services/UuidService";
-import { findActiveUser } from "@application/src/utils/userValidators";
+import { InvalidThreadParticipantsError } from "@application/errors/threads/InvalidThreadParticipantsError";
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { ClockService } from "@application/ports/services/ClockService";
+import { UuidService } from "@application/ports/services/UuidService";
+import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
 

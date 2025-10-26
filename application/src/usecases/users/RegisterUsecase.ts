@@ -1,10 +1,10 @@
-import { EmailAlreadyExistsError } from "@application/src/errors/users/EmailAlreadyExistsError";
-import { UserRepository } from "@application/src/ports/repositories/UserRepository";
-import { ClockService } from "@application/src/ports/services/ClockService";
-import { EmailService } from "@application/src/ports/services/EmailService";
-import { EncryptionService } from "@application/src/ports/services/EncryptionService";
-import { TokenService } from "@application/src/ports/services/TokenService";
-import { UuidService } from "@application/src/ports/services/UuidService";
+import { EmailAlreadyExistsError } from "@application/errors/users/EmailAlreadyExistsError";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { ClockService } from "@application/ports/services/ClockService";
+import { EmailService } from "@application/ports/services/EmailService";
+import { EncryptionService } from "@application/ports/services/EncryptionService";
+import { TokenService } from "@application/ports/services/TokenService";
+import { UuidService } from "@application/ports/services/UuidService";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import { Email } from "@domain/values/Email";

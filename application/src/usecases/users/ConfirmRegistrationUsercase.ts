@@ -1,8 +1,8 @@
-import { InvalidTokenError } from "@application/src/errors/users/InvalidTokenError";
-import { UserNotFoundError } from "@application/src/errors/users/UserNotFoundError";
-import { UserRepository } from "@application/src/ports/repositories/UserRepository";
-import { ClockService } from "@application/src/ports/services/ClockService";
-import { TokenService } from "@application/src/ports/services/TokenService";
+import { InvalidTokenError } from "@application/errors/users/InvalidTokenError";
+import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { ClockService } from "@application/ports/services/ClockService";
+import { TokenService } from "@application/ports/services/TokenService";
 import { UserEntity } from "@domain/entities/UserEntity";
 
 type Props = {

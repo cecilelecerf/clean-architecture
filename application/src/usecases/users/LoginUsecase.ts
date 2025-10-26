@@ -1,8 +1,8 @@
-import { InvalidCredentialsError } from "@application/src/errors/users/InvalidCredentialsError";
-import { UserNotFoundError } from "@application/src/errors/users/UserNotFoundError";
-import { UserRepository } from "@application/src/ports/repositories/UserRepository";
-import { EncryptionService } from "@application/src/ports/services/EncryptionService";
-import { TokenService } from "@application/src/ports/services/TokenService";
+import { InvalidCredentialsError } from "@application/errors/users/InvalidCredentialsError";
+import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { EncryptionService } from "@application/ports/services/EncryptionService";
+import { TokenService } from "@application/ports/services/TokenService";
 import { UserEntity } from "@domain/entities/UserEntity";
 
 type Props = {
