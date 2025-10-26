@@ -1,4 +1,4 @@
-import { MySQLClient } from "@adapters/db/MySQLClient";
+import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { NotificationRepository } from "@application/ports/repositories/NotificationRepository";
 import { NotificationEntity } from "@domain/entities/NotificationEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";

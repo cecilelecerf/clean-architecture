@@ -1,9 +1,9 @@
-import { MySQLClient } from "@adapters/db/MySQLClient";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
+import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
 export class AccountRepositoryMySQL implements AccountRepository {

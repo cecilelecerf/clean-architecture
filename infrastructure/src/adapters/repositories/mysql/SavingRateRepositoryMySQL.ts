@@ -1,4 +1,4 @@
-import { MySQLClient } from "@adapters/db/MySQLClient";
+import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { SavingRateRepository } from "@application/ports/repositories/SavingRateRepository";
 import { SavingsRateEntity } from "@domain/entities/SavingsRateEntity";
 import { Percentage } from "@domain/values/Percentage";

@@ -1,4 +1,4 @@
-import { MySQLClient } from "@adapters/db/MySQLClient";
+import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";

@@ -1,4 +1,4 @@
-import { MySQLClient } from "@adapters/db/MySQLClient";
+import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { TransactionRepository } from "@application/ports/repositories/TransactionRepository";
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { IBAN } from "@domain/values/IBAN";

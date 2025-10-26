@@ -1,7 +1,7 @@
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { MySQLClient } from "@adapters/db/MySQLClient";
+import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
 export class ThreadRepositoryMySQL implements ThreadRepository {

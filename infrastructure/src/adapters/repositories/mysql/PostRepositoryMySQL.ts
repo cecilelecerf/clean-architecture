@@ -1,4 +1,4 @@
-import { MySQLClient } from "@adapters/db/MySQLClient";
+import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
