@@ -14,6 +14,8 @@ export const userSchema = z.object({
   confirmedAt: z.date(),
   modifiedAt: z.date(),
 });
+export type User = z.infer<typeof userSchema>;
+
 export const userDtoSchema = userSchema.pick({
   id: true,
   firstname: true,

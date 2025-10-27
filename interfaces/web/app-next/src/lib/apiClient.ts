@@ -1,3 +1,4 @@
+import { getSession } from 'next-auth/react';
 import { toast } from 'sonner';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -8,10 +9,14 @@ async function request<T>(
   path: string,
   options: { method?: HttpMethod; body?: any } = {},
 ): Promise<T> {
+  const { user } = await getSession();
   try {
     const res = await fetch(`${apiUrl}/api${path}`, {
       method: options.method ?? 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user?.accessToken || ''}`,
+      },
       body: options.body ? JSON.stringify(options.body) : undefined,
     });
 

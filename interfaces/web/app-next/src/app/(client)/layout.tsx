@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import SessionInfo from '@/components/SessinInfo';
+import { SignOutButton } from '@/components/SignOutButton';
 import { Button } from '@/components/ui/button';
 import {
   Drawer,
@@ -13,6 +14,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { CircleX, Menu } from 'lucide-react';
 import { Metadata } from 'next';
+import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -28,16 +30,8 @@ export default function RootLayout({
   return (
     <main className="px-4 py-6 xl:py-8 md:px-13 xl:px-30">
       <div className="flex items-center justify-between mb-4 xl:mb-6">
-        <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-sm text-muted-foreground">Bonjour 👋</p>
-            <p className="font-semibold text-lg">Cécel</p>
-          </div>
-        </div>
+        <SessionInfo />
+
         <Drawer direction="right">
           <DrawerTrigger asChild>
             <Button variant="ghost" size="icon">
@@ -69,7 +63,7 @@ export default function RootLayout({
               </Button>
             </div>
             <DrawerFooter>
-              <Button>Déconnexion</Button>
+              <SignOutButton />
             </DrawerFooter>
           </DrawerContent>
         </Drawer>

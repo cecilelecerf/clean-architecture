@@ -8,6 +8,7 @@ import { mockAccounts } from '@infrastructure/data/accounts';
 import { useRouter } from 'next/navigation';
 
 export default function AccountsPage() {
+
   const router = useRouter();
 
   return (
