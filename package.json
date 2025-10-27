@@ -2,10 +2,21 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "scripts": {
+    "dev:api": "pnpm --filter interfaces/api/express dev",
+    "dev:web": "pnpm --filter app-next dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "mono-build": "pnpm tsc -b tsconfig.build.json"
+  },
   "workspaces": [
     "application",
     "domain",
-    "infrastructure/adapters",
-    "infrastructure/api"
-  ]
+    "infrastructure",
+    "interfaces/api/*",
+    "interfaces/web/*"
+  ],
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
 }

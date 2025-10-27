@@ -1,5 +1,6 @@
 packages:
-  - "application/"
-  - "domain/"
-  - "infrastructure/adapters/"
-  - "infrastructure/api/"
+  - "application"
+  - "domain"
+  - "infrastructure"
+  - "interfaces/web/*"
+  - "interfaces/api/*"

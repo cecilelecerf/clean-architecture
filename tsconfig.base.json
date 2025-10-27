@@ -2,17 +2,24 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "Node",
-    "baseUrl": ".",
-    "paths": {
-      "@domain/*": ["domain/*"],
-      "@application/*": ["application/*"],
-      "@adapters/*": ["infrastructure/adapters/*"],
-      "@api/*": ["infrastructure/api/*"]
-    },
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "moduleResolution": "Node",
+    "baseUrl": ".",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "incremental": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "sourceMap": true,
+    "paths": {
+      "@domain/*": ["domain/src/*"],
+      "@application/*": ["application/src/*"],
+      "@infrastructure/*": ["infrastructure/src/*"],
+      "@api/*": ["interfaces/api/*"],
+      "@web/*": ["interfaces/web/*"]
+    }
   },
-  "include": ["domain", "application", "infrastructure"]
+  "exclude": ["node_modules", "dist"]
 }

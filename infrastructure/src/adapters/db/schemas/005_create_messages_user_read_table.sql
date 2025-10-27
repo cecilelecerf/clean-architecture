@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS message_user_read (
+    messageId VARCHAR(36) NOT NULL,
+    userId VARCHAR(36) NOT NULL,
+    readAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (messageId, userId),
+    FOREIGN KEY (messageId) REFERENCES messages(id) ON DELETE CASCADE,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+);
