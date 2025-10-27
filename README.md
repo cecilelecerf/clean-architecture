@@ -66,7 +66,8 @@ Mot de passe : root
 Dans le workspace web, lance le serveur de développement :
 
 `pnpm run web:dev`
-
+`pnpm eslint --fix .`
+`npnpx prettier --write .`
 L’API et l’interface web seront disponibles sur http://localhost:3000.
 
 Les routes API utiliseront la base MySQL configurée via .env.

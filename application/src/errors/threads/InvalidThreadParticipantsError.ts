@@ -1,4 +1,5 @@
 export class InvalidThreadParticipantsError extends Error {
+  public readonly statusCode = 400;
   public readonly name = "InvalidThreadParticipantsError";
 
   constructor(message?: string) {

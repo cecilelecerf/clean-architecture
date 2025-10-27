@@ -2,6 +2,7 @@ import { UserEntity } from "@domain/entities/UserEntity";
 
 export class UserRoleMismatchError extends Error {
   public readonly name = "UserRoleMismatchError";
+  public readonly statusCode = 403;
 
   constructor(
     public readonly expectedRoles: UserEntity["role"][],

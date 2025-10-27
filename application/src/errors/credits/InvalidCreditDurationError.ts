@@ -1,6 +1,7 @@
 import { CreditEntity } from "@domain/entities/CreditEntity";
 
 export class InvalidCreditDurationError extends Error {
+  public readonly statusCode = 400;
   public readonly name = "InvalidCreditDurationError";
 
   constructor(public readonly durationMonths: CreditEntity["durationMonths"]) {

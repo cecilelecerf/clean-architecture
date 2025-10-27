@@ -13,13 +13,17 @@ export type RegisterPayload = z.infer<typeof reqSchema>;
 export type RegisterResponse = z.infer<typeof userSchema>;
 export async function POST(req: NextRequest) {
   try {
-    const data: RegisterPayload = reqSchema.parse(await req.json());
+    const json = await req.json();
+    const data: RegisterPayload = reqSchema.parse(json);
     const result = await registerFactory().execute({
       ...data,
       confirmationUrl: clientUrl,
     });
+    if (result instanceof Error)
+      return NextResponse.json({ message: result.message }, { status: result.statusCode });
     return NextResponse.json(result);
   } catch (err) {
+    console.error(err);
     return NextResponse.json({ message: err.message || 'Erreur' }, { status: 400 });
   }
 }

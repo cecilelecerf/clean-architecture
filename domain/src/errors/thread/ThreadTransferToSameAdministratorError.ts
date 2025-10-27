@@ -1,4 +1,5 @@
 export class ThreadTransferToSameAdministratorError extends Error {
+  public readonly statusCode = 409;
   constructor(
     public readonly threadId: string,
     public readonly administratorId: string

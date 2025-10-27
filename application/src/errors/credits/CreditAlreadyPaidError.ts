@@ -1,6 +1,6 @@
 import { CreditEntity } from "@domain/entities/CreditEntity";
-
 export class CreditAlreadyPaidError extends Error {
+  public readonly statusCode = 409;
   public readonly name = "CreditAlreadyPaidError";
 
   constructor(public readonly creditId: CreditEntity["id"]) {

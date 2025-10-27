@@ -6,5 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     passwordHash VARCHAR(255),
     role ENUM('client','conseiller','directeur'),
     isActive BOOLEAN DEFAULT TRUE,
-    createdAt DATETIME NOT NULL
+    createdAt DATETIME NOT NULL,
+    confirmedAt DATETIME NOT NULL,
+    modifiedAt DATETIME NOT NULL
 );

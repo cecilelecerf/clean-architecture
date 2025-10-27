@@ -1,6 +1,7 @@
 import { CreditEntity } from "@domain/entities/CreditEntity";
 
 export class CreditNotBelongsToClientError extends Error {
+  public readonly statusCode = 403;
   public readonly name = "CreditNotBelongsToClientError";
 
   constructor(

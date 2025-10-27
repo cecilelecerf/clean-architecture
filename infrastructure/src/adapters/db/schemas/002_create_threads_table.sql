@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS threads (
     administratorId VARCHAR(36) NOT NULL,
     title VARCHAR(50),
     createdAt DATETIME NOT NULL,
+    lastUpdatedAt DATETIME NOT NULL,
     isClose BOOLEAN DEFAULT 0,
     type ENUM('internal','external')
 );

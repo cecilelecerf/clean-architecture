@@ -4,10 +4,13 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
+import { Email } from "@domain/values/Email";
 
 type Props = {
   plainedPassword: string;
-} & Pick<UserEntity, "email">;
+  email: string;
+};
 
 export class LoginUsecase {
   public constructor(
@@ -23,8 +26,11 @@ export class LoginUsecase {
     | { user: UserEntity; token: string }
     | UserNotFoundError
     | InvalidCredentialsError
+    | EmailInvalidFormatError
   > {
-    const user = await this.userRepository.findByEmail(email);
+    const emailVo = Email.create(email);
+    if (emailVo instanceof Error) return emailVo;
+    const user = await this.userRepository.findByEmail(emailVo);
     if (!user) return new UserNotFoundError();
     const isValidPassword = await this.encryptionService.compare(
       plainedPassword,

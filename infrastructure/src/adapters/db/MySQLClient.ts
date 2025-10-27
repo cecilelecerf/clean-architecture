@@ -1,12 +1,14 @@
 import mysql, { Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import dotenv from "dotenv";
+import path from "path";
 
+dotenv.config({ path: path.resolve("../../../.env") });
 /**
  * Wrapper générique autour de mysql2/promise
  * pour centraliser la connexion et exécuter des requêtes SQL typées.
  */
 export class MySQLClient {
   private pool: Pool;
-
   constructor() {
     this.pool = mysql.createPool({
       host: process.env.MYSQL_HOST,
