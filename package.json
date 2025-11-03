@@ -7,7 +7,8 @@
     "dev:web": "pnpm --filter app-next dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "mono-build": "pnpm tsc -b tsconfig.build.json"
+    "mono-build": "pnpm tsc -b tsconfig.build.json",
+    "seed:mysql": "pnpm --filter infrastructure run seed:mysql"
   },
   "workspaces": [
     "application",

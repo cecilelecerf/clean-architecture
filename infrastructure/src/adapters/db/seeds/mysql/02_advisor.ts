@@ -5,15 +5,15 @@ import { UserRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql
 import { BcryptEncryptionService } from "@infrastructure/adapters/services/BcryptEncryptionService";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { rawClients } from "@infrastructure/adapters/db/seeds/raws/clients";
+import { rawAdvisors } from "../raws/advisors";
 
-export async function seedSQLClient() {
-  const mysqlClient = new MySQLClient();
+export async function seedSQLAdministrator(mysqlClient: MySQLClient) {
+  console.log("aministrator");
   const userRepository = new UserRepositoryMySQL(mysqlClient);
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
-  for (const raw of rawClients) {
+  for (const raw of rawAdvisors) {
     try {
       const email = Email.create(raw.email);
       if (email instanceof Error) return;
@@ -23,7 +23,7 @@ export async function seedSQLClient() {
         email,
         passwordHash,
         id: uuidService.generate(),
-        role: "client",
+        role: "conseiller",
         createdAt: clockService.now(),
         isActiveField: true,
       });

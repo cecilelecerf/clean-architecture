@@ -5,15 +5,16 @@ import { UserRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql
 import { BcryptEncryptionService } from "@infrastructure/adapters/services/BcryptEncryptionService";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { rawAdvisors } from "../raws/advisors";
+import { rawClients } from "@infrastructure/adapters/db/seeds/raws/clients";
 
-export async function seedSQLAdministrator() {
-  const mysqlClient = new MySQLClient();
+export async function seedSQLClient(mysqlClient: MySQLClient) {
+  console.log("🌱 Client");
+
   const userRepository = new UserRepositoryMySQL(mysqlClient);
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
-  for (const raw of rawAdvisors) {
+  for (const raw of rawClients) {
     try {
       const email = Email.create(raw.email);
       if (email instanceof Error) return;
@@ -23,11 +24,11 @@ export async function seedSQLAdministrator() {
         email,
         passwordHash,
         id: uuidService.generate(),
-        role: "conseiller",
+        role: "client",
         createdAt: clockService.now(),
         isActiveField: true,
       });
-
+      console.log(user);
       userRepository.save(user);
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);
