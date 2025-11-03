@@ -11,20 +11,39 @@ export const authOptions = {
         password: { label: 'Mot de passe', type: 'password' },
       },
       async authorize(credentials) {
-        console.log(process.env.NEXTAUTH_SECRET);
         const result = await loginFactory().execute({
           email: credentials.email,
           plainedPassword: credentials.password,
         });
         if (result instanceof Error) return null;
-        return { id: result.user.id, name: result.user.lastname, email: result.user.email.value };
+        return {
+          id: result.user.id,
+          name: result.user.lastname,
+          email: result.user.email.value,
+          accessToken: result.token,
+        };
       },
     }),
   ],
   session: {
     strategy: 'jwt' as 'jwt',
-    secret: process.env.NEXTAUTH_SECRET,
   },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      // Première connexion → attache le token utilisateur
+      if (user) {
+        token.accessToken = user.accessToken;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Ajoute accessToken dans la session côté client
+      session.user.accessToken = token.accessToken;
+      return session;
+    },
+  },
+  secret: process.env.NEXTAUTH_SECRET,
   debug: true,
 };
 

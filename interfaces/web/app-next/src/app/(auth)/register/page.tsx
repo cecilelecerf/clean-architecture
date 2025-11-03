@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import AuthForm from '../AuthFromWrapper';
 import { useMutation } from '@tanstack/react-query';
-import { RegisterPayload, RegisterResponse } from '@/app/api/auth/register/route';
 import { post } from '@/lib/apiClient';
+import { RegisterPayload, RegisterResponse } from '@/app/api/auth/register/route';
 
 
 export default function RegisterPage() {
@@ -14,8 +14,9 @@ export default function RegisterPage() {
         plainedPassword: '',
     });
     const mutate = useMutation<RegisterResponse, Error, RegisterPayload>({
-        mutationFn: (data: RegisterPayload) => post<RegisterResponse, RegisterPayload>("/auth/register", data)
-    });
+        mutationFn: (data: RegisterPayload) =>
+            post<RegisterResponse, RegisterPayload>("/auth/register", data)
+    })
     return (
         <form onSubmit={(e) => { e.preventDefault(); mutate.mutate(register) }}>
             <AuthForm

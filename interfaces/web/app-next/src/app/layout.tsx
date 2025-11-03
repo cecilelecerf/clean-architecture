@@ -23,10 +23,8 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({
   children,
-  pageProps
 }: Readonly<{
   children: React.ReactNode;
-  pageProps
 }>) {
   return (
     <html lang="en">

@@ -64,12 +64,6 @@ importers:
         specifier: ^5.6.3
         version: 5.9.3
 
-  infrastructure/src/adapters:
-    dependencies:
-      jsonwebtoken:
-        specifier: ^9.0.2
-        version: 9.0.2
-
   interfaces/api/express:
     dependencies:
       '@types/body-parser':

@@ -10,10 +10,7 @@ export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
-  // const mutate = useMutation<LoginResponse, Error, LoginPayload>({
-  //   mutationFn: (data: LoginPayload) => post<LoginResponse, LoginPayload>("/auth/login", data),
-  //   onSuccess: () => { router.push("/accounts") }
-  // })
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const res = await signIn('credentials', {
@@ -23,7 +20,7 @@ export default function LoginPage() {
     });
 
     if (res?.ok) {
-      router.push('/accounts'); // redirection après login
+      router.push('/accounts');
     } else {
       console.error('Erreur de connexion', res?.error);
     }
@@ -39,7 +36,6 @@ export default function LoginPage() {
         ]}
         button="Connexion"
         loading={false}
-      // loading={mutate.isPending} 
       />
     </form>
   );

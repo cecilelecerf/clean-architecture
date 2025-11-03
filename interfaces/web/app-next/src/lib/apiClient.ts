@@ -1,5 +1,6 @@
 import { getSession } from 'next-auth/react';
 import { toast } from 'sonner';
+import jwt from 'next-auth/jwt';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -9,14 +10,19 @@ async function request<T>(
   path: string,
   options: { method?: HttpMethod; body?: any } = {},
 ): Promise<T> {
-  const { user } = await getSession();
+  const session = await getSession();
+  const token = session?.user?.accessToken;
+
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
   try {
     const res = await fetch(`${apiUrl}/api${path}`, {
       method: options.method ?? 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${user?.accessToken || ''}`,
-      },
+      headers,
       body: options.body ? JSON.stringify(options.body) : undefined,
     });
 
