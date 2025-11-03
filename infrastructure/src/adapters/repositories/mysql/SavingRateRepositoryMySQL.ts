@@ -38,14 +38,14 @@ export class SavingsRateRepositoryMySQL implements SavingRateRepository {
 
   async save(savingsRate: SavingsRateEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO savings_rates (id, rate, effectiveDate) VALUES (?, ?, ?)`,
+      `INSERT INTO savings_rates (id, rate, effective_date) VALUES (?, ?, ?)`,
       [savingsRate.id, savingsRate.rate.value, savingsRate.effectiveDate]
     );
   }
 
   async update(savingsRate: SavingsRateEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `UPDATE savings_rates SET rate = ?, effectiveDate = ? WHERE id = ?`,
+      `UPDATE savings_rates SET rate = ?, effective_date = ? WHERE id = ?`,
       [savingsRate.rate.value, savingsRate.effectiveDate, savingsRate.id]
     );
   }

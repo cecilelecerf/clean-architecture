@@ -9,7 +9,7 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
   async save(notification: NotificationEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO notifications 
-       (id, advisorId, clientId, title, content, createdAt, isRead, type)
+       (id, advisor_id, client_id, title, content, created_at, is_read, type)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         notification.id,
@@ -49,7 +49,7 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
     clientId: NotificationEntity["clientId"]
   ): Promise<NotificationEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM notifications WHERE clientId = ? ORDER BY createdAt DESC`,
+      `SELECT * FROM notifications WHERE client_id = ? ORDER BY created_at DESC`,
       [clientId]
     );
     return rows.map((row) =>
@@ -70,7 +70,7 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
     advisorId: NotificationEntity["advisorId"]
   ): Promise<NotificationEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM notifications WHERE advisorId = ? ORDER BY createdAt DESC`,
+      `SELECT * FROM notifications WHERE advisor_id = ? ORDER BY created_at DESC`,
       [advisorId]
     );
     return rows.map((row) =>
@@ -92,7 +92,7 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
     limit: number = 10
   ): Promise<NotificationEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM notifications WHERE clientId = ? ORDER BY createdAt DESC LIMIT ?`,
+      `SELECT * FROM notifications WHERE client_id = ? ORDER BY created_at DESC LIMIT ?`,
       [clientId, limit]
     );
     return rows.map((row) =>

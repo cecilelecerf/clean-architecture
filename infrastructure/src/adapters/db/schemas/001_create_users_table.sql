@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY,
-    firstname VARCHAR(50),
-    lastname VARCHAR(50),
-    email VARCHAR(100) UNIQUE,
-    passwordHash VARCHAR(255),
+    firstname VARCHAR(50) NOT NULL,
+    lastname VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255),
     role ENUM('client','conseiller','directeur'),
-    isActive BOOLEAN DEFAULT TRUE,
-    createdAt DATETIME NOT NULL,
-    confirmedAt DATETIME NOT NULL,
-    modifiedAt DATETIME NOT NULL
+    is_active BOOLEAN DEFAULT TRUE NOT NULL,
+    created_at DATETIME NOT NULL,
+    confirmed_at DATETIME,
+    modified_at DATETIME
 );

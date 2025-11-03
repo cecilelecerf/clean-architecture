@@ -12,7 +12,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
   async save(order: OrderEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO orders 
-       (id, userId, actionId, type, quantity, priceAmount, priceCurrency, feeCurrency, feeAmount, date, status) 
+       (id, user_id, actionId, type, quantity, price_amount, price_currency, fee_currency, fee_amount, date, status) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         order.id,
@@ -55,7 +55,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
 
   async findAllByUserId(userId: UserEntity["id"]): Promise<OrderEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM orders WHERE userId = ?`,
+      `SELECT * FROM orders WHERE user_id = ?`,
       [userId]
     );
     return rows.map((row) =>
@@ -80,7 +80,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
     actionId: ActionEntity["ISIN"]
   ): Promise<OrderEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM orders WHERE actionId = ?`,
+      `SELECT * FROM orders WHERE action_id = ?`,
       [actionId]
     );
     return rows.map((row) =>
@@ -126,7 +126,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
   async update(order: OrderEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE orders 
-       SET userId = ?, actionId = ?, type = ?, quantity = ?, priceAmount = ?, priceCurrency = ?, feeAmount = ?, feeCurrency = ?, date = ?, status = ? 
+       SET user_id = ?, action_id = ?, type = ?, quantity = ?, price_amount = ?, price_currency = ?, fee_amount = ?, fee_currency = ?, date = ?, status = ? 
        WHERE id = ?`,
       [
         order.userId,

@@ -9,7 +9,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
 
   async save(message: MessageEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO messages (id, threadId, senderId, content, sentAt)
+      `INSERT INTO messages (id, thread_id, sender_id, content, sent_at)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [
         message.id,
@@ -21,7 +21,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
     );
 
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO message_user_read (messageId, userId, readAt)
+      `INSERT INTO message_user_read (message_id, user_id, read_at)
        VALUES (?, ?, ?)`,
       [message.id, message.senderId, message.sentAt]
     );
@@ -31,7 +31,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
     threadId: ThreadEntity["id"]
   ): Promise<MessageEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM messages WHERE threadId = ? ORDER BY sentAt ASC`,
+      `SELECT * FROM messages WHERE thread_id = ? ORDER BY sent_at ASC`,
       [threadId]
     );
 
@@ -54,7 +54,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
     );
 
     const existingUserReadRows = await this.client.query<RowDataPacket[]>(
-      `SELECT userId FROM message_user_read WHERE messageId = ?`,
+      `SELECT user_id FROM message_user_read WHERE message_id = ?`,
       [message.id]
     );
     const existingUserReadIds = existingUserReadRows.map((r) => r.userId);
@@ -64,7 +64,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
     );
     for (const userId of UsersReadToAdd) {
       await this.client.query<ResultSetHeader>(
-        `INSERT INTO message_user_read (messageId, userId) VALUES (?, ?)`,
+        `INSERT INTO message_user_read (message_id, user_id) VALUES (?, ?)`,
         [message.id, userId]
       );
     }
@@ -74,7 +74,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
     );
     for (const userId of UsersReadToRemove) {
       await this.client.query<ResultSetHeader>(
-        `DELETE FROM message_user_read WHERE messageId = ? AND userId = ?`,
+        `DELETE FROM message_user_read WHERE message_id = ? AND user_id = ?`,
         [message.id, userId]
       );
     }

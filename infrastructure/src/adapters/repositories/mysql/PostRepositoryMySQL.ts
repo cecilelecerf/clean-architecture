@@ -10,7 +10,7 @@ export class PostRepositoryMySQL implements PostRepository {
 
   async save(post: PostEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO posts (id, advisorId, title, content, createdAt, modifiedAt, publishedAt) 
+      `INSERT INTO posts (id, advisor_id, title, content, created_at, modified_at, published_at) 
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         post.id,
@@ -25,7 +25,7 @@ export class PostRepositoryMySQL implements PostRepository {
 
     for (const tagId of post.tagsId) {
       await this.client.query<ResultSetHeader>(
-        `INSERT INTO post_tag (postId, tagId) VALUES (?, ?)`,
+        `INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)`,
         [post.id, tagId]
       );
     }
@@ -40,7 +40,7 @@ export class PostRepositoryMySQL implements PostRepository {
     const row = rows[0];
 
     const tagRows = await this.client.query<RowDataPacket[]>(
-      `SELECT tagId FROM post_tag WHERE postId = ?`,
+      `SELECT tag_id FROM post_tag WHERE post_id = ?`,
       [id]
     );
 
@@ -62,14 +62,14 @@ export class PostRepositoryMySQL implements PostRepository {
 
   async findAllByAdvisorId(advisorId: UserEntity["id"]): Promise<PostEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM posts WHERE advisorId = ?`,
+      `SELECT * FROM posts WHERE advisor_id = ?`,
       [advisorId]
     );
 
     return Promise.all(
       rows.map(async (row) => {
         const tagRows = await this.client.query<RowDataPacket[]>(
-          `SELECT tagId FROM post_tag WHERE postId = ?`,
+          `SELECT tag_id FROM post_tag WHERE post_id = ?`,
           [row.id]
         );
         const tagsId = tagRows.map((r) => r.tagId);
@@ -91,14 +91,14 @@ export class PostRepositoryMySQL implements PostRepository {
 
   async findAllRecent(limit = 10): Promise<PostEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM posts ORDER BY createdAt DESC LIMIT ?`,
+      `SELECT * FROM posts ORDER BY created_at DESC LIMIT ?`,
       [limit]
     );
 
     return Promise.all(
       rows.map(async (row) => {
         const tagRows = await this.client.query<RowDataPacket[]>(
-          `SELECT tagId FROM post_tag WHERE postId = ?`,
+          `SELECT tag_id FROM post_tag WHERE post_id = ?`,
           [row.id]
         );
         const tagsId = tagRows.map((r) => r.tagId);
@@ -121,7 +121,7 @@ export class PostRepositoryMySQL implements PostRepository {
   async update(post: PostEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE posts
-       SET title = ?, content = ?, modifiedAt = ?, publishedAt = ?
+       SET title = ?, content = ?, modified_at = ?, published_at = ?
        WHERE id = ?`,
       [
         post.title,
@@ -133,7 +133,7 @@ export class PostRepositoryMySQL implements PostRepository {
     );
 
     const existingTagRows = await this.client.query<RowDataPacket[]>(
-      `SELECT tagId FROM post_tag WHERE postId = ?`,
+      `SELECT tag_id FROM post_tag WHERE post_id = ?`,
       [post.id]
     );
     const existingTagIds = existingTagRows.map((r) => r.tagId);
@@ -141,7 +141,7 @@ export class PostRepositoryMySQL implements PostRepository {
     const tagsToAdd = post.tagsId.filter((id) => !existingTagIds.includes(id));
     for (const tagId of tagsToAdd) {
       await this.client.query<ResultSetHeader>(
-        `INSERT INTO post_tag (postId, tagId) VALUES (?, ?)`,
+        `INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)`,
         [post.id, tagId]
       );
     }
@@ -151,7 +151,7 @@ export class PostRepositoryMySQL implements PostRepository {
     );
     for (const tagId of tagsToRemove) {
       await this.client.query<ResultSetHeader>(
-        `DELETE FROM post_tag WHERE postId = ? AND tagId = ?`,
+        `DELETE FROM post_tag WHERE post_id = ? AND tag_id = ?`,
         [post.id, tagId]
       );
     }
@@ -165,7 +165,7 @@ export class PostRepositoryMySQL implements PostRepository {
 
   async findAllByTags(tagId: TagEntity["id"]): Promise<PostEntity[]> {
     const tagRows = await this.client.query<RowDataPacket[]>(
-      `SELECT postId FROM post_tag WHERE tagId = ?`,
+      `SELECT post_id FROM post_tag WHERE tag_id = ?`,
       [tagId]
     );
 

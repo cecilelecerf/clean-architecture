@@ -2,6 +2,8 @@ import mysql, { Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, resolve } from "path";
+import fs from "fs";
+import path from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -13,15 +15,20 @@ dotenv.config({ path: resolve(__dirname, "../../../../.env") });
  */
 export class MySQLClient {
   private pool: Pool;
+  private host = process.env.MYSQL_HOST;
+  private user = process.env.MYSQL_USER;
+  private password = process.env.MYSQL_PASSWORD;
+  private db = process.env.MYSQL_DATABASE;
   constructor() {
     this.pool = mysql.createPool({
-      host: process.env.MYSQL_HOST,
-      user: process.env.MYSQL_USER,
-      password: process.env.MYSQL_PASSWORD,
-      database: process.env.MYSQL_DATABASE,
+      host: this.host,
+      user: this.user,
+      password: this.password,
+      database: this.db,
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
+      multipleStatements: true,
     });
   }
 
@@ -62,6 +69,43 @@ export class MySQLClient {
       throw err;
     } finally {
       conn.release();
+    }
+  }
+
+  async resetDatabase() {
+    try {
+      const SQL_FOLDER = resolve(__dirname, "./schemas");
+
+      // Connexion temporaire sans DB pour drop/create
+      const tempConn = await mysql.createConnection({
+        host: this.host,
+        user: this.user,
+        password: this.password,
+        multipleStatements: true,
+      });
+
+      await tempConn.execute(`DROP DATABASE IF EXISTS \`${this.db}\``);
+      console.log(`Database ${this.db} dropped successfully.`);
+
+      await tempConn.execute(`CREATE DATABASE \`${this.db}\``);
+      console.log(`Database ${this.db} created successfully.`);
+
+      await tempConn.end();
+
+      // Maintenant, utiliser le pool existant pour exécuter les fichiers SQL
+      for (const file of fs
+        .readdirSync(SQL_FOLDER)
+        .filter((f) => f.endsWith(".sql"))) {
+        const filePath = path.join(SQL_FOLDER, file);
+        const sql = fs.readFileSync(filePath, "utf-8");
+        await this.pool.execute(sql);
+        console.log(`Executed ${file}`);
+      }
+
+      await this.close();
+      console.log("All SQL files executed successfully.");
+    } catch (error) {
+      console.error("Error resetting database:", error);
     }
   }
 }

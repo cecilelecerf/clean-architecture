@@ -11,7 +11,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
   async save(thread: ThreadEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO threads
-       (id, administratorId, title, createdAt, lastUpdatedAt, isClose, type)
+       (id, administrator_id, title, created_at, last_updated_at, is_close, type)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         thread.id,
@@ -27,7 +27,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     // Insert participants dans la table de liaison
     for (const participantId of thread.participantsId) {
       await this.client.query<ResultSetHeader>(
-        `INSERT INTO thread_participant (threadId, userId) VALUES (?, ?)`,
+        `INSERT INTO thread_participant (thread_id, user_id) VALUES (?, ?)`,
         [thread.id, participantId]
       );
     }
@@ -37,7 +37,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
   async update(thread: ThreadEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE threads
-       SET administratorId = ?, title = ?, lastUpdatedAt = ?, isClose = ?, type = ?
+       SET administrator_id = ?, title = ?, last_updated_at = ?, is_close = ?, type = ?
        WHERE id = ?`,
       [
         thread.administratorId,
@@ -50,7 +50,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     );
 
     const existingParticipantRows = await this.client.query<RowDataPacket[]>(
-      `SELECT userId FROM thread_participant WHERE threadId = ?`,
+      `SELECT user_id FROM thread_participant WHERE thread_id = ?`,
       [thread.id]
     );
     const existingParticipantIds = existingParticipantRows.map((r) => r.userId);
@@ -60,7 +60,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     );
     for (const participantId of participantsToAdd) {
       await this.client.query<ResultSetHeader>(
-        `INSERT INTO post_tag (threadId, participantId) VALUES (?, ?)`,
+        `INSERT INTO post_tag (thread_id, participant_id) VALUES (?, ?)`,
         [thread.id, participantId]
       );
     }
@@ -70,7 +70,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     );
     for (const userId of tagsToRemove) {
       await this.client.query<ResultSetHeader>(
-        `DELETE FROM post_tag WHERE threadId = ? AND userId = ?`,
+        `DELETE FROM post_tag WHERE thread_id = ? AND user_id = ?`,
         [thread.id, userId]
       );
     }
@@ -94,7 +94,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     const threadRow = rows[0];
 
     const participantRows = await this.client.query<RowDataPacket[]>(
-      `SELECT userId FROM thread_participant WHERE threadId = ?`,
+      `SELECT user_id FROM thread_participant WHERE thread_id = ?`,
       [id]
     );
     const participantsId = participantRows.map((row) => row.userId);
@@ -116,15 +116,15 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT t.* 
        FROM threads t
-       JOIN thread_participant tp ON tp.threadId = t.id
-       WHERE tp.userId = ?`,
+       JOIN thread_participant tp ON tp.thread_id = t.id
+       WHERE tp.user_id = ?`,
       [userId]
     );
 
     const threads: ThreadEntity[] = [];
     for (const row of rows) {
       const participantRows = await this.client.query<RowDataPacket[]>(
-        `SELECT userId FROM thread_participant WHERE threadId = ?`,
+        `SELECT userId FROM thread_participant WHERE thread_id = ?`,
         [row.id]
       );
       const participantsId = participantRows.map((r) => r.userId);
@@ -149,14 +149,14 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     advisorId: UserEntity["id"]
   ): Promise<ThreadEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM threads WHERE administratorId = ?`,
+      `SELECT * FROM threads WHERE administrator_id = ?`,
       [advisorId]
     );
 
     return Promise.all(
       rows.map(async (row) => {
         const participantRows = await this.client.query<RowDataPacket[]>(
-          `SELECT userId FROM thread_participant WHERE threadId = ?`,
+          `SELECT user_id FROM thread_participant WHERE thread_id = ?`,
           [row.id]
         );
         const participantsId = participantRows.map((r) => r.userId);

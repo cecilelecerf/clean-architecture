@@ -8,8 +8,8 @@ export class TagRepositoryMySQL implements TagRepository {
 
   async save(tag: TagEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO tags (id, label, color, createdAt, modifiedAt) 
-       VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO tags (id, label, color, created_at, modified_at) 
+        VALUES (?, ?, ?, ?, ?)`,
       [tag.id, tag.label, tag.color, tag.createdAt, tag.modifiedAt || null]
     );
   }
@@ -46,7 +46,7 @@ export class TagRepositoryMySQL implements TagRepository {
   async update(tag: TagEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE tags
-       SET label = ?, color = ?, modifiedAt = ? 
+       SET label = ?, color = ?, modified_at = ? 
        WHERE id = ?`,
       [tag.label, tag.color, tag.modifiedAt || new Date(), tag.id]
     );

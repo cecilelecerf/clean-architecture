@@ -15,7 +15,18 @@ export class AccountEntity {
     public userId: UserEntity["id"],
     public name: string,
     public type: "courant" | "epargne",
-    public color: "yellow" | "red" | "blue",
+    public color:
+      | "yellow"
+      | "red"
+      | "blue"
+      | "green"
+      | "purple"
+      | "orange"
+      | "pink"
+      | "teal"
+      | "brown"
+      | "cyan"
+      | "grey",
     public balance: Money,
     public createdAt: Date,
     public updatedAt?: Date

@@ -33,8 +33,12 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
 
   async findByIban(iban: IBAN): Promise<TransactionEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM transactions WHERE fromAccountId = ? OR toAccountId = ? ORDER BY date ASC`,
-      [iban, iban]
+      `SELECT * 
+     FROM transactions 
+     WHERE from_account_id = ? OR to_account_id = ? 
+     ORDER BY transaction_date ASC`,
+
+      [iban.value, iban.value]
     );
 
     return rows.map((row) =>
@@ -54,12 +58,13 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
   async save(transaction: TransactionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO transactions 
-        (id, fromAccountId, toAccountId, amount, currency, date, type) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        (id, label, from_account_id, to_account_id, amount, currency, date, type) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         transaction.id,
-        transaction.fromAccountId,
-        transaction.toAccountId,
+        transaction.label,
+        transaction.fromAccountId.value,
+        transaction.toAccountId.value,
         transaction.amount.amount,
         transaction.amount.currency,
         transaction.date,

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS thread_participant (
-    threadId VARCHAR(36),
-    userId VARCHAR(36),
-    PRIMARY KEY(threadId, userId),
-    FOREIGN KEY(threadId) REFERENCES threads(id),
-    FOREIGN KEY(userId) REFERENCES users(id)
+    thread_id VARCHAR(36),
+    user_id VARCHAR(36),
+    PRIMARY KEY(thread_id, user_id),
+    FOREIGN KEY(thread_id) REFERENCES threads(id),
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );

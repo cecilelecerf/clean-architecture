@@ -92,11 +92,10 @@ export class UserRepositoryMySQL implements UserRepository {
   }
 
   async save(user: UserEntity): Promise<void> {
-    console.log("repo");
     await this.client.query<ResultSetHeader>(
       `INSERT INTO users 
-        (id, firstname, lastname, email, passwordHash, role, isActive, createdAt) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, firstname, lastname, email, password_hash, role, is_active, created_at, confirmed_at, modified_at) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         user.id,
         user.firstname,
@@ -106,6 +105,8 @@ export class UserRepositoryMySQL implements UserRepository {
         user.role,
         user.isActiveField,
         user.createdAt,
+        user.confirmedAt ?? null,
+        user.modifiedAt ?? null,
       ]
     );
   }
@@ -113,8 +114,16 @@ export class UserRepositoryMySQL implements UserRepository {
   async update(user: UserEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE users 
-       SET firstname = ?, lastname = ?, email = ?, passwordHash = ?, role = ?, isActive = ?, createdAt = ?, confirmedAt = ?, modifiedAt = ? 
-       WHERE id = ?`,
+     SET firstname = ?, 
+         lastname = ?, 
+         email = ?, 
+         password_hash = ?, 
+         role = ?, 
+         is_active = ?, 
+         created_at = ?, 
+         confirmed_at = ?, 
+         modified_at = ? 
+     WHERE id = ?`,
       [
         user.firstname,
         user.lastname,
@@ -123,8 +132,8 @@ export class UserRepositoryMySQL implements UserRepository {
         user.role,
         user.isActiveField,
         user.createdAt,
-        user.confirmedAt,
-        user.modifiedAt,
+        user.confirmedAt ?? null,
+        user.modifiedAt ?? null,
         user.id,
       ]
     );

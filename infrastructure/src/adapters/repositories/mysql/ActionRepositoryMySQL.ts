@@ -10,7 +10,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async save(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO actions 
-        (ISIN, name, symbol, market, activitySector, currentPrice, currency, isAvailable, createdAt, updatedAt)
+        (isin, name, symbol, market, activity_sector, current_price, currency, is_available, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         action.ISIN,
@@ -29,7 +29,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
 
   async findById(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
     const [rows] = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM actions WHERE ISIN = ?`,
+      `SELECT * FROM actions WHERE isin = ?`,
       [ISIN]
     );
     if (rows.length === 0) return null;
@@ -75,7 +75,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
 
   async findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM actions WHERE isAvailable = ?`,
+      `SELECT * FROM actions WHERE is_available = ?`,
       [isAvailable ? 1 : 0]
     );
     return rows.map((row) =>
@@ -98,7 +98,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
 
   async setAvailability(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `UPDATE actions SET isAvailable = ?, updatedAt = ? WHERE ISIN = ?`,
+      `UPDATE actions SET is_available = ?, updated_at = ? WHERE isin = ?`,
       [action.isAvailable ? 1 : 0, action.updatedAt || new Date(), action.ISIN]
     );
   }
@@ -106,8 +106,8 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async update(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE actions 
-       SET name = ?, symbol = ?, market = ?, activitySector = ?, currentPrice = ?, currency = ?, isAvailable = ?, updatedAt = ? 
-       WHERE ISIN = ?`,
+       SET name = ?, symbol = ?, market = ?, activity_sector = ?, current_price = ?, currency = ?, is_available = ?, updated_at = ? 
+       WHERE isin = ?`,
       [
         action.name,
         action.symbol,
@@ -124,7 +124,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
 
   async delete(ISIN: ActionEntity["ISIN"]): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `DELETE FROM actions WHERE ISIN = ?`,
+      `DELETE FROM actions WHERE isin = ?`,
       [ISIN]
     );
   }

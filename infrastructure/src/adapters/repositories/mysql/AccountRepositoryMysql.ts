@@ -17,13 +17,13 @@ export class AccountRepositoryMySQL implements AccountRepository {
     return rows.map((row) =>
       AccountEntity.from({
         iban: row.iban,
-        userId: row.userId,
+        userId: row.user_id,
         name: row.name,
         type: row.type,
         color: row.color,
-        balance: Money.from({ amount: row.balence, currency: row.currency }),
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
+        balance: Money.from({ amount: row.balance, currency: row.currency }),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
       })
     );
   }
@@ -31,29 +31,29 @@ export class AccountRepositoryMySQL implements AccountRepository {
   async findByIBAN(iban: IBAN): Promise<AccountEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM accounts WHERE iban = ?",
-      [iban]
+      [iban.value]
     );
     if (rows.length === 0) return null;
     const row = rows[0];
     return AccountEntity.from({
       iban: row.iban,
-      userId: row.userId,
+      userId: row.user_id,
       name: row.name,
       type: row.type,
       color: row.color,
-      balance: Money.from({ amount: row.balence, currency: row.currency }),
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+      balance: Money.from({ amount: row.balance, currency: row.currency }),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
     });
   }
 
   async save(account: AccountEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO accounts 
-        (iban, user_id, name, type, balance, cuurency, createdAt) 
+        (iban, user_id, name, type, balance, currency, created_at) 
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
-        account.iban,
+        account.iban.value,
         account.userId,
         account.name,
         account.type,
@@ -67,15 +67,16 @@ export class AccountRepositoryMySQL implements AccountRepository {
   async update(account: AccountEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE accounts 
-       SET user_id = ?, name = ?, type = ?, balance = ?, createdAt = ? 
+       SET user_id = ?, name = ?, type = ?, balance = ?, currency = ?, updated_at = ? 
        WHERE iban = ?`,
       [
         account.userId,
         account.name,
         account.type,
-        account.balance,
-        account.createdAt,
-        account.iban,
+        account.balance.amount,
+        account.balance.currency,
+        account.updatedAt,
+        account.iban.value,
       ]
     );
   }
@@ -83,7 +84,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
   async delete(iban: IBAN): Promise<void> {
     await this.client.query<ResultSetHeader>(
       "DELETE FROM accounts WHERE iban = ?",
-      [iban]
+      [iban.value]
     );
   }
 }

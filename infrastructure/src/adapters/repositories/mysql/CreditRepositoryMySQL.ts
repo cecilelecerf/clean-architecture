@@ -41,7 +41,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
 
   async findAllByUserId(userId: UserEntity["id"]): Promise<CreditEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM credits WHERE userId = ?",
+      "SELECT * FROM credits WHERE user_id = ?",
       [userId]
     );
     return rows.map((row) =>
@@ -70,7 +70,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
 
   async findActiveCredits(): Promise<CreditEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM credits WHERE remainingAmount > 0"
+      "SELECT * FROM credits WHERE remaining_amount > 0"
     );
     return rows.map((row) =>
       CreditEntity.from({
@@ -99,7 +99,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
   async save(credit: CreditEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO credits 
-        (id, userId, initialAmount, initialCurrency, interestRate, insuranceRate, durationMonths, startDate, monthlyAmount, monthlyCurrency, remainingAmount, remainingCurrency)
+        (id, user_id, initial_amount, initial_currency, interest_rate, insurance_rate, duration_months, start_date, monthly_amount, monthly_currency, remaining_amount, remaining_currency)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         credit.id,
@@ -121,7 +121,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
   async update(credit: CreditEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE credits
-       SET userId = ?, initialAmount = ?, initialCurrency = ?, interestRate = ?, insuranceRate = ?, durationMonths = ?, startDate = ?, monthlyAmount = ?, monthlyCurrency = ?, remainingAmount = ?, remainingCurrency = ?
+       SET user_id = ?, initial_amount = ?, initial_currency = ?, interest_rate = ?, insurance_rate = ?, duration_months = ?, start_date = ?, monthly_amount = ?, monthly_currency = ?, remaining_amount = ?, remaining_currency = ?
        WHERE id = ?`,
       [
         credit.userId,
