@@ -14,11 +14,11 @@ export default function AccountsPage() {
   return (
     <>
       <h1 className="text-3xl font-bold mb-2">Mes comptes</h1>
-      <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {mockAccounts.map((account) => (
           <Card
             key={account.IBAN}
-            className={`p-4 flex justify-between items-center rounded-lg border-0 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer flex-row`}
+            className={`p-4 flex justify-between items-center rounded-lg border-0 bg-gray-50 hover:bg-gray-100 shadow-none transition-all duration-200 cursor-pointer flex-row`}
             onClick={() => router.push(`/accounts/${account.IBAN}`)}
           >
             {/* Left side */}
@@ -43,7 +43,8 @@ export default function AccountsPage() {
       </div>
       <div className="mt-6">
         <Button
-          className="w-full rounded-full py-5 text-base font-semibold"
+          variant="ghost"
+          className="w-full bg-gray-100 text-gray-800 hover:bg-gray-200"
           onClick={() => router.push('/accounts/new')}
         >
           + Ajouter un compte

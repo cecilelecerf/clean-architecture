@@ -31,7 +31,7 @@ export class UnpublishPostUsecase {
     if (user instanceof Error) return user;
 
     const access = post.permissionToModify(user);
-    if (!access) return new Error();
+    if (!access) return new InvalidPostAccessError(user.id, post.id);
 
     post.publishedAt = undefined;
     post.readBy = [];

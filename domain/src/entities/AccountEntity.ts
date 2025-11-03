@@ -3,6 +3,8 @@ import { UserEntity } from "./UserEntity";
 import { Money } from "@domain/values/Money";
 import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
 import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
+import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
+import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
 
 // TODO : Add in adapter
 // ? add color
@@ -61,7 +63,13 @@ export class AccountEntity {
   // Retirer de l'argent
   public withdraw(
     amount: Money
-  ): MoneyCurrencyMismatchError | MoneyAmountNegativeError | AccountEntity {
+  ):
+    | MoneyCurrencyMismatchError
+    | MoneyAmountNegativeError
+    | AccountEntity
+    | MoneyAmountNegativeError
+    | MoneyAmountInvalidError
+    | MoneyCurrencyMissingError {
     const newBalence = this.balance.subtract(amount);
     if (newBalence instanceof Error) return newBalence;
 

@@ -8,6 +8,8 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 type Props = { userId: PostEntity["advisorId"] } & Pick<PostEntity, "id">;
+
+// TODO delete Error
 export class DeleteMessageInPostUsecase {
   constructor(
     private readonly feedRepository: PostRepository,
@@ -31,7 +33,7 @@ export class DeleteMessageInPostUsecase {
     if (user instanceof Error) return user;
 
     const access = post.permissionToModify(user);
-    if (!access) return new Error();
+    if (!access) return new InvalidPostAccessError(user.id, post.id);
 
     await this.feedRepository.delete(post.id);
     return "Message deleted";

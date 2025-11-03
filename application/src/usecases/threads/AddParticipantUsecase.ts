@@ -1,12 +1,14 @@
 import { InvalidThreadAccessError } from "@application/errors/threads/InvalidThreadAccessError";
 import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
 import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
 import { ThreadParticipantAlreadyExistError } from "@domain/errors/thread/ThreadParticipantAlreadyExistError";
 
 type Props = { userId: UserEntity["id"] } & Pick<
@@ -27,9 +29,11 @@ export class AddParticipantUsecase {
   }: Props): Promise<
     | ThreadEntity
     | ThreadNotFoundError
+    | UserNotFoundError
     | InvalidThreadAccessError
     | ThreadParticipantAlreadyExistError
     | UserNotActiveError
+    | ThreadClosedError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;

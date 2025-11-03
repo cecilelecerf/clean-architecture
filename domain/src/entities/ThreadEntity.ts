@@ -133,7 +133,7 @@ export class ThreadEntity {
   public removeParticipant(
     userId: UserEntity["id"],
     now: Date
-  ): ThreadEntity | InvalidThreadAccessError {
+  ): ThreadEntity | InvalidThreadAccessError | ThreadClosedError {
     if (this.isClose) return new ThreadClosedError(this.id);
     if (this.administratorId === userId) {
       return new AdministratorCannotLeaveThreadError(this.id, userId);

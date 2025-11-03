@@ -1,4 +1,4 @@
-export class Error extends Error {
+export class AppError extends Error {
   public readonly name: string;
   public readonly statusCode: number;
 

@@ -8,6 +8,7 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
 
 type Props = { userId: UserEntity["id"] } & Pick<
   ThreadEntity,
@@ -30,6 +31,7 @@ export class RemoveParticipantUsecase {
     | InvalidThreadAccessError
     | UserNotFoundError
     | UserNotActiveError
+    | ThreadClosedError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;

@@ -38,7 +38,7 @@ export class EditMessageInPostUsecase {
     if (!post) return new PostNotFoundError();
 
     const access = post.permissionToModify(user);
-    if (!access) return new Error();
+    if (!access) return new InvalidPostAccessError(user.id, post.id);
 
     const updatedAt = this.clockService.now();
 

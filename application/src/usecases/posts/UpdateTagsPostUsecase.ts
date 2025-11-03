@@ -29,6 +29,7 @@ export class UpdateTagsInMessageInPostUsecase {
     | PostNotFoundError
     | UserRoleMismatchError
     | InvalidPostAccessError
+    | TagNotFoundError
   > {
     const post = await this.feedRepository.findById(postId);
     if (!post) return new PostNotFoundError();
@@ -37,7 +38,7 @@ export class UpdateTagsInMessageInPostUsecase {
     if (user instanceof Error) return user;
 
     const access = post.permissionToModify(user);
-    if (!access) return new Error();
+    if (!access) return new InvalidPostAccessError(user.id, post.id);
 
     post.tagsId = [];
     for (const id of [...new Set(tagsId)]) {
