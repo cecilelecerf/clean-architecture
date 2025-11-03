@@ -7,16 +7,24 @@ import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidServi
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { rawAdvisors } from "../raws/advisors";
 
-export async function seedSQLAdministrator(mysqlClient: MySQLClient) {
-  console.log("aministrator");
+export async function seedSQLAdministrator(
+  mysqlClient: MySQLClient
+): Promise<UserEntity[]> {
+  console.log("-- Création des comptes Administrateur --");
   const userRepository = new UserRepositoryMySQL(mysqlClient);
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
+
+  const advisors: UserEntity[] = [];
+
   for (const raw of rawAdvisors) {
     try {
       const email = Email.create(raw.email);
-      if (email instanceof Error) return;
+      if (email instanceof Error) {
+        console.warn(email);
+        continue;
+      }
       const passwordHash = await hasher.hash(raw.password);
       const user = UserEntity.from({
         ...raw,
@@ -28,9 +36,12 @@ export async function seedSQLAdministrator(mysqlClient: MySQLClient) {
         isActiveField: true,
       });
 
+      advisors.push(user);
       userRepository.save(user);
+      console.log(user.id);
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);
     }
   }
+  return advisors;
 }

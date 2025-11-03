@@ -7,16 +7,23 @@ import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidServi
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { rawDirectors } from "../raws/director";
 
-export async function seedSQLDirector(mysqlClient: MySQLClient) {
-  console.log("director");
+export async function seedSQLDirector(
+  mysqlClient: MySQLClient
+): Promise<UserEntity[]> {
+  console.log("-- Création des comptes Directeurs --");
   const userRepository = new UserRepositoryMySQL(mysqlClient);
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
+
+  const users = [];
   for (const raw of rawDirectors) {
     try {
       const email = Email.create(raw.email);
-      if (email instanceof Error) return;
+      if (email instanceof Error) {
+        console.warn(email);
+        continue;
+      }
       const passwordHash = await hasher.hash(raw.password);
       const user = UserEntity.from({
         ...raw,
@@ -28,9 +35,12 @@ export async function seedSQLDirector(mysqlClient: MySQLClient) {
         isActiveField: true,
       });
 
+      users.push(user);
       userRepository.save(user);
+      console.log(user.id);
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);
     }
   }
+  return users;
 }

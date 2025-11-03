@@ -14,8 +14,10 @@ import { AccountRepositoryMySQL } from "@infrastructure/adapters/repositories/my
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { TransactionRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/TransactionRepositoryMySQL";
 
-export async function seedSQLClient(mysqlClient: MySQLClient) {
-  console.log("🌱 Client");
+export async function seedSQLClient(
+  mysqlClient: MySQLClient
+): Promise<UserEntity[]> {
+  console.log("-- Création des comptes Client --");
 
   const userRepository = new UserRepositoryMySQL(mysqlClient);
   const accountRepository = new AccountRepositoryMySQL(mysqlClient);
@@ -23,10 +25,17 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
+
+  const users: UserEntity[] = [];
+
   for (const raw of rawClients) {
     try {
       const email = Email.create(raw.email);
-      if (email instanceof Error) return;
+
+      if (email instanceof Error) {
+        console.warn(email);
+        continue;
+      }
       const passwordHash = await hasher.hash(raw.password);
       const user = UserEntity.from({
         ...raw,
@@ -37,8 +46,9 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
         createdAt: clockService.now(),
         isActiveField: true,
       });
+      users.push(user);
       await userRepository.save(user);
-      console.log(`============${user.email.value}, SAVE=========`);
+      console.log(user.email.value);
 
       const accounts: AccountEntity[] = [];
       for (const rawAccount of raw.accounts ?? []) {
@@ -59,9 +69,9 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
             currency: rawAccount.currency,
           }),
         });
-        console.log(`--- ${iban.value}`);
         accounts.push(account);
         await accountRepository.save(account);
+        console.log(iban.value);
 
         for (const rawTransaction of rawAccount.transactions ?? []) {
           const recipientAccount = accounts.find(
@@ -78,12 +88,13 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
             }),
           });
 
-          console.log(`- ${transaction.id}`);
           await transactionRepository.save(transaction);
+          console.log(transaction.id);
         }
       }
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);
     }
   }
+  return users;
 }
