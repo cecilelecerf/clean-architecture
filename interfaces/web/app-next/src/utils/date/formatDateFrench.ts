@@ -1,6 +1,5 @@
 export function formatDateFrench(isoString: string | Date): string {
   const date = typeof isoString === 'string' ? new Date(isoString) : isoString;
-  console.log(date);
   if (isNaN(date.getTime())) {
     throw new Error('Invalid date');
   }

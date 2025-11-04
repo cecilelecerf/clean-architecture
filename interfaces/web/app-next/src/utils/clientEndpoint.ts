@@ -5,10 +5,15 @@ import { AccountId, accountSchema } from '@infrastructure/types/account';
 import { ThreadId, threadSchema } from '@infrastructure/types/thread';
 import { messageSchema } from '@infrastructure/types/message';
 import { userDtoSchema } from '@infrastructure/types/user';
-import { safeParse } from 'zod';
+import z, { safeParse } from 'zod';
 import { safeParseWithLog } from '@/lib/zodUtils';
 
-const messageWithUser = messageSchema.extend({ user: userDtoSchema });
+const getMessageSchema = threadSchema.extend({
+  messages: messageSchema.array(),
+  administrator: userDtoSchema,
+  participants: userDtoSchema.array(),
+});
+export type GetMessage = z.infer<typeof getMessageSchema>;
 export const clientEndpoints = createEndpointsNodes({
   accounts: {
     getAll: () =>
@@ -42,14 +47,7 @@ export const clientEndpoints = createEndpointsNodes({
         queryKey: ['threads', id],
         queryFn: () =>
           get(`/threads/${id}`, 'client').then((data) => {
-            return safeParseWithLog(
-              threadSchema.extend({
-                messages: messageSchema.array(),
-                administrator: userDtoSchema,
-                participants: userDtoSchema.array(),
-              }),
-              data,
-            );
+            return safeParseWithLog(getMessageSchema, data);
           }),
       }),
   },
