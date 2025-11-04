@@ -5,7 +5,7 @@ import { ThreadId } from '@infrastructure/types/thread';
 import { formatDateFrench } from '@/utils/date/formatDateFrench';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { match } from 'ts-pattern';
-import { clientEndpoints, GetMessage } from '@/utils/clientEndpoint';
+import { clientEndpoints, GetMessage } from '@/utils/endpoint.ts';
 import { useEffect, useRef, useState } from 'react';
 import { socket } from '@/lib/socket';
 import { Button } from '@/components/ui/button';

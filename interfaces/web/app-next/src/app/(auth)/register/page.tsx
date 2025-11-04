@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import AuthForm from '../AuthFromWrapper';
+import FormWrapper from '../../../components/FromWrapper';
 import { useMutation } from '@tanstack/react-query';
 import { post } from '@/lib/apiClient';
 import { RegisterPayload, RegisterResponse } from '@/app/api/auth/register/route';
@@ -19,7 +19,7 @@ export default function RegisterPage() {
     })
     return (
         <form onSubmit={(e) => { e.preventDefault(); mutate.mutate(register) }}>
-            <AuthForm
+            <FormWrapper
                 title="S'inscrire"
                 fields={[
                     {

@@ -1,6 +1,6 @@
 'use client';
 import { useMutation } from '@tanstack/react-query';
-import AuthForm from '../AuthFromWrapper';
+import FormWrapper from '../../../components/FromWrapper';
 import { useState } from 'react';
 import { post } from '@/lib/apiClient';
 import { useRouter } from 'next/navigation';
@@ -28,7 +28,7 @@ export default function LoginPage() {
 
   return (
     <form onSubmit={(e) => handleSubmit(e)}>
-      <AuthForm
+      <FormWrapper
         title="Se connecter"
         fields={[
           { get: email, set: (e) => setEmail(e), label: 'Email', type: 'email' },

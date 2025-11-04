@@ -35,16 +35,13 @@ async function request<T>(
   }
 }
 
-export function post<T, B = unknown>(
-  path: string,
-  body: B,
-  user?: 'client' | 'director' | 'activisor' | 'other',
-) {
-  const addUser = user ? `/${user}` : '';
-  return request<T>(`${addUser}${path}`, { method: 'POST', body });
+type Scope = 'client' | 'director' | 'activisor' | 'other';
+export function post<T, B = unknown>(path: string, body: B, scope?: Scope) {
+  const userScope = scope ? `/${scope}` : '';
+  return request<T>(`${userScope}${path}`, { method: 'POST', body });
 }
 
-export function get<T>(path: string, user?: 'client' | 'director' | 'activisor' | 'other') {
-  const addUser = user ? `/${user}` : '';
-  return request<T>(`${addUser}${path}`, { method: 'GET' });
+export function get<T>(path: string, scope?: Scope) {
+  const userScope = scope ? `/${scope}` : '';
+  return request<T>(`${userScope}${path}`, { method: 'GET' });
 }

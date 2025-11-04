@@ -2,7 +2,7 @@
 import { ButtonLink } from "@/components/ButtonLink";
 import { Card } from "@/components/ui/card";
 import { socket } from "@/lib/socket";
-import { clientEndpoints } from "@/utils/clientEndpoint";
+import { clientEndpoints } from "@/utils/endpoint.ts";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -30,7 +30,7 @@ export default function ThreadsPage() {
                         {threads.map((thread) => {
                             return <Card
                                 key={thread.id}
-                                className={`p-4 flex justify-between items-center rounded-lg border-0 bg-gray-50 hover:bg-gray-100 shadow-none transition-all duration-200 cursor-pointer flex-row`}
+                                className={`p-4 flex justify-between items-center rounded-lg border-0 bg-gray-50 hover:bg-gray-100 shadow-none transition-all duration-200 cursor-pointer flex-row mb-4`}
                                 onClick={() => router.push(`/threads/${thread.id}`)}
                             >
                                 {/* Left side */}
