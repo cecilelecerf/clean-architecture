@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { registerFactory } from '@infrastructure/factories/users/registerFactory';
+import { registerFactory } from '@infrastructure/adapters/db/mysql/factories/users/registerFactory';
 import { userSchema } from '@infrastructure/types/user';
 import z from 'zod';
 

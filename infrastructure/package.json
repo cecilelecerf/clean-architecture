@@ -7,8 +7,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "seed:mysql": "tsx --tsconfig ./tsconfig.json ./src/adapters/db/seeds/mysql/index.ts",
-    "mysql:restart": "tsx --tsconfig ./tsconfig.json ./src/adapters/db/seeds/mysql/drop-and-create-db.ts"
+    "seed:mysql": "tsx --tsconfig ./tsconfig.json ./src/adapters/db/mysql/seeds/index.ts",
+    "mysql:restart": "tsx --tsconfig ./tsconfig.json ./src/adapters/db/mysql/seeds/drop-and-create-db.ts"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",

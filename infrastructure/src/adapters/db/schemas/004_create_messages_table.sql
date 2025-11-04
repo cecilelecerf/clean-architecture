@@ -1,9 +1,0 @@
-CREATE TABLE IF NOT EXISTS messages (
-    id VARCHAR(36) NOT NULL PRIMARY KEY,
-    thread_id VARCHAR(36) NOT NULL,
-    sender_id VARCHAR(36) NOT NULL,
-    content TEXT NOT NULL,
-    sent_it DATETIME NOT NULL,
-    FOREIGN KEY (thread_id) REFERENCES threads(id) ON DELETE CASCADE,
-    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
-);

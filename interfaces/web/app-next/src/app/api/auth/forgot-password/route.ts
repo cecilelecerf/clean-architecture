@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { forgotPasswordFactory } from '@infrastructure/factories/users/forgotPasswordFactory';
+import { forgotPasswordFactory } from '@infrastructure/adapters/db/mysql/factories/users/forgotPasswordFactory';
 
 const forgotPasswordUsecase = forgotPasswordFactory;
 export async function POST(req: NextRequest) {

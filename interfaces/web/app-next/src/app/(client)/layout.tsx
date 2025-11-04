@@ -55,7 +55,7 @@ export default function RootLayout({
               </Button>
 
               <Button variant="link" asChild>
-                <Link href={'/messages'}>Conversations</Link>
+                <Link href={'/threads'}>Conversations</Link>
               </Button>
 
               <Button variant="link" asChild>

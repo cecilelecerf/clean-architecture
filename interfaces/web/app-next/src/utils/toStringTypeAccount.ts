@@ -1,4 +1,4 @@
-import { Account } from '@infrastructure/types/accounts';
+import { Account } from '@infrastructure/types/account';
 import { match } from 'ts-pattern';
 
 export const toStringTypeAccount = (account: Account): string => {

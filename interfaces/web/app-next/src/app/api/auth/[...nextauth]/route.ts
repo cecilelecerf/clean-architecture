@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { loginFactory } from '@infrastructure/factories/users/loginFactory';
+import { loginFactory } from '@infrastructure/adapters/db/mysql/factories/users/loginFactory';
 
 export const authOptions = {
   providers: [
@@ -16,10 +16,12 @@ export const authOptions = {
           plainedPassword: credentials.password,
         });
         if (result instanceof Error) return null;
+
         return {
           id: result.user.id,
           name: result.user.lastname,
-          email: result.user.email.value,
+          email: result.user.email.toString(),
+          image: undefined,
           accessToken: result.token,
         };
       },
@@ -31,14 +33,16 @@ export const authOptions = {
 
   callbacks: {
     async jwt({ token, user }) {
-      // Première connexion → attache le token utilisateur
       if (user) {
+        token.id = user.id;
+        token.email = user.email;
         token.accessToken = user.accessToken;
       }
       return token;
     },
     async session({ session, token }) {
-      // Ajoute accessToken dans la session côté client
+      session.user.id = token.id;
+      session.user.email = token.email;
       session.user.accessToken = token.accessToken;
       return session;
     },

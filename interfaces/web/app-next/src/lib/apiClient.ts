@@ -1,6 +1,5 @@
 import { getSession } from 'next-auth/react';
 import { toast } from 'sonner';
-import jwt from 'next-auth/jwt';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -36,10 +35,16 @@ async function request<T>(
   }
 }
 
-export function post<T, B = unknown>(path: string, body: B) {
-  return request<T>(path, { method: 'POST', body });
+export function post<T, B = unknown>(
+  path: string,
+  body: B,
+  user?: 'client' | 'director' | 'activisor' | 'other',
+) {
+  const addUser = user ? `/${user}` : '';
+  return request<T>(`${addUser}${path}`, { method: 'POST', body });
 }
 
-export function get<T>(path: string) {
-  return request<T>(path, { method: 'GET' });
+export function get<T>(path: string, user?: 'client' | 'director' | 'activisor' | 'other') {
+  const addUser = user ? `/${user}` : '';
+  return request<T>(`${addUser}${path}`, { method: 'GET' });
 }

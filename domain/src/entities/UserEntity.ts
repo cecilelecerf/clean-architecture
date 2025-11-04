@@ -64,3 +64,8 @@ export class UserEntity {
     return role === this.role;
   }
 }
+
+export type UserDTO = Pick<
+  UserEntity,
+  "id" | "email" | "firstname" | "lastname" | "role"
+>;

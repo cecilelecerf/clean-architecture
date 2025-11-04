@@ -28,14 +28,18 @@ export class LoginUsecase {
     | InvalidCredentialsError
     | EmailInvalidFormatError
   > {
+    console.log("enter");
+    console.log(email, plainedPassword);
     const emailVo = Email.create(email);
     if (emailVo instanceof Error) return emailVo;
     const user = await this.userRepository.findByEmail(emailVo);
+    console.log(user);
     if (!user) return new UserNotFoundError();
     const isValidPassword = await this.encryptionService.compare(
       plainedPassword,
       user.passwordHash
     );
+    console.log("verify");
     if (!isValidPassword) return new InvalidCredentialsError();
     const token = await this.tokenService.generateAuthToken({
       userId: user.id,

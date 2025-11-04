@@ -2,7 +2,10 @@ import { InvalidThreadAccessError } from "@application/errors/threads/InvalidThr
 import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
 import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
 import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { MessageRepository } from "@application/ports/repositories/MessageRepository";
+import {
+  MessageRepository,
+  MessageWithUser,
+} from "@application/ports/repositories/MessageRepository";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
@@ -39,7 +42,7 @@ export class GetThreadMessages {
 
     if (!thread.hasAccess(user.id))
       return new InvalidThreadAccessError(user.id, thread.id);
-
-    return await this.messageRepository.findAllByThread(thread.id);
+    const messages = await this.messageRepository.findAllByThread(thread.id);
+    return messages;
   }
 }
