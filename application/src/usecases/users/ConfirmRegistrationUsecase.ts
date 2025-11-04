@@ -9,7 +9,7 @@ type Props = {
   token: string;
 };
 
-export class RegisterUsecase {
+export class ConfirmRegistrationUsecase {
   public constructor(
     private readonly userRepository: UserRepository,
     private readonly clockService: ClockService,

@@ -32,7 +32,7 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
 
   if (!session) redirect('/login');
-  if (session.user.role !== 'client') redirect('/unauthorized');
+  if (session.user.role !== 'conseiller') redirect('/unauthorized');
 
   return (
     <main className="px-4 py-6 xl:py-8 md:px-13 xl:px-30">

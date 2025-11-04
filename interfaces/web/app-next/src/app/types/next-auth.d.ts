@@ -1,3 +1,4 @@
+import { User } from '@infrastructure/types/user';
 import NextAuth from 'next-auth';
 
 declare module 'next-auth' {
@@ -6,6 +7,7 @@ declare module 'next-auth' {
       id: string;
       name: string;
       email: string;
+      role: User['role'];
       accessToken?: string;
     };
   }
@@ -15,6 +17,7 @@ declare module 'next-auth' {
     name: string;
     email: string;
     accessToken?: string;
+    role: User['role'];
   }
 }
 

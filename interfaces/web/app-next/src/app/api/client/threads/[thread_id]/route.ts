@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getThreadMessagesFactory } from '@infrastructure/adapters/db/mysql/factories/threads/getThreadMessagesFactory';
+import { getThreadMessagesFactory } from '@infrastructure/adapters/db/mysql/factories/messages/getThreadMessagesFactory';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { findThreadWithUserFactory } from '@infrastructure/adapters/db/mysql/factories/threads/findThreadWithUserFactory';

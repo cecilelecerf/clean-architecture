@@ -182,4 +182,26 @@ export class UserRepositoryMySQL implements UserRepository {
       modifiedAt: row.modified_at,
     });
   }
+
+  async findAllByAdvisor(advisorId: UserEntity["id"]): Promise<UserEntity[]> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      "SELECT * FROM users WHERE advisorId = ?",
+      [advisorId]
+    );
+    return rows.map((row) =>
+      UserEntity.from({
+        id: row.id,
+        firstname: row.firstname,
+        lastname: row.lastname,
+        email: row.email,
+        passwordHash: row.password_hash,
+        role: row.role,
+        isActiveField: row.is_active,
+        createdAt: row.creadted_at,
+        confirmedAt: row.confirmed_at,
+        modifiedAt: row.modified_at,
+        advisorId: row.advisor_id,
+      })
+    );
+  }
 }
