@@ -13,9 +13,11 @@ import { AccountRepositoryMySQL } from "@infrastructure/adapters/db/mysql/reposi
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { TransactionRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/TransactionRepositoryMySQL";
 import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
+import { pick } from "./utils";
 
 export async function seedSQLClient(
-  mysqlClient: MySQLClient
+  mysqlClient: MySQLClient,
+  advisors: UserEntity[]
 ): Promise<UserEntity[]> {
   console.log("-- Création des comptes Client --");
 
@@ -55,6 +57,14 @@ export async function seedSQLClient(
         }
       }
       const passwordHash = await hasher.hash(raw.password);
+      let advisorId: UserEntity["id"];
+      if (index === 0) {
+        // Premier client → advisor 0
+        advisorId = advisors[0].id;
+      } else {
+        // Les autres → advisor choisi aléatoirement
+        advisorId = pick(advisors).id;
+      }
       const user = UserEntity.from({
         ...raw,
         email,
@@ -64,6 +74,7 @@ export async function seedSQLClient(
         createdAt,
         isActiveField: true,
         confirmedAt,
+        advisorId: advisorId,
       });
       users.push(user);
       await userRepository.save(user);

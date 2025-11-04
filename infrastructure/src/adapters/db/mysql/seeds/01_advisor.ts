@@ -34,6 +34,7 @@ export async function seedSQLAdministrator(
         role: "conseiller",
         createdAt: clockService.now(),
         isActiveField: true,
+        confirmedAt: clockService.now(),
       });
 
       advisors.push(user);

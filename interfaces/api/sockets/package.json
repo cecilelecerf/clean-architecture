@@ -1,0 +1,25 @@
+{
+  "version": "0.1.0",
+  "private": true,
+  "name": "sockets",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "socket": "tsx watch ./src/socket-server.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@types/body-parser": "^1.19.6",
+    "@types/express": "^5.0.3",
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "infrastructure": "workspace:*",
+    "ts-pattern": "^5.9.0",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.6"
+  }
+}

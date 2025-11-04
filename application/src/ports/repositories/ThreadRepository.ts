@@ -18,7 +18,7 @@ export interface ThreadRepository {
   findAllByAdministratorId(
     administratorId: UserEntity["id"]
   ): Promise<ThreadEntity[]>;
-  findOpenThreadsWithUserByParticipantId(
+  findALLExternalThreadWithUserByUserId(
     participantId: UserEntity["id"]
   ): Promise<ThreadEntityWithUsers[]>;
 }

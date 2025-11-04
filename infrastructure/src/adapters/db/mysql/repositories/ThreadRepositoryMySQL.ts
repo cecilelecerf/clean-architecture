@@ -21,7 +21,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
         thread.administratorId,
         thread.title,
         thread.createdAt,
-        thread.updatedAt ?? null,
+        thread.createdAt,
         thread.isClose ? 1 : 0,
         thread.type,
       ]
@@ -181,7 +181,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
   /**
    * Récupère les threads ouverts pour un participant donné avec les informations de l'administrateur
    */
-  async findOpenThreadsWithUserByParticipantId(
+  async findALLExternalThreadWithUserByUserId(
     participantId: string
   ): Promise<ThreadEntityWithUsers[]> {
     const rows = await this.client.query<RowDataPacket[]>(
@@ -206,12 +206,12 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     JOIN users admin ON t.administrator_id = admin.id
     JOIN thread_participant tp ON t.id = tp.thread_id
     JOIN users p ON tp.user_id = p.id
-    WHERE t.is_close = 0 AND tp.thread_id IN (
+    WHERE t.is_close = 0 AND (tp.thread_id IN (
       SELECT thread_id FROM thread_participant WHERE user_id = ?
-    )      
+    ) OR t.administrator_id = ?)
     ORDER BY t.updated_at DESC, t.created_at DESC
     `,
-      [participantId]
+      [participantId, participantId]
     );
 
     const threadsMap = new Map<string, ThreadEntityWithUsers>();

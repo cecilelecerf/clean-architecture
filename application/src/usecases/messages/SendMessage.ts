@@ -59,6 +59,7 @@ export class SendMessage {
     const validateContent = message.validateContent();
     if (validateContent instanceof Error) return validateContent;
     await this.messageRepository.save(message);
+
     return message;
   }
 }

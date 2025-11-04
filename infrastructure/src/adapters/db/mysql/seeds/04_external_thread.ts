@@ -7,11 +7,7 @@ import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
-
-// helpers
-const rand = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
-const pick = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+import { pick, rand } from "./utils";
 
 const lorem = [
   "Bonjour, j’ai une question concernant mon compte.",

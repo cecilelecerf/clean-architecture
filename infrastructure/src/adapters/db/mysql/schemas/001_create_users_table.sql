@@ -8,5 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     is_active BOOLEAN DEFAULT TRUE NOT NULL,
     created_at DATETIME NOT NULL,
     confirmed_at DATETIME,
-    modified_at DATETIME
+    modified_at DATETIME,
+    advisor_id VARCHAR(36),
+    FOREIGN KEY(advisor_id) REFERENCES users(id)
 );

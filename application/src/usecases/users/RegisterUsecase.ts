@@ -1,4 +1,5 @@
 import { EmailAlreadyExistsError } from "@application/errors/users/EmailAlreadyExistsError";
+import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { EmailService } from "@application/ports/services/EmailService";
@@ -32,7 +33,10 @@ export class RegisterUsecase {
     plainedPassword,
     confirmationUrl,
   }: Props): Promise<
-    UserEntity | EmailInvalidFormatError | EmailAlreadyExistsError
+    | UserEntity
+    | EmailInvalidFormatError
+    | EmailAlreadyExistsError
+    | UserNotFoundError
   > {
     const emailVO = Email.create(email);
     if (emailVO instanceof Error) return emailVO;
@@ -40,10 +44,11 @@ export class RegisterUsecase {
     const existingUser = await this.userRepository.findByEmail(emailVO);
     if (existingUser) return new EmailAlreadyExistsError(emailVO);
 
+    const advisor = await this.userRepository.findLeastAssignedActiveAdvisor();
+    if (!advisor) return new UserNotFoundError();
     const passwordHash = await this.encryptionService.hash(plainedPassword);
 
     const id = this.uuidService.generate();
-
     const createdAt = this.clockService.now();
 
     const user = UserEntity.from({
@@ -55,6 +60,7 @@ export class RegisterUsecase {
       createdAt,
       role: "client",
       isActiveField: false,
+      advisorId: advisor.id,
     });
 
     this.userRepository.save(user);

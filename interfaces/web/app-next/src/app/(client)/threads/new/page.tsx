@@ -1,6 +1,7 @@
 "use client"
 import { NewThread } from "@/app/api/client/threads/route";
 import FormWrapper, { Field } from "@/components/FromWrapper";
+import { ButtonBack } from "@/components/ButtonBack";
 import { clientEndpoints } from "@/utils/endpoint.ts";
 import { Thread } from "@infrastructure/types/thread";
 import { useMutation } from "@tanstack/react-query";
@@ -32,13 +33,16 @@ export default function NewThreadPage() {
     }
 
     return (
-        <form onSubmit={(e) => onSubmit(e)} className="max-w-lg mx-auto mt-10" >
-            <FormWrapper
-                title="Nouvelle conversation"
-                fields={fields}
-                button="Contacter"
-                loading={mutate.isPending}
-            />
-        </form >
+        <>
+            <ButtonBack />
+            <form onSubmit={(e) => onSubmit(e)} className="max-w-lg mx-auto mt-10" >
+                <FormWrapper
+                    title="Nouvelle conversation"
+                    fields={fields}
+                    button="Contacter"
+                    loading={mutate.isPending}
+                />
+            </form >
+        </>
     );
 }

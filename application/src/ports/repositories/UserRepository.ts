@@ -9,4 +9,5 @@ export interface UserRepository {
   save(user: UserEntity): Promise<void>;
   update(user: UserEntity): Promise<void>;
   delete(id: UserEntity["id"]): Promise<void>;
+  findLeastAssignedActiveAdvisor(): Promise<UserEntity | null>;
 }

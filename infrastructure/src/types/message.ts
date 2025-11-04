@@ -12,3 +12,5 @@ export const messageSchema = z.object({
   sentAt: z.iso.datetime(),
   readBy: userIdSchema.array(),
 });
+
+export type Message = z.infer<typeof messageSchema>;

@@ -1,5 +1,11 @@
 export const rawAdvisors = [
   {
+    firstname: "advisors",
+    lastname: "advisors",
+    email: "advisors@example.com",
+    password: "password123",
+  },
+  {
     firstname: "Sophie",
     lastname: "Morel",
     email: "sophie.morel@example.com",
@@ -57,12 +63,6 @@ export const rawAdvisors = [
     firstname: "Hugo",
     lastname: "Fournier",
     email: "hugo.fournier@example.com",
-    password: "password123",
-  },
-  {
-    firstname: "advisors",
-    lastname: "advisors",
-    email: "advisors@example.com",
     password: "password123",
   },
 ];

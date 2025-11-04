@@ -6,10 +6,7 @@ import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { UserEntity } from "@domain/entities/UserEntity";
-
-const rand = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
-const pick = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+import { pick, rand } from "./utils";
 
 const lorem = [
   "Merci pour la mise à jour du rapport.",
