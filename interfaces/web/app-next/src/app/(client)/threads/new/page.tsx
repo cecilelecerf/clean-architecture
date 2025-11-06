@@ -2,11 +2,11 @@
 import { NewThread } from "@/app/api/client/threads/route";
 import FormWrapper, { Field } from "@/components/FromWrapper";
 import { ButtonBack } from "@/components/ButtonBack";
-import { clientEndpoints } from "@/utils/endpoint.ts";
 import { Thread } from "@infrastructure/types/thread";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { clientEndpoints } from "@/utils/endpoint/client";
 
 export default function NewThreadPage() {
     const router = useRouter()

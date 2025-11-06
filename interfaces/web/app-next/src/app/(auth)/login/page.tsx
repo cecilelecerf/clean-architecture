@@ -2,7 +2,7 @@
 import FormWrapper from '../../../components/FromWrapper';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
 export default function LoginPage() {

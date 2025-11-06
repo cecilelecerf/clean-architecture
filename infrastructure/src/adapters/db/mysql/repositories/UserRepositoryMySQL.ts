@@ -23,7 +23,7 @@ export class UserRepositoryMySQL implements UserRepository {
       passwordHash: row.password_hash,
       role: row.role,
       isActiveField: row.is_active,
-      createdAt: row.creadted_at,
+      createdAt: row.created_at,
       confirmedAt: row.confirmed_at,
       modifiedAt: row.modified_at,
       advisorId: row.advisor_id,
@@ -45,7 +45,7 @@ export class UserRepositoryMySQL implements UserRepository {
       passwordHash: row.password_hash,
       role: row.role,
       isActiveField: row.is_active,
-      createdAt: row.creadted_at,
+      createdAt: row.created_at,
       confirmedAt: row.confirmed_at,
       modifiedAt: row.modified_at,
       advisorId: row.advisor_id,
@@ -65,7 +65,7 @@ export class UserRepositoryMySQL implements UserRepository {
         passwordHash: row.password_hash,
         role: row.role,
         isActiveField: row.is_active,
-        createdAt: row.creadted_at,
+        createdAt: row.created_at,
         confirmedAt: row.confirmed_at,
         modifiedAt: row.modified_at,
         advisorId: row.advisor_id,
@@ -87,7 +87,7 @@ export class UserRepositoryMySQL implements UserRepository {
         passwordHash: row.password_hash,
         role: row.role,
         isActiveField: row.is_active,
-        createdAt: row.creadted_at,
+        createdAt: row.created_at,
         confirmedAt: row.confirmed_at,
         modifiedAt: row.modified_at,
         advisorId: row.advisor_id,
@@ -177,7 +177,7 @@ export class UserRepositoryMySQL implements UserRepository {
       passwordHash: row.password_hash,
       role: row.role,
       isActiveField: row.is_active,
-      createdAt: row.creadted_at,
+      createdAt: row.created_at,
       confirmedAt: row.confirmed_at,
       modifiedAt: row.modified_at,
     });
@@ -185,7 +185,7 @@ export class UserRepositoryMySQL implements UserRepository {
 
   async findAllByAdvisor(advisorId: UserEntity["id"]): Promise<UserEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM users WHERE advisorId = ?",
+      "SELECT * FROM users WHERE advisor_id = ?",
       [advisorId]
     );
     return rows.map((row) =>
@@ -197,7 +197,7 @@ export class UserRepositoryMySQL implements UserRepository {
         passwordHash: row.password_hash,
         role: row.role,
         isActiveField: row.is_active,
-        createdAt: row.creadted_at,
+        createdAt: row.created_at,
         confirmedAt: row.confirmed_at,
         modifiedAt: row.modified_at,
         advisorId: row.advisor_id,

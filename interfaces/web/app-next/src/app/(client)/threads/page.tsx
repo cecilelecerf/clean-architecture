@@ -2,8 +2,8 @@
 import { ButtonLink } from "@/components/ButtonLink";
 import { Card } from "@/components/ui/card";
 import { socket } from "@/lib/socket";
-import { clientEndpoints } from "@/utils/endpoint.ts";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
+import { clientEndpoints } from "@/utils/endpoint/client";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

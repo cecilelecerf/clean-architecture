@@ -9,7 +9,7 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 type Props = { userId: PostEntity["advisorId"] } & Pick<PostEntity, "id">;
-export class PublishMessageInPostUsecase {
+export class PublishPostUsecase {
   constructor(
     private readonly feedRepository: PostRepository,
     private readonly userRepository: UserRepository,

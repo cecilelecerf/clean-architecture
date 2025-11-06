@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { forgotPasswordFactory } from '@infrastructure/adapters/db/mysql/factories/users/forgotPasswordFactory';
+import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
 
-const forgotPasswordUsecase = forgotPasswordFactory;
 export async function POST(req: NextRequest) {
   try {
     const { email } = await req.json();
     if (!email) return NextResponse.json({ message: 'Email requis' }, { status: 400 });
 
-    const result = await forgotPasswordUsecase().execute({
+    const result = await usersFactory().forgotPassword.execute({
       email,
       confirmationUrl: process.env.FRONTEND_URL,
     });

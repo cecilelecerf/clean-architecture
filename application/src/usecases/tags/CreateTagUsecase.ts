@@ -1,0 +1,48 @@
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+import { TagRepository } from "@application/ports/repositories/TagRepository";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { ClockService } from "@application/ports/services/ClockService";
+import { UuidService } from "@application/ports/services/UuidService";
+import { findActiveUser } from "@application/utils/userValidators";
+import { TagEntity } from "@domain/entities/TagEntity";
+import { UserEntity } from "@domain/entities/UserEntity";
+
+interface CreateTagInput {
+  label: string;
+  color: TagEntity["color"];
+  advisorId: UserEntity["id"];
+}
+
+export class CreateTagUseCase {
+  constructor(
+    private readonly tagRepository: TagRepository,
+    private readonly userRepository: UserRepository,
+    private readonly uuidService: UuidService,
+    private readonly clockService: ClockService
+  ) {}
+
+  async execute({
+    label,
+    color,
+    advisorId,
+  }: CreateTagInput): Promise<
+    TagEntity | UserNotFoundError | UserNotActiveError | UserRoleMismatchError
+  > {
+    const user = await findActiveUser(this.userRepository, advisorId);
+    if (user instanceof Error) return user;
+    if (user.hasRole({ role: "client" }))
+      return new UserRoleMismatchError(["conseiller", "directeur"], user.role);
+
+    const tag = TagEntity.from({
+      id: this.uuidService.generate(),
+      label: label,
+      color: color,
+      createdAt: this.clockService.now(),
+    });
+
+    await this.tagRepository.save(tag);
+    return tag;
+  }
+}

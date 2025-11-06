@@ -217,7 +217,6 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     const threadsMap = new Map<string, ThreadEntityWithUsers>();
 
     for (const row of rows) {
-      // Check if thread already exists in map
       if (!threadsMap.has(row.id)) {
         const thread = ThreadEntity.from({
           id: row.id,
@@ -245,7 +244,6 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
         threadsMap.set(row.id, thread);
       }
 
-      // Add participant to the thread
       const thread = threadsMap.get(row.id)!;
       thread.participants.push(
         UserEntity.from({
@@ -260,7 +258,6 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
         })
       );
 
-      // Add participant ID to participantsId array if not already present
       if (!thread.participantsId.includes(row.participant_id)) {
         thread.participantsId.push(row.participant_id);
       }
@@ -336,9 +333,174 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       })
     );
 
-    // IDs des participants
     thread.participantsId = participants.map((p) => p.id);
 
     return Object.assign(thread, { administrator, participants });
+  }
+
+  async findAllWithUserByAdministratorId(
+    administratorId: UserEntity["id"]
+  ): Promise<ThreadEntityWithUsers[]> {
+    console.log("admin");
+
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT t.*, 
+          admin.id as admin_id,
+          admin.firstname as admin_firstname,
+          admin.lastname as admin_lastname,
+          admin.email as admin_email,
+          admin.role as admin_role,
+          admin.created_at as admin_created_at,
+          admin.is_active as admin_is_active,
+          admin.password_hash as admin_password_hash,
+          p.id as participant_id,
+          p.firstname as participant_firstname,
+          p.lastname as participant_lastname,
+          p.email as participant_email,
+          p.role as participant_role,
+          p.created_at as participant_created_at,
+          p.is_active as participant_is_active,
+          p.password_hash as participant_password_hash
+    FROM threads t
+    JOIN users admin ON t.administrator_id = admin.id
+    JOIN thread_participant tp ON t.id = tp.thread_id
+    JOIN users p ON tp.user_id = p.id
+    WHERE t.administrator_id = ?
+    `,
+      [administratorId]
+    );
+
+    const threadsMap = new Map<string, ThreadEntityWithUsers>();
+
+    for (const row of rows) {
+      if (!threadsMap.has(row.id)) {
+        const thread = ThreadEntity.from({
+          id: row.id,
+          administratorId: row.administrator_id,
+          participantsId: [],
+          title: row.title,
+          createdAt: new Date(row.created_at),
+          updatedAt: row.updated_at ? new Date(row.updated_at) : undefined,
+          isClose: row.is_close === 1,
+          type: row.type,
+        }) as ThreadEntityWithUsers;
+
+        thread.administrator = UserEntity.from({
+          id: row.admin_id,
+          firstname: row.admin_firstname,
+          lastname: row.admin_lastname,
+          email: row.admin_email,
+          role: row.admin_role,
+          createdAt: new Date(row.admin_created_at),
+          isActiveField: row.admin_is_active === 1,
+          passwordHash: row.admin_password_hash,
+        });
+
+        thread.participants = [];
+        threadsMap.set(row.id, thread);
+      }
+
+      const thread = threadsMap.get(row.id)!;
+      thread.participants.push(
+        UserEntity.from({
+          id: row.participant_id,
+          firstname: row.participant_firstname,
+          lastname: row.participant_lastname,
+          email: row.participant_email,
+          role: row.participant_role,
+          createdAt: new Date(row.participant_created_at),
+          isActiveField: row.participant_is_active === 1,
+          passwordHash: row.participant_password_hash,
+        })
+      );
+
+      if (!thread.participantsId.includes(row.participant_id)) {
+        thread.participantsId.push(row.participant_id);
+      }
+    }
+
+    return Array.from(threadsMap.values());
+  }
+
+  async findAllWithUserByAdministratorNullable(): Promise<
+    ThreadEntityWithUsers[]
+  > {
+    console.log("nullable");
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT t.*, 
+          admin.id as admin_id,
+          admin.firstname as admin_firstname,
+          admin.lastname as admin_lastname,
+          admin.email as admin_email,
+          admin.role as admin_role,
+          admin.created_at as admin_created_at,
+          admin.is_active as admin_is_active,
+          admin.password_hash as admin_password_hash,
+          p.id as participant_id,
+          p.firstname as participant_firstname,
+          p.lastname as participant_lastname,
+          p.email as participant_email,
+          p.role as participant_role,
+          p.created_at as participant_created_at,
+          p.is_active as participant_is_active,
+          p.password_hash as participant_password_hash
+    FROM threads t
+    JOIN users admin ON t.administrator_id = admin.id
+    JOIN thread_participant tp ON t.id = tp.thread_id
+    JOIN users p ON tp.user_id = p.id
+    WHERE t.administrator_id = null
+    `
+    );
+
+    const threadsMap = new Map<string, ThreadEntityWithUsers>();
+
+    for (const row of rows) {
+      if (!threadsMap.has(row.id)) {
+        const thread = ThreadEntity.from({
+          id: row.id,
+          administratorId: row.administrator_id,
+          participantsId: [],
+          title: row.title,
+          createdAt: new Date(row.created_at),
+          updatedAt: row.updated_at ? new Date(row.updated_at) : undefined,
+          isClose: row.is_close === 1,
+          type: row.type,
+        }) as ThreadEntityWithUsers;
+
+        thread.administrator = UserEntity.from({
+          id: row.admin_id,
+          firstname: row.admin_firstname,
+          lastname: row.admin_lastname,
+          email: row.admin_email,
+          role: row.admin_role,
+          createdAt: new Date(row.admin_created_at),
+          isActiveField: row.admin_is_active === 1,
+          passwordHash: row.admin_password_hash,
+        });
+
+        thread.participants = [];
+        threadsMap.set(row.id, thread);
+      }
+
+      const thread = threadsMap.get(row.id)!;
+      thread.participants.push(
+        UserEntity.from({
+          id: row.participant_id,
+          firstname: row.participant_firstname,
+          lastname: row.participant_lastname,
+          email: row.participant_email,
+          role: row.participant_role,
+          createdAt: new Date(row.participant_created_at),
+          isActiveField: row.participant_is_active === 1,
+          passwordHash: row.participant_password_hash,
+        })
+      );
+
+      if (!thread.participantsId.includes(row.participant_id)) {
+        thread.participantsId.push(row.participant_id);
+      }
+    }
+
+    return Array.from(threadsMap.values());
   }
 }

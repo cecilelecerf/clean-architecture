@@ -5,16 +5,18 @@ import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
 import { AdministratorCannotLeaveThreadError } from "@domain/errors/thread/AdministratorCannotLeaveThreadError";
 import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
 import { ThreadTransferToSameAdministratorError } from "@domain/errors/thread/ThreadTransferToSameAdministratorError";
+import { ThreadNotActiveError } from "@domain/errors/thread/ThreadNotActiveError";
+import { ThreadAlreadyHasAdvisorError } from "@domain/errors/thread/ThreadAlreadyHasAdvisorError";
 
 export class ThreadEntity {
   private constructor(
     public id: string,
-    public administratorId: UserEntity["id"],
     public participantsId: UserEntity["id"][],
     public title: string,
     public createdAt: Date,
     public isClose: boolean,
     public type: "external" | "internal",
+    public administratorId?: UserEntity["id"],
     public updatedAt?: Date
   ) {}
 
@@ -42,12 +44,12 @@ export class ThreadEntity {
     if (verifiedTitle instanceof Error) return verifiedTitle;
     return new ThreadEntity(
       id,
-      administratorId,
       participantsId,
       verifiedTitle,
       createdAt,
       isClose,
       type,
+      administratorId,
       updatedAt
     );
   }
@@ -74,12 +76,12 @@ export class ThreadEntity {
   >) {
     return new ThreadEntity(
       id,
-      administratorId,
       participantsId,
       title,
       createdAt,
       isClose,
       type,
+      administratorId,
       updatedAt
     );
   }
@@ -168,5 +170,30 @@ export class ThreadEntity {
 
     this.updatedAt = now;
     return this;
+  }
+  private hasAdministrator(): boolean {
+    return !!this.administratorId;
+  }
+  private ensureCanAssignAdvisorInExternal():
+    | ThreadNotActiveError
+    | ThreadAlreadyHasAdvisorError
+    | void {
+    if (this.isClose) {
+      return new ThreadNotActiveError("Le thread n'est plus actif.");
+    }
+
+    if (this.hasAdministrator()) {
+      return new ThreadAlreadyHasAdvisorError(
+        "Ce thread a déjà un conseiller."
+      );
+    }
+  }
+
+  public assignAdvisor(
+    userId: UserEntity["id"]
+  ): ThreadNotActiveError | ThreadAlreadyHasAdvisorError | void {
+    const error = this.ensureCanAssignAdvisorInExternal();
+    if (error instanceof Error) return error;
+    this.administratorId = userId;
   }
 }

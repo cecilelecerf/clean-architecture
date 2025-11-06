@@ -1,4 +1,6 @@
 import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
 import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
@@ -8,11 +10,13 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
+import { InvalidPostContentError } from "@domain/errors/posts/InvalidPostContentError";
+import { InvalidPostTitleError } from "@domain/errors/posts/InvalidPostTitleError";
 type Props = { tagsId: TagEntity["id"][]; published?: boolean } & Pick<
   PostEntity,
   "content" | "title" | "advisorId"
 >;
-export class AddMessageInPostUsecase {
+export class AddPostUsecase {
   constructor(
     private readonly feedRepository: PostRepository,
     private readonly tagRepository: TagRepository,
@@ -26,7 +30,15 @@ export class AddMessageInPostUsecase {
     content,
     tagsId,
     published,
-  }: Props) {
+  }: Props): Promise<
+    | PostEntity
+    | UserNotFoundError
+    | UserNotActiveError
+    | InvalidPostContentError
+    | InvalidPostTitleError
+    | UserRoleMismatchError
+    | TagNotFoundError
+  > {
     const advisor = await findActiveUser(this.userRepository, advisorId);
     if (advisor instanceof Error) return advisor;
 
@@ -57,6 +69,7 @@ export class AddMessageInPostUsecase {
     });
     if (post instanceof Error) return post;
     await this.feedRepository.save(post);
+    return post;
   }
 }
 

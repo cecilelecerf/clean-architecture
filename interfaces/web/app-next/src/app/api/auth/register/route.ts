@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { registerFactory } from '@infrastructure/adapters/db/mysql/factories/users/registerFactory';
 import { userSchema } from '@infrastructure/types/user';
+import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
 import z from 'zod';
 
 const clientUrl = process.env.NEXT_PUBLIC_CLIENT_URL;
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   try {
     const json = await req.json();
     const data: RegisterPayload = reqSchema.parse(json);
-    const result = await registerFactory().execute({
+    const result = await usersFactory().register.execute({
       ...data,
       confirmationUrl: clientUrl,
     });

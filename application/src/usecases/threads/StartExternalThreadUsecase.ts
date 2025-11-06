@@ -20,11 +20,9 @@ import { ContentEmptyError } from "@domain/errors/message/ContentEmptyError";
 import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
 
 type Props = {
-  administratorId?: UserEntity["id"];
   clientId: UserEntity["id"];
   messageContent: MessageEntity["content"];
 } & Pick<ThreadEntity, "title">;
-
 export class StartExternalThreadUsecase {
   constructor(
     private readonly threadRepository: ThreadRepository,
@@ -36,7 +34,6 @@ export class StartExternalThreadUsecase {
   public async execute({
     title,
     clientId,
-    administratorId,
     messageContent,
   }: Props): Promise<
     | ThreadEntity
@@ -56,16 +53,6 @@ export class StartExternalThreadUsecase {
 
     if (!client?.hasRole({ role: "client" })) return new UserNotFoundError();
 
-    const advisorId: UserEntity["id"] | undefined =
-      administratorId ?? client.advisorId;
-    if (!advisorId) return new NoAdvisorFoundError();
-
-    const advisor = await findActiveUser(this.userRepository, advisorId);
-    if (advisor instanceof Error) return advisor;
-
-    if (!advisor?.hasRole({ role: "conseiller" }))
-      return new UserRoleMismatchError(["conseiller"], advisor.role);
-
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
 
@@ -74,7 +61,6 @@ export class StartExternalThreadUsecase {
       createdAt,
       type: "external",
       participantsId: [clientId],
-      administratorId: advisor.id,
       title,
       isClose: false,
     });
@@ -89,7 +75,7 @@ export class StartExternalThreadUsecase {
       this.clockService
     ).execute({
       content: messageContent,
-      senderId: administratorId ?? client.id,
+      senderId: client.id,
       threadId: thread.id,
     });
     if (message instanceof Error) return message;

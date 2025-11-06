@@ -8,20 +8,24 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
-type Props = { userId: PostEntity["advisorId"] } & Pick<
-  PostEntity,
-  "content" | "title" | "id"
->;
-export class EditMessageInPostUsecase {
+import { UpdateTagsPostUsecase } from "./UpdateTagsPostUsecase";
+import { TagRepository } from "@application/ports/repositories/TagRepository";
+type Props = {
+  userId: PostEntity["advisorId"];
+  id: PostEntity["id"];
+} & Partial<Pick<PostEntity, "content" | "title" | "tagsId">>;
+export class EditPostUsecase {
   constructor(
     private readonly feedRepository: PostRepository,
     private readonly userRepository: UserRepository,
+    private readonly tagRepository: TagRepository,
     private readonly clockService: ClockService
   ) {}
   public async execute({
     userId,
     title,
     content,
+    tagsId,
     id: postId,
   }: Props): Promise<
     | PostEntity
@@ -42,9 +46,16 @@ export class EditMessageInPostUsecase {
 
     const updatedAt = this.clockService.now();
 
-    post.editContent(content, updatedAt);
-    post.editTitle(title, updatedAt);
+    if (content) post.editContent(content, updatedAt);
+    if (title) post.editTitle(title, updatedAt);
+    if (tagsId)
+      new UpdateTagsPostUsecase(
+        this.feedRepository,
+        this.userRepository,
+        this.tagRepository
+      ).execute({ userId: user.id, id: post.id, tagsId: tagsId });
 
+    if (post instanceof Error) return post;
     await this.feedRepository.update(post);
     return post;
   }

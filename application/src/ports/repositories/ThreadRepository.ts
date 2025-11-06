@@ -11,13 +11,19 @@ export interface ThreadRepository {
   update(thread: ThreadEntity): Promise<void>;
   delete(id: ThreadEntity["id"]): Promise<void>;
   findById(id: ThreadEntity["id"]): Promise<ThreadEntity | null>;
-  findWithUserById(
-    id: ThreadEntity["id"]
-  ): Promise<ThreadEntityWithUsers | null>;
   findAllByParticipantId(userId: UserEntity["id"]): Promise<ThreadEntity[]>;
   findAllByAdministratorId(
     administratorId: UserEntity["id"]
   ): Promise<ThreadEntity[]>;
+
+  // With user
+  findWithUserById(
+    id: ThreadEntity["id"]
+  ): Promise<ThreadEntityWithUsers | null>;
+  findAllWithUserByAdministratorId(
+    administratorId: UserEntity["id"]
+  ): Promise<ThreadEntityWithUsers[]>;
+  findAllWithUserByAdministratorNullable(): Promise<ThreadEntityWithUsers[]>;
   findALLExternalThreadWithUserByUserId(
     participantId: UserEntity["id"]
   ): Promise<ThreadEntityWithUsers[]>;

@@ -1,5 +1,8 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
-import { PostRepository } from "@application/ports/repositories/PostRepository";
+import {
+  PostRepository,
+  PostWithTags,
+} from "@application/ports/repositories/PostRepository";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
@@ -175,5 +178,149 @@ export class PostRepositoryMySQL implements PostRepository {
       if (post) posts.push(post);
     }
     return posts;
+  }
+
+  async findAllPaginatedWithTagsByFilters(
+    filters: {
+      dateFrom?: Date;
+      dateTo?: Date;
+      tagsId?: string[];
+      name?: string;
+      published?: boolean;
+    },
+    pagination: { page: number; limit: number }
+  ): Promise<{ posts: PostWithTags[]; total: number }> {
+    const whereClauses: string[] = [];
+    const params: any[] = [];
+
+    if (filters.dateFrom) {
+      whereClauses.push("p.created_at >= ?");
+      params.push(filters.dateFrom);
+    }
+    if (filters.dateTo) {
+      whereClauses.push("p.created_at <= ?");
+      params.push(filters.dateTo);
+    }
+
+    let tagJoin = "";
+    if (filters.tagsId?.length) {
+      tagJoin = "INNER JOIN post_tag pt ON p.id = pt.post_id";
+      whereClauses.push(
+        `pt.tag_id IN (${filters.tagsId.map(() => "?").join(",")})`
+      );
+      params.push(...filters.tagsId);
+    }
+
+    if (filters.name) {
+      whereClauses.push("p.title LIKE ?");
+      params.push(`%${filters.name}%`);
+    }
+
+    if (typeof filters.published === "boolean") {
+      if (filters.published) {
+        whereClauses.push("p.published_at IS NOT NULL");
+      } else {
+        whereClauses.push("p.published_at IS NULL");
+      }
+    }
+
+    const whereSQL = whereClauses.length
+      ? "WHERE " + whereClauses.join(" AND ")
+      : "";
+
+    const offset = (pagination.page - 1) * pagination.limit;
+
+    const rows = await this.client.query<RowDataPacket[]>(
+      `
+      SELECT DISTINCT p.*
+      FROM posts p
+      ${tagJoin}
+      ${whereSQL}
+      ORDER BY p.created_at DESC
+      LIMIT ? OFFSET ?
+      `,
+      [...params, pagination.limit, offset]
+    );
+
+    const totalRows = await this.client.query<RowDataPacket[]>(
+      `
+      SELECT COUNT(DISTINCT p.id) as total
+      FROM posts p
+      ${tagJoin}
+      ${whereSQL}
+      `,
+      params
+    );
+    const total = totalRows[0]?.total || 0;
+
+    const posts = await Promise.all(
+      rows.map(async (row) => {
+        const tagRows = await this.client.query<RowDataPacket[]>(
+          `SELECT t.* FROM post_tag pt JOIN tags t WHERE t.id = pt.id WHERE pt.post_id = ? `,
+          [row.id]
+        );
+        const tagsId = tagRows.map((r) => r.id);
+        const tags = tagRows.map((tagRow) =>
+          TagEntity.from({
+            id: tagRow.id,
+            label: tagRow.label,
+            color: tagRow.color,
+            createdAt: tagRow.created_at,
+            modifiedAt: tagRow.modified_at,
+          })
+        );
+        const post = PostEntity.from({
+          id: row.id,
+          advisorId: row.advisor_id,
+          title: row.title,
+          content: row.content,
+          tagsId,
+          createdAt: row.created_at,
+          modifiedAt: row.modified_at ?? undefined,
+          publishedAt: row.published_at ?? undefined,
+          readBy: [],
+        });
+        return Object.assign(post, { tags });
+      })
+    );
+
+    return { posts, total };
+  }
+
+  async findWithTagsById(id: PostEntity["id"]): Promise<PostWithTags | null> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT * FROM posts WHERE id = ?`,
+      [id]
+    );
+    if (rows.length === 0) return null;
+    const row = rows[0];
+
+    const tagRows = await this.client.query<RowDataPacket[]>(
+      `SELECT t.* FROM post_tag pt JOIN tags t WHERE t.id = pt.id WHERE pt.post_id = ? `,
+      [row.id]
+    );
+    const tagsId = tagRows.map((r) => r.id);
+    const tags = tagRows.map((tagRow) =>
+      TagEntity.from({
+        id: tagRow.id,
+        label: tagRow.label,
+        color: tagRow.color,
+        createdAt: tagRow.created_at,
+        modifiedAt: tagRow.modified_at,
+      })
+    );
+    const post = PostEntity.from({
+      id: row.id,
+      advisorId: row.advisorId,
+      title: row.title,
+      content: row.content,
+      tagsId,
+      createdAt: row.createdAt,
+      modifiedAt: row.modifiedAt ?? undefined,
+      publishedAt: row.publishedAt ?? undefined,
+      // TODO : à remplir si tu veux gérer la lecture par utilisateurs
+      readBy: [],
+    });
+    return Object.assign(post, { tags });
   }
 }

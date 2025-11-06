@@ -7,8 +7,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "seed:mysql": "tsx --tsconfig ./tsconfig.json ./src/adapters/db/mysql/seeds/index.ts",
-    "mysql:restart": "tsx --tsconfig ./tsconfig.json ./src/adapters/db/mysql/seeds/drop-and-create-db.ts"
+    "seed:mysql": "tsx ./src/adapters/db/mysql/seeds/index.ts",
+    "mysql:restart": "tsx ./src/adapters/db/mysql/seeds/drop-and-create-db.ts"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
@@ -21,7 +21,6 @@
     "bcryptjs": "^3.0.2",
     "domain": "workspace:*",
     "dotenv": "^17.2.3",
-    "fs": "0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.15.3",
     "nodemailer": "^7.0.10",

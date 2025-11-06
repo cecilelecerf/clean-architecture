@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
 async function request<T>(
   path: string,
@@ -35,7 +35,7 @@ async function request<T>(
   }
 }
 
-type Scope = 'client' | 'director' | 'activisor' | 'other';
+type Scope = 'client' | 'director' | 'advisor' | 'other';
 export function post<T, B = unknown>(path: string, body: B, scope?: Scope) {
   const userScope = scope ? `/${scope}` : '';
   return request<T>(`${userScope}${path}`, { method: 'POST', body });
@@ -44,4 +44,13 @@ export function post<T, B = unknown>(path: string, body: B, scope?: Scope) {
 export function get<T>(path: string, scope?: Scope) {
   const userScope = scope ? `/${scope}` : '';
   return request<T>(`${userScope}${path}`, { method: 'GET' });
+}
+
+export function patch<T, B = unknown>(path: string, body: B, scope?: Scope) {
+  const userScope = scope ? `/${scope}` : '';
+  return request<T>(`${userScope}${path}`, { method: 'PATCH', body });
+}
+export function deleteEntity<T, B = unknown>(path: string, scope?: Scope) {
+  const userScope = scope ? `/${scope}` : '';
+  return request<T>(`${userScope}${path}`, { method: 'DELETE' });
 }

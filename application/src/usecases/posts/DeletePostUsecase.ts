@@ -10,7 +10,7 @@ import { PostEntity } from "@domain/entities/PostEntity";
 type Props = { userId: PostEntity["advisorId"] } & Pick<PostEntity, "id">;
 
 // TODO delete Error
-export class DeleteMessageInPostUsecase {
+export class DeletePostUsecase {
   constructor(
     private readonly feedRepository: PostRepository,
     private readonly userRepository: UserRepository

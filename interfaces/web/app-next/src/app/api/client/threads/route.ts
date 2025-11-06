@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clientGetAllThreadFactory } from '@infrastructure/adapters/db/mysql/factories/threads/clientGetAllThreadFactory';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
-import { startExternalThreadFactory } from '@infrastructure/adapters/db/mysql/factories/threads/startExternalThreadFactory';
+import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
 import { threadSchema } from '@infrastructure/types/thread';
 import z from 'zod';
 import { messageSchema } from '@infrastructure/types/message';
@@ -13,7 +12,7 @@ export async function GET(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    const result = await clientGetAllThreadFactory().execute(session.user.id);
+    const result = await threadsFactory().clientGetAllThread.execute(session.user.id);
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },
@@ -40,7 +39,7 @@ export async function POST(req: NextRequest) {
     }
     const json = await req.json();
     const data = newThreadSchmea.parse(json);
-    const thread = await startExternalThreadFactory().execute({
+    const thread = await threadsFactory().startExternalThread.execute({
       ...data,
       clientId: session.user.id,
     });

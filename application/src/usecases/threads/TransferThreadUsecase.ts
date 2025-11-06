@@ -65,7 +65,7 @@ export class TransferThreadUsecase {
 Règle métier : 
 - Le thread doit être ouvert
 - L'user doit être différent de l'ancien administrateur
-- Doit mettre à jouir la date de modification
+- Doit mettre à jour la date de modification
 
 Règle applicative :
 - Le thread doit exister

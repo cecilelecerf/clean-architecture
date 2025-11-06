@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { loginFactory } from '@infrastructure/adapters/db/mysql/factories/users/loginFactory';
+import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
 
 export const authOptions = {
   providers: [
@@ -11,7 +11,7 @@ export const authOptions = {
         password: { label: 'Mot de passe', type: 'password' },
       },
       async authorize(credentials) {
-        const result = await loginFactory().execute({
+        const result = await usersFactory().login.execute({
           email: credentials.email,
           plainedPassword: credentials.password,
         });
