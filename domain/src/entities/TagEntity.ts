@@ -1,8 +1,10 @@
+import { Color } from "@domain/values/Color";
+
 export class TagEntity {
   private constructor(
     public id: string,
     public label: string,
-    public color: "blue" | "red" | "pink" | "yellow",
+    public color: Color,
     public createdAt: Date,
     public modifiedAt?: Date
   ) {}

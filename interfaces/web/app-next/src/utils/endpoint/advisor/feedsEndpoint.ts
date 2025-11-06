@@ -10,8 +10,13 @@ const postWithTagsSchema = postSchema.extend({ tags: tagSchema.array() });
 export const newPostSchema = postSchema.pick({ title: true, content: true, tagsId: true });
 export type NewPost = z.infer<typeof newPostSchema>;
 
-const newTagSchema = tagSchema.pick({ color: true, label: true });
+export const newTagSchema = tagSchema.pick({ color: true, label: true });
 export type NewTag = z.infer<typeof newTagSchema>;
+
+export const publishActionSchema = z.object({
+  action: z.enum(['publish', 'unpublish']),
+});
+type PublishAction = z.infer<typeof publishActionSchema>;
 
 const queryKeys = {
   posts: {
@@ -72,25 +77,16 @@ export const threadsEndpoint = createEndpointsNodes({
         },
       }),
 
-    publish: ({ id }: { id: PostId }) =>
+    action: ({ id, action }: { id: PostId } & PublishAction) =>
       mutationOptions({
         mutationFn: () =>
-          get(`/posts/${id}/publish`, 'advisor').then((data) => postWithTagsSchema.parse(data)),
+          patch(`/posts/${id}/publish`, { action }, 'advisor').then((data) =>
+            postSchema.parse(data),
+          ),
         onSuccess: async () => {
           await Promise.all([
             queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(id) }),
             queryClient.invalidateQueries({ queryKey: queryKeys.posts.list }),
-          ]);
-        },
-      }),
-    unpublish: ({ id }: { id: PostId }) =>
-      mutationOptions({
-        mutationFn: () =>
-          get(`/posts/${id}/unpublish`, 'advisor').then((data) => postWithTagsSchema.parse(data)),
-        onSuccess: async () => {
-          await Promise.all([
-            queryClient.invalidateQueries({ queryKey: queryKeys.posts.list }),
-            queryClient.removeQueries({ queryKey: queryKeys.posts.detail(id) }),
           ]);
         },
       }),

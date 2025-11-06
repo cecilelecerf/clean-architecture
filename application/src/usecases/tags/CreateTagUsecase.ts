@@ -8,10 +8,12 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { ColorInvalidFormatError } from "@domain/errors/color/ColorInvalidFormatError";
+import { Color } from "@domain/values/Color";
 
 interface CreateTagInput {
   label: string;
-  color: TagEntity["color"];
+  color: string;
   advisorId: UserEntity["id"];
 }
 
@@ -28,17 +30,24 @@ export class CreateTagUseCase {
     color,
     advisorId,
   }: CreateTagInput): Promise<
-    TagEntity | UserNotFoundError | UserNotActiveError | UserRoleMismatchError
+    | TagEntity
+    | UserNotFoundError
+    | UserNotActiveError
+    | UserRoleMismatchError
+    | ColorInvalidFormatError
   > {
     const user = await findActiveUser(this.userRepository, advisorId);
     if (user instanceof Error) return user;
     if (user.hasRole({ role: "client" }))
       return new UserRoleMismatchError(["conseiller", "directeur"], user.role);
 
+    const colorVo = Color.from(color);
+    if (colorVo instanceof Error) return colorVo;
+
     const tag = TagEntity.from({
       id: this.uuidService.generate(),
       label: label,
-      color: color,
+      color: colorVo,
       createdAt: this.clockService.now(),
     });
 

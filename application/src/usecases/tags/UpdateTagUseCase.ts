@@ -7,11 +7,13 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { ColorInvalidFormatError } from "@domain/errors/color/ColorInvalidFormatError";
+import { Color } from "@domain/values/Color";
 
 interface Props {
   id: TagEntity["id"];
   label?: string;
-  color?: TagEntity["color"];
+  color?: string;
   administratorId: UserEntity["id"];
 }
 
@@ -32,6 +34,7 @@ export class UpdateTagUseCase {
     | UserNotFoundError
     | UserNotActiveError
     | TagNotFoundError
+    | ColorInvalidFormatError
   > {
     const user = await findActiveUser(this.userRepository, administratorId);
     if (user instanceof Error) return user;
@@ -42,9 +45,12 @@ export class UpdateTagUseCase {
     if (!tag) {
       return new TagNotFoundError();
     }
+    let colorVo;
+    if (color) colorVo = Color.from(color);
+    if (colorVo instanceof Error) return colorVo;
 
     if (label) tag.rename(label);
-    if (color) tag.changeColor(color);
+    if (colorVo) tag.changeColor(colorVo);
 
     await this.tagRepository.update(tag);
     return tag;
