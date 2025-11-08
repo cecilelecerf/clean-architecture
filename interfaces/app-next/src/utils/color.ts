@@ -226,7 +226,7 @@ export const fromColorClasses: Record<number, Record<Color, string>> = {
     red: 'from-red-950',
   },
 };
-export const toColorClasses: Record<number, Record<string, string>> = {
+export const toColorClasses: Record<number, Record<Color, string>> = {
   50: {
     blue: 'to-blue-50',
     green: 'to-green-50',
@@ -339,7 +339,7 @@ export const toColorClasses: Record<number, Record<string, string>> = {
   },
 };
 
-export const bgColorClasses: Record<number, Record<string, string>> = {
+export const bgColorClasses: Record<number, Record<Color, string>> = {
   50: {
     blue: 'bg-blue-50',
     green: 'bg-green-50',

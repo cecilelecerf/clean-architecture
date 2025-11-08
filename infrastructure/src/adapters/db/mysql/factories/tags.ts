@@ -3,12 +3,12 @@ import { TagRepositoryMySQL } from "../repositories/TagRepositoryMySQL";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 
-import { CreateTagUseCase } from "@application/usecases/tags/CreateTagUseCase";
 import { GetTagByIdUseCase } from "@application/usecases/tags/GetTagByIdUseCase";
 import { GetAllTagsUseCase } from "@application/usecases/tags/GetAllTagsUseCase";
 import { UpdateTagUseCase } from "@application/usecases/tags/UpdateTagUseCase";
 import { DeleteTagUseCase } from "@application/usecases/tags/DeleteTagUseCase";
 import { UserRepositoryMySQL } from "../repositories/UserRepositoryMySQL";
+import { AddTagUseCase } from "@application/usecases/tags/CreateTagUsecase";
 
 export const tagsFactory = () => {
   const client = new MySQLClient();
@@ -17,7 +17,7 @@ export const tagsFactory = () => {
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
 
-  const createTag = new CreateTagUseCase(
+  const createTag = new AddTagUseCase(
     tagRepository,
     userRepository,
     uuidService,

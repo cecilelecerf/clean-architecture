@@ -2,7 +2,10 @@ import { PostEntity } from "@domain/entities/PostEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 
-export type PostWithTags = PostEntity & { tags: TagEntity[] };
+export type PostWithTagsAndUser = PostEntity & {
+  tags: TagEntity[];
+  advisor: UserEntity;
+};
 
 export interface PostRepository {
   /** 📬 Créer un nouveau Post */
@@ -26,7 +29,7 @@ export interface PostRepository {
   /** 🔍 Trouver tous les Posts par son tagId */
   findAllByTags(id: TagEntity["id"]): Promise<PostEntity[]>;
 
-  findAllPaginatedWithTagsByFilters(
+  findAllPaginatedWithTagsAndUserByFilters(
     filters: {
       dateFrom?: Date;
       dateTo?: Date;
@@ -38,8 +41,10 @@ export interface PostRepository {
       page: number;
       limit: number;
     }
-  ): Promise<{ posts: PostWithTags[]; total: number }>;
+  ): Promise<{ posts: PostWithTagsAndUser[]; total: number }>;
 
   /** 🔍 Trouver un Post par son ID avec les entity tags */
-  findWithTagsById(id: PostEntity["id"]): Promise<PostWithTags | null>;
+  findWithTagsAndUserById(
+    id: PostEntity["id"]
+  ): Promise<PostWithTagsAndUser | null>;
 }

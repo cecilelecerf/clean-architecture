@@ -46,17 +46,18 @@ export class AdminFindPostWithFilterUsecase {
     if (user instanceof Error) return user;
     if (user.hasRole({ role: "client" }))
       return new UserRoleMismatchError(["conseiller", "directeur"], user.role);
-
-    const posts = await this.postRepository.findAllPaginatedWithTagsByFilters(
-      {
-        dateFrom: fromDate,
-        dateTo: toDate,
-        tags,
-        name,
-        published,
-      },
-      { page, limit }
-    );
+    console.log(page, limit);
+    const posts =
+      await this.postRepository.findAllPaginatedWithTagsAndUserByFilters(
+        {
+          dateFrom: fromDate,
+          dateTo: toDate,
+          tags,
+          name,
+          published,
+        },
+        { page, limit }
+      );
     return posts;
   }
 }

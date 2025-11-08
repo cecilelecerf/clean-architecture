@@ -126,6 +126,183 @@ importers:
         specifier: ^5.6.3
         version: 5.9.3
 
+  interfaces/app-next:
+    dependencies:
+      '@hookform/resolvers':
+        specifier: ^5.2.2
+        version: 5.2.2(react-hook-form@7.65.0)
+      '@radix-ui/react-avatar':
+        specifier: ^1.1.10
+        version: 1.1.10(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-dialog':
+        specifier: ^1.1.15
+        version: 1.1.15(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-label':
+        specifier: ^2.1.7
+        version: 2.1.7(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-popover':
+        specifier: ^1.1.15
+        version: 1.1.15(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-select':
+        specifier: ^2.2.6
+        version: 2.2.6(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-separator':
+        specifier: ^1.1.7
+        version: 1.1.7(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-slot':
+        specifier: ^1.2.3
+        version: 1.2.3(@types/react@19.2.2)(react@19.2.0)
+      '@tailwindcss/postcss':
+        specifier: ^4.1.16
+        version: 4.1.16
+      '@tanstack/react-query':
+        specifier: ^5.90.5
+        version: 5.90.5(react@19.2.0)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
+      eslint:
+        specifier: ^9.38.0
+        version: 9.38.0
+      lucide-react:
+        specifier: ^0.548.0
+        version: 0.548.0(react@19.2.0)
+      next:
+        specifier: 16.0.0
+        version: 16.0.0(@babel/core@7.28.5)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0)(react@19.2.0)
+      next-themes:
+        specifier: ^0.4.6
+        version: 0.4.6(react-dom@19.2.0)(react@19.2.0)
+      postcss:
+        specifier: ^8.5.6
+        version: 8.5.6
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-hook-form:
+        specifier: ^7.65.0
+        version: 7.65.0(react@19.2.0)
+      socket.io-client:
+        specifier: ^4.8.1
+        version: 4.8.1
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.0)(react@19.2.0)
+      tailwind-merge:
+        specifier: ^3.3.1
+        version: 3.3.1
+      tailwindcss:
+        specifier: ^4.1.16
+        version: 4.1.16
+      ts-pattern:
+        specifier: ^5.9.0
+        version: 5.9.0
+      uuid:
+        specifier: ^13.0.0
+        version: 13.0.0
+      vaul:
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      zod:
+        specifier: ^4.1.12
+        version: 4.1.12
+    devDependencies:
+      '@tanstack/eslint-plugin-query':
+        specifier: ^5.91.2
+        version: 5.91.2(eslint@9.38.0)(typescript@5.9.3)
+      '@types/next-auth':
+        specifier: ^3.15.0
+        version: 3.15.0(next@16.0.0)(react-dom@19.2.0)(react@19.2.0)
+      '@types/node':
+        specifier: ^20
+        version: 20.19.23
+      '@types/react':
+        specifier: ^19
+        version: 19.2.2
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.2(@types/react@19.2.2)
+      babel-plugin-react-compiler:
+        specifier: 1.0.0
+        version: 1.0.0
+      eslint-config-next:
+        specifier: 16.0.0
+        version: 16.0.0(@typescript-eslint/parser@8.46.2)(eslint@9.38.0)(typescript@5.9.3)
+      next-auth:
+        specifier: ^4.24.11
+        version: 4.24.11(next@16.0.0)(react-dom@19.2.0)(react@19.2.0)
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
+      tw-animate-css:
+        specifier: ^1.4.0
+        version: 1.4.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  interfaces/express:
+    dependencies:
+      '@types/body-parser':
+        specifier: ^1.19.6
+        version: 1.19.6
+      '@types/express':
+        specifier: ^5.0.3
+        version: 5.0.4
+      body-parser:
+        specifier: ^2.2.0
+        version: 2.2.0
+      express:
+        specifier: ^5.1.0
+        version: 5.1.0
+      tsconfig-paths:
+        specifier: ^4.2.0
+        version: 4.2.0
+    devDependencies:
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+
+  interfaces/sockets:
+    dependencies:
+      '@types/body-parser':
+        specifier: ^1.19.6
+        version: 1.19.6
+      '@types/express':
+        specifier: ^5.0.3
+        version: 5.0.4
+      body-parser:
+        specifier: ^2.2.0
+        version: 2.2.0
+      express:
+        specifier: ^5.1.0
+        version: 5.1.0
+      infrastructure:
+        specifier: workspace:*
+        version: link:../../infrastructure
+      ts-pattern:
+        specifier: ^5.9.0
+        version: 5.9.0
+      tsconfig-paths:
+        specifier: ^4.2.0
+        version: 4.2.0
+      tsx:
+        specifier: ^4.20.6
+        version: 4.20.6
+    devDependencies:
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+
   interfaces/web/app-next:
     dependencies:
       '@hookform/resolvers':
@@ -140,6 +317,9 @@ importers:
       '@radix-ui/react-label':
         specifier: ^2.1.7
         version: 2.1.7(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-popover':
+        specifier: ^1.1.15
+        version: 1.1.15(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
       '@radix-ui/react-select':
         specifier: ^2.2.6
         version: 2.2.6(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
@@ -837,7 +1017,6 @@ packages:
   /@babel/runtime@7.28.4:
     resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
     engines: {node: '>=6.9.0'}
-    dev: false
 
   /@babel/template@7.27.2:
     resolution: {integrity: sha512-LPDZ85aEJyYSd18/DkjNh4/y1ntkE5KwUHWTiqgRxruuZL2F1yuHligVHLvcHY2vMHXttKFpJn6LwfI7cw7ODw==}
@@ -1252,7 +1431,6 @@ packages:
     resolution: {integrity: sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw==}
     engines: {node: '>=18'}
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-darwin-arm64@0.34.4:
@@ -1263,7 +1441,6 @@ packages:
     requiresBuild: true
     optionalDependencies:
       '@img/sharp-libvips-darwin-arm64': 1.2.3
-    dev: false
     optional: true
 
   /@img/sharp-darwin-x64@0.34.4:
@@ -1274,7 +1451,6 @@ packages:
     requiresBuild: true
     optionalDependencies:
       '@img/sharp-libvips-darwin-x64': 1.2.3
-    dev: false
     optional: true
 
   /@img/sharp-libvips-darwin-arm64@1.2.3:
@@ -1282,7 +1458,6 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-libvips-darwin-x64@1.2.3:
@@ -1290,7 +1465,6 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-libvips-linux-arm64@1.2.3:
@@ -1298,7 +1472,6 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-libvips-linux-arm@1.2.3:
@@ -1306,7 +1479,6 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-libvips-linux-ppc64@1.2.3:
@@ -1314,7 +1486,6 @@ packages:
     cpu: [ppc64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-libvips-linux-s390x@1.2.3:
@@ -1322,7 +1493,6 @@ packages:
     cpu: [s390x]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-libvips-linux-x64@1.2.3:
@@ -1330,7 +1500,6 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-libvips-linuxmusl-arm64@1.2.3:
@@ -1338,7 +1507,6 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-libvips-linuxmusl-x64@1.2.3:
@@ -1346,7 +1514,6 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-linux-arm64@0.34.4:
@@ -1357,7 +1524,6 @@ packages:
     requiresBuild: true
     optionalDependencies:
       '@img/sharp-libvips-linux-arm64': 1.2.3
-    dev: false
     optional: true
 
   /@img/sharp-linux-arm@0.34.4:
@@ -1368,7 +1534,6 @@ packages:
     requiresBuild: true
     optionalDependencies:
       '@img/sharp-libvips-linux-arm': 1.2.3
-    dev: false
     optional: true
 
   /@img/sharp-linux-ppc64@0.34.4:
@@ -1379,7 +1544,6 @@ packages:
     requiresBuild: true
     optionalDependencies:
       '@img/sharp-libvips-linux-ppc64': 1.2.3
-    dev: false
     optional: true
 
   /@img/sharp-linux-s390x@0.34.4:
@@ -1390,7 +1554,6 @@ packages:
     requiresBuild: true
     optionalDependencies:
       '@img/sharp-libvips-linux-s390x': 1.2.3
-    dev: false
     optional: true
 
   /@img/sharp-linux-x64@0.34.4:
@@ -1401,7 +1564,6 @@ packages:
     requiresBuild: true
     optionalDependencies:
       '@img/sharp-libvips-linux-x64': 1.2.3
-    dev: false
     optional: true
 
   /@img/sharp-linuxmusl-arm64@0.34.4:
@@ -1412,7 +1574,6 @@ packages:
     requiresBuild: true
     optionalDependencies:
       '@img/sharp-libvips-linuxmusl-arm64': 1.2.3
-    dev: false
     optional: true
 
   /@img/sharp-linuxmusl-x64@0.34.4:
@@ -1423,7 +1584,6 @@ packages:
     requiresBuild: true
     optionalDependencies:
       '@img/sharp-libvips-linuxmusl-x64': 1.2.3
-    dev: false
     optional: true
 
   /@img/sharp-wasm32@0.34.4:
@@ -1433,7 +1593,6 @@ packages:
     requiresBuild: true
     dependencies:
       '@emnapi/runtime': 1.6.0
-    dev: false
     optional: true
 
   /@img/sharp-win32-arm64@0.34.4:
@@ -1442,7 +1601,6 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-win32-ia32@0.34.4:
@@ -1451,7 +1609,6 @@ packages:
     cpu: [ia32]
     os: [win32]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@img/sharp-win32-x64@0.34.4:
@@ -1460,7 +1617,6 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@jridgewell/gen-mapping@0.3.13:
@@ -1500,7 +1656,6 @@ packages:
 
   /@next/env@16.0.0:
     resolution: {integrity: sha512-s5j2iFGp38QsG1LWRQaE2iUY3h1jc014/melHFfLdrsMJPqxqDQwWNwyQTcNoUSGZlCVZuM7t7JDMmSyRilsnA==}
-    dev: false
 
   /@next/eslint-plugin-next@16.0.0:
     resolution: {integrity: sha512-IB7RzmmtrPOrpAgEBR1PIQPD0yea5lggh5cq54m51jHjjljU80Ia+czfxJYMlSDl1DPvpzb8S9TalCc0VMo9Hw==}
@@ -1514,7 +1669,6 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@next/swc-darwin-x64@16.0.0:
@@ -1523,7 +1677,6 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@next/swc-linux-arm64-gnu@16.0.0:
@@ -1532,7 +1685,6 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@next/swc-linux-arm64-musl@16.0.0:
@@ -1541,7 +1693,6 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@next/swc-linux-x64-gnu@16.0.0:
@@ -1550,7 +1701,6 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@next/swc-linux-x64-musl@16.0.0:
@@ -1559,7 +1709,6 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@next/swc-win32-arm64-msvc@16.0.0:
@@ -1568,7 +1717,6 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@next/swc-win32-x64-msvc@16.0.0:
@@ -1577,7 +1725,6 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@nodelib/fs.scandir@2.1.5:
@@ -1608,7 +1755,6 @@ packages:
 
   /@panva/hkdf@1.2.1:
     resolution: {integrity: sha512-6oclG6Y3PiDFcoyk8srjLfVKyMfVCKJ27JwNPViuXziFpmdz+MZnZN/aKY0JGXgYuO/VghU0jcOAZgWXZ1Dmrw==}
-    dev: false
 
   /@radix-ui/number@1.1.1:
     resolution: {integrity: sha512-MkKCwxlXTgz6CFoJx3pCwn07GKp36+aZyu/u2Ln2VrA5DcdyCZkASEDBTd8x5whTQQL5CiYf4prXKLcgQdv29g==}
@@ -1848,6 +1994,40 @@ packages:
       '@types/react-dom': 19.2.2(@types/react@19.2.2)
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
+    dev: false
+
+  /@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0):
+    resolution: {integrity: sha512-kr0X2+6Yy/vJzLYJUPCZEc8SfQcf+1COFoAqauJm74umQhta9M7lNJHP7QQS3vkvcGLQUbWpMzwrXYwrYztHKA==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@radix-ui/primitive': 1.1.3
+      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.2)(react@19.2.0)
+      '@radix-ui/react-context': 1.1.2(@types/react@19.2.2)(react@19.2.0)
+      '@radix-ui/react-dismissable-layer': 1.1.11(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-focus-guards': 1.1.3(@types/react@19.2.2)(react@19.2.0)
+      '@radix-ui/react-focus-scope': 1.1.7(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-id': 1.1.1(@types/react@19.2.2)(react@19.2.0)
+      '@radix-ui/react-popper': 1.2.8(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-portal': 1.1.9(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-presence': 1.1.5(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0)
+      '@radix-ui/react-slot': 1.2.3(@types/react@19.2.2)(react@19.2.0)
+      '@radix-ui/react-use-controllable-state': 1.2.2(@types/react@19.2.2)(react@19.2.0)
+      '@types/react': 19.2.2
+      '@types/react-dom': 19.2.2(@types/react@19.2.2)
+      aria-hidden: 1.2.6
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      react-remove-scroll: 2.7.1(@types/react@19.2.2)(react@19.2.0)
     dev: false
 
   /@radix-ui/react-popper@1.2.8(@types/react-dom@19.2.2)(@types/react@19.2.2)(react-dom@19.2.0)(react@19.2.0):
@@ -2582,7 +2762,6 @@ packages:
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
     dependencies:
       tslib: 2.8.1
-    dev: false
 
   /@tailwindcss/node@4.1.16:
     resolution: {integrity: sha512-BX5iaSsloNuvKNHRN3k2RcCuTEgASTo77mofW0vmeHkfrDWaoFAFvNHpEgtu0eqyypcyiBkDWzSMxJhp3AUVcw==}
@@ -2834,6 +3013,19 @@ packages:
 
   /@types/ms@2.1.0:
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
+    dev: true
+
+  /@types/next-auth@3.15.0(next@16.0.0)(react-dom@19.2.0)(react@19.2.0):
+    resolution: {integrity: sha512-ZVfejlu81YiIRX1m0iKAfvZ3nK7K9EyZWhNARNKsFop8kNAgEvMnlKpTpwN59xkK2OhyWLagPuiDAVBYSO9jSA==}
+    deprecated: This is a stub types definition. next-auth provides its own type definitions, so you do not need this installed.
+    dependencies:
+      next-auth: 4.24.11(next@16.0.0)(react-dom@19.2.0)(react@19.2.0)
+    transitivePeerDependencies:
+      - '@auth/core'
+      - next
+      - nodemailer
+      - react
+      - react-dom
     dev: true
 
   /@types/node@20.19.23:
@@ -3500,7 +3692,6 @@ packages:
 
   /client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
-    dev: false
 
   /clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
@@ -3542,7 +3733,6 @@ packages:
   /cookie@0.7.2:
     resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
-    dev: false
 
   /cors@2.8.5:
     resolution: {integrity: sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==}
@@ -3663,7 +3853,6 @@ packages:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
     requiresBuild: true
-    dev: false
 
   /detect-node-es@1.1.0:
     resolution: {integrity: sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==}
@@ -4827,7 +5016,6 @@ packages:
 
   /jose@4.15.9:
     resolution: {integrity: sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==}
-    dev: false
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -5104,7 +5292,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
-    dev: false
 
   /lru-cache@7.18.3:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
@@ -5225,7 +5412,6 @@ packages:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
-    dev: false
 
   /napi-postinstall@0.3.4:
     resolution: {integrity: sha512-PHI5f1O0EP5xJ9gQmFGMS6IZcrVvTjpXjz7Na41gTE7eE2hK11lg04CECCYEEjdc17EV4DO+fkGEtt7TpTaTiQ==}
@@ -5272,7 +5458,6 @@ packages:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
       uuid: 8.3.2
-    dev: false
 
   /next-themes@0.4.6(react-dom@19.2.0)(react@19.2.0):
     resolution: {integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==}
@@ -5326,7 +5511,6 @@ packages:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
-    dev: false
 
   /node-releases@2.0.26:
     resolution: {integrity: sha512-S2M9YimhSjBSvYnlr5/+umAnPHE++ODwt5e2Ij6FoX45HA/s4vHdkDx1eax2pAPeAOqu4s9b7ppahsyEFdVqQA==}
@@ -5338,7 +5522,6 @@ packages:
 
   /oauth@0.9.15:
     resolution: {integrity: sha512-a5ERWK1kh38ExDEfoO6qUHJb32rd7aYmPHuyCu3Fta/cnICvYmgd2uhuKXvPD+PXB+gCEYYEaQdIRAjCOwAKNA==}
-    dev: false
 
   /object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
@@ -5347,7 +5530,6 @@ packages:
   /object-hash@2.2.0:
     resolution: {integrity: sha512-gScRMn0bS5fH+IuwyIFgnh9zBdo4DV+6GhygmWM9HyNJSgS0hScp1f5vjtm7oIIOiT9trXrShAkLFSc2IqKNgw==}
     engines: {node: '>= 6'}
-    dev: false
 
   /object-inspect@1.13.4:
     resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
@@ -5412,7 +5594,6 @@ packages:
   /oidc-token-hash@5.1.1:
     resolution: {integrity: sha512-D7EmwxJV6DsEB6vOFLrBM2OzsVgQzgPWyHlV2OOAVj772n+WTXpudC9e9u5BVKQnYwaD30Ivhi9b+4UeBcGu9g==}
     engines: {node: ^10.13.0 || >=12.0.0}
-    dev: false
 
   /on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
@@ -5434,7 +5615,6 @@ packages:
       lru-cache: 6.0.0
       object-hash: 2.2.0
       oidc-token-hash: 5.1.1
-    dev: false
 
   /optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -5520,7 +5700,6 @@ packages:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
-    dev: false
 
   /postcss@8.5.6:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
@@ -5538,11 +5717,9 @@ packages:
     dependencies:
       preact: 10.27.2
       pretty-format: 3.8.0
-    dev: false
 
   /preact@10.27.2:
     resolution: {integrity: sha512-5SYSgFKSyhCbk6SrXyMpqjb5+MQBgfvEKE/OC+PujcY34sOpqtr+0AZQtPYx5IA6VxynQ7rUPCtKzyovpj9Bpg==}
-    dev: false
 
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -5556,7 +5733,6 @@ packages:
 
   /pretty-format@3.8.0:
     resolution: {integrity: sha512-WuxUnVtlWL1OfZFQFuqvnvs6MiAGk9UNsBostyBOB0Is9wb5uRESevA6rnl/rkksXaGX3GzZhPup5d6Vp1nFew==}
-    dev: false
 
   /prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
@@ -5611,7 +5787,6 @@ packages:
     dependencies:
       react: 19.2.0
       scheduler: 0.27.0
-    dev: false
 
   /react-hook-form@7.65.0(react@19.2.0):
     resolution: {integrity: sha512-xtOzDz063WcXvGWaHgLNrNzlsdFgtUWcb32E6WFaGTd7kPZG3EeDusjdZfUsPwKCKVXy1ZlntifaHZ4l8pAsmw==}
@@ -5680,7 +5855,6 @@ packages:
   /react@19.2.0:
     resolution: {integrity: sha512-tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /reflect.getprototypeof@1.0.10:
     resolution: {integrity: sha512-00o4I+DVrefhv+nX0ulyi3biSHCPDe+yLv5o/p6d/UVlirijB8E16FtfwSAi4g3tcqrQ4lRAqQSoFEZJehYEcw==}
@@ -5796,7 +5970,6 @@ packages:
 
   /scheduler@0.27.0:
     resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
-    dev: false
 
   /semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -5908,7 +6081,6 @@ packages:
       '@img/sharp-win32-arm64': 0.34.4
       '@img/sharp-win32-ia32': 0.34.4
       '@img/sharp-win32-x64': 0.34.4
-    dev: false
     optional: true
 
   /shebang-command@2.0.0:
@@ -6022,7 +6194,6 @@ packages:
   /source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /sqlstring@2.3.3:
     resolution: {integrity: sha512-qC9iz2FlN7DQl3+wjwn3802RTyjCx7sDvfQEXchwa6CWOx07/WVfh91gBmQ9fahw8snwGEWU3xGzOt4tFyHLxg==}
@@ -6146,7 +6317,6 @@ packages:
       '@babel/core': 7.28.5
       client-only: 0.0.1
       react: 19.2.0
-    dev: false
 
   /supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
@@ -6435,7 +6605,6 @@ packages:
   /uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
-    dev: false
 
   /vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
@@ -6547,7 +6716,6 @@ packages:
 
   /yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
-    dev: false
 
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}

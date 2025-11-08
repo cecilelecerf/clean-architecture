@@ -5,8 +5,13 @@ import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { PostId, postSchema, TagId, tagSchema } from '@infrastructure/types/feed';
 import { queryClient } from '@/lib/queryClient';
 import z from 'zod';
+import { userDtoSchema } from '@infrastructure/types/user';
 
-const postWithTagsSchema = postSchema.extend({ tags: tagSchema.array() });
+const postWithTagsAndUserSchema = postSchema.extend({
+  tags: tagSchema.array(),
+  advisor: userDtoSchema,
+});
+export type PostWithTagsAndUser = z.infer<typeof postWithTagsAndUserSchema>;
 export const newPostSchema = postSchema.pick({ title: true, content: true, tagsId: true });
 export type NewPost = z.infer<typeof newPostSchema>;
 
@@ -20,7 +25,7 @@ type PublishAction = z.infer<typeof publishActionSchema>;
 
 const queryKeys = {
   posts: {
-    list: ['posts', 'list'] as const,
+    list: (filters: FiltersProps) => ['posts', 'list', filters] as const,
     detail: (id: PostId) => ['posts', 'detail', id] as const,
   },
   tags: {
@@ -28,40 +33,66 @@ const queryKeys = {
     detail: (id: TagId) => ['tags', 'detail', id] as const,
   },
 };
+export type FiltersProps = {
+  page?: number;
+  limit?: number;
+  tags?: string[];
+  published?: boolean;
+  fromDate?: string;
+  toDate?: string;
+  name?: string;
+};
 
-export const threadsEndpoint = createEndpointsNodes({
+export const feedsEndpoint = createEndpointsNodes({
   posts: {
-    getAll: () =>
+    getAll: ({ filters }: { filters?: FiltersProps }) =>
       queryOptions({
-        queryKey: queryKeys.posts.list,
-        queryFn: () =>
-          get('/posts', 'advisor').then((data) => {
+        queryKey: queryKeys.posts.list(filters),
+        queryFn: async () => {
+          const params = new URLSearchParams();
+
+          if (filters?.page) params.append('page', String(filters.page));
+          if (filters?.limit) params.append('limit', String(filters.limit));
+          if (filters?.tags?.length) params.append('tags', filters.tags.join(','));
+          if (filters?.published !== undefined)
+            params.append('published', String(filters.published));
+          if (filters?.fromDate) params.append('fromDate', filters.fromDate);
+          if (filters?.toDate) params.append('toDate', filters.toDate);
+
+          const queryString = params.toString();
+          return get(`/posts${queryString ? `?${queryString}` : ''}`, 'advisor').then((data) => {
             return safeParseWithLog(
-              z.object({ posts: postWithTagsSchema.array(), page: z.number() }),
+              z.object({ posts: postWithTagsAndUserSchema.array(), total: z.number() }),
               data,
             );
-          }),
+          });
+        },
       }),
     get: ({ id }: { id: PostId }) =>
       queryOptions({
         queryKey: queryKeys.posts.detail(id),
         queryFn: () =>
-          get(`/posts/${id}`, 'advisor').then((data) => postWithTagsSchema.parse(data)),
+          get(`/posts/${id}`, 'advisor').then((data) => postWithTagsAndUserSchema.parse(data)),
       }),
-    add: ({ ...payload }: NewPost) =>
+    add: () =>
       mutationOptions({
-        mutationFn: () =>
+        mutationFn: ({ ...payload }: NewPost) =>
           post(`/posts`, { ...payload }, 'advisor').then((data) => postSchema.parse(data)),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.posts.list }),
+        onSuccess: () =>
+          queryClient.invalidateQueries({
+            predicate: (query) => query.queryKey[0] === 'posts' && query.queryKey[1] === 'list',
+          }),
       }),
-    edit: ({ id, ...payload }: Partial<NewPost> & { id: PostId }) =>
+    edit: ({ id }: { id: PostId }) =>
       mutationOptions({
-        mutationFn: () =>
+        mutationFn: ({ ...payload }: Partial<NewPost>) =>
           patch(`/posts/${id}`, { ...payload }, 'advisor').then((data) => postSchema.parse(data)),
         onSuccess: async () => {
           await Promise.all([
             queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(id) }),
-            queryClient.invalidateQueries({ queryKey: queryKeys.posts.list }),
+            queryClient.invalidateQueries({
+              predicate: (query) => query.queryKey[0] === 'posts' && query.queryKey[1] === 'list',
+            }),
           ]);
         },
       }),
@@ -72,21 +103,25 @@ export const threadsEndpoint = createEndpointsNodes({
         onSuccess: async () => {
           await Promise.all([
             queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(id) }),
-            queryClient.invalidateQueries({ queryKey: queryKeys.posts.list }),
+            queryClient.invalidateQueries({
+              predicate: (query) => query.queryKey[0] === 'posts' && query.queryKey[1] === 'list',
+            }),
           ]);
         },
       }),
 
-    action: ({ id, action }: { id: PostId } & PublishAction) =>
+    action: ({ id }: { id: PostId }) =>
       mutationOptions({
-        mutationFn: () =>
+        mutationFn: ({ action }: PublishAction) =>
           patch(`/posts/${id}/publish`, { action }, 'advisor').then((data) =>
             postSchema.parse(data),
           ),
         onSuccess: async () => {
           await Promise.all([
             queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(id) }),
-            queryClient.invalidateQueries({ queryKey: queryKeys.posts.list }),
+            queryClient.invalidateQueries({
+              predicate: (query) => query.queryKey[0] === 'posts' && query.queryKey[1] === 'list',
+            }),
           ]);
         },
       }),
@@ -105,16 +140,16 @@ export const threadsEndpoint = createEndpointsNodes({
         queryFn: () => get(`/tags/${id}`, 'advisor').then((data) => tagSchema.parse(data)),
       }),
 
-    add: ({ ...payload }: NewTag) =>
+    add: () =>
       mutationOptions({
-        mutationFn: () =>
+        mutationFn: ({ ...payload }: NewTag) =>
           post(`/tags/new`, { ...payload }, 'advisor').then((data) => tagSchema.parse(data)),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.tags.list }),
       }),
 
-    edit: ({ id, ...payload }: Partial<NewTag> & { id: TagId }) =>
+    edit: ({ id }: { id: TagId }) =>
       mutationOptions({
-        mutationFn: () =>
+        mutationFn: ({ ...payload }: Partial<NewTag>) =>
           patch(`/tags/${id}`, { ...payload }, 'advisor').then((data) => tagSchema.parse(data)),
         onSuccess: async () => {
           await Promise.all([

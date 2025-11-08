@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { newPostSchema } from '@/utils/endpoint/advisor/feedsEndpoint';
 import { postSchema } from '@infrastructure/types/feed';
+import z from 'zod';
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,8 +14,8 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const page: number | undefined = Number(searchParams.get('page'));
-    const limit: number | undefined = Number(searchParams.get('limit'));
+    const page: string | undefined = searchParams.get('page');
+    const limit: string | undefined = searchParams.get('limit');
     const tagsParam = searchParams.get('tags');
     const tags = tagsParam
       ? tagsParam
@@ -27,8 +28,8 @@ export async function GET(req: NextRequest) {
     const fromDate = searchParams.get('fromDate');
     const toDate = searchParams.get('toDate');
     const result = await postsFactory().adminFindPostWithFilter.execute({
-      page,
-      limit,
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
       tags,
       published,
       administratorId: session.user.id,
@@ -72,7 +73,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(postSchema.parse(result));
+    return NextResponse.json(
+      postSchema
+        .omit({ createdAt: true, modifiedAt: true, publishedAt: true })
+        .extend({
+          createdAt: z.date(),
+          modifiedAt: z.date().optional(),
+          publishedAt: z.date().optional(),
+        })
+        .parse(result),
+    );
   } catch (err) {
     console.error(err);
     return NextResponse.json(

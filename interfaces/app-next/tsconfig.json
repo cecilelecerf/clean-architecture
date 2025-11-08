@@ -19,9 +19,9 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@infrastructure/*": ["../../../infrastructure/src/*"],
-      "@application/*": ["../../../application/src/*"],
-      "@domain/*": ["../../../domain/src/*"]
+      "@infrastructure/*": ["../../infrastructure/src/*"],
+      "@application/*": ["../../application/src/*"],
+      "@domain/*": ["../../domain/src/*"]
     }
   },
   "include": [
@@ -34,9 +34,9 @@
     "src/utils/endpoint"
   ],
   "references": [
-    { "path": "../../../infrastructure/" },
-    { "path": "../../../application/" },
-    { "path": "../../../domain" }
+    { "path": "../../infrastructure/" },
+    { "path": "../../application/" },
+    { "path": "../../domain/" }
   ],
 
   "exclude": ["node_modules"]

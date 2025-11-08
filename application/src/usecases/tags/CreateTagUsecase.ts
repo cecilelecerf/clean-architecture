@@ -17,7 +17,7 @@ interface CreateTagInput {
   advisorId: UserEntity["id"];
 }
 
-export class CreateTagUseCase {
+export class AddTagUseCase {
   constructor(
     private readonly tagRepository: TagRepository,
     private readonly userRepository: UserRepository,

@@ -4,7 +4,7 @@ import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
 import {
   PostRepository,
-  PostWithTags,
+  PostWithTagsAndUser,
 } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
@@ -22,7 +22,7 @@ export class AdminFindPostByIdWithTagsUsecase {
     userId,
     id: postId,
   }: Props): Promise<
-    | PostWithTags
+    | PostWithTagsAndUser
     | UserNotFoundError
     | UserNotActiveError
     | PostNotFoundError
@@ -34,7 +34,7 @@ export class AdminFindPostByIdWithTagsUsecase {
     if (user.hasRole({ role: "client" }))
       return new UserRoleMismatchError(["conseiller", "directeur"], user.role);
 
-    const post = await this.feedRepository.findWithTagsById(postId);
+    const post = await this.feedRepository.findWithTagsAndUserById(postId);
     if (!post) return new PostNotFoundError();
 
     return post;

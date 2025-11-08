@@ -25,7 +25,7 @@ export const postSchema = z.object({
   tagsId: tagIdSchema.array(),
   createdAt: z.iso.datetime(),
   readBy: userIdSchema.array(),
-  modifiedAt: z.iso.datetime().nullable(),
-  publishedAt: z.iso.datetime().nullable(),
+  modifiedAt: z.iso.datetime().optional(),
+  publishedAt: z.iso.datetime().optional(),
 });
 export type Post = z.infer<typeof postSchema>;

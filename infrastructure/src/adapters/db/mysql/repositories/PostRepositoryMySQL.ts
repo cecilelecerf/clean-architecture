@@ -1,7 +1,7 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import {
   PostRepository,
-  PostWithTags,
+  PostWithTagsAndUser,
 } from "@application/ports/repositories/PostRepository";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
@@ -55,9 +55,9 @@ export class PostRepositoryMySQL implements PostRepository {
       title: row.title,
       content: row.content,
       tagsId,
-      createdAt: row.createdAt,
-      modifiedAt: row.modifiedAt ?? undefined,
-      publishedAt: row.publishedAt ?? undefined,
+      createdAt: row.created_at,
+      modifiedAt: row.modified_at ?? undefined,
+      publishedAt: row.published_at ?? undefined,
       // TODO : à remplir si tu veux gérer la lecture par utilisateurs
       readBy: [],
     });
@@ -83,9 +83,9 @@ export class PostRepositoryMySQL implements PostRepository {
           title: row.title,
           content: row.content,
           tagsId,
-          createdAt: row.createdAt,
-          modifiedAt: row.modifiedAt ?? undefined,
-          publishedAt: row.publishedAt ?? undefined,
+          createdAt: row.created_at,
+          modifiedAt: row.modified_at ?? undefined,
+          publishedAt: row.published_at ?? undefined,
           readBy: [],
         });
       })
@@ -112,9 +112,9 @@ export class PostRepositoryMySQL implements PostRepository {
           title: row.title,
           content: row.content,
           tagsId,
-          createdAt: row.createdAt,
-          modifiedAt: row.modifiedAt ?? undefined,
-          publishedAt: row.publishedAt ?? undefined,
+          createdAt: row.created_at,
+          modifiedAt: row.modified_at ?? undefined,
+          publishedAt: row.published_at ?? undefined,
           readBy: [],
         });
       })
@@ -180,7 +180,7 @@ export class PostRepositoryMySQL implements PostRepository {
     return posts;
   }
 
-  async findAllPaginatedWithTagsByFilters(
+  async findAllPaginatedWithTagsAndUserByFilters(
     filters: {
       dateFrom?: Date;
       dateTo?: Date;
@@ -189,7 +189,9 @@ export class PostRepositoryMySQL implements PostRepository {
       published?: boolean;
     },
     pagination: { page: number; limit: number }
-  ): Promise<{ posts: PostWithTags[]; total: number }> {
+  ): Promise<{ posts: PostWithTagsAndUser[]; total: number }> {
+    console.log(filters);
+    console.log(pagination);
     const whereClauses: string[] = [];
     const params: any[] = [];
 
@@ -229,17 +231,29 @@ export class PostRepositoryMySQL implements PostRepository {
       : "";
 
     const offset = (pagination.page - 1) * pagination.limit;
-
+    console.log(params);
+    console.log(pagination.limit);
+    console.log(offset);
     const rows = await this.client.query<RowDataPacket[]>(
       `
-      SELECT DISTINCT p.*
-      FROM posts p
+      SELECT DISTINCT p.*, 
+        u.id AS advisor_id,
+        u.firstname AS advisor_firstname,
+        u.lastname AS advisor_lastname,
+        u.email AS advisor_email,
+        u.password_hash AS advisor_password_hash,
+        u.role AS advisor_role,
+        u.is_active AS advisor_is_active,
+        u.created_at AS advisor_created_at,
+        u.confirmed_at AS advisor_confirmed_at,
+        u.modified_at AS advisor_modified_at
+      FROM posts p JOIN users u ON u.id = p.advisor_id
       ${tagJoin}
       ${whereSQL}
       ORDER BY p.created_at DESC
-      LIMIT ? OFFSET ?
+        LIMIT ${pagination.limit} OFFSET ${offset}
       `,
-      [...params, pagination.limit, offset]
+      [...params]
     );
 
     const totalRows = await this.client.query<RowDataPacket[]>(
@@ -256,7 +270,7 @@ export class PostRepositoryMySQL implements PostRepository {
     const posts = await Promise.all(
       rows.map(async (row) => {
         const tagRows = await this.client.query<RowDataPacket[]>(
-          `SELECT t.* FROM post_tag pt JOIN tags t WHERE t.id = pt.id WHERE pt.post_id = ? `,
+          `SELECT t.* FROM post_tag pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = ? `,
           [row.id]
         );
         const tagsId = tagRows.map((r) => r.id);
@@ -269,6 +283,18 @@ export class PostRepositoryMySQL implements PostRepository {
             modifiedAt: tagRow.modified_at,
           })
         );
+        const advisor = UserEntity.from({
+          id: row.advisor_id,
+          firstname: row.advisor_firstname,
+          lastname: row.advisor_lastname,
+          email: row.advisor_email,
+          passwordHash: row.advisor_password_hash,
+          role: row.advisor_role,
+          isActiveField: row.advisor_is_active,
+          createdAt: row.advisor_created_at,
+          confirmedAt: row.advisor_confirmed_at,
+          modifiedAt: row.advisor_modified_at,
+        });
         const post = PostEntity.from({
           id: row.id,
           advisorId: row.advisor_id,
@@ -280,23 +306,37 @@ export class PostRepositoryMySQL implements PostRepository {
           publishedAt: row.published_at ?? undefined,
           readBy: [],
         });
-        return Object.assign(post, { tags });
+        return Object.assign(post, { tags, advisor });
       })
     );
 
     return { posts, total };
   }
 
-  async findWithTagsById(id: PostEntity["id"]): Promise<PostWithTags | null> {
+  async findWithTagsAndUserById(
+    id: PostEntity["id"]
+  ): Promise<PostWithTagsAndUser | null> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM posts WHERE id = ?`,
+      `SELECT 
+        p.*,
+        u.id AS advisor_id,
+        u.firstname AS advisor_firstname,
+        u.lastname AS advisor_lastname,
+        u.email AS advisor_email,
+        u.password_hash AS advisor_password_hash,
+        u.role AS advisor_role,
+        u.is_active AS advisor_is_active,
+        u.created_at AS advisor_created_at,
+        u.confirmed_at AS advisor_confirmed_at,
+        u.modified_at AS advisor_modified_at
+       FROM posts p JOIN users u ON u.id = p.advisor_id WHERE p.id = ?`,
       [id]
     );
     if (rows.length === 0) return null;
     const row = rows[0];
 
     const tagRows = await this.client.query<RowDataPacket[]>(
-      `SELECT t.* FROM post_tag pt JOIN tags t WHERE t.id = pt.id WHERE pt.post_id = ? `,
+      `SELECT t.* FROM post_tag pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = ? `,
       [row.id]
     );
     const tagsId = tagRows.map((r) => r.id);
@@ -309,18 +349,30 @@ export class PostRepositoryMySQL implements PostRepository {
         modifiedAt: tagRow.modified_at,
       })
     );
+    const advisor = UserEntity.from({
+      id: row.advisor_id,
+      firstname: row.advisor_firstname,
+      lastname: row.advisor_lastname,
+      email: row.advisor_email,
+      passwordHash: row.advisor_password_hash,
+      role: row.advisor_role,
+      isActiveField: row.advisor_is_active,
+      createdAt: row.advisor_created_at,
+      confirmedAt: row.advisor_confirmed_at,
+      modifiedAt: row.advisor_modified_at,
+    });
     const post = PostEntity.from({
       id: row.id,
-      advisorId: row.advisorId,
+      advisorId: row.advisor_id,
       title: row.title,
       content: row.content,
       tagsId,
-      createdAt: row.createdAt,
-      modifiedAt: row.modifiedAt ?? undefined,
-      publishedAt: row.publishedAt ?? undefined,
+      createdAt: row.created_at,
+      modifiedAt: row.modified_at ?? undefined,
+      publishedAt: row.published_at ?? undefined,
       // TODO : à remplir si tu veux gérer la lecture par utilisateurs
       readBy: [],
     });
-    return Object.assign(post, { tags });
+    return Object.assign(post, { tags, advisor });
   }
 }
