@@ -12,7 +12,6 @@ export class UserRepositoryMySQL implements UserRepository {
       "SELECT * FROM users WHERE id = ?",
       [id]
     );
-
     if (rows.length === 0) return null;
     const row = rows[0];
     return UserEntity.from({
@@ -26,7 +25,7 @@ export class UserRepositoryMySQL implements UserRepository {
       createdAt: row.created_at,
       confirmedAt: row.confirmed_at,
       modifiedAt: row.modified_at,
-      advisorId: row.advisor_id,
+      advisorId: row.advisor_id ?? null,
     });
   }
 

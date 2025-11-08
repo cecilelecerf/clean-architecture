@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { match } from "ts-pattern";
 ;
 
 type PostFiltersProps = {
@@ -16,9 +17,9 @@ type PostFiltersProps = {
 export const PostFilters = ({ filters, onChange }: PostFiltersProps) => {
     const [localFilters, setLocalFilters] = useState<FiltersProps>(filters);
 
-    // const tagsQuery = useQuery(advisorEndpoint.feeds.tags.getAll());
 
     useEffect(() => {
+        console.log(localFilters)
         onChange(localFilters);
     }, [localFilters]);
 
@@ -27,9 +28,9 @@ export const PostFilters = ({ filters, onChange }: PostFiltersProps) => {
             <Input
                 className="w-full"
                 placeholder="Rechercher par titre"
-                value={localFilters.name || ""}
+                value={localFilters.title || ""}
                 onChange={(e) =>
-                    setLocalFilters((prev) => ({ ...prev, name: e.target.value }))
+                    setLocalFilters((prev) => ({ ...prev, title: e.target.value }))
                 }
             />
             <Popover>
@@ -45,19 +46,17 @@ export const PostFilters = ({ filters, onChange }: PostFiltersProps) => {
                         <div className="flex flex-col">
                             <Label>Publié</Label>
                             <Select
-                                value={
-                                    localFilters.published === undefined
-                                        ? "all"
-                                        : localFilters.published
-                                            ? "true"
-                                            : "false"
+                                value={match(localFilters.status).with(true, () => "published").with(false, () => "unpublished").otherwise(() => "all")
+
                                 }
-                                onValueChange={(val) =>
+                                onValueChange={(val) => {
+                                    const status = match(val).with("published", () => true).with("unpublished", () => false).otherwise(() => undefined)
                                     setLocalFilters((prev) => ({
                                         ...prev,
-                                        published:
-                                            val === "all" ? undefined : val === "true",
+                                        status
                                     }))
+                                    return val
+                                }
                                 }
                             >
                                 <SelectTrigger>
@@ -65,8 +64,8 @@ export const PostFilters = ({ filters, onChange }: PostFiltersProps) => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Tous</SelectItem>
-                                    <SelectItem value="true">Publié</SelectItem>
-                                    <SelectItem value="false">Brouillon</SelectItem>
+                                    <SelectItem value="published">Publié</SelectItem>
+                                    <SelectItem value="unpublished">Brouillon</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -156,6 +155,6 @@ export const PostFilters = ({ filters, onChange }: PostFiltersProps) => {
                     </div>
                 </PopoverContent>
             </Popover>
-        </div>
+        </div >
     );
 };

@@ -7,7 +7,6 @@ import { PostCard } from "./PostCard"
 
 export const Posts = ({ filters }: { filters: FiltersProps }) => {
     const query = useQuery(advisorEndpoint.feeds.posts.getAll({ filters }))
-
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: "pending" }, () => "pending")

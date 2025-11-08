@@ -2,7 +2,7 @@ import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { PostId, postSchema, TagId, tagSchema } from '@infrastructure/types/feed';
+import { PostId, postSchema, TagId, tagIdSchema, tagSchema } from '@infrastructure/types/feed';
 import { queryClient } from '@/lib/queryClient';
 import z from 'zod';
 import { userDtoSchema } from '@infrastructure/types/user';
@@ -19,7 +19,7 @@ export const newTagSchema = tagSchema.pick({ color: true, label: true });
 export type NewTag = z.infer<typeof newTagSchema>;
 
 export const publishActionSchema = z.object({
-  action: z.enum(['publish', 'unpublish']),
+  status: z.enum(['publish', 'unpublish']),
 });
 type PublishAction = z.infer<typeof publishActionSchema>;
 
@@ -33,15 +33,18 @@ const queryKeys = {
     detail: (id: TagId) => ['tags', 'detail', id] as const,
   },
 };
-export type FiltersProps = {
-  page?: number;
-  limit?: number;
-  tags?: string[];
-  published?: boolean;
-  fromDate?: string;
-  toDate?: string;
-  name?: string;
-};
+
+export const querySchema = z.object({
+  page: z.number().optional(),
+  limit: z.number().optional(),
+  tagsId: tagIdSchema.array().optional(),
+  status: z.boolean().optional(),
+  fromDate: z.iso.datetime().optional(),
+  toDate: z.iso.datetime().optional(),
+  title: z.string().optional(),
+});
+
+export type FiltersProps = z.infer<typeof querySchema>;
 
 export const feedsEndpoint = createEndpointsNodes({
   posts: {
@@ -50,22 +53,20 @@ export const feedsEndpoint = createEndpointsNodes({
         queryKey: queryKeys.posts.list(filters),
         queryFn: async () => {
           const params = new URLSearchParams();
-
-          if (filters?.page) params.append('page', String(filters.page));
-          if (filters?.limit) params.append('limit', String(filters.limit));
-          if (filters?.tags?.length) params.append('tags', filters.tags.join(','));
-          if (filters?.published !== undefined)
-            params.append('published', String(filters.published));
-          if (filters?.fromDate) params.append('fromDate', filters.fromDate);
-          if (filters?.toDate) params.append('toDate', filters.toDate);
-
-          const queryString = params.toString();
-          return get(`/posts${queryString ? `?${queryString}` : ''}`, 'advisor').then((data) => {
-            return safeParseWithLog(
+          if (filters.page) params.set('page', String(filters.page));
+          if (filters.limit) params.set('limit', String(filters.limit));
+          if (filters.tagsId && filters.tagsId.length > 0)
+            params.set('tagsId', filters.tagsId.join(','));
+          if (typeof filters.status === 'boolean')
+            params.set('status', filters.status ? 'true' : 'false');
+          if (filters.fromDate) params.set('fromDate', filters.fromDate);
+          if (filters.toDate) params.set('toDate', filters.toDate);
+          return get(`/posts?${params.toString()}`, 'advisor').then((data) =>
+            safeParseWithLog(
               z.object({ posts: postWithTagsAndUserSchema.array(), total: z.number() }),
               data,
-            );
-          });
+            ),
+          );
         },
       }),
     get: ({ id }: { id: PostId }) =>
@@ -110,10 +111,10 @@ export const feedsEndpoint = createEndpointsNodes({
         },
       }),
 
-    action: ({ id }: { id: PostId }) =>
+    status: ({ id }: { id: PostId }) =>
       mutationOptions({
-        mutationFn: ({ action }: PublishAction) =>
-          patch(`/posts/${id}/publish`, { action }, 'advisor').then((data) =>
+        mutationFn: ({ status }: PublishAction) =>
+          patch(`/posts/${id}/status`, { status }, 'advisor').then((data) =>
             postSchema.parse(data),
           ),
         onSuccess: async () => {

@@ -10,7 +10,6 @@ import { rawAdvisors } from "../../seeds/advisors";
 export async function seedSQLAdministrator(
   mysqlClient: MySQLClient
 ): Promise<UserEntity[]> {
-  console.log("-- Création des comptes Administrateur --");
   const userRepository = new UserRepositoryMySQL(mysqlClient);
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
@@ -39,7 +38,6 @@ export async function seedSQLAdministrator(
 
       advisors.push(user);
       userRepository.save(user);
-      console.log(user.id);
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);
     }

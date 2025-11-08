@@ -5,12 +5,6 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
 
-    // if (!req.nextUrl.pathname.startsWith('/admin')) {
-    //   if (token && token?.role !== 'client') {
-    //     return NextResponse.redirect(new URL('/unauthorized', req.url));
-    //   }
-    // }
-    console.log(token);
     if (req.nextUrl.pathname.startsWith('/admin')) {
       if (token?.role !== 'conseiller') {
         return NextResponse.redirect(new URL('/unauthorized', req.url));

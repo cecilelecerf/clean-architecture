@@ -341,8 +341,6 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
   async findAllWithUserByAdministratorId(
     administratorId: UserEntity["id"]
   ): Promise<ThreadEntityWithUsers[]> {
-    console.log("admin");
-
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT t.*, 
           admin.id as admin_id,
@@ -425,7 +423,6 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
   async findAllWithUserByAdministratorNullable(): Promise<
     ThreadEntityWithUsers[]
   > {
-    console.log("nullable");
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT t.*, 
           admin.id as admin_id,

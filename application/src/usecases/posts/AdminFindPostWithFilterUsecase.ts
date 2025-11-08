@@ -6,13 +6,14 @@ import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatc
 import { PostEntity } from "@domain/entities/PostEntity";
 import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { TagEntity } from "@domain/entities/TagEntity";
 
 type Props = {
   fromDate?: Date;
   toDate?: Date;
-  tags?: string[];
-  name?: string;
-  published?: boolean;
+  tagsId?: TagEntity["id"][];
+  title?: string;
+  status?: boolean;
   page?: number;
   limit?: number;
   administratorId: UserEntity["id"];
@@ -27,10 +28,10 @@ export class AdminFindPostWithFilterUsecase {
   public async execute({
     fromDate,
     toDate,
-    tags,
-    name,
+    tagsId,
+    title,
     page = 1,
-    published,
+    status,
     limit = 10,
     administratorId,
   }: Props): Promise<
@@ -46,18 +47,18 @@ export class AdminFindPostWithFilterUsecase {
     if (user instanceof Error) return user;
     if (user.hasRole({ role: "client" }))
       return new UserRoleMismatchError(["conseiller", "directeur"], user.role);
-    console.log(page, limit);
     const posts =
       await this.postRepository.findAllPaginatedWithTagsAndUserByFilters(
         {
           dateFrom: fromDate,
           dateTo: toDate,
-          tags,
-          name,
-          published,
+          tagsId,
+          title,
+          status,
         },
         { page, limit }
       );
+
     return posts;
   }
 }

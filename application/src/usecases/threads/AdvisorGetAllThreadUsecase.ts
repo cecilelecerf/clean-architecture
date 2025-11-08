@@ -21,7 +21,6 @@ export class AdvisorGetAllThreadUsecase {
   > {
     const user = await findActiveUser(this.userRepository, administratorId);
     if (user instanceof Error) return user;
-    console.log(user);
     const administratorThread =
       await this.threadRepository.findAllWithUserByAdministratorId(user.id);
     const nullableAdministratorThread =

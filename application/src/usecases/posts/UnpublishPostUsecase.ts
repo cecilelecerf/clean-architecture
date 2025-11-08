@@ -35,7 +35,6 @@ export class UnpublishPostUsecase {
 
     post.publishedAt = undefined;
     post.readBy = [];
-
     await this.feedRepository.update(post);
     return post;
   }

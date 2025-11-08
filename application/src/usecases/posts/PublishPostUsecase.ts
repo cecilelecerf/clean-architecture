@@ -31,12 +31,10 @@ export class PublishPostUsecase {
 
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-
     const access = post.permissionToModify(user);
     if (!access) return new InvalidPostAccessError(user.id, post.id);
 
     post.published(this.clockService.now());
-
     await this.feedRepository.update(post);
     return post;
   }

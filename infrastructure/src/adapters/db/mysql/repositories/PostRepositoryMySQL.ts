@@ -46,12 +46,10 @@ export class PostRepositoryMySQL implements PostRepository {
       `SELECT tag_id FROM post_tag WHERE post_id = ?`,
       [id]
     );
-
-    const tagsId = tagRows.map((r) => r.tagId);
-
+    const tagsId = tagRows.map((r) => r.tag_id);
     return PostEntity.from({
       id: row.id,
-      advisorId: row.advisorId,
+      advisorId: row.advisor_id,
       title: row.title,
       content: row.content,
       tagsId,
@@ -79,7 +77,7 @@ export class PostRepositoryMySQL implements PostRepository {
 
         return PostEntity.from({
           id: row.id,
-          advisorId: row.advisorId,
+          advisorId: row.advisor_id,
           title: row.title,
           content: row.content,
           tagsId,
@@ -108,7 +106,7 @@ export class PostRepositoryMySQL implements PostRepository {
 
         return PostEntity.from({
           id: row.id,
-          advisorId: row.advisorId,
+          advisorId: row.advisor_id,
           title: row.title,
           content: row.content,
           tagsId,
@@ -139,7 +137,7 @@ export class PostRepositoryMySQL implements PostRepository {
       `SELECT tag_id FROM post_tag WHERE post_id = ?`,
       [post.id]
     );
-    const existingTagIds = existingTagRows.map((r) => r.tagId);
+    const existingTagIds = existingTagRows.map((r) => r.tag_id);
 
     const tagsToAdd = post.tagsId.filter((id) => !existingTagIds.includes(id));
     for (const tagId of tagsToAdd) {
@@ -185,16 +183,13 @@ export class PostRepositoryMySQL implements PostRepository {
       dateFrom?: Date;
       dateTo?: Date;
       tagsId?: string[];
-      name?: string;
-      published?: boolean;
+      title?: string;
+      status?: boolean;
     },
     pagination: { page: number; limit: number }
   ): Promise<{ posts: PostWithTagsAndUser[]; total: number }> {
-    console.log(filters);
-    console.log(pagination);
     const whereClauses: string[] = [];
     const params: any[] = [];
-
     if (filters.dateFrom) {
       whereClauses.push("p.created_at >= ?");
       params.push(filters.dateFrom);
@@ -213,13 +208,13 @@ export class PostRepositoryMySQL implements PostRepository {
       params.push(...filters.tagsId);
     }
 
-    if (filters.name) {
+    if (filters.title) {
       whereClauses.push("p.title LIKE ?");
-      params.push(`%${filters.name}%`);
+      params.push(`%${filters.title}%`);
     }
-
-    if (typeof filters.published === "boolean") {
-      if (filters.published) {
+    console.log(filters.status);
+    if (typeof filters.status === "boolean") {
+      if (filters.status) {
         whereClauses.push("p.published_at IS NOT NULL");
       } else {
         whereClauses.push("p.published_at IS NULL");
@@ -229,11 +224,7 @@ export class PostRepositoryMySQL implements PostRepository {
     const whereSQL = whereClauses.length
       ? "WHERE " + whereClauses.join(" AND ")
       : "";
-
     const offset = (pagination.page - 1) * pagination.limit;
-    console.log(params);
-    console.log(pagination.limit);
-    console.log(offset);
     const rows = await this.client.query<RowDataPacket[]>(
       `
       SELECT DISTINCT p.*, 
@@ -266,7 +257,6 @@ export class PostRepositoryMySQL implements PostRepository {
       params
     );
     const total = totalRows[0]?.total || 0;
-
     const posts = await Promise.all(
       rows.map(async (row) => {
         const tagRows = await this.client.query<RowDataPacket[]>(

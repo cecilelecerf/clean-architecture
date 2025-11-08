@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
-import { newPostSchema } from '@/utils/endpoint/advisor/feedsEndpoint';
+import { newPostSchema, querySchema } from '@/utils/endpoint/advisor/feedsEndpoint';
 import { postSchema } from '@infrastructure/types/feed';
 import z from 'zod';
 
@@ -14,28 +14,22 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const page: string | undefined = searchParams.get('page');
-    const limit: string | undefined = searchParams.get('limit');
-    const tagsParam = searchParams.get('tags');
-    const tags = tagsParam
-      ? tagsParam
-          .split(',')
-          .map((t) => t.trim())
-          .filter(Boolean)
-      : [];
-    const published = searchParams.get('published') === 'true';
-
-    const fromDate = searchParams.get('fromDate');
-    const toDate = searchParams.get('toDate');
-    const result = await postsFactory().adminFindPostWithFilter.execute({
-      page: page ? Number(page) : undefined,
-      limit: limit ? Number(limit) : undefined,
-      tags,
-      published,
-      administratorId: session.user.id,
-      fromDate: fromDate ? new Date(fromDate) : undefined,
-      toDate: toDate ? new Date(toDate) : undefined,
+    const paramsObj: Record<string, string | boolean> = {};
+    searchParams.forEach((val, key) => {
+      if (key === 'status') return (paramsObj[key] = val === 'true');
+      paramsObj[key] = val;
     });
+    const parsed = querySchema.parse(paramsObj);
+    const result = await postsFactory().adminFindPostWithFilter.execute({
+      page: parsed.page,
+      limit: parsed.limit,
+      tagsId: parsed.tagsId,
+      status: parsed.status,
+      administratorId: session.user.id,
+      fromDate: parsed.fromDate && new Date(parsed.fromDate),
+      toDate: parsed.toDate && new Date(parsed.toDate),
+    });
+
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },

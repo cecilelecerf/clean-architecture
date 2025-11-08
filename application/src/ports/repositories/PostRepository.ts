@@ -33,9 +33,9 @@ export interface PostRepository {
     filters: {
       dateFrom?: Date;
       dateTo?: Date;
-      tags?: string[];
-      name?: string;
-      published?: boolean;
+      tagsId?: TagEntity["id"][];
+      title?: PostEntity["title"];
+      status?: boolean;
     },
     pagination: {
       page: number;

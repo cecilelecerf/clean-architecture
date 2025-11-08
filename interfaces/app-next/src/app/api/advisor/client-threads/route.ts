@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    console.log(session.user.id);
     const result = await threadsFactory().advisorGetAllThread.execute({
       administratorId: session.user.id,
     });

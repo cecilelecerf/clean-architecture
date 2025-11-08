@@ -21,9 +21,8 @@ export async function PATCH(
     }
 
     const { postId } = await ctx.params;
-
     const body = await req.json();
-    const { action } = publishActionSchema.parse(body);
+    const { status } = publishActionSchema.parse(body);
 
     let result:
       | PostEntity
@@ -32,7 +31,7 @@ export async function PATCH(
       | PostNotFoundError
       | UserRoleMismatchError
       | InvalidPostAccessError;
-    if (action === 'publish') {
+    if (status === 'publish') {
       result = await postsFactory().publishPost.execute({
         userId: session.user.id,
         id: postId,
