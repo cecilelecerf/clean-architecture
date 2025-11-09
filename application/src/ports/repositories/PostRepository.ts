@@ -17,9 +17,6 @@ export interface PostRepository {
   /** 👨‍💼 Trouver toutes les Posts envoyées par un conseiller */
   findAllByAdvisorId(advisorId: UserEntity["id"]): Promise<PostEntity[]>;
 
-  /** 🕒 Récupérer les Posts récentes d’un client  */
-  findAllRecent(limit?: number): Promise<PostEntity[]>;
-
   /** ✅ Mettre à jour un Posts  */
   update(feed: PostEntity): Promise<void>;
 

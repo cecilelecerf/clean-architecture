@@ -66,7 +66,7 @@ export default async function RootLayout({
               </Button>
 
               <Button variant="link" asChild>
-                <Link href={'/accounts'}>Account</Link>
+                <Link href={'/feeds'}>Actualités</Link>
               </Button>
             </div>
             <DrawerFooter>

@@ -1,5 +1,4 @@
 "use client"
-import { advisorEndpoint } from "@/utils/endpoint/advisor"
 import { PostWithTagsAndUser } from "@/utils/endpoint/advisor/feedsEndpoint"
 import { useQuery } from "@tanstack/react-query"
 import { match } from "ts-pattern"
@@ -9,9 +8,10 @@ import { useEffect, useState } from "react"
 import { socket } from "@/lib/socket"
 import { queryClient } from "@/lib/queryClient"
 import { FiltersProps } from "@/utils/endpoint/client/feedsEndpoint"
+import { clientEndpoints } from "@/utils/endpoint/client"
 
 export const Posts = ({ filters, onPaginationChange }: { filters: FiltersProps, onPaginationChange: (pageNumber: number) => void }) => {
-    const query = useQuery(advisorEndpoint.feeds.posts.getAll({ filters }))
+    const query = useQuery(clientEndpoints.feeds.posts.getAll({ filters }))
     useEffect(() => {
         if (!socket) return;
         const eventName = `post:status`;

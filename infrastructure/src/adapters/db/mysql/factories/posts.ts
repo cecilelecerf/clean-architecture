@@ -2,17 +2,19 @@ import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/UserRepositoryMySQL";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { AddPostUsecase } from "@application/usecases/posts/AddPostUsecase";
-import { DeletePostUsecase } from "@application/usecases/posts/DeletePostUsecase";
-import { EditPostUsecase } from "@application/usecases/posts/EditPostUsecase";
-import { MarkPostAsReadUsecase } from "@application/usecases/posts/MarkPostAsReadUsecase";
-import { PublishPostUsecase } from "@application/usecases/posts/PublishPostUsecase";
-import { UnpublishPostUsecase } from "@application/usecases/posts/UnpublishPostUsecase";
-import { UpdateTagsPostUsecase } from "@application/usecases/posts/UpdateTagsPostUsecase";
+import { AddPostUsecase } from "@application/usecases/posts//admin/AddPostUsecase";
+import { DeletePostUsecase } from "@application/usecases/posts/admin/DeletePostUsecase";
+import { EditPostUsecase } from "@application/usecases/posts/admin/EditPostUsecase";
+import { MarkPostAsReadUsecase } from "@application/usecases/posts/client/MarkPostAsReadUsecase";
+import { PublishPostUsecase } from "@application/usecases/posts/admin/PublishPostUsecase";
+import { UnpublishPostUsecase } from "@application/usecases/posts/admin/UnpublishPostUsecase";
+import { UpdateTagsPostUsecase } from "@application/usecases/posts/admin/UpdateTagsPostUsecase";
 import { PostRepositoryMySQL } from "../repositories/PostRepositoryMySQL";
 import { TagRepositoryMySQL } from "../repositories/TagRepositoryMySQL";
-import { AdminFindPostWithFilterUsecase } from "@application/usecases/posts/AdminFindPostWithFilterUsecase";
-import { AdminFindPostByIdWithTagsUsecase } from "@application/usecases/posts/AdminFindPostByIdWithTagsUsecase";
+import { AdminFindPostWithFilterUsecase } from "@application/usecases/posts/admin/AdminFindPostWithFilterUsecase";
+import { ClientFindPostWithFilterUsecase } from "@application/usecases/posts/client/ClientFindPostWithFilterUsecase";
+import { AdminFindPostByIdWithTagsUsecase } from "@application/usecases/posts/admin/AdminFindPostByIdWithTagsUsecase";
+import { ClientFindPostByIdWithTagsUsecase } from "@application/usecases/posts/client/ClientFindPostByIdWithTagsUsecase";
 
 export const postsFactory = () => {
   const client = new MySQLClient();
@@ -58,20 +60,34 @@ export const postsFactory = () => {
     feedRepository,
     userRepository
   );
+  const clientFindPostWithFilter = new ClientFindPostWithFilterUsecase(
+    feedRepository,
+    userRepository
+  );
   const adminFindPostByIdWithTags = new AdminFindPostByIdWithTagsUsecase(
+    feedRepository,
+    userRepository
+  );
+  const clientFindPostByIdWithTags = new ClientFindPostByIdWithTagsUsecase(
     feedRepository,
     userRepository
   );
 
   return {
-    addPost,
-    deletePost,
-    editPost,
-    markPostAsRead,
-    publishPost,
-    unpublishPost,
-    updateTagsPost,
-    adminFindPostWithFilter,
-    adminFindPostByIdWithTags,
+    admin: {
+      addPost,
+      deletePost,
+      editPost,
+      publishPost,
+      unpublishPost,
+      updateTagsPost,
+      adminFindPostWithFilter,
+      adminFindPostByIdWithTags,
+    },
+    client: {
+      markPostAsRead,
+      clientFindPostWithFilter,
+      clientFindPostByIdWithTags,
+    },
   };
 };

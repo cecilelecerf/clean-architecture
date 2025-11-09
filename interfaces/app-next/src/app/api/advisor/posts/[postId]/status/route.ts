@@ -32,12 +32,12 @@ export async function PATCH(
       | UserRoleMismatchError
       | InvalidPostAccessError;
     if (status === 'publish') {
-      result = await postsFactory().publishPost.execute({
+      result = await postsFactory().admin.publishPost.execute({
         userId: session.user.id,
         id: postId,
       });
     } else {
-      result = await postsFactory().unpublishPost.execute({
+      result = await postsFactory().admin.unpublishPost.execute({
         userId: session.user.id,
         id: postId,
       });

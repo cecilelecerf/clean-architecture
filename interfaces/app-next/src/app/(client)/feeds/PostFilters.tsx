@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
-import { FiltersProps } from "@/utils/endpoint/client/feedsEndpoint"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { match } from "ts-pattern";
 import { CalendarFilter } from "../../../components/CalendarFilter";
 import { Slider } from "@/components/ui/slider";
-;
+import { FiltersProps } from "@/utils/endpoint/client/feedsEndpoint"
 
 type PostFiltersProps = {
     filters: FiltersProps;
@@ -18,7 +15,6 @@ type PostFiltersProps = {
 
 export const PostFilters = ({ filters, onChange }: PostFiltersProps) => {
     const [localFilters, setLocalFilters] = useState<FiltersProps>(filters);
-
 
     useEffect(() => {
         console.log(localFilters)
@@ -43,33 +39,7 @@ export const PostFilters = ({ filters, onChange }: PostFiltersProps) => {
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-65 md:w-90">
                     <div className="flex flex-col gap-4">
-                        {/* Statut publié */}
-                        <div className="flex flex-col gap-1">
-                            <Label>Publié</Label>
-                            <Select
-                                value={match(localFilters.status).with(true, () => "published").with(false, () => "unpublished").otherwise(() => "all")
 
-                                }
-                                onValueChange={(val) => {
-                                    const status = match(val).with("published", () => true).with("unpublished", () => false).otherwise(() => undefined)
-                                    setLocalFilters((prev) => ({
-                                        ...prev,
-                                        status
-                                    }))
-                                    return val
-                                }
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Tous" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Tous</SelectItem>
-                                    <SelectItem value="published">Publié</SelectItem>
-                                    <SelectItem value="unpublished">Brouillon</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
 
                         {/* Tags */}
                         {/* <div className="flex flex-col">

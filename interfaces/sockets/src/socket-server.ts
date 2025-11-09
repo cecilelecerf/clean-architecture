@@ -1,6 +1,8 @@
 import { createServer } from "http";
 import { Message } from "infrastructure/src/types/message";
+import { Post } from "infrastructure/src/types/feed";
 import { Server } from "socket.io";
+import { PostWithTagsAndUser } from "@application/ports/repositories/PostRepository";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -22,14 +24,19 @@ io.on("connection", (socket) => {
     socket.leave(threadId);
   });
   socket.on("thread:new_message", ({ message }: { message: Message }) => {
-    console.log(message);
-    console.log("au revoir");
-    console.log("on new message");
-    io.emit("test");
     io.to(message.threadId).emit(
       `thread:${message.threadId}:new_message`,
       message
     );
+  });
+
+  socket.on("post:update", ({ post }: { post: PostWithTagsAndUser }) => {
+    io.emit(`post:${post.id}:update`, post);
+  });
+  socket.on("post:status", ({ post }: { post: PostWithTagsAndUser }) => {
+    console.log(post);
+    io.emit(`post:${post.id}:update`, post);
+    io.emit(`post:status`, post);
   });
 
   socket.on("notification:new", ({ title, content }) => {

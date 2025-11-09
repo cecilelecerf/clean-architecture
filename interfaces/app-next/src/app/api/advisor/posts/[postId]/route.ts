@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../auth/[...nextauth]/route';
 import { newPostSchema } from '@/utils/endpoint/advisor/feedsEndpoint';
 import { postSchema } from '@infrastructure/types/feed';
+import z from 'zod';
 
 export async function GET(req: NextRequest, ctx: RouteContext<'/api/advisor/posts/[postId]'>) {
   try {
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/advisor/post
 
     const { postId } = await ctx.params;
 
-    const result = await postsFactory().adminFindPostByIdWithTags.execute({
+    const result = await postsFactory().admin.adminFindPostByIdWithTags.execute({
       userId: session.user.id,
       id: postId,
     });
@@ -41,9 +42,11 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/advisor/po
     const { postId } = await ctx.params;
 
     const body = await req.json();
+    console.log('body');
+    console.log(body);
     const payload = newPostSchema.partial().parse(body);
 
-    const result = await postsFactory().editPost.execute({
+    const result = await postsFactory().admin.editPost.execute({
       userId: session.user.id,
       id: postId,
       ...payload,
@@ -55,8 +58,14 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/advisor/po
         { status: result.statusCode ?? 400 },
       );
     }
-
-    return NextResponse.json(postSchema.parse(result));
+    console.log('result');
+    console.log(result);
+    return NextResponse.json(
+      postSchema
+        .omit({ modifiedAt: true, publishedAt: true, createdAt: true })
+        .extend({ modifiedAt: z.date(), publishedAt: z.date(), createdAt: z.date() })
+        .parse(result),
+    );
   } catch (err) {
     console.error(err);
     return NextResponse.json(
@@ -75,7 +84,7 @@ export async function DELETE(req: NextRequest, ctx: RouteContext<'/api/advisor/p
 
     const { postId } = await ctx.params;
 
-    const result = await postsFactory().deletePost.execute({
+    const result = await postsFactory().admin.deletePost.execute({
       userId: session.user.id,
       id: postId,
     });

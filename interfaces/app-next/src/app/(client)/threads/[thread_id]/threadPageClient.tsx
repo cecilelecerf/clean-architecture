@@ -52,13 +52,11 @@ const Display = ({ thread, userId }: { thread: GetMessage, userId: UserDto["id"]
 
         const eventName = `thread:${thread.id}:new_message`;
 
-        // Quand un message arrive du serveur
         socket.on(eventName, (msg) => {
             console.log("💬 Nouveau message reçu:", msg);
             setMessages((prev) => [...prev, msg]);
         });
 
-        // Nettoyage
         return () => {
             socket.off(eventName);
         };

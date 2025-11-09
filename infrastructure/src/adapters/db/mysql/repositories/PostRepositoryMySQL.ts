@@ -297,7 +297,7 @@ export class PostRepositoryMySQL implements PostRepository {
         return Object.assign(post, { tags, advisor });
       })
     );
-    return { posts, total: totalRows[0].total / pagination.limit };
+    return { posts, total: Math.ceil(totalRows[0].total / pagination.limit) };
   }
 
   async findWithTagsAndUserById(

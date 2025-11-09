@@ -1,6 +1,7 @@
 "use client"
 import { ButtonBack } from "@/components/ButtonBack";
 import FormWrapper, { Field } from "@/components/FromWrapper";
+import { socket } from "@/lib/socket";
 import { advisorEndpoint } from "@/utils/endpoint/advisor";
 import { NewPost } from "@/utils/endpoint/advisor/feedsEndpoint";
 import { Post } from "@infrastructure/types/feed";
@@ -29,7 +30,14 @@ export default function PostsPage() {
 
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        mutate.mutate(field, { onSuccess: () => router.push("/admin/feeds") })
+        mutate.mutate(field, {
+            onSuccess: (post) => {
+                router.push("/admin/feeds");
+                if (post.publishedAt)
+                    socket.emit("post:status", { post })
+            }
+
+        })
     }
 
     return (

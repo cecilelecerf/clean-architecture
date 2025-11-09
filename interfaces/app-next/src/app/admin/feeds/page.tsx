@@ -1,5 +1,5 @@
 "use client"
-import { FiltersProps } from "@/utils/endpoint/advisor/feedsEndpoint";
+import { FiltersProps } from "@/utils/endpoint/client/feedsEndpoint"
 import { useState } from "react";
 import { Posts } from "./Posts";
 import { PostFilters } from "./PostFilters";
@@ -17,7 +17,6 @@ export default function PostsPage() {
         limit: 3,
         page: 1
     })
-    console.log(filters)
     return (
         <>
             <PostFilters filters={filters} onChange={(f) => setFilters(f)} />

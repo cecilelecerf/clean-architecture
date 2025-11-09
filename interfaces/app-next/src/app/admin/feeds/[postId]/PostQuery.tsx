@@ -6,13 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { socket } from "@/lib/socket";
 import { advisorEndpoint } from "@/utils/endpoint/advisor";
 import { NewPost, PostWithTagsAndUser } from "@/utils/endpoint/advisor/feedsEndpoint";
 import { PostId } from "@infrastructure/types/feed";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Edit, Save, X } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
 
 type Props = { postId: PostId }
@@ -24,13 +25,13 @@ export const PostQuery = ({ postId }: Props) => {
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: "pending" }, () => "pending")
-        .with({ status: "success" }, ({ data: post }) => <PostDisplay post={post} />
+        .with({ status: "success" }, ({ data: post }) => <PostDisplay postData={post} />
         ).exhaustive()
 
 }
 
-
-const PostDisplay = ({ post }: { post: PostWithTagsAndUser }) => {
+const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
+    const [post, setPost] = useState<PostWithTagsAndUser>(postData)
     const [editValues, setEditValues] = useState<NewPost | null>(null);
 
     const editMutation = useMutation(advisorEndpoint.feeds.posts.edit({ id: post.id }));
@@ -40,6 +41,17 @@ const PostDisplay = ({ post }: { post: PostWithTagsAndUser }) => {
     if (!session?.user?.id) return <div>Unauthorized</div>;
     const isMine = session.user.id === post.advisor.id;
 
+    useEffect(() => {
+        if (!socket) return;
+        const eventNameUpdate = `post:${post.id}:update`;
+        socket.on(eventNameUpdate, (socketPost: PostWithTagsAndUser) => {
+            console.log("💬 Post mis à jour:", socketPost);
+            setPost(socketPost);
+        });
+        return () => {
+            socket.off(eventNameUpdate);
+        };
+    }, []);
 
     const handleChange = (field: keyof NewPost, value: string) => {
         if (!editValues) return;
@@ -47,7 +59,8 @@ const PostDisplay = ({ post }: { post: PostWithTagsAndUser }) => {
     };
 
     const handleSave = () => {
-        editMutation.mutate(editValues);
+        console.log(editValues)
+        editMutation.mutate(editValues, { onSuccess: () => socket.emit("post:update", { post: { ...post, ...editValues } }) });
     };
 
     const handleEditToggle = () => {
@@ -56,6 +69,13 @@ const PostDisplay = ({ post }: { post: PostWithTagsAndUser }) => {
             return { title: post.title, content: post.content, tagsId: post.tagsId }
         });
     };
+
+    const toogleStatus = () => {
+        actionMutation.mutate({
+            status: post.publishedAt ? "unpublish" : "publish"
+        }, { onSuccess: (dataSuccess) => socket.emit(`post:status`, { post: { ...post, publishedAt: dataSuccess.publishedAt } }) })
+    }
+
     const currentValues = editValues ?? { title: post.title, content: post.content };
 
     return <>
@@ -73,7 +93,7 @@ const PostDisplay = ({ post }: { post: PostWithTagsAndUser }) => {
                 <div className="flex gap-2">
                     {editValues ? (
                         <>
-                            <ButtonLoading loading={editMutation.isPending} >
+                            <ButtonLoading loading={editMutation.isPending} onClick={handleSave} >
                                 <Save />
                             </ButtonLoading>
                             <Button variant="outline" onClick={handleEditToggle} size="icon">
@@ -99,7 +119,7 @@ const PostDisplay = ({ post }: { post: PostWithTagsAndUser }) => {
                         </div>
                     )}
                     {isMine ?
-                        <SwitchComponent id="publie" label="Publié" checked={!!post.publishedAt} onChange={() => actionMutation.mutate({ status: post.publishedAt ? "unpublish" : "publish" })} />
+                        <SwitchComponent id="publie" label="Publié" checked={!!post.publishedAt} onChange={toogleStatus} />
                         : <Badge variant={post.publishedAt ? "secondary" : "outline"} className="h-fit ml-2">
                             {post.publishedAt ? "Publié" : "Brouillon"}
                         </Badge>}

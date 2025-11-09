@@ -10,6 +10,9 @@ import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { UpdateTagsPostUsecase } from "./UpdateTagsPostUsecase";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
+import { InvalidPostTitleError } from "@domain/errors/posts/InvalidPostTitleError";
+import { InvalidPostContentError } from "@domain/errors/posts/InvalidPostContentError";
+import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
 type Props = {
   userId: PostEntity["advisorId"];
   id: PostEntity["id"];
@@ -34,6 +37,9 @@ export class EditPostUsecase {
     | PostNotFoundError
     | UserRoleMismatchError
     | InvalidPostAccessError
+    | InvalidPostTitleError
+    | InvalidPostContentError
+    | TagNotFoundError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -43,20 +49,37 @@ export class EditPostUsecase {
 
     const access = post.permissionToModify(user);
     if (!access) return new InvalidPostAccessError(user.id, post.id);
+    console.log(post);
 
     const updatedAt = this.clockService.now();
 
-    if (content) post.editContent(content, updatedAt);
-    if (title) post.editTitle(title, updatedAt);
-    if (tagsId)
-      new UpdateTagsPostUsecase(
+    if (content) {
+      const result = post.editContent(content, updatedAt);
+      if (result instanceof Error) return result;
+    }
+
+    if (title) {
+      const result = post.editTitle(title, updatedAt);
+      if (result instanceof Error) return result;
+    }
+
+    if (tagsId) {
+      const updateTagsUsecase = new UpdateTagsPostUsecase(
         this.feedRepository,
         this.userRepository,
         this.tagRepository
-      ).execute({ userId: user.id, id: post.id, tagsId: tagsId });
+      );
+      const tagResult = await updateTagsUsecase.execute({
+        userId: user.id,
+        id: post.id,
+        tagsId,
+      });
+      if (tagResult instanceof Error) return tagResult;
+    }
 
-    if (post instanceof Error) return post;
     await this.feedRepository.update(post);
+    console.log("updated", post);
+    console.log(post);
     return post;
   }
 }

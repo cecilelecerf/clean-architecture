@@ -5,6 +5,7 @@ import z from 'zod';
 import { accountsEndpoint } from './accountEndpoints';
 import { threadsEndpoint } from './threadEndpoints';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
+import { feedsEndpoint } from './feedsEndpoint';
 
 const getMessageSchema = threadSchema.extend({
   messages: messageSchema.array(),
@@ -15,4 +16,5 @@ export type GetMessage = z.infer<typeof getMessageSchema>;
 export const clientEndpoints = createEndpointsNodes({
   accounts: accountsEndpoint,
   threads: threadsEndpoint,
+  feeds: feedsEndpoint,
 });

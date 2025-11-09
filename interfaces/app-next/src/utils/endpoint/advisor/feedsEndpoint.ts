@@ -2,12 +2,13 @@ import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { PostId, postSchema, TagId, tagIdSchema, tagSchema } from '@infrastructure/types/feed';
+import { PostId, postSchema, TagId, tagSchema } from '@infrastructure/types/feed';
 import { queryClient } from '@/lib/queryClient';
 import z from 'zod';
 import { userDtoSchema } from '@infrastructure/types/user';
+import { feedsQueryKeys, FiltersProps } from '../client/feedsEndpoint';
 
-const postWithTagsAndUserSchema = postSchema.extend({
+export const postWithTagsAndUserSchema = postSchema.extend({
   tags: tagSchema.array(),
   advisor: userDtoSchema,
 });
@@ -23,34 +24,11 @@ export const publishActionSchema = z.object({
 });
 type PublishAction = z.infer<typeof publishActionSchema>;
 
-const queryKeys = {
-  posts: {
-    list: (filters: FiltersProps) => ['posts', 'list', filters] as const,
-    detail: (id: PostId) => ['posts', 'detail', id] as const,
-  },
-  tags: {
-    list: ['tags', 'list'] as const,
-    detail: (id: TagId) => ['tags', 'detail', id] as const,
-  },
-};
-
-export const querySchema = z.object({
-  page: z.number().optional(),
-  limit: z.number().optional(),
-  tagsId: tagIdSchema.array().optional(),
-  status: z.boolean().optional(),
-  fromDate: z.iso.datetime().optional(),
-  toDate: z.iso.datetime().optional(),
-  title: z.string().optional(),
-});
-
-export type FiltersProps = z.infer<typeof querySchema>;
-
 export const feedsEndpoint = createEndpointsNodes({
   posts: {
     getAll: ({ filters }: { filters?: FiltersProps }) =>
       queryOptions({
-        queryKey: queryKeys.posts.list(filters),
+        queryKey: feedsQueryKeys.posts.list(filters),
         queryFn: () => {
           const params = new URLSearchParams();
           if (filters.title) params.set('title', filters.title);
@@ -72,7 +50,7 @@ export const feedsEndpoint = createEndpointsNodes({
       }),
     get: ({ id }: { id: PostId }) =>
       queryOptions({
-        queryKey: queryKeys.posts.detail(id),
+        queryKey: feedsQueryKeys.posts.detail(id),
         queryFn: () =>
           get(`/posts/${id}`, 'advisor').then((data) => postWithTagsAndUserSchema.parse(data)),
       }),
@@ -91,7 +69,7 @@ export const feedsEndpoint = createEndpointsNodes({
           patch(`/posts/${id}`, { ...payload }, 'advisor').then((data) => postSchema.parse(data)),
         onSuccess: async () => {
           await Promise.all([
-            queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(id) }),
+            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.posts.detail(id) }),
             queryClient.invalidateQueries({
               predicate: (query) => query.queryKey[0] === 'posts' && query.queryKey[1] === 'list',
             }),
@@ -104,7 +82,7 @@ export const feedsEndpoint = createEndpointsNodes({
         mutationFn: () => deleteEntity(`/posts/${id}`, 'advisor'),
         onSuccess: async () => {
           await Promise.all([
-            queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(id) }),
+            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.posts.detail(id) }),
             queryClient.invalidateQueries({
               predicate: (query) => query.queryKey[0] === 'posts' && query.queryKey[1] === 'list',
             }),
@@ -120,7 +98,7 @@ export const feedsEndpoint = createEndpointsNodes({
           ),
         onSuccess: async () => {
           await Promise.all([
-            queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(id) }),
+            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.posts.detail(id) }),
             queryClient.invalidateQueries({
               predicate: (query) => query.queryKey[0] === 'posts' && query.queryKey[1] === 'list',
             }),
@@ -131,14 +109,14 @@ export const feedsEndpoint = createEndpointsNodes({
   tags: {
     getAll: () =>
       queryOptions({
-        queryKey: queryKeys.tags.list,
+        queryKey: feedsQueryKeys.tags.list,
         queryFn: () =>
           get('/tags', 'advisor').then((data) => safeParseWithLog(tagSchema.array(), data)),
       }),
 
     get: ({ id }: { id: TagId }) =>
       queryOptions({
-        queryKey: queryKeys.tags.detail(id),
+        queryKey: feedsQueryKeys.tags.detail(id),
         queryFn: () => get(`/tags/${id}`, 'advisor').then((data) => tagSchema.parse(data)),
       }),
 
@@ -146,7 +124,7 @@ export const feedsEndpoint = createEndpointsNodes({
       mutationOptions({
         mutationFn: ({ ...payload }: NewTag) =>
           post(`/tags/new`, { ...payload }, 'advisor').then((data) => tagSchema.parse(data)),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.tags.list }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: feedsQueryKeys.tags.list }),
       }),
 
     edit: ({ id }: { id: TagId }) =>
@@ -155,8 +133,8 @@ export const feedsEndpoint = createEndpointsNodes({
           patch(`/tags/${id}`, { ...payload }, 'advisor').then((data) => tagSchema.parse(data)),
         onSuccess: async () => {
           await Promise.all([
-            queryClient.invalidateQueries({ queryKey: queryKeys.tags.detail(id) }),
-            queryClient.invalidateQueries({ queryKey: queryKeys.tags.list }),
+            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.tags.detail(id) }),
+            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.tags.list }),
           ]);
         },
       }),
@@ -166,8 +144,8 @@ export const feedsEndpoint = createEndpointsNodes({
         mutationFn: () => deleteEntity(`/tags/${id}`, 'advisor'),
         onSuccess: async () => {
           await Promise.all([
-            queryClient.removeQueries({ queryKey: queryKeys.tags.detail(id) }),
-            queryClient.invalidateQueries({ queryKey: queryKeys.tags.list }),
+            queryClient.removeQueries({ queryKey: feedsQueryKeys.tags.detail(id) }),
+            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.tags.list }),
           ]);
         },
       }),
