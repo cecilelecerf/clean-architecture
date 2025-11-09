@@ -3,7 +3,6 @@ import { useSession } from "next-auth/react";
 import { PostWithTagsAndUser } from "@/utils/endpoint/advisor/feedsEndpoint";
 import { useRouter } from "next/navigation";
 import { Tag } from "@/components/Tag";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 
 type PostCardProps = {

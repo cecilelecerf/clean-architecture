@@ -212,7 +212,6 @@ export class PostRepositoryMySQL implements PostRepository {
       whereClauses.push("p.title LIKE ?");
       params.push(`%${filters.title}%`);
     }
-    console.log(filters.status);
     if (typeof filters.status === "boolean") {
       if (filters.status) {
         whereClauses.push("p.published_at IS NOT NULL");
@@ -256,7 +255,6 @@ export class PostRepositoryMySQL implements PostRepository {
       `,
       params
     );
-    const total = totalRows[0]?.total || 0;
     const posts = await Promise.all(
       rows.map(async (row) => {
         const tagRows = await this.client.query<RowDataPacket[]>(
@@ -299,8 +297,7 @@ export class PostRepositoryMySQL implements PostRepository {
         return Object.assign(post, { tags, advisor });
       })
     );
-
-    return { posts, total };
+    return { posts, total: totalRows[0].total / pagination.limit };
   }
 
   async findWithTagsAndUserById(

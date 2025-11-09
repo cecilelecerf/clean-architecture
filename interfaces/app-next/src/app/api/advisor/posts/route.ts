@@ -14,9 +14,10 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const paramsObj: Record<string, string | boolean> = {};
+    const paramsObj: Record<string, string | boolean | number> = {};
     searchParams.forEach((val, key) => {
       if (key === 'status') return (paramsObj[key] = val === 'true');
+      if (key === 'limit' || key === 'page') return (paramsObj[key] = Number(val));
       paramsObj[key] = val;
     });
     const parsed = querySchema.parse(paramsObj);
@@ -25,6 +26,7 @@ export async function GET(req: NextRequest) {
       limit: parsed.limit,
       tagsId: parsed.tagsId,
       status: parsed.status,
+      title: parsed.title,
       administratorId: session.user.id,
       fromDate: parsed.fromDate && new Date(parsed.fromDate),
       toDate: parsed.toDate && new Date(parsed.toDate),

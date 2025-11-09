@@ -7,6 +7,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { match } from "ts-pattern";
+import { CalendarFilter } from "../../../components/CalendarFilter";
+import { Slider } from "@/components/ui/slider";
 ;
 
 type PostFiltersProps = {
@@ -39,11 +41,10 @@ export const PostFilters = ({ filters, onChange }: PostFiltersProps) => {
                         <SlidersHorizontal />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent>
-
+                <PopoverContent align="end" className="w-65 md:w-90">
                     <div className="flex flex-col gap-4">
                         {/* Statut publié */}
-                        <div className="flex flex-col">
+                        <div className="flex flex-col gap-1">
                             <Label>Publié</Label>
                             <Select
                                 value={match(localFilters.status).with(true, () => "published").with(false, () => "unpublished").otherwise(() => "all")
@@ -92,65 +93,32 @@ export const PostFilters = ({ filters, onChange }: PostFiltersProps) => {
             </div> */}
 
                         {/* Dates */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col">
-                                <Label>De</Label>
-                                <Input
-                                    type="date"
-                                    value={localFilters.fromDate || ""}
-                                    onChange={(e) =>
-                                        setLocalFilters((prev) => ({
-                                            ...prev,
-                                            fromDate: e.target.value || undefined,
-                                        }))
-                                    }
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <Label>À</Label>
-                                <Input
-                                    type="date"
-                                    value={localFilters.toDate || ""}
-                                    onChange={(e) =>
-                                        setLocalFilters((prev) => ({
-                                            ...prev,
-                                            toDate: e.target.value || undefined,
-                                        }))
-                                    }
-                                />
-                            </div>
+                        <div className="flex gap-3 flex-col md:flex-row">
+                            <CalendarFilter
+                                dateIso={filters.fromDate}
+                                onDateChange={(date) => setLocalFilters((prev) => ({ ...prev, fromDate: date ? date.toISOString() : undefined }))}
+                                label="Du"
+                            />
+                            <CalendarFilter
+                                dateIso={filters.toDate}
+                                onDateChange={(date) => setLocalFilters((prev) => ({ ...prev, toDate: date ? date.toISOString() : undefined }))}
+                                label="Au"
+                            />
                         </div>
-
-                        {/* Pagination */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col">
-                                <Label>Page</Label>
-                                <Input
-                                    type="number"
-                                    min={1}
-                                    value={localFilters.page || 1}
-                                    onChange={(e) =>
-                                        setLocalFilters((prev) => ({
-                                            ...prev,
-                                            page: Number(e.target.value),
-                                        }))
-                                    }
-                                />
+                        <div className="flex flex-col gap-1">
+                            <div className="flex justify-between w-full">
+                                <Label>Post par page</Label>
+                                <p>{localFilters.limit}</p>
                             </div>
-                            <div className="flex flex-col">
-                                <Label>Par page</Label>
-                                <Input
-                                    type="number"
-                                    min={1}
-                                    value={localFilters.limit || 10}
-                                    onChange={(e) =>
-                                        setLocalFilters((prev) => ({
-                                            ...prev,
-                                            limit: Number(e.target.value),
-                                        }))
-                                    }
-                                />
-                            </div>
+                            <Slider
+                                defaultValue={[localFilters.limit]}
+                                max={50}
+                                step={1}
+                                onValueCommit={(e) => setLocalFilters((prev) => ({
+                                    ...prev,
+                                    limit: e[0],
+                                }))}
+                            />
                         </div>
                     </div>
                 </PopoverContent>

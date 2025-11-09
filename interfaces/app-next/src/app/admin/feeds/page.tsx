@@ -13,12 +13,15 @@ export default function PostsPage() {
         title: undefined,
         fromDate: undefined,
         toDate: undefined,
-        status: undefined
+        status: undefined,
+        limit: 3,
+        page: 1
     })
+    console.log(filters)
     return (
         <>
             <PostFilters filters={filters} onChange={(f) => setFilters(f)} />
-            <Posts filters={filters} />
+            <Posts filters={filters} onPaginationChange={(pageNumber) => setFilters((prev) => ({ ...prev, page: pageNumber }))} />
             <Button
                 className="fixed bottom-3 right-3 group flex items-center justify-center overflow-hidden w-12 h-12  transition-all duration-300 hover:w-auto gap-0"
                 onClick={() => router.push("/admin/feeds/new")}

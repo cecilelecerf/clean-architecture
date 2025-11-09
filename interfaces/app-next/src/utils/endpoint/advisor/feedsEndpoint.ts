@@ -51,8 +51,9 @@ export const feedsEndpoint = createEndpointsNodes({
     getAll: ({ filters }: { filters?: FiltersProps }) =>
       queryOptions({
         queryKey: queryKeys.posts.list(filters),
-        queryFn: async () => {
+        queryFn: () => {
           const params = new URLSearchParams();
+          if (filters.title) params.set('title', filters.title);
           if (filters.page) params.set('page', String(filters.page));
           if (filters.limit) params.set('limit', String(filters.limit));
           if (filters.tagsId && filters.tagsId.length > 0)
