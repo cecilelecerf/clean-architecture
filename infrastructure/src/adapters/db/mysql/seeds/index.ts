@@ -15,7 +15,7 @@ const all = async () => {
   await generateExternalThreads(clients, advisors, mysqlClient);
   await generateInternalThreads(directors, advisors, mysqlClient);
   const tags = await generateTags(mysqlClient);
-  await generatePosts(advisors, directors, tags, mysqlClient);
+  await generatePosts(advisors, directors, clients, tags, mysqlClient);
 };
 all()
   .then(() => {

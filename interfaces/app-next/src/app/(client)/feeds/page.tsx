@@ -9,7 +9,7 @@ export default function PostsPage() {
         title: undefined,
         fromDate: undefined,
         toDate: undefined,
-        limit: 3,
+        limit: 20,
         page: 1
     })
     return (

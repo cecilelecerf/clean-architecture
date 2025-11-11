@@ -13,8 +13,8 @@ export class PostRepositoryMySQL implements PostRepository {
 
   async save(post: PostEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO posts (id, advisor_id, title, content, created_at, modified_at, published_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO posts (id, advisor_id, title, content, created_at, modified_at, published_at, client_id) 
+       VALUES (?, ?, ?, ?, ?, ?, ?,?)`,
       [
         post.id,
         post.advisorId,
@@ -23,9 +23,15 @@ export class PostRepositoryMySQL implements PostRepository {
         post.createdAt,
         post.modifiedAt || null,
         post.publishedAt || null,
+        post.clientId || null,
       ]
     );
-
+    for (const readId of post.readBy) {
+      await this.client.query<ResultSetHeader>(
+        `INSERT INTO post_user_read (post_id, user_id) VALUES (?, ?)`,
+        [post.id, readId]
+      );
+    }
     for (const tagId of post.tagsId) {
       await this.client.query<ResultSetHeader>(
         `INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)`,
@@ -46,6 +52,11 @@ export class PostRepositoryMySQL implements PostRepository {
       `SELECT tag_id FROM post_tag WHERE post_id = ?`,
       [id]
     );
+    const readRows = await this.client.query<RowDataPacket[]>(
+      `SELECT user_id FROM post_user_read WHERE post_id = ?`,
+      [id]
+    );
+    const readsId = readRows.map((r) => r.user_id);
     const tagsId = tagRows.map((r) => r.tag_id);
     return PostEntity.from({
       id: row.id,
@@ -56,8 +67,8 @@ export class PostRepositoryMySQL implements PostRepository {
       createdAt: row.created_at,
       modifiedAt: row.modified_at ?? undefined,
       publishedAt: row.published_at ?? undefined,
-      // TODO : à remplir si tu veux gérer la lecture par utilisateurs
-      readBy: [],
+      readBy: readsId,
+      clientId: row.client_id ?? undefined,
     });
   }
 
@@ -75,6 +86,11 @@ export class PostRepositoryMySQL implements PostRepository {
         );
         const tagsId = tagRows.map((r) => r.tagId);
 
+        const readRows = await this.client.query<RowDataPacket[]>(
+          `SELECT user_id FROM post_user_read WHERE post_id = ?`,
+          [row.id]
+        );
+        const readsId = readRows.map((r) => r.user_id);
         return PostEntity.from({
           id: row.id,
           advisorId: row.advisor_id,
@@ -84,7 +100,8 @@ export class PostRepositoryMySQL implements PostRepository {
           createdAt: row.created_at,
           modifiedAt: row.modified_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
-          readBy: [],
+          readBy: readsId,
+          clientId: row.client_id ?? undefined,
         });
       })
     );
@@ -104,6 +121,11 @@ export class PostRepositoryMySQL implements PostRepository {
         );
         const tagsId = tagRows.map((r) => r.tagId);
 
+        const readRows = await this.client.query<RowDataPacket[]>(
+          `SELECT user_id FROM post_user_read WHERE post_id = ?`,
+          [row.id]
+        );
+        const readsId = readRows.map((r) => r.user_id);
         return PostEntity.from({
           id: row.id,
           advisorId: row.advisor_id,
@@ -113,7 +135,8 @@ export class PostRepositoryMySQL implements PostRepository {
           createdAt: row.created_at,
           modifiedAt: row.modified_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
-          readBy: [],
+          readBy: readsId,
+          clientId: row.client_id ?? undefined,
         });
       })
     );
@@ -261,6 +284,12 @@ export class PostRepositoryMySQL implements PostRepository {
           `SELECT t.* FROM post_tag pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = ? `,
           [row.id]
         );
+
+        const readRows = await this.client.query<RowDataPacket[]>(
+          `SELECT user_id FROM post_user_read WHERE post_id = ?`,
+          [row.id]
+        );
+        const readsId = readRows.map((r) => r.user_id);
         const tagsId = tagRows.map((r) => r.id);
         const tags = tagRows.map((tagRow) =>
           TagEntity.from({
@@ -292,7 +321,8 @@ export class PostRepositoryMySQL implements PostRepository {
           createdAt: row.created_at,
           modifiedAt: row.modified_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
-          readBy: [],
+          readBy: readsId,
+          clientId: row.client_id ?? undefined,
         });
         return Object.assign(post, { tags, advisor });
       })
@@ -326,6 +356,11 @@ export class PostRepositoryMySQL implements PostRepository {
       `SELECT t.* FROM post_tag pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = ? `,
       [row.id]
     );
+    const readRows = await this.client.query<RowDataPacket[]>(
+      `SELECT user_id FROM post_user_read WHERE post_id = ?`,
+      [id]
+    );
+    const readsId = readRows.map((r) => r.user_id);
     const tagsId = tagRows.map((r) => r.id);
     const tags = tagRows.map((tagRow) =>
       TagEntity.from({
@@ -357,8 +392,8 @@ export class PostRepositoryMySQL implements PostRepository {
       createdAt: row.created_at,
       modifiedAt: row.modified_at ?? undefined,
       publishedAt: row.published_at ?? undefined,
-      // TODO : à remplir si tu veux gérer la lecture par utilisateurs
-      readBy: [],
+      readBy: readsId,
+      clientId: row.client_id ?? undefined,
     });
     return Object.assign(post, { tags, advisor });
   }

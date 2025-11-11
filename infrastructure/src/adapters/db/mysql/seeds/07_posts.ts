@@ -33,6 +33,7 @@ const contents = [
 export const generatePosts = async (
   advisors: UserEntity[],
   directors: UserEntity[],
+  clients: UserEntity[],
   tags: TagEntity[],
   mySqlClient: MySQLClient,
   opts?: {
@@ -64,7 +65,11 @@ export const generatePosts = async (
   const authors = [...advisors, ...directors];
   const posts: PostEntity[] = [];
 
-  const createPost = async (author: UserEntity) => {
+  const createPost = async (
+    author: UserEntity,
+    client?: UserEntity,
+    defineReadBy?: UserEntity
+  ) => {
     const createdAt = clockService.nowMinusDays(rand(0, 60));
     const modifiedAt =
       Math.random() < 0.3
@@ -84,6 +89,25 @@ export const generatePosts = async (
       )
     );
 
+    const readBy = [];
+
+    if (defineReadBy) {
+      readBy.push(defineReadBy.id);
+    } else if (client) {
+      if (rand(0, 1) === 0) {
+        readBy.push(client.id);
+      }
+    } else {
+      const readers = Array.from(
+        new Set(
+          Array.from(
+            { length: rand(0, Math.min(10, clients.length)) },
+            () => pick(clients).id
+          )
+        )
+      );
+      readBy.push(...readers);
+    }
     const post = PostEntity.from({
       id: uuidService.generate(),
       advisorId: author.id,
@@ -93,7 +117,8 @@ export const generatePosts = async (
       createdAt,
       modifiedAt,
       publishedAt,
-      readBy: [],
+      readBy,
+      clientId: client?.id,
     });
 
     posts.push(post);
@@ -102,15 +127,18 @@ export const generatePosts = async (
   };
 
   // 🟩 Post garanti pour le premier director
+  await createPost(directors[0], clients[0], clients[0]);
   await createPost(directors[0]);
 
   // 🟩 Post garanti pour le premier advisor
+  await createPost(advisors[0], clients[0]);
   await createPost(advisors[0]);
 
   // 🔁 Posts aléatoires supplémentaires
   const remainingCount = Math.max(0, postsCount - 2);
   for (let i = 0; i < remainingCount; i++) {
     await createPost(pick(authors));
+    await createPost(pick(authors), pick(clients));
   }
 
   return posts;

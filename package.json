@@ -8,7 +8,8 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "mono-build": "pnpm tsc -b tsconfig.build.json",
-    "seed:mysql": "pnpm --filter infrastructure run seed:mysql",
+    "mysql:seed": "pnpm --filter infrastructure run mysql:seed",
+    "mysql:restart": "pnpm --filter infrastructure run mysql:restart",
     "socket": "pnpm --filter sockets run socket"
   },
   "workspaces": [

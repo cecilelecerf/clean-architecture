@@ -26,16 +26,18 @@ export const Posts = ({ filters, onPaginationChange }: { filters: FiltersProps, 
         .with({ status: "error" }, () => "error")
         .with({ status: "pending" }, () => "pending")
         .with({ status: "success" }, ({ data }) => <>
-            <div className="space-y-4">
-                {data.posts.length === 0 ? (
-                    <div className="text-gray-500">Aucun post trouvé</div>
-                ) : (
-                    data.posts.map((post) => (
-                        <DisplayPost dataPost={post} key={post.id} />
-                    ))
-                )}
+            <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-10">
+                    {data.posts.length === 0 ? (
+                        <div className="text-gray-500">Aucun post trouvé</div>
+                    ) : (
+                        data.posts.map((post) => (
+                            <DisplayPost dataPost={post} key={post.id} />
+                        ))
+                    )}
+                </div>
                 <PaginationPosts onPaginationChange={onPaginationChange} totalPage={data.total} filters={filters} />
-            </div>
+            </>
         </>
         )
 

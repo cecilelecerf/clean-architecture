@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "seed:mysql": "tsx ./src/adapters/db/mysql/seeds/index.ts",
+    "mysql:seed": "tsx ./src/adapters/db/mysql/seeds/index.ts",
     "mysql:restart": "tsx ./src/adapters/db/mysql/seeds/drop-and-create-db.ts"
   },
   "devDependencies": {

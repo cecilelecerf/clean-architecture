@@ -6,5 +6,7 @@ CREATE TABLE IF NOT EXISTS posts (
     created_at DATETIME NOT NULL,
     modified_at DATETIME,
     published_at DATETIME,
-    FOREIGN KEY (advisor_id) REFERENCES users(id)
+    client_id VARCHAR(36),
+    FOREIGN KEY (advisor_id) REFERENCES users(id),
+    FOREIGN KEY (client_id) REFERENCES users(id)
 );

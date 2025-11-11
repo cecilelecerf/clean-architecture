@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
+import { UserId } from '@infrastructure/types/user';
 
 export const authOptions = {
   providers: [
@@ -18,7 +19,7 @@ export const authOptions = {
         if (result instanceof Error) return null;
 
         return {
-          id: result.user.id,
+          id: result.user.id as UserId,
           name: result.user.lastname,
           email: result.user.email.toString(),
           role: result.user.role,
@@ -35,7 +36,7 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = user.id as UserId;
         token.email = user.email;
         token.accessToken = user.accessToken;
         token.role = user.role;
@@ -43,7 +44,7 @@ export const authOptions = {
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id;
+      session.user.id = token.id as UserId;
       session.user.email = token.email;
       session.user.accessToken = token.accessToken;
       session.user.role = token.role;

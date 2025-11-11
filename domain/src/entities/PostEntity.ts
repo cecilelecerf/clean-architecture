@@ -13,7 +13,8 @@ export class PostEntity {
     public createdAt: Date,
     public readBy: UserEntity["id"][] = [],
     public modifiedAt?: Date,
-    public publishedAt?: Date
+    public publishedAt?: Date,
+    public clientId?: UserEntity["id"]
   ) {}
 
   public static create({
@@ -25,6 +26,7 @@ export class PostEntity {
     createdAt,
     modifiedAt,
     publishedAt,
+    clientId,
   }: Pick<
     PostEntity,
     | "id"
@@ -35,6 +37,7 @@ export class PostEntity {
     | "createdAt"
     | "modifiedAt"
     | "publishedAt"
+    | "clientId"
   >): PostEntity | InvalidPostContentError | InvalidPostTitleError {
     const verifiedContent = this.verifyContent(content);
     if (verifiedContent instanceof Error) return verifiedContent;
@@ -50,7 +53,8 @@ export class PostEntity {
       createdAt,
       [],
       modifiedAt,
-      publishedAt
+      publishedAt,
+      clientId
     );
   }
 
@@ -64,6 +68,7 @@ export class PostEntity {
     modifiedAt,
     publishedAt,
     readBy,
+    clientId,
   }: Pick<
     PostEntity,
     | "id"
@@ -75,6 +80,7 @@ export class PostEntity {
     | "modifiedAt"
     | "publishedAt"
     | "readBy"
+    | "clientId"
   >) {
     return new PostEntity(
       id,
@@ -85,7 +91,8 @@ export class PostEntity {
       createdAt,
       readBy,
       modifiedAt,
-      publishedAt
+      publishedAt,
+      clientId
     );
   }
 
