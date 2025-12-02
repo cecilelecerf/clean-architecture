@@ -4,7 +4,7 @@ import { colorSchema } from "./color";
 export const accountIdSchema = z.string().length(27).brand("account");
 export type AccountId = z.infer<typeof accountIdSchema>;
 
-export const AccountSchema = z.object({
+export const accountSchema = z.object({
   IBAN: accountIdSchema,
   name: z.string().min(1),
   balance: z.number().nonnegative(),
@@ -12,6 +12,4 @@ export const AccountSchema = z.object({
   color: colorSchema,
 });
 
-export type Account = z.infer<typeof AccountSchema>;
-
-export const AccountsSchema = z.array(AccountSchema);
+export type Account = z.infer<typeof accountSchema>;

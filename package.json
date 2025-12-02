@@ -7,14 +7,16 @@
     "dev:web": "pnpm --filter app-next dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "mono-build": "pnpm tsc -b tsconfig.build.json"
+    "mono-build": "pnpm tsc -b tsconfig.build.json",
+    "mysql:seed": "pnpm --filter infrastructure run mysql:seed",
+    "mysql:restart": "pnpm --filter infrastructure run mysql:restart",
+    "socket": "pnpm --filter sockets run socket"
   },
   "workspaces": [
     "application",
     "domain",
     "infrastructure",
-    "interfaces/api/*",
-    "interfaces/web/*"
+    "interfaces/*"
   ],
   "devDependencies": {
     "typescript": "^5.9.3"

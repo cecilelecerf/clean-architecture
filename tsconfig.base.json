@@ -17,8 +17,7 @@
       "@domain/*": ["domain/src/*"],
       "@application/*": ["application/src/*"],
       "@infrastructure/*": ["infrastructure/src/*"],
-      "@api/*": ["interfaces/api/*"],
-      "@web/*": ["interfaces/web/*"]
+      "@interfaces/*": ["interfaces/*"]
     }
   },
   "exclude": ["node_modules", "dist"]

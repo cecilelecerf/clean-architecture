@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const userIdSchema = z.uuid().brand("user");
-
+export type UserId = z.infer<typeof userIdSchema>;
 export const userSchema = z.object({
   id: userIdSchema,
   firstname: z.string(),
@@ -9,10 +9,10 @@ export const userSchema = z.object({
   email: z.email(),
   passwordHash: z.string(),
   role: z.enum(["client", "conseiller", "directeur"]),
-  isActive: z.boolean(),
-  createdAt: z.date(),
-  confirmedAt: z.date(),
-  modifiedAt: z.date(),
+  isActiveField: z.preprocess((val) => val === 1 || val === true, z.boolean()),
+  createdAt: z.iso.datetime(),
+  confirmedAt: z.iso.datetime().nullable(),
+  modifiedAt: z.iso.datetime().nullable(),
 });
 export type User = z.infer<typeof userSchema>;
 

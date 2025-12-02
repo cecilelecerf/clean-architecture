@@ -59,7 +59,8 @@ export class Money {
     | Money
     | MoneyCurrencyMismatchError
     | MoneyAmountNegativeError
-    | MoneyAmountInvalidError {
+    | MoneyAmountInvalidError
+    | MoneyCurrencyMissingError {
     const currencyError = this.ensureSameCurrency(other);
     if (currencyError instanceof Error) return currencyError;
     const result = this.amount - other.amount;

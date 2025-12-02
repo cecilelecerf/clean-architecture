@@ -3,11 +3,14 @@ import {
   RealTimeEvent,
   RealTimeService,
 } from "@application/ports/services/RealTimeService";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 
 export class SocketIORealTimeService implements RealTimeService {
   constructor(
+    // Serveur Websocket en general
     private readonly io: Server,
+    // Connexion avec un client
+    private readonly socket: Socket,
     private readonly clockService: ClockService
   ) {}
   /**
@@ -25,16 +28,12 @@ export class SocketIORealTimeService implements RealTimeService {
   /**
    * Envoie un événement en temps réel à une room
    */
-  async emitRooms(
-    event: Omit<RealTimeEvent, "to"> & { rooms: string[] }
+  async emitRoom(
+    event: Omit<RealTimeEvent, "to"> & { room: string }
   ): Promise<void> {
-    const { rooms, type, payload } = event;
+    const { room, type, payload, sentAt } = event;
 
-    const sendAt = this.clockService.now();
-
-    for (const room of rooms) {
-      this.io.to(room).emit(type, { ...payload, sendAt });
-    }
+    this.io.to(room).emit(type, { ...payload, sentAt });
   }
 
   /**
@@ -46,5 +45,19 @@ export class SocketIORealTimeService implements RealTimeService {
     const sendAt = this.clockService.now();
 
     this.io.emit(type, { ...payload, sendAt });
+  }
+
+  /**
+   * Rejoins une room
+   */
+  async joinRoom({ room }: { room: string }): Promise<void> {
+    this.io.socketsJoin(room);
+  }
+
+  /**
+   * Exit une room
+   */
+  leaveRoom({ room }: { room: string }): void {
+    this.socket.leave(room);
   }
 }

@@ -6,7 +6,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "mysql:seed": "tsx ./src/adapters/db/mysql/seeds/index.ts",
+    "mysql:restart": "tsx ./src/adapters/db/mysql/seeds/drop-and-create-db.ts"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
@@ -15,12 +17,15 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "application": "workspace:*",
     "bcryptjs": "^3.0.2",
+    "domain": "workspace:*",
     "dotenv": "^17.2.3",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.15.3",
     "nodemailer": "^7.0.10",
     "socket.io": "^4.8.1",
+    "tsx": "^4.20.6",
     "uuid": "^13.0.0",
     "zod": "^4.1.12"
   }

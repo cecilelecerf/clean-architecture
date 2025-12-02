@@ -6,7 +6,8 @@ type SocketType =
   | "message:new"
   | "message:update"
   | "message:read"
-  | "message:delete";
+  | "message:delete"
+  | "thread:new_message";
 
 export interface RealTimeEvent {
   to: UserEntity["id"][];
@@ -22,11 +23,9 @@ export interface RealTimeService {
   emitUsers(event: RealTimeEvent): Promise<void>;
 
   /**
-   * Envoie un événement en temps réel à un ou plusieurs utilisateurs
+   * Envoie un événement en temps réel à une room
    */
-  emitRooms(
-    event: Omit<RealTimeEvent, "to"> & { rooms: string[] }
-  ): Promise<void>;
+  emitRoom(event: Omit<RealTimeEvent, "to"> & { room: string }): Promise<void>;
 
   /**
    * Diffuse un événement à tout le monde (ex: conversation interne, groupe)

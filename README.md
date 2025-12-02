@@ -56,10 +56,11 @@ Utilisateur : root
 
 Mot de passe : root
 
-💡 Si tu modifies les scripts SQL dans infrastructure/src/adapters/db/schemas/, supprime le volume pour que MySQL réexécute les scripts :
+Pour drop et recréer la db avec les tables :
+`pnpm --filter infrastructure mysql:restart`
 
-`docker compose down -v`
-`docker compose up -d`
+Pour ajouter un jeu de fausse donnée :
+`pnpm --filter infrastructure seed:mysql`
 
 ## 5️⃣ Démarrer l’application Next.js (API + Web)
 
@@ -71,6 +72,12 @@ Dans le workspace web, lance le serveur de développement :
 L’API et l’interface web seront disponibles sur http://localhost:3000.
 
 Les routes API utiliseront la base MySQL configurée via .env.
+
+## User
+
+Un client :
+Email : client@example.com
+Mdp : password123
 
 ## 6️⃣ Bonnes pratiques
 

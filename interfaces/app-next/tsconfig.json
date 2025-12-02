@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "types": ["next-auth"],
+    "outDir": "dist",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@infrastructure/*": ["../../infrastructure/src/*"],
+      "@application/*": ["../../application/src/*"],
+      "@domain/*": ["../../domain/src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts",
+    "src/utils/endpoint"
+  ],
+  "references": [
+    { "path": "../../infrastructure/" },
+    { "path": "../../application/" },
+    { "path": "../../domain/" }
+  ],
+
+  "exclude": ["node_modules"]
+}

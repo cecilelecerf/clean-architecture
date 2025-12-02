@@ -56,7 +56,7 @@ export class UpdateThreadTitleUsecase {
 Règle métier 
   - Nombre de caractère max
   - Nombre de caractère min
-  - Tim
+  - Trim
   - Vérfier si close
   - Update la date de modification
 

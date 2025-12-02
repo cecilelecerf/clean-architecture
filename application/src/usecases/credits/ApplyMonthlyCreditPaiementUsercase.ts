@@ -2,6 +2,7 @@ import { CreditNotFoundError } from "@application/errors/credits/CreditNotFoundE
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { CreditEntity } from "@domain/entities/CreditEntity";
 import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
+import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
 import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
 import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
 import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
@@ -16,9 +17,10 @@ export class GrantCreditUsecase {
     | CreditEntity
     | CreditNotFoundError
     | CreditAlreadyPaidError
-    | MoneyAmountNegativeError
     | MoneyCurrencyMissingError
     | MoneyCurrencyMismatchError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
   > {
     const credit = await this.creditRepository.findById(id);
     if (!credit) return new CreditNotFoundError();

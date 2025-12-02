@@ -5,17 +5,19 @@ import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
 import { AdministratorCannotLeaveThreadError } from "@domain/errors/thread/AdministratorCannotLeaveThreadError";
 import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
 import { ThreadTransferToSameAdministratorError } from "@domain/errors/thread/ThreadTransferToSameAdministratorError";
+import { ThreadNotActiveError } from "@domain/errors/thread/ThreadNotActiveError";
+import { ThreadAlreadyHasAdvisorError } from "@domain/errors/thread/ThreadAlreadyHasAdvisorError";
 
 export class ThreadEntity {
   private constructor(
     public id: string,
-    public administratorId: UserEntity["id"],
     public participantsId: UserEntity["id"][],
     public title: string,
     public createdAt: Date,
     public isClose: boolean,
     public type: "external" | "internal",
-    public lastUpdatedAt?: Date
+    public administratorId?: UserEntity["id"],
+    public updatedAt?: Date
   ) {}
 
   public static create({
@@ -24,7 +26,7 @@ export class ThreadEntity {
     administratorId,
     title,
     createdAt,
-    lastUpdatedAt,
+    updatedAt,
     isClose,
     type,
   }: Pick<
@@ -32,7 +34,7 @@ export class ThreadEntity {
     | "id"
     | "administratorId"
     | "createdAt"
-    | "lastUpdatedAt"
+    | "updatedAt"
     | "participantsId"
     | "title"
     | "isClose"
@@ -42,13 +44,13 @@ export class ThreadEntity {
     if (verifiedTitle instanceof Error) return verifiedTitle;
     return new ThreadEntity(
       id,
-      administratorId,
       participantsId,
       verifiedTitle,
       createdAt,
       isClose,
       type,
-      lastUpdatedAt
+      administratorId,
+      updatedAt
     );
   }
 
@@ -58,7 +60,7 @@ export class ThreadEntity {
     administratorId,
     title,
     createdAt,
-    lastUpdatedAt,
+    updatedAt,
     isClose,
     type,
   }: Pick<
@@ -66,7 +68,7 @@ export class ThreadEntity {
     | "id"
     | "administratorId"
     | "createdAt"
-    | "lastUpdatedAt"
+    | "updatedAt"
     | "participantsId"
     | "title"
     | "isClose"
@@ -74,13 +76,13 @@ export class ThreadEntity {
   >) {
     return new ThreadEntity(
       id,
-      administratorId,
       participantsId,
       title,
       createdAt,
       isClose,
       type,
-      lastUpdatedAt
+      administratorId,
+      updatedAt
     );
   }
 
@@ -95,16 +97,17 @@ export class ThreadEntity {
         this.administratorId
       );
     this.administratorId = newAdvisorId;
-    this.lastUpdatedAt = now;
+    this.updatedAt = now;
     return this;
   }
 
   public close(now: Date): void {
-    this.lastUpdatedAt = now;
+    this.updatedAt = now;
     this.isClose = true;
   }
   /** Vérifie si un utilisateur est participant du thread */
   public isParticipant(userId: UserEntity["id"]): boolean {
+    if (!this.participantsId) return false;
     return this.participantsId.includes(userId);
   }
 
@@ -126,14 +129,14 @@ export class ThreadEntity {
     if (this.hasAccess(userId))
       return new ThreadParticipantAlreadyExistError(userId);
     this.participantsId = [...this.participantsId, userId];
-    this.lastUpdatedAt = now;
+    this.updatedAt = now;
     return this;
   }
 
   public removeParticipant(
     userId: UserEntity["id"],
     now: Date
-  ): ThreadEntity | InvalidThreadAccessError {
+  ): ThreadEntity | InvalidThreadAccessError | ThreadClosedError {
     if (this.isClose) return new ThreadClosedError(this.id);
     if (this.administratorId === userId) {
       return new AdministratorCannotLeaveThreadError(this.id, userId);
@@ -142,7 +145,7 @@ export class ThreadEntity {
       return new InvalidThreadAccessError(userId, this.id);
     const index = this.participantsId.indexOf(userId);
     this.participantsId.splice(index, 1);
-    this.lastUpdatedAt = now;
+    this.updatedAt = now;
 
     return this;
   }
@@ -165,7 +168,32 @@ export class ThreadEntity {
     if (validatedTitle instanceof Error) return validatedTitle;
     this.title = validatedTitle;
 
-    this.lastUpdatedAt = now;
+    this.updatedAt = now;
     return this;
+  }
+  private hasAdministrator(): boolean {
+    return !!this.administratorId;
+  }
+  private ensureCanAssignAdvisorInExternal():
+    | ThreadNotActiveError
+    | ThreadAlreadyHasAdvisorError
+    | void {
+    if (this.isClose) {
+      return new ThreadNotActiveError("Le thread n'est plus actif.");
+    }
+
+    if (this.hasAdministrator()) {
+      return new ThreadAlreadyHasAdvisorError(
+        "Ce thread a déjà un conseiller."
+      );
+    }
+  }
+
+  public assignAdvisor(
+    userId: UserEntity["id"]
+  ): ThreadNotActiveError | ThreadAlreadyHasAdvisorError | void {
+    const error = this.ensureCanAssignAdvisorInExternal();
+    if (error instanceof Error) return error;
+    this.administratorId = userId;
   }
 }
