@@ -1,8 +1,6 @@
 import { Money } from "@domain/values/Money";
 import { AccountEntity } from "./AccountEntity";
 
-// TODO add label and icon
-
 export class TransactionEntity {
   private constructor(
     public id: string,
