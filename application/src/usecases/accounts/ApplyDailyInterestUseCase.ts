@@ -1,24 +1,28 @@
+import { RateNotFoundError } from "@application/errors/accounts/RateNotFoundError";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { SavingRateRepository } from "@application/ports/repositories/SavingRateRepository";
 import { TransactionRepository } from "@application/ports/repositories/TransactionRepository";
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
+import { ClockService } from "@application/ports/services/ClockService";
+import { UuidService } from "@application/ports/services/UuidService";
 
 export class ApplyDailyInterestUseCase {
   constructor(
     private readonly accountRepository: AccountRepository,
     private readonly configRepository: SavingRateRepository,
-    private readonly transactionRepository: TransactionRepository
+    private readonly transactionRepository: TransactionRepository,
+    private readonly clockService: ClockService,
+    private readonly uuidService: UuidService
   ) {}
 
-  async execute(): Promise<void> {
+  async execute(): Promise<void | RateNotFoundError> {
     const rate = await this.configRepository.findCurrent();
-    // TODO : faire un fichier d'error
-    if (!rate) throw new Error("Aucun taux d’épargne défini");
 
-    const savingsAccounts =
-      await this.accountRepository.findAllSavingsAccounts();
-    // TODO: utiliser le service clock
-    const today = new Date();
+    if (!rate) return new RateNotFoundError();
+
+    const savingsAccounts = await this.accountRepository.findAllSavingsAccounts();
+
+    const today = this.clockService.now();
 
     if (savingsAccounts) {
       for (const account of savingsAccounts) {
@@ -34,9 +38,8 @@ export class ApplyDailyInterestUseCase {
         account.deposit(interestMoney);
 
         const transaction = TransactionEntity.from({
-          // TODO: utiliser le service uuid
-          id: crypto.randomUUID(),
-          // TODO : il faut passer un id de user en ay  ant faire les verifs necesaire au prélable
+          id: this.uuidService.generate(),
+          // TODO : il faut passer un id de user en ayant faire les verifs necesaire au prélable
           fromAccountId: "BANK",
           toAccountId: account.iban,
           amount: interestMoney,
