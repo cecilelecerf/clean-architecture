@@ -8,7 +8,23 @@ import fs from "fs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({ path: resolve(__dirname, "../../../../.env") });
+let pool: Pool;
 
+function getPool(): Pool {
+  if (!pool) {
+    pool = mysql.createPool({
+      host: process.env.MYSQL_HOST,
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
+      waitForConnections: true,
+      connectionLimit: 10, // à ajuster selon ton serveur
+      queueLimit: 0,
+      multipleStatements: true,
+    });
+  }
+  return pool;
+}
 /**
  * Wrapper générique autour de mysql2/promise
  * pour centraliser la connexion et exécuter des requêtes SQL typées.
@@ -20,16 +36,7 @@ export class MySQLClient {
   private password = process.env.MYSQL_PASSWORD;
   private db = process.env.MYSQL_DATABASE;
   constructor() {
-    this.pool = mysql.createPool({
-      host: this.host,
-      user: this.user,
-      password: this.password,
-      database: this.db,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-      multipleStatements: true,
-    });
+    this.pool = getPool();
   }
 
   /**
