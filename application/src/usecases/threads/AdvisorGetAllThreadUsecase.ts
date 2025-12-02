@@ -19,7 +19,6 @@ export class AdvisorGetAllThreadUsecase {
   }: Props): Promise<
     ThreadEntityWithUsers[] | UserNotFoundError | UserNotActiveError
   > {
-    console.log(administratorId);
     const user = await findActiveUser(this.userRepository, administratorId);
     if (user instanceof Error) return user;
     const administratorThread =

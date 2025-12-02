@@ -49,7 +49,6 @@ export class EditPostUsecase {
 
     const access = post.permissionToModify(user);
     if (!access) return new InvalidPostAccessError(user.id, post.id);
-    console.log(post);
 
     const updatedAt = this.clockService.now();
 
@@ -78,8 +77,6 @@ export class EditPostUsecase {
     }
 
     await this.feedRepository.update(post);
-    console.log("updated", post);
-    console.log(post);
     return post;
   }
 }

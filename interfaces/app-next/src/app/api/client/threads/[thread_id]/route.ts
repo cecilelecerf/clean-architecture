@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getThreadMessagesFactory } from '@infrastructure/adapters/db/mysql/factories/messages/getThreadMessagesFactory';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { findThreadWithUserFactory } from '@infrastructure/adapters/db/mysql/factories/threads/findThreadWithUserFactory';
+import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
 
 export async function GET(req: NextRequest, ctx: RouteContext<'/api/client/threads/[thread_id]'>) {
   try {
@@ -12,13 +12,14 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/client/threa
     }
     const { thread_id } = await ctx.params;
 
-    const thread = await findThreadWithUserFactory().execute(thread_id, session.user.id);
+    const thread = await threadsFactory().findThreadWithUser.execute(thread_id, session.user.id);
     if (thread instanceof Error) {
       return NextResponse.json(
         { name: thread.name, message: thread.message },
         { status: thread.statusCode ?? 404 },
       );
     }
+    console.log(thread);
     const messages = await getThreadMessagesFactory().execute({
       userId: session.user.id,
       id: thread_id,

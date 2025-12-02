@@ -9,7 +9,7 @@ import { feedsEndpoint } from './feedsEndpoint';
 
 const getMessageSchema = threadSchema.extend({
   messages: messageSchema.array(),
-  administrator: userDtoSchema,
+  administrator: userDtoSchema.nullable(),
   participants: userDtoSchema.array(),
 });
 export type GetMessage = z.infer<typeof getMessageSchema>;

@@ -55,6 +55,7 @@ export class StartExternalThreadUsecase {
 
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
+    console.log("thread");
 
     const thread = ThreadEntity.create({
       id,

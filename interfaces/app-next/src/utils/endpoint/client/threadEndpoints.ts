@@ -11,7 +11,7 @@ import { createEndpointsNodes } from '@/utils/createEndpointNode';
 
 export const threadsWithMessageAndUserSchema = threadSchema.extend({
   messages: messageSchema.array(),
-  administrator: userDtoSchema,
+  administrator: userDtoSchema.nullable(),
   participants: userDtoSchema.array(),
 });
 export type GetMessage = z.infer<typeof threadsWithMessageAndUserSchema>;
@@ -22,7 +22,7 @@ export const threadsEndpoint = createEndpointsNodes({
       queryFn: () =>
         get('/threads', 'client').then((data) => {
           return safeParseWithLog(
-            threadSchema.extend({ administrator: userDtoSchema }).array(),
+            threadSchema.extend({ administrator: userDtoSchema.nullable() }).array(),
             data,
           );
         }),

@@ -34,9 +34,12 @@ export default function ThreadsPage() {
                                 onClick={() => router.push(`/threads/${thread.id}`)}
                             >
                                 {/* Left side */}
+
                                 <div>
                                     <p className={`font-semibold text-lg leading-5`}>{thread.title}</p>
-                                    <p className="text-sm text-gray-500">{thread.administrator.firstname} {" "}{thread.administrator.lastname}</p>
+                                    {thread.administrator && (
+                                        <p className="text-sm text-gray-500">{thread.administrator.firstname} {" "}{thread.administrator.lastname}</p>
+                                    )}
                                 </div>
 
                                 {/* Right side */}

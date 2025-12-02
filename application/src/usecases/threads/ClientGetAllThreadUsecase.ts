@@ -19,13 +19,9 @@ export class ClientGetAllThreadUsecase {
     if (user instanceof Error) return user;
 
     const threads =
-      await this.threadRepository.findALLExternalThreadWithUserByUserId(
+      await this.threadRepository.findAllExternalThreadWithUserByUserId(
         clientId
       );
-    threads.map((thread) => {
-      const { participants, ...rest } = thread;
-      return rest;
-    });
     return threads;
   }
 }

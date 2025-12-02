@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS threads (
     id VARCHAR(36) PRIMARY KEY,
-    administrator_id VARCHAR(36) NOT NULL,
+    administrator_id VARCHAR(36),
     title VARCHAR(50),
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,

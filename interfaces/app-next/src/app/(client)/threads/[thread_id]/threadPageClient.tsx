@@ -71,8 +71,12 @@ const Display = ({ thread, userId }: { thread: GetMessage, userId: UserDto["id"]
         <div className="flex justify-between items-center border-b pb-2 mb-4">
             <h2 className="font-bold text-lg">{thread.title}</h2>
             <span className="text-sm text-gray-500">
-                Administrateur: {thread.administrator.firstname}
-                {thread.administrator.lastname}
+                {thread.administrator && (
+                    <>
+                        Administrateur: {thread.administrator.firstname}
+                        {thread.administrator.lastname}
+                    </>
+                )}
             </span>
         </div>
 
@@ -80,10 +84,10 @@ const Display = ({ thread, userId }: { thread: GetMessage, userId: UserDto["id"]
         <div className="flex-1 overflow-y-scroll space-y-3 max-h-[65vh] sm:max-h-[75vh] xl:max-h-[72vh]">
             {messages.map((msg) => {
                 const isCurrentUser = msg.senderId === userId;
-                const sender =
-                    msg.senderId === thread.administrator.id
-                        ? thread.administrator
-                        : thread.participants.find((p) => p.id === msg.senderId);
+                const sender = (thread.administrator &&
+                    msg.senderId === thread.administrator.id)
+                    ? thread.administrator
+                    : thread.participants.find((p) => p.id === msg.senderId);
 
                 return (
                     <div
