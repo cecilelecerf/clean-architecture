@@ -179,6 +179,32 @@ export class PostRepositoryMySQL implements PostRepository {
         [post.id, tagId]
       );
     }
+
+    const existingUserReadRows = await this.client.query<RowDataPacket[]>(
+      `SELECT user_id FROM post_user_read WHERE post_id = ?`,
+      [post.id]
+    );
+    const existingUserIds = existingUserReadRows.map((r) => r.user_id);
+
+    const UsersToAdd = post.readBy.filter(
+      (id) => !existingUserIds.includes(id)
+    );
+    for (const userId of UsersToAdd) {
+      await this.client.query<ResultSetHeader>(
+        `INSERT INTO post_user_read (post_id, user_id) VALUES (?, ?)`,
+        [post.id, userId]
+      );
+    }
+
+    const usersToRemove = existingUserIds.filter(
+      (id) => !post.readBy.includes(id)
+    );
+    for (const userId of usersToRemove) {
+      await this.client.query<ResultSetHeader>(
+        `DELETE FROM post_user_read WHERE post_id = ? AND user_id = ?`,
+        [post.id, userId]
+      );
+    }
   }
 
   async delete(id: PostEntity["id"]): Promise<void> {
@@ -396,5 +422,81 @@ export class PostRepositoryMySQL implements PostRepository {
       clientId: row.client_id ?? undefined,
     });
     return Object.assign(post, { tags, advisor });
+  }
+
+  async findAllUnreadWithTags(
+    userId: UserEntity["id"]
+  ): Promise<PostWithTagsAndUser[]> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+      p.*,
+      u.id AS advisor_id,
+      u.firstname AS advisor_firstname,
+      u.lastname AS advisor_lastname,
+      u.email AS advisor_email,
+      u.password_hash AS advisor_password_hash,
+      u.role AS advisor_role,
+      u.is_active AS advisor_is_active,
+      u.created_at AS advisor_created_at,
+      u.confirmed_at AS advisor_confirmed_at,
+      u.modified_at AS advisor_modified_at
+    FROM posts p
+    JOIN users u ON u.id = p.advisor_id
+    LEFT JOIN post_user_read pr ON pr.post_id = p.id AND pr.user_id = ?
+    WHERE pr.user_id IS NULL AND p.published_at IS NOT NULL
+    ORDER BY p.created_at DESC`,
+      [userId]
+    );
+
+    const posts = await Promise.all(
+      rows.map(async (row) => {
+        const tagRows = await this.client.query<RowDataPacket[]>(
+          `SELECT t.* FROM post_tag pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = ? `,
+          [row.id]
+        );
+
+        const readRows = await this.client.query<RowDataPacket[]>(
+          `SELECT user_id FROM post_user_read WHERE post_id = ?`,
+          [row.id]
+        );
+        const readsId = readRows.map((r) => r.user_id);
+        const tagsId = tagRows.map((r) => r.id);
+        const tags = tagRows.map((tagRow) =>
+          TagEntity.from({
+            id: tagRow.id,
+            label: tagRow.label,
+            color: tagRow.color,
+            createdAt: tagRow.created_at,
+            modifiedAt: tagRow.modified_at,
+          })
+        );
+        const advisor = UserEntity.from({
+          id: row.advisor_id,
+          firstname: row.advisor_firstname,
+          lastname: row.advisor_lastname,
+          email: row.advisor_email,
+          passwordHash: row.advisor_password_hash,
+          role: row.advisor_role,
+          isActiveField: row.advisor_is_active,
+          createdAt: row.advisor_created_at,
+          confirmedAt: row.advisor_confirmed_at,
+          modifiedAt: row.advisor_modified_at,
+        });
+        const post = PostEntity.from({
+          id: row.id,
+          advisorId: row.advisor_id,
+          title: row.title,
+          content: row.content,
+          tagsId,
+          createdAt: row.created_at,
+          modifiedAt: row.modified_at ?? undefined,
+          publishedAt: row.published_at ?? undefined,
+          readBy: readsId,
+          clientId: row.client_id ?? undefined,
+        });
+        return Object.assign(post, { tags, advisor });
+      })
+    );
+    return posts;
   }
 }

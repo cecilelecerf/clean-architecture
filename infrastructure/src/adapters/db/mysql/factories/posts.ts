@@ -15,6 +15,7 @@ import { AdminFindPostWithFilterUsecase } from "@application/usecases/posts/admi
 import { ClientFindPostWithFilterUsecase } from "@application/usecases/posts/client/ClientFindPostWithFilterUsecase";
 import { AdminFindPostByIdWithTagsUsecase } from "@application/usecases/posts/admin/AdminFindPostByIdWithTagsUsecase";
 import { ClientFindPostByIdWithTagsUsecase } from "@application/usecases/posts/client/ClientFindPostByIdWithTagsUsecase";
+import { ClientFindUnreadPostWithTag } from "@application/usecases/posts/client/ClientFindUnreadPostWithTag";
 
 export const postsFactory = () => {
   const client = new MySQLClient();
@@ -72,6 +73,10 @@ export const postsFactory = () => {
     feedRepository,
     userRepository
   );
+  const clientFindUnreadPostWithTags = new ClientFindUnreadPostWithTag(
+    feedRepository,
+    userRepository
+  );
 
   return {
     admin: {
@@ -88,6 +93,7 @@ export const postsFactory = () => {
       markPostAsRead,
       clientFindPostWithFilter,
       clientFindPostByIdWithTags,
+      clientFindUnreadPostWithTags,
     },
   };
 };

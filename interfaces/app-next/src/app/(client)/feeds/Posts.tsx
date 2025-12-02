@@ -22,6 +22,11 @@ export const Posts = ({ filters, onPaginationChange }: { filters: FiltersProps, 
             socket.off(eventName);
         };
     }, []);
+    useEffect(() => {
+        for (const query of queryClient.getQueryCache().getAll()) {
+            console.log("QUERY KEY:", query.queryKey);
+        }
+    }, []);
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: "pending" }, () => "pending")
@@ -58,6 +63,7 @@ const DisplayPost = ({ dataPost }: { dataPost: PostWithTagsAndUser }) => {
             socket.off(eventName);
         };
     }, []);
+    useEffect(() => { setPost(dataPost) }, [dataPost])
 
     return <PostCard post={post} key={post.id} />
 }

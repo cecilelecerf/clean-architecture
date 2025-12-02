@@ -25,7 +25,6 @@ export class MarkPostAsReadUsecase {
 
     const post = await this.feedRepository.findById(postId);
     if (!post) return new PostNotFoundError();
-
     post.markAsRead(userId);
     await this.feedRepository.update(post);
 

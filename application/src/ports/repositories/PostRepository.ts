@@ -44,4 +44,8 @@ export interface PostRepository {
   findWithTagsAndUserById(
     id: PostEntity["id"]
   ): Promise<PostWithTagsAndUser | null>;
+
+  findAllUnreadWithTags(
+    userId: UserEntity["id"]
+  ): Promise<PostWithTagsAndUser[]>;
 }

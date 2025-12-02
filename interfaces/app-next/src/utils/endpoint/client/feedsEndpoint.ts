@@ -1,14 +1,16 @@
-import { queryOptions } from '@tanstack/react-query';
-import { get } from '@/lib/apiClient';
+import { mutationOptions, queryOptions } from '@tanstack/react-query';
+import { get, patch } from '@/lib/apiClient';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { PostId, TagId, tagIdSchema, tagSchema } from '@infrastructure/types/feed';
 import z from 'zod';
 import { postWithTagsAndUserSchema } from '../advisor/feedsEndpoint';
+import { queryClient } from '@/lib/queryClient';
 
 export const feedsQueryKeys = {
   posts: {
-    list: (filters: FiltersProps) => ['posts', 'list', filters] as const,
+    list: (filters: FiltersProps) => ['posts', 'list', filters ?? {}] as const,
+    unread: () => ['posts', 'unread'] as const,
     detail: (id: PostId) => ['posts', 'detail', id] as const,
   },
   tags: {
@@ -51,11 +53,34 @@ export const feedsEndpoint = createEndpointsNodes({
           );
         },
       }),
+    getUnread: () =>
+      queryOptions({
+        queryKey: feedsQueryKeys.posts.unread(),
+        queryFn: () => {
+          return get(`/posts/unread`, 'client').then((data) =>
+            safeParseWithLog(postWithTagsAndUserSchema.array(), data),
+          );
+        },
+      }),
     get: ({ id }: { id: PostId }) =>
       queryOptions({
         queryKey: feedsQueryKeys.posts.detail(id),
         queryFn: () =>
           get(`/posts/${id}`, 'client').then((data) => postWithTagsAndUserSchema.parse(data)),
+      }),
+    markAsRead: () =>
+      mutationOptions({
+        mutationFn: ({ postId }: { postId: PostId }) =>
+          patch(`/posts/${postId}/read`, {}, 'client'),
+        onSuccess: async ({ postId }: { postId: PostId }) => {
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.posts.detail(postId) }),
+            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.posts.unread() }),
+            queryClient.invalidateQueries({
+              queryKey: ['posts', 'list'],
+            }),
+          ]);
+        },
       }),
   },
   tags: {
