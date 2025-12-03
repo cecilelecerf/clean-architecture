@@ -5,6 +5,7 @@
   "scripts": {
     "dev:api": "pnpm --filter interfaces/api/express dev",
     "dev:web": "pnpm --filter app-next dev",
+    "web:build": "pnpm --filter app-next build",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "mono-build": "pnpm tsc -b tsconfig.build.json",
