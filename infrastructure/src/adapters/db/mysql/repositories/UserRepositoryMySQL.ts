@@ -69,11 +69,18 @@ export class UserRepositoryMySQL implements UserRepository {
     );
   }
 
-  async findAllByRole(role: UserEntity["role"]): Promise<UserEntity[]> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM users WHERE role = ?",
-      [role]
-    );
+  async findAllByRoleAndIsActif(
+    role?: UserEntity["role"]
+  ): Promise<UserEntity[]> {
+    let query =
+      "SELECT * FROM users WHERE is_active = 1 AND confirmed_at IS NOT NULL";
+    const params: any[] = [];
+
+    if (!!role) {
+      query += " AND role = ?";
+      params.push(role);
+    }
+    const rows = await this.client.query<RowDataPacket[]>(query, params);
     return rows.map((row) =>
       UserEntity.from({
         id: row.id,

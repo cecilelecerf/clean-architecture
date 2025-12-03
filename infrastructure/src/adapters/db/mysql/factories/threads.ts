@@ -1,22 +1,22 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/UserRepositoryMySQL";
 import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/ThreadRepositoryMySQL";
-import { StartExternalThreadUsecase } from "@application/usecases/threads/StartExternalThreadUsecase";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { MessageRepositoryMySQL } from "../repositories/MessageRepositoryMySQL";
 import { CloseThreadUsecase } from "@application/usecases/threads/CloseThreadUsecase";
-import { AddParticipantUsecase } from "@application/usecases/threads/AddParticipantUsecase";
-import { AdvisorGetAllThreadUsecase } from "@application/usecases/threads/AdvisorGetAllThreadUsecase";
-import { ClientGetAllThreadUsecase } from "@application/usecases/threads/ClientGetAllThreadUsecase";
-import { FindThreadWithUserUsecase } from "@application/usecases/threads/FindThreadWithUserUsecase";
 import { LeaveThreadUsecase } from "@application/usecases/threads/LeaveThreadUsecase";
-import { RemoveParticipantUsecase } from "@application/usecases/threads/RemoveParticipantUsecase";
-import { StartInternalThreadUsecase } from "@application/usecases/threads/StartInternalThreadUsecase";
-import { TransferThreadUsecase } from "@application/usecases/threads/TransferThreadUsecase";
-import { UpdateThreadTitleUsecase } from "@application/usecases/threads/UpdateThreadTitleUsecase";
-import { AdvisorJoinExternalThread } from "@application/usecases/threads/AdvisorJoinExternalThread";
-
+import { StartExternalThreadUsecase } from "@application/usecases/threads/clients/StartExternalThreadUsecase";
+import { AddParticipantUsecase } from "@application/usecases/threads/administrators/advisors/AddParticipantUsecase";
+import { AdvisorGetAllThreadUsecase } from "@application/usecases/threads/administrators/advisors/AdvisorGetAllThreadUsecase";
+import { ClientGetAllThreadUsecase } from "@application/usecases/threads/clients/ClientGetAllThreadUsecase";
+import { FindThreadWithUserUsecase } from "@application/usecases/threads/administrators/advisors/FindThreadWithUserUsecase";
+import { RemoveParticipantUsecase } from "@application/usecases/threads/administrators/RemoveParticipantUsecase";
+import { StartInternalThreadUsecase } from "@application/usecases/threads/administrators/directors/StartInternalThreadUsecase";
+import { TransferThreadUsecase } from "@application/usecases/threads/administrators/TransferThreadUsecase";
+import { UpdateThreadTitleUsecase } from "@application/usecases/threads/administrators/UpdateThreadTitleUsecase";
+import { AdvisorJoinExternalThread } from "@application/usecases/threads/administrators/advisors/AdvisorJoinExternalThread";
+import { AdvisorGetAllThreadByClientUsecase } from "@application/usecases/threads/administrators/advisors/AdvisorGetAllThreadByClientUsecase";
 export const threadsFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);
@@ -38,6 +38,10 @@ export const threadsFactory = () => {
     clockService
   );
   const advisorGetAllThread = new AdvisorGetAllThreadUsecase(
+    threadRepository,
+    userRepository
+  );
+  const advisorGetAllByClientThread = new AdvisorGetAllThreadByClientUsecase(
     threadRepository,
     userRepository
   );
@@ -98,5 +102,6 @@ export const threadsFactory = () => {
     transferThread,
     updateThreadTitle,
     advisorJoinExternalThread,
+    advisorGetAllByClientThread,
   };
 };

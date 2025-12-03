@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
-export async function GET(
+export async function POST(
   req: NextRequest,
-  ctx: RouteContext<'/api/advisor/client-threads/[threadId]'>,
+  ctx: RouteContext<'/api/advisor/client-threads/[threadId]/join'>,
 ) {
   try {
     const session = await getServerSession(authOptions);

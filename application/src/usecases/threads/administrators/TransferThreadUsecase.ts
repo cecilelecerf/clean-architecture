@@ -8,11 +8,12 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
+import { UserEntity } from "@domain/entities/UserEntity";
 
-type Props = { newAdministratorId: ThreadEntity["administratorId"] } & Pick<
-  ThreadEntity,
-  "id" | "administratorId"
->;
+type Props = {
+  newAdministratorId: UserEntity["id"];
+  administratorId: UserEntity["id"];
+} & Pick<ThreadEntity, "id">;
 
 export class TransferThreadUsecase {
   constructor(

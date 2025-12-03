@@ -10,7 +10,7 @@ import { match } from "ts-pattern";
 
 export default function ClientsThreadsPage() {
     const router = useRouter()
-    const query = useQuery(advisorEndpoint.clientsThread.getAll())
+    const query = useQuery(advisorEndpoint.thread.client.getAll())
     useEffect(() => {
         if (query.status === "success") {
             query.data.forEach((thread) => {
@@ -29,7 +29,7 @@ export default function ClientsThreadsPage() {
                     {threads.map((thread) => {
                         return <Card
                             key={thread.id}
-                            className={`p-4 flex justify-between items-center rounded-lg border-0 bg-gray-50 hover:bg-gray-100 shadow-none transition-all duration-200 cursor-pointer flex-row mb-4`}
+                            className={`p-4 flex justify-between items-center rounded-xs border-0 bg-gray-50 hover:bg-gray-100 shadow-none transition-all duration-200 cursor-pointer flex-row mb-3`}
                             onClick={() => router.push(`/admin/client-threads/${thread.id}`)}
                         >
                             {/* Left side */}

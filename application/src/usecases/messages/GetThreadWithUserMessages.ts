@@ -2,59 +2,47 @@ import { InvalidThreadAccessError } from "@application/errors/threads/InvalidThr
 import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
 import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
 import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import {
+  MessageRepository,
+  MessageWithUser,
+} from "@application/ports/repositories/MessageRepository";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
-import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
+import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
 
-type Props = { userId: UserEntity["id"] } & Pick<
-  ThreadEntity,
-  "id" | "administratorId"
->;
+type Props = { userId: UserEntity["id"] } & Pick<ThreadEntity, "id">;
 
-export class RemoveParticipantUsecase {
+export class GetThreadMessages {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly threadRepository: ThreadRepository,
-    private readonly clockService: ClockService
+    private readonly messageRepository: MessageRepository
   ) {}
   public async execute({
-    id,
     userId,
-    administratorId,
+    id,
   }: Props): Promise<
-    | ThreadEntity
+    | MessageWithUser[]
+    | UserNotFoundError
     | ThreadNotFoundError
     | InvalidThreadAccessError
-    | UserNotFoundError
-    | UserNotActiveError
     | ThreadClosedError
+    | UserNotActiveError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    const administrator = await findActiveUser(
-      this.userRepository,
-      administratorId
-    );
-    if (administrator instanceof Error) return administrator;
-
     const thread = await this.threadRepository.findById(id);
     if (!thread) return new ThreadNotFoundError();
-
-    if (!thread.isAdministrator(administrator.id))
-      return new InvalidThreadAccessError(administrator.id, thread.id);
-
-    const updateThread = thread.removeParticipant(
-      user.id,
-      this.clockService.now()
+    if (thread.administratorId && !thread.hasAccess(user.id))
+      return new InvalidThreadAccessError(user.id, thread.id);
+    const messages = await this.messageRepository.findAllWithUserByThread(
+      thread.id
     );
-    if (updateThread instanceof Error) return updateThread;
-
-    this.threadRepository.save(updateThread);
-    return updateThread;
+    return messages;
   }
 }

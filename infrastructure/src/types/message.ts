@@ -1,5 +1,5 @@
 import z from "zod";
-import { userIdSchema } from "./user";
+import { userDtoSchema, userIdSchema } from "./user";
 import { threadIdSchema } from "./thread";
 
 export const messageIdSchema = z.uuid().brand("message");
@@ -14,3 +14,8 @@ export const messageSchema = z.object({
 });
 
 export type Message = z.infer<typeof messageSchema>;
+
+export const messageWithUserSchema = messageSchema.extend({
+  sender: userDtoSchema,
+});
+export type MessageWithUser = z.infer<typeof messageWithUserSchema>;
