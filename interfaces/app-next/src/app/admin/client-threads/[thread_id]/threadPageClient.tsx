@@ -22,10 +22,10 @@ import { ButtonLoading } from '@/components/ButtonLoading';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
-    const query = useQuery(advisorEndpoint.clientsThread.get({ id: threadId }))
+    const query = useQuery(advisorEndpoint.thread.client.get({ id: threadId }))
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
-
+    console.log("----new query")
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: "pending" }, () => "pending")
@@ -37,12 +37,13 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
 
 
 const Display = ({ thread, userId }: { thread: GetMessage, userId: UserDto["id"] }) => {
+    console.log(thread)
     const [messages, setMessages] = useState<Message[]>(thread.messages);
     const [input, setInput] = useState("");
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter()
 
-    const joinMutate = useMutation(advisorEndpoint.clientsThread.join({ id: thread.id }))
+    const joinMutate = useMutation(advisorEndpoint.thread.client.join({ id: thread.id }))
     const sendMessageMutate = useMutation({
         mutationFn: (content: string) => post<Message, NewMessage>(`/threads/${thread.id}/messages/new`, { content }, "client"),
         onSuccess: (data) => {
@@ -117,7 +118,6 @@ const Display = ({ thread, userId }: { thread: GetMessage, userId: UserDto["id"]
             <div ref={bottomRef} />
 
         </div>
-
         {/* Input */}
         {thread.administratorId ?
             <div className="flex gap-3 mt-4">
@@ -129,7 +129,8 @@ const Display = ({ thread, userId }: { thread: GetMessage, userId: UserDto["id"]
                 />
                 <Button onClick={() => input.length && sendMessageMutate.mutate(input)} disabled={sendMessageMutate.isPending} >{sendMessageMutate.isPending && <Spinner />} <ArrowRight /></Button>
             </div> :
-            <ButtonLoading loading={joinMutate.isPending} onClick={() => joinMutate.mutate()}>Rejoindre la conversation <ArrowRight /></ButtonLoading>
+            <ButtonLoading loading={joinMutate.isPending} onClick={() => joinMutate.mutate()}>Rejoindre la conversation <ArrowRight />
+            </ButtonLoading>
         }
     </div>
 }

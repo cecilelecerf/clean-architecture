@@ -1,10 +1,10 @@
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { usersEndpoint } from './usersEndpoint';
-import { threadsEndpoint as clientsThreadEndpoint } from './threadsEndpoint';
+import { threadsEndpoint } from './threadsEndpoint';
 import { feedsEndpoint } from './feedsEndpoint';
 
 export const advisorEndpoint = createEndpointsNodes({
   users: usersEndpoint,
-  clientsThread: clientsThreadEndpoint,
+  thread: threadsEndpoint,
   feeds: feedsEndpoint,
 });

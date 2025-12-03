@@ -58,11 +58,15 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       `SELECT user_id FROM thread_participant WHERE thread_id = ?`,
       [thread.id]
     );
-    const existingParticipantIds = existingParticipantRows.map((r) => r.userId);
-
+    console.log(existingParticipantRows);
+    const existingParticipantIds = existingParticipantRows.map(
+      (r) => r.user_id
+    );
+    console.log(existingParticipantIds);
     const participantsToAdd = thread.participantsId.filter(
       (id) => !existingParticipantIds.includes(id)
     );
+    console.log(participantsToAdd);
     for (const participantId of participantsToAdd) {
       await this.client.query<ResultSetHeader>(
         `INSERT INTO thread_participant (thread_id, user_id) VALUES (?, ?)`,
@@ -70,10 +74,10 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       );
     }
 
-    const tagsToRemove = existingParticipantIds.filter(
+    const participantsToRemove = existingParticipantIds.filter(
       (id) => !thread.participantsId.includes(id)
     );
-    for (const userId of tagsToRemove) {
+    for (const userId of participantsToRemove) {
       await this.client.query<ResultSetHeader>(
         `DELETE FROM thread_participant WHERE thread_id = ? AND user_id = ?`,
         [thread.id, userId]

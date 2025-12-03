@@ -8,36 +8,40 @@ import { threadsWithMessageAndUserSchema } from '../client/threadEndpoints';
 import { queryClient } from '@/lib/queryClient';
 
 export const threadsEndpoint = createEndpointsNodes({
-  getAll: () =>
-    queryOptions({
-      queryKey: ['client-threads', 'list'],
-      queryFn: () =>
-        get('/client-threads', 'advisor').then((data) => {
-          return safeParseWithLog(
-            threadSchema
-              .extend({
-                administrator: userDtoSchema.nullable(),
-                participants: userDtoSchema.array(),
-              })
-              .array(),
-            data,
-          );
-        }),
-    }),
-  get: ({ id }: { id: ThreadId }) =>
-    queryOptions({
-      queryKey: ['client-threads', id],
-      queryFn: () =>
-        get(`/client-threads/${id}`, 'advisor').then((data) =>
-          threadsWithMessageAndUserSchema.parse(data),
-        ),
-    }),
-  join: ({ id }: { id: ThreadId }) =>
-    mutationOptions({
-      mutationFn: () =>
-        post(`/client-threads/${id}/join`, {}, 'advisor').then((data) =>
-          threadsWithMessageAndUserSchema.parse(data),
-        ),
-      onSuccess: () => queryClient.invalidateQueries({ queryKey: ['client-threads', id] }),
-    }),
+  client: {
+    getAll: () =>
+      queryOptions({
+        queryKey: ['client-threads', 'list'],
+        queryFn: () =>
+          get('/client-threads', 'advisor').then((data) => {
+            return safeParseWithLog(
+              threadSchema
+                .extend({
+                  administrator: userDtoSchema.nullable(),
+                  participants: userDtoSchema.array(),
+                })
+                .array(),
+              data,
+            );
+          }),
+      }),
+    get: ({ id }: { id: ThreadId }) =>
+      queryOptions({
+        queryKey: ['client-threads', id],
+        queryFn: () =>
+          get(`/client-threads/${id}`, 'advisor').then((data) =>
+            threadsWithMessageAndUserSchema.parse(data),
+          ),
+      }),
+    join: ({ id }: { id: ThreadId }) =>
+      mutationOptions({
+        mutationFn: async () => await post(`/client-threads/${id}/join`, {}, 'advisor'),
+        onSuccess: () => {
+          return queryClient.invalidateQueries({
+            queryKey: ['client-threads', id],
+            refetchType: 'active',
+          });
+        },
+      }),
+  },
 });

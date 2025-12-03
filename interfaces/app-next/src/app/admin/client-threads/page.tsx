@@ -10,7 +10,7 @@ import { match } from "ts-pattern";
 
 export default function ClientsThreadsPage() {
     const router = useRouter()
-    const query = useQuery(advisorEndpoint.clientsThread.getAll())
+    const query = useQuery(advisorEndpoint.thread.client.getAll())
     useEffect(() => {
         if (query.status === "success") {
             query.data.forEach((thread) => {
