@@ -65,7 +65,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     );
     for (const participantId of participantsToAdd) {
       await this.client.query<ResultSetHeader>(
-        `INSERT INTO post_tag (thread_id, participant_id) VALUES (?, ?)`,
+        `INSERT INTO thread_participant (thread_id, user_id) VALUES (?, ?)`,
         [thread.id, participantId]
       );
     }
@@ -75,7 +75,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     );
     for (const userId of tagsToRemove) {
       await this.client.query<ResultSetHeader>(
-        `DELETE FROM post_tag WHERE thread_id = ? AND user_id = ?`,
+        `DELETE FROM thread_participant WHERE thread_id = ? AND user_id = ?`,
         [thread.id, userId]
       );
     }
@@ -199,7 +199,6 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       admin.created_at AS admin_created_at,
       admin.is_active AS admin_is_active,
       admin.password_hash AS admin_password_hash,
-
       p.id AS participant_id,
       p.firstname AS participant_firstname,
       p.lastname AS participant_lastname,
@@ -447,28 +446,19 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     ThreadEntityWithUsers[]
   > {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT t.*, 
-          admin.id as admin_id,
-          admin.firstname as admin_firstname,
-          admin.lastname as admin_lastname,
-          admin.email as admin_email,
-          admin.role as admin_role,
-          admin.created_at as admin_created_at,
-          admin.is_active as admin_is_active,
-          admin.password_hash as admin_password_hash,
-          p.id as participant_id,
-          p.firstname as participant_firstname,
-          p.lastname as participant_lastname,
-          p.email as participant_email,
-          p.role as participant_role,
-          p.created_at as participant_created_at,
-          p.is_active as participant_is_active,
-          p.password_hash as participant_password_hash
-    FROM threads t
-    JOIN users admin ON t.administrator_id = admin.id
-    JOIN thread_participant tp ON t.id = tp.thread_id
-    JOIN users p ON tp.user_id = p.id
-    WHERE t.administrator_id = null
+      `SELECT t.*,
+      p.id as participant_id,
+      p.firstname as participant_firstname,
+      p.lastname as participant_lastname,
+      p.email as participant_email,
+      p.role as participant_role,
+      p.created_at as participant_created_at,
+      p.is_active as participant_is_active,
+      p.password_hash as participant_password_hash
+      FROM threads t
+      JOIN thread_participant tp ON t.id = tp.thread_id
+      JOIN users p ON tp.user_id = p.id
+       WHERE t.administrator_id IS NULL
     `
     );
 
@@ -487,16 +477,18 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           type: row.type,
         }) as ThreadEntityWithUsers;
 
-        thread.administrator = UserEntity.from({
-          id: row.admin_id,
-          firstname: row.admin_firstname,
-          lastname: row.admin_lastname,
-          email: row.admin_email,
-          role: row.admin_role,
-          createdAt: new Date(row.admin_created_at),
-          isActiveField: row.admin_is_active === 1,
-          passwordHash: row.admin_password_hash,
-        });
+        thread.administrator = row.admin_id
+          ? UserEntity.from({
+              id: row.admin_id,
+              firstname: row.admin_firstname,
+              lastname: row.admin_lastname,
+              email: row.admin_email,
+              role: row.admin_role,
+              createdAt: new Date(row.admin_created_at),
+              isActiveField: row.admin_is_active === 1,
+              passwordHash: row.admin_password_hash,
+            })
+          : null;
 
         thread.participants = [];
         threadsMap.set(row.id, thread);

@@ -12,7 +12,7 @@ import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
-import { SendMessage } from "../messages/SendMessage";
+import { SendMessage } from "../../messages/SendMessage";
 import { MessageRepository } from "@application/ports/repositories/MessageRepository";
 import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
 import { InvalidThreadAccessError } from "@domain/errors/thread/InvalidThreadAccessError";
@@ -55,7 +55,6 @@ export class StartExternalThreadUsecase {
 
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
-    console.log("thread");
 
     const thread = ThreadEntity.create({
       id,

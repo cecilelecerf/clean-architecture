@@ -21,10 +21,12 @@ export async function GET(
         { status: thread.statusCode ?? 404 },
       );
     }
+    console.log(thread);
     const messages = await getThreadMessagesFactory().execute({
       userId: session.user.id,
       id: threadId,
     });
+    console.log(messages);
     if (messages instanceof Error) {
       return NextResponse.json(
         { name: messages.name, message: messages.message },

@@ -35,7 +35,7 @@ export const threadsEndpoint = createEndpointsNodes({
   join: ({ id }: { id: ThreadId }) =>
     mutationOptions({
       mutationFn: () =>
-        post(`/client-threads/${id}/join`, 'advisor').then((data) =>
+        post(`/client-threads/${id}/join`, {}, 'advisor').then((data) =>
           threadsWithMessageAndUserSchema.parse(data),
         ),
       onSuccess: () => queryClient.invalidateQueries({ queryKey: ['client-threads', id] }),

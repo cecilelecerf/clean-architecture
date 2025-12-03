@@ -36,9 +36,12 @@ export class AdvisorJoinExternalThread {
 
     if (!advisor.hasRole({ role: "conseiller" }))
       return new UserRoleMismatchError(["conseiller"], advisor.role);
+
     const error = thread.assignAdvisor(advisor.id);
+
     if (error instanceof Error) return error;
-    await this.threadRepository.save(thread);
+
+    await this.threadRepository.update(thread);
     return thread;
   }
 }

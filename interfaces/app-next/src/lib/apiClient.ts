@@ -37,6 +37,7 @@ async function request<T>(
 
 type Scope = 'client' | 'director' | 'advisor' | 'other';
 export function post<T, B = unknown>(path: string, body: B, scope?: Scope) {
+  console.log(scope);
   const userScope = scope ? `/${scope}` : '';
   return request<T>(`${userScope}${path}`, { method: 'POST', body });
 }

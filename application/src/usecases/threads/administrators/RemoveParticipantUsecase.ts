@@ -10,10 +10,10 @@ import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
 
-type Props = { userId: UserEntity["id"] } & Pick<
-  ThreadEntity,
-  "id" | "administratorId"
->;
+type Props = {
+  userId: UserEntity["id"];
+  administratorId: UserEntity["id"];
+} & Pick<ThreadEntity, "id">;
 
 export class RemoveParticipantUsecase {
   constructor(

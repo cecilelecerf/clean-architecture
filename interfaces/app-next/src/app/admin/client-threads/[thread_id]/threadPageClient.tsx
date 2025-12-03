@@ -88,10 +88,10 @@ const Display = ({ thread, userId }: { thread: GetMessage, userId: UserDto["id"]
         <div className="flex-1 overflow-y-scroll space-y-3 min-h-[65vh] sm:min-h-[75vh] xl:min-h-[72vh] max-h-[65vh] sm:max-h-[75vh] xl:max-h-[72vh]">
             {messages.map((msg) => {
                 const isCurrentUser = msg.senderId === userId;
-                const sender =
-                    msg.senderId === thread.administrator.id
-                        ? thread.administrator
-                        : thread.participants.find((p) => p.id === msg.senderId);
+                const sender = (thread.administrator &&
+                    msg.senderId === thread.administrator.id)
+                    ? thread.administrator
+                    : thread.participants.find((p) => p.id === msg.senderId);
 
                 return (
                     <div
