@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
-export async function POST(
+import z from 'zod';
+import { userIdSchema } from '@infrastructure/types/user';
+export async function PATCH(
   req: NextRequest,
-  ctx: RouteContext<'/api/advisor/client-threads/[threadId]/join'>,
+  ctx: RouteContext<'/api/advisor/client-threads/[threadId]/transfer'>,
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -12,10 +14,13 @@ export async function POST(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     const { threadId } = await ctx.params;
+    const body = await req.json();
+    const payload = z.object({ advisor: userIdSchema }).parse(body);
 
-    const thread = await threadsFactory().advisorJoinExternalThread.execute({
-      threadId: threadId,
-      advisorId: session.user.id,
+    const thread = await threadsFactory().transferThread.execute({
+      id: threadId,
+      administratorId: session.user.id,
+      newAdministratorId: payload.advisor,
     });
     if (thread instanceof Error) {
       return NextResponse.json(

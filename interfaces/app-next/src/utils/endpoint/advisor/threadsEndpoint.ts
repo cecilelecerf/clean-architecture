@@ -1,9 +1,9 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
-import { get, post } from '@/lib/apiClient';
-import { userDtoSchema } from '@infrastructure/types/user';
+import { get, patch, post } from '@/lib/apiClient';
+import { UserId } from '@infrastructure/types/user';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { ThreadId, threadSchema } from '@infrastructure/types/thread';
+import { ThreadId } from '@infrastructure/types/thread';
 import { threadsWithUserSchema } from '../client/threadEndpoints';
 import { queryClient } from '@/lib/queryClient';
 import { messageWithUserSchema } from '@infrastructure/types/message';
@@ -30,7 +30,7 @@ export const threadsEndpoint = createEndpointsNodes({
       }),
     get: ({ id }: { id: ThreadId }) =>
       queryOptions({
-        queryKey: ['client-threads', id],
+        queryKey: ['client-threads', id, 'single'],
         queryFn: () =>
           get(`/client-threads/${id}`, 'advisor').then((data) => threadsWithUserSchema.parse(data)),
       }),
@@ -39,10 +39,24 @@ export const threadsEndpoint = createEndpointsNodes({
         mutationFn: async () => await post(`/client-threads/${id}/join`, {}, 'advisor'),
         onSuccess: () => {
           return queryClient.invalidateQueries({
-            queryKey: ['client-threads', id],
+            queryKey: ['client-threads', id, 'single'],
             refetchType: 'active',
           });
         },
+      }),
+    transfer: ({ threadId }: { threadId: ThreadId }) =>
+      mutationOptions({
+        mutationFn: ({ userId }: { userId: UserId }) =>
+          patch(`/client-threads/${threadId}/transfer`, { advisor: userId }, 'advisor'),
+        onSuccess: () =>
+          Promise.all([
+            queryClient.invalidateQueries({
+              queryKey: ['client-threads', threadId, 'single'],
+            }),
+            queryClient.invalidateQueries({
+              queryKey: ['client-threads', 'list'],
+            }),
+          ]),
       }),
   },
 });

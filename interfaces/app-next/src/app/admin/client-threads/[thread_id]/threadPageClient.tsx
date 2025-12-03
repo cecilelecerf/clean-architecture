@@ -19,6 +19,8 @@ import { useRouter } from 'next/navigation';
 import { ButtonLoading } from '@/components/ButtonLoading';
 import { MessageComponent } from '@/components/Message';
 import { ThreadWithUser } from '@/utils/endpoint/client/threadEndpoints';
+import { Settings } from './Settings';
+import { Flex } from '@radix-ui/themes';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
@@ -48,7 +50,7 @@ const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWit
 
     const joinMutate = useMutation(advisorEndpoint.thread.client.join({ id: thread.id }))
     const sendMessageMutate = useMutation({
-        mutationFn: (content: string) => post<Message, NewMessage>(`/threads/${thread.id}/messages/new`, { content }, "client"),
+        mutationFn: (content: string) => post<MessageWithUser, NewMessage>(`/threads/${thread.id}/messages/new`, { content }, "client"),
         onSuccess: (data) => {
             socket.emit("thread:new_message", { message: data });
             setInput("")
@@ -79,14 +81,19 @@ const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWit
 
     return <div className="flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center border-b pb-2 mb-4">
+        <Flex justify="between" align="center" className="border-b pb-2 mb-4">
             <h2 className="font-bold text-lg">{thread.title}</h2>
-            <span className="text-sm text-gray-500">
-                Client:
-                <Button className='ml-2' variant='outline' onClick={() => router.push(`/admin/users/${thread.participants[0].id}`)}>{thread.participants[0].firstname}{" "}
-                    {thread.participants[0].lastname}</Button>
-            </span>
-        </div>
+            <Flex gap="3">
+                <span className="text-sm text-gray-500">
+                    Client:
+                    <Button className='ml-2' variant='outline' onClick={() => router.push(`/admin/users/${thread.participants[0].id}`)}>{thread.participants[0].firstname}{" "}
+                        {thread.participants[0].lastname}</Button>
+                </span>
+                {!!thread.isClose && (
+                    <Settings {...thread} />
+                )}
+            </Flex>
+        </Flex>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-scroll space-y-3 min-h-[60vh] sm:min-h-[70vh] xl:min-h-[70vh] max-h-[60vh] sm:max-h-[75vh] xl:max-h-[72vh]">

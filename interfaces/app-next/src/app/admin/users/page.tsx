@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 
 export default function AdminUsersPage() {
-    const query = useQuery(advisorEndpoint.users.getAll())
+    const query = useQuery(advisorEndpoint.users.getAll({ role: "client" }))
     const router = useRouter()
     return match(query)
         .with({ status: "error" }, () => "error")

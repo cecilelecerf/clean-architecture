@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
+
     const paramsObj: Record<string, string | boolean | number> = {};
     searchParams.forEach((val, key) => {
       if (key === 'status') return (paramsObj[key] = val === 'true');

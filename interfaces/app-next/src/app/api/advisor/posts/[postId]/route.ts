@@ -42,8 +42,6 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/advisor/po
     const { postId } = await ctx.params;
 
     const body = await req.json();
-    console.log('body');
-    console.log(body);
     const payload = newPostSchema.partial().parse(body);
 
     const result = await postsFactory().admin.editPost.execute({

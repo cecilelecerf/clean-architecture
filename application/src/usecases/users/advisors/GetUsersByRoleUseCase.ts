@@ -5,13 +5,14 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 
-type Props = { userId: UserEntity["id"] };
+type Props = { userId: UserEntity["id"]; role?: UserEntity["role"] };
 
-export class ListUsersByAdvisorUseCase {
+export class GetUsersByRoleUseCase {
   public constructor(private readonly userRepository: UserRepository) {}
 
   public async execute({
     userId,
+    role,
   }: Props): Promise<
     | UserEntity[]
     | UserNotFoundError
@@ -25,6 +26,6 @@ export class ListUsersByAdvisorUseCase {
         ["conseiller", "directeur"],
         advisor.role
       );
-    return await this.userRepository.findAllByRole("client");
+    return await this.userRepository.findAllByRole(role);
   }
 }

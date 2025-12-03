@@ -5,6 +5,8 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { Toaster } from "@/components/ui/sonner"
 import { SessionProvider } from "next-auth/react"
+import { Theme } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,8 +33,11 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <SessionProvider>
           <QueryClientProvider client={queryClient}>
-            <Toaster />
-            {children}
+            <Theme>
+
+              <Toaster />
+              {children}
+            </Theme>
           </QueryClientProvider>
         </SessionProvider>
       </body>

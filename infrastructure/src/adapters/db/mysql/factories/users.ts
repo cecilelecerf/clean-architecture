@@ -12,7 +12,7 @@ import { GetUserUsecase } from "@application/usecases/users/GetUserUsecase";
 import { ForgotPasswordUsecase } from "@application/usecases/users/ForgotPasswordUsecase";
 import { ConfirmRegistrationUsecase } from "@application/usecases/users/ConfirmRegistrationUsecase";
 import { BanClientUsecase } from "@application/usecases/users/BanClientUsecase";
-import { ListUsersByAdvisorUseCase } from "@application/usecases/users/advisors/ListUsersByAdvisorUseCase";
+import { GetUsersByRoleUseCase } from "@application/usecases/users/advisors/GetUsersByRoleUseCase";
 import { AdvisorGetClientUsercase } from "@application/usecases/users/advisors/AdvisorGetClientUsercase";
 
 export const usersFactory = () => {
@@ -51,7 +51,7 @@ export const usersFactory = () => {
     tokenService
   );
   const banClient = new BanClientUsecase(userRepository, clockService);
-  const listClients = new ListUsersByAdvisorUseCase(userRepository);
+  const getUsersByRole = new GetUsersByRoleUseCase(userRepository);
   const advisorGetClient = new AdvisorGetClientUsercase(userRepository);
 
   return {
@@ -62,7 +62,7 @@ export const usersFactory = () => {
     forgotPassword,
     confirmRegistration,
     banClient,
-    listClients,
+    getUsersByRole,
     advisorGetClient,
   };
 };

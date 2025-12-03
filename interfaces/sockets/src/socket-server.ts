@@ -1,6 +1,5 @@
 import { createServer } from "http";
-import { Message } from "infrastructure/src/types/message";
-import { Post } from "infrastructure/src/types/feed";
+import { MessageWithUser } from "infrastructure/src/types/message";
 import { Server } from "socket.io";
 import { PostWithTagsAndUser } from "@application/ports/repositories/PostRepository";
 
@@ -23,12 +22,15 @@ io.on("connection", (socket) => {
     console.log(`${socket.id} quitte la thread ${threadId}`);
     socket.leave(threadId);
   });
-  socket.on("thread:new_message", ({ message }: { message: Message }) => {
-    io.to(message.threadId).emit(
-      `thread:${message.threadId}:new_message`,
-      message
-    );
-  });
+  socket.on(
+    "thread:new_message",
+    ({ message }: { message: MessageWithUser }) => {
+      io.to(message.threadId).emit(
+        `thread:${message.threadId}:new_message`,
+        message
+      );
+    }
+  );
 
   socket.on("post:update", ({ post }: { post: PostWithTagsAndUser }) => {
     io.emit(`post:${post.id}:update`, post);

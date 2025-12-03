@@ -1,3 +1,4 @@
+import { Flex } from "@radix-ui/themes"
 import { Label } from "./ui/label"
 import { Switch } from "./ui/switch"
 
@@ -5,9 +6,9 @@ type Props = { label: string, id: string, checked: boolean, onChange: (checkoud:
 
 export const SwitchComponent = ({ id, label, checked, onChange }: Props) => {
   return (
-    <div className="flex items-center space-x-2">
+    <Flex align="center" className="space-x-2">
       <Switch id={id} checked={checked} onCheckedChange={onChange} />
       <Label htmlFor={id}>{label}</Label>
-    </div>
+    </Flex>
   )
 }
