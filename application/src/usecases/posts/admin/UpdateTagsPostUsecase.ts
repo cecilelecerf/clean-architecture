@@ -41,7 +41,7 @@ export class UpdateTagsPostUsecase {
     if (!access) return new InvalidPostAccessError(user.id, post.id);
 
     post.tagsId = [];
-    for (const id of [...new Set(tagsId)]) {
+    for (const id of Array.from(new Set(tagsId))) {
       const tag = await this.tagRepository.findById(id);
       if (!tag) return new TagNotFoundError();
       post.tagsId = [...post.tagsId, tag.id];

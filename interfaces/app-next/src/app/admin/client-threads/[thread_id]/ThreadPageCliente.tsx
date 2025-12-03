@@ -13,7 +13,7 @@ import { advisorEndpoint } from '@/utils/endpoint/advisor';
 import { useRouter } from 'next/navigation';
 import { MessageComponent } from '@/components/Message';
 import { ThreadWithUser } from '@/utils/endpoint/client/threadEndpoints';
-import { Settings } from './Settings';
+import { Settings } from "@/app/admin/client-threads/[thread_id]/Settings";
 import { Flex } from '@radix-ui/themes';
 import { PostMessage } from './PostMessage';
 import { JoinThread } from './Join';
