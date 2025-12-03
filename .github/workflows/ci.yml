@@ -44,7 +44,9 @@ jobs:
 
       - name: Build packages
         run: |
-          pnpm build
+          pnpm --filter domain build
+          pnpm --filter application build
+          pnpm --filter infrastructure build
 
       - name: Lint
         run: |
