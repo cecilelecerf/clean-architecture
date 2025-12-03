@@ -48,10 +48,10 @@ jobs:
           pnpm --filter application build
           pnpm --filter infrastructure build
 
-      - name: Lint
-        run: |
-          pnpm lint
-        continue-on-error: true
+      # - name: Lint
+      #   run: |
+      #     pnpm lint
+      #   continue-on-error: true
 
       - name: Type check
         run: |
