@@ -16,7 +16,7 @@ import { StartInternalThreadUsecase } from "@application/usecases/threads/admini
 import { TransferThreadUsecase } from "@application/usecases/threads/administrators/TransferThreadUsecase";
 import { UpdateThreadTitleUsecase } from "@application/usecases/threads/administrators/UpdateThreadTitleUsecase";
 import { AdvisorJoinExternalThread } from "@application/usecases/threads/administrators/advisors/AdvisorJoinExternalThread";
-
+import { AdvisorGetAllThreadByClientUsecase } from "@application/usecases/threads/administrators/advisors/AdvisorGetAllThreadByClientUsecase";
 export const threadsFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);
@@ -38,6 +38,10 @@ export const threadsFactory = () => {
     clockService
   );
   const advisorGetAllThread = new AdvisorGetAllThreadUsecase(
+    threadRepository,
+    userRepository
+  );
+  const advisorGetAllByClientThread = new AdvisorGetAllThreadByClientUsecase(
     threadRepository,
     userRepository
   );
@@ -98,5 +102,6 @@ export const threadsFactory = () => {
     transferThread,
     updateThreadTitle,
     advisorJoinExternalThread,
+    advisorGetAllByClientThread,
   };
 };

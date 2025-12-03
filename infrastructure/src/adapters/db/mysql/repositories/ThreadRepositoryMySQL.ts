@@ -388,7 +388,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     FROM threads t
     JOIN users admin ON t.administrator_id = admin.id
     JOIN thread_participant tp ON t.id = tp.thread_id
-    JOIN users p ON tp.user_id = p.id
+    JOIN users p ON tp.user_id = p.id AND p.is_active = 1 AND p.confirmed_at IS NOT NULL
     WHERE t.administrator_id = ?
     `,
       [administratorId]
@@ -461,7 +461,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       p.password_hash as participant_password_hash
       FROM threads t
       JOIN thread_participant tp ON t.id = tp.thread_id
-      JOIN users p ON tp.user_id = p.id
+      JOIN users p ON tp.user_id = p.id AND p.is_active = 1 AND p.confirmed_at IS NOT NULL
        WHERE t.administrator_id IS NULL
     `
     );

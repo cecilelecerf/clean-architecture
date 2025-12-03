@@ -26,6 +26,6 @@ export class GetUsersByRoleUseCase {
         ["conseiller", "directeur"],
         advisor.role
       );
-    return await this.userRepository.findAllByRole(role);
+    return await this.userRepository.findAllByRoleAndIsActif(role);
   }
 }

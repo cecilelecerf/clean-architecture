@@ -1,11 +1,8 @@
 "use client";
 
 import {
-  Home,
   LogOutIcon,
   Menu,
-  MessageSquare,
-  Users
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -16,15 +13,8 @@ import {
   SheetTrigger,
   SheetContent
 } from "@/components/ui/sheet";
-
-const menuItems = [
-  { icon: <Home size={18} />, label: "Accueil", href: "/admin" },
-  { icon: <Users size={18} />, label: "Utilisateurs", href: "/admin/users" },
-  { icon: <MessageSquare size={18} />, label: "Conversations clients", href: "/admin/client-threads" },
-  { icon: <MessageSquare size={18} />, label: "Demandes de crédits", href: "/admin/credit-requests" },
-  { icon: <MessageSquare size={18} />, label: "Messageries", href: "/admin/threads" },
-  { icon: <MessageSquare size={18} />, label: "Actualités", href: "/admin/feeds" },
-];
+import { menuItems } from "./menu-item";
+import Link from "next/link";
 
 export default function AdminLayout({
   children,
@@ -68,10 +58,12 @@ export default function AdminLayout({
 function SidebarContent({ pathname }: { pathname: string }) {
   return (
     <div className="p-6 flex flex-col justify-between h-full">
-      <div className="space-y-6">
-        <h1 className="text-xl font-bold">Conseiller</h1>
-        <nav className="space-y-3">
-          {menuItems.map((item) => (
+      <div >
+        <Link href="/admin" >
+          <h1 className="text-xl font-bold">Conseiller</h1>
+        </Link>
+        <nav className="space-y-1 mt-6">
+          {menuItems.map((item, i) => (
             <MenuLink
               key={item.href}
               icon={item.icon}
@@ -79,7 +71,7 @@ function SidebarContent({ pathname }: { pathname: string }) {
               href={item.href}
               active={
                 pathname === item.href ||
-                pathname.startsWith(item.href + "/")
+                (pathname.startsWith(item.href + "/") && i !== 0)
               }
             />
           ))}

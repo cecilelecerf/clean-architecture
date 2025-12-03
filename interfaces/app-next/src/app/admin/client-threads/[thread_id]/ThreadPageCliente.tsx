@@ -2,25 +2,21 @@
 
 import { useSession } from 'next-auth/react';
 import { ThreadId } from '@infrastructure/types/thread';
-import { useMutation, useQueries } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 import { match } from 'ts-pattern';
 import { useEffect, useRef, useState } from 'react';
 import { socket } from '@/lib/socket';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { UserDto } from '@infrastructure/types/user';
-import { Message, MessageWithUser } from '@infrastructure/types/message';
-import { post } from '@/lib/apiClient';
-import { NewMessage } from '@/app/api/client/threads/[thread_id]/messages/new/route';
-import { Spinner } from '@/components/ui/spinner';
-import { ArrowRight } from 'lucide-react';
+import { MessageWithUser } from '@infrastructure/types/message';
 import { advisorEndpoint } from '@/utils/endpoint/advisor';
 import { useRouter } from 'next/navigation';
-import { ButtonLoading } from '@/components/ButtonLoading';
 import { MessageComponent } from '@/components/Message';
 import { ThreadWithUser } from '@/utils/endpoint/client/threadEndpoints';
 import { Settings } from './Settings';
 import { Flex } from '@radix-ui/themes';
+import { PostMessage } from './PostMessage';
+import { JoinThread } from './Join';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
@@ -44,23 +40,12 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
 
 const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWithUser, messages: MessageWithUser[], userId: UserDto["id"] }) => {
     const [messages, setMessages] = useState<MessageWithUser[]>(messagesData);
-    const [input, setInput] = useState("");
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter()
-
-    const joinMutate = useMutation(advisorEndpoint.thread.client.join({ id: thread.id }))
-    const sendMessageMutate = useMutation({
-        mutationFn: (content: string) => post<MessageWithUser, NewMessage>(`/threads/${thread.id}/messages/new`, { content }, "client"),
-        onSuccess: (data) => {
-            socket.emit("thread:new_message", { message: data });
-            setInput("")
-        }
-    })
 
     useEffect(() => {
         if (!socket) return;
         socket.emit("thread:join", { threadId: thread.id });
-
         const eventName = `thread:${thread.id}:new_message`;
 
         // Quand un message arrive du serveur
@@ -105,19 +90,10 @@ const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWit
             .with({ isClose: true }, () =>
                 <p className='w-full bg-red-200 text-red-900 rounded-sm text-center p-2 font-bold'>Discussion fermée</p>)
             .with({ haveAdministrator: true }, () =>
-                <div className="flex gap-3 mt-4">
-                    <Input
-                        type="text"
-                        value={input}
-                        placeholder="Écrire un message..."
-                        onChange={(e) => setInput(e.target.value)}
-                    />
-                    <Button onClick={() => input.length && sendMessageMutate.mutate(input)} disabled={sendMessageMutate.isPending} >{sendMessageMutate.isPending && <Spinner />} <ArrowRight /></Button>
-                </div>
+                <PostMessage threadId={thread.id} />
             )
             .with({ haveAdministrator: false }, () =>
-                <ButtonLoading loading={joinMutate.isPending} onClick={() => joinMutate.mutate()}>Rejoindre la conversation <ArrowRight />
-                </ButtonLoading>
+                <JoinThread threadId={thread.id} />
             )
             .exhaustive()
         }

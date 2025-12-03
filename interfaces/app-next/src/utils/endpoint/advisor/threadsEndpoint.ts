@@ -3,7 +3,7 @@ import { get, patch, post } from '@/lib/apiClient';
 import { UserId } from '@infrastructure/types/user';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { ThreadId } from '@infrastructure/types/thread';
+import { ThreadId, threadSchema } from '@infrastructure/types/thread';
 import { threadsWithUserSchema } from '../client/threadEndpoints';
 import { queryClient } from '@/lib/queryClient';
 import { messageWithUserSchema } from '@infrastructure/types/message';
@@ -16,6 +16,13 @@ export const threadsEndpoint = createEndpointsNodes({
         queryFn: () =>
           get(`/client-threads/${id}/messages`, 'advisor').then((data) =>
             safeParseWithLog(messageWithUserSchema.array(), data),
+          ),
+      }),
+    post: ({ threadId }: { threadId: ThreadId }) =>
+      mutationOptions({
+        mutationFn: (content: string) =>
+          post(`/threads/${threadId}/messages/new`, { content }, 'client').then((data) =>
+            safeParseWithLog(messageWithUserSchema, data),
           ),
       }),
   },
@@ -57,6 +64,14 @@ export const threadsEndpoint = createEndpointsNodes({
               queryKey: ['client-threads', 'list'],
             }),
           ]),
+      }),
+    getAllByUser: ({ userId }: { userId: UserId }) =>
+      queryOptions({
+        queryKey: ['client-threads', 'user', userId],
+        queryFn: () =>
+          get(`/client-threads/users/${userId}`, 'advisor').then((data) => {
+            return safeParseWithLog(threadSchema.array(), data);
+          }),
       }),
   },
 });
