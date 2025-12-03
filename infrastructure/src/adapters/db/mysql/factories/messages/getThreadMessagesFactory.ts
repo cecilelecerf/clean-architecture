@@ -1,7 +1,7 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/UserRepositoryMySQL";
 import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/ThreadRepositoryMySQL";
-import { GetThreadMessages } from "@application/usecases/messages/GetThreadMessages";
+import { GetThreadMessages } from "@application/usecases/messages/GetThreadWithUserMessages";
 import { MessageRepositoryMySQL } from "../../repositories/MessageRepositoryMySQL";
 
 export const getThreadMessagesFactory = () => {

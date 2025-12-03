@@ -35,11 +35,11 @@ export class GetThreadMessages {
 
     const thread = await this.threadRepository.findById(id);
     if (!thread) return new ThreadNotFoundError();
-    if (thread.isClose) return new ThreadClosedError(thread.id);
-    console.log(!thread.administratorId, !thread.hasAccess(user.id));
     if (thread.administratorId && !thread.hasAccess(user.id))
       return new InvalidThreadAccessError(user.id, thread.id);
-    const messages = await this.messageRepository.findAllByThread(thread.id);
+    const messages = await this.messageRepository.findAllWithUserByThread(
+      thread.id
+    );
     return messages;
   }
 }

@@ -11,6 +11,7 @@ export const threadSchema = z.object({
   createdAt: z.iso.datetime(),
   type: z.enum(["external", "internal"]),
   updatedAt: z.iso.datetime(),
+  isClose: z.boolean(),
 });
 
 export type Thread = z.infer<typeof threadIdSchema>;

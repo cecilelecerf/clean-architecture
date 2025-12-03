@@ -1,21 +1,30 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { get, post } from '@/lib/apiClient';
 import { Thread, ThreadId, threadSchema } from '@infrastructure/types/thread';
-import { messageSchema } from '@infrastructure/types/message';
 import { userDtoSchema } from '@infrastructure/types/user';
 import z from 'zod';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { NewThread } from '@/app/api/client/threads/route';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
+import { messageWithUserSchema } from '@infrastructure/types/message';
 
-export const threadsWithMessageAndUserSchema = threadSchema.extend({
-  messages: messageSchema.array(),
+export const threadsWithUserSchema = threadSchema.extend({
   administrator: userDtoSchema.nullable(),
   participants: userDtoSchema.array(),
 });
-export type GetMessage = z.infer<typeof threadsWithMessageAndUserSchema>;
+export type ThreadWithUser = z.infer<typeof threadsWithUserSchema>;
 export const threadsEndpoint = createEndpointsNodes({
+  messages: {
+    getAll: ({ id }: { id: ThreadId }) =>
+      queryOptions({
+        queryKey: ['thread', id, 'messages', 'list'],
+        queryFn: () =>
+          get(`/threads/${id}/messages`, 'client').then((data) =>
+            safeParseWithLog(messageWithUserSchema.array(), data),
+          ),
+      }),
+  },
   getAll: () =>
     queryOptions({
       queryKey: ['threads', 'list'],
@@ -32,7 +41,7 @@ export const threadsEndpoint = createEndpointsNodes({
       queryKey: ['threads', id],
       queryFn: () =>
         get(`/threads/${id}`, 'client').then((data) => {
-          return safeParseWithLog(threadsWithMessageAndUserSchema, data);
+          return safeParseWithLog(threadsWithUserSchema, data);
         }),
     }),
   post: () =>

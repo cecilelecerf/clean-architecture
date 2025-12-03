@@ -6,6 +6,7 @@ import {
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { UserEntity } from "@domain/entities/UserEntity";
 
 export class MessageRepositoryMySQL implements MessageRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -92,5 +93,58 @@ export class MessageRepositoryMySQL implements MessageRepository {
       `DELETE FROM messages WHERE id = ?`,
       [messageId]
     );
+  }
+
+  async findAllWithUserByThread(
+    threadId: ThreadEntity["id"]
+  ): Promise<MessageWithUser[]> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT m.id AS message_id,
+      m.thread_id,
+      m.sender_id,
+      m.content,
+      m.sent_at,
+      u.id AS user_id,
+      u.firstname,
+      u.lastname,
+      u.email,
+      u.password_hash,
+      u.role,
+      u.is_active,
+      u.created_at AS user_created_at,
+      u.confirmed_at,
+      u.modified_at AS user_modified_at
+      FROM messages m
+      JOIN users u ON m.sender_id = u.id
+      WHERE m.thread_id = ?
+      ORDER BY m.sent_at ASC
+      `,
+      [threadId]
+    );
+
+    const messages: MessageWithUser[] = rows.map((row) => {
+      const message = MessageEntity.from({
+        id: row.message_id,
+        threadId: row.thread_id,
+        senderId: row.sender_id,
+        content: row.content,
+        sentAt: new Date(row.sent_at),
+        readBy: JSON.parse(row.read_by || "[]"),
+      });
+      const sender = UserEntity.from({
+        id: row.user_id,
+        firstname: row.firstname,
+        lastname: row.lastname,
+        email: row.email,
+        passwordHash: row.password_hash,
+        role: row.role,
+        isActiveField: row.is_active,
+        createdAt: row.user_created_at,
+        confirmedAt: row.confirmed_at,
+        modifiedAt: row.user_modified_at,
+      });
+      return Object.assign(message, { sender });
+    });
+    return messages;
   }
 }
