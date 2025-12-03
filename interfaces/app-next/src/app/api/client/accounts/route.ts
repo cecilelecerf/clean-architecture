@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // const forgotPasswordUsecase = forgotPasswordFactory;
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // const { email } = await req.json();
     // if (!email) return NextResponse.json({ message: 'Email requis' }, { status: 400 });
