@@ -10,7 +10,7 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY domain/package.json ./domain/
 COPY application/package.json ./application/
 COPY infrastructure/package.json ./infrastructure/
-COPY interfaces/app-next/package.json ./interfaces/app-next/
+COPY interfaces/*/package.json ./interfaces/*/
 
 # Installer les dépendances
 RUN pnpm install --frozen-lockfile
