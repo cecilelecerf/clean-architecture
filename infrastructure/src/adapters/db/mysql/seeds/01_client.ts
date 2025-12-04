@@ -18,6 +18,7 @@ import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { TransactionRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/TransactionRepositoryMySQL";
 >>>>>>> 6d4e8ed (clean mysql create db):infrastructure/src/adapters/db/seeds/mysql/01_client.ts
 
+<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_client.ts
 <<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/03_director.ts
 export async function seedSQLDirector(
   mysqlClient: MySQLClient
@@ -26,6 +27,12 @@ export async function seedSQLDirector(
 ========
 export async function seedSQLClient(mysqlClient: MySQLClient) {
   console.log("🌱 Client");
+=======
+export async function seedSQLClient(
+  mysqlClient: MySQLClient
+): Promise<UserEntity[]> {
+  console.log("-- Création des comptes Client --");
+>>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/01_client.ts
 
 >>>>>>>> 9e13f8e (create seeds):infrastructure/src/adapters/db/mysql/seeds/01_client.ts
   const userRepository = new UserRepositoryMySQL(mysqlClient);
@@ -35,10 +42,19 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
 
+<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_client.ts
   const users = [];
   for (const raw of rawDirectors) {
     try {
       const email = Email.create(raw.email);
+=======
+  const users: UserEntity[] = [];
+
+  for (const raw of rawClients) {
+    try {
+      const email = Email.create(raw.email);
+
+>>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/01_client.ts
       if (email instanceof Error) {
         console.warn(email);
         continue;
@@ -54,6 +70,7 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
         isActiveField: true,
       });
 <<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_client.ts
+<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_client.ts
 <<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/03_director.ts
 
       users.push(user);
@@ -63,8 +80,11 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
       userRepository.save(user);
       console.log(user.id);
 =======
+=======
+      users.push(user);
+>>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/01_client.ts
       await userRepository.save(user);
-      console.log(`============${user.email.value}, SAVE=========`);
+      console.log(user.email.value);
 
       const accounts: AccountEntity[] = [];
       for (const rawAccount of raw.accounts ?? []) {
@@ -85,9 +105,9 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
             currency: rawAccount.currency,
           }),
         });
-        console.log(`--- ${iban.value}`);
         accounts.push(account);
         await accountRepository.save(account);
+        console.log(iban.value);
 
         for (const rawTransaction of rawAccount.transactions ?? []) {
           const recipientAccount = accounts.find(
@@ -104,8 +124,8 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
             }),
           });
 
-          console.log(`- ${transaction.id}`);
           await transactionRepository.save(transaction);
+          console.log(transaction.id);
         }
       }
 >>>>>>> 6d4e8ed (clean mysql create db):infrastructure/src/adapters/db/seeds/mysql/01_client.ts

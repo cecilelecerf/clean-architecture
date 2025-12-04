@@ -1,12 +1,24 @@
+<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/05_internal_thread.ts
 import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/ThreadRepositoryMySQL";
 import { MessageRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/MessageRepositoryMySQL";
+=======
+import { ThreadRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/ThreadRepositoryMySQL";
+import { MessageRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/MessageRepositoryMySQL";
+>>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/05_internal_thread.ts
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { UserEntity } from "@domain/entities/UserEntity";
+<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/05_internal_thread.ts
 import { pick, rand } from "./utils";
+=======
+
+const rand = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
+const pick = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+>>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/05_internal_thread.ts
 
 const lorem = [
   "Merci pour la mise à jour du rapport.",
@@ -90,7 +102,11 @@ export const generateInternalThreads = async (
       participantsId: adminsInThread,
       title: pick(titles),
       createdAt,
+<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/05_internal_thread.ts
       updatedAt: lastUpdatedAt,
+=======
+      lastUpdatedAt,
+>>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/05_internal_thread.ts
       isClose: Math.random() < 0.1,
       type: "internal",
     });
