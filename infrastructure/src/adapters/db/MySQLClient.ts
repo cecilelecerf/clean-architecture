@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, resolve } from "path";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import path from "path";
 import fs from "fs";
 
@@ -27,6 +28,10 @@ function getPool(): Pool {
   return pool;
 }
 =======
+=======
+import fs from "fs";
+import path from "path";
+>>>>>>> 6d4e8ed (clean mysql create db)
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -44,7 +49,20 @@ export class MySQLClient {
   private password = process.env.MYSQL_PASSWORD;
   private db = process.env.MYSQL_DATABASE;
   constructor() {
+<<<<<<< HEAD
     this.pool = getPool();
+=======
+    this.pool = mysql.createPool({
+      host: this.host,
+      user: this.user,
+      password: this.password,
+      database: this.db,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+      multipleStatements: true,
+    });
+>>>>>>> 6d4e8ed (clean mysql create db)
   }
 
   /**
@@ -89,7 +107,11 @@ export class MySQLClient {
 
   async resetDatabase() {
     try {
+<<<<<<< HEAD
       const SQL_FOLDER = resolve(__dirname, "./mysql/schemas");
+=======
+      const SQL_FOLDER = resolve(__dirname, "./schemas");
+>>>>>>> 6d4e8ed (clean mysql create db)
 
       // Connexion temporaire sans DB pour drop/create
       const tempConn = await mysql.createConnection({

@@ -5,7 +5,18 @@ import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositor
 import { BcryptEncryptionService } from "@infrastructure/adapters/services/BcryptEncryptionService";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
+<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_client.ts
 import { rawDirectors } from "../../seeds/director";
+=======
+import { rawClients } from "@infrastructure/adapters/db/seeds/raws/clients";
+import { AccountEntity } from "@domain/entities/AccountEntity";
+import { generateFrenchIBAN } from "../utils";
+import { IBAN } from "@domain/values/IBAN";
+import { Money } from "@domain/values/Money";
+import { AccountRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/AccountRepositoryMysql";
+import { TransactionEntity } from "@domain/entities/TransactionEntity";
+import { TransactionRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/TransactionRepositoryMySQL";
+>>>>>>> 6d4e8ed (clean mysql create db):infrastructure/src/adapters/db/seeds/mysql/01_client.ts
 
 <<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/03_director.ts
 export async function seedSQLDirector(
@@ -18,6 +29,8 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
 
 >>>>>>>> 9e13f8e (create seeds):infrastructure/src/adapters/db/mysql/seeds/01_client.ts
   const userRepository = new UserRepositoryMySQL(mysqlClient);
+  const accountRepository = new AccountRepositoryMySQL(mysqlClient);
+  const transactionRepository = new TransactionRepositoryMySQL(mysqlClient);
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
@@ -40,6 +53,7 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
         createdAt: clockService.now(),
         isActiveField: true,
       });
+<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_client.ts
 <<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/03_director.ts
 
       users.push(user);
@@ -48,6 +62,53 @@ export async function seedSQLClient(mysqlClient: MySQLClient) {
 >>>>>>>> 9e13f8e (create seeds):infrastructure/src/adapters/db/mysql/seeds/01_client.ts
       userRepository.save(user);
       console.log(user.id);
+=======
+      await userRepository.save(user);
+      console.log(`============${user.email.value}, SAVE=========`);
+
+      const accounts: AccountEntity[] = [];
+      for (const rawAccount of raw.accounts ?? []) {
+        const iban = IBAN.create(generateFrenchIBAN());
+        if (iban instanceof Error) {
+          console.warn(
+            `Invalid IBAN for user ${user.email.value}, skipping account.`
+          );
+          continue;
+        }
+        const account = AccountEntity.from({
+          ...rawAccount,
+          iban,
+          createdAt: clockService.now(),
+          userId: user.id,
+          balance: Money.from({
+            amount: rawAccount.balance,
+            currency: rawAccount.currency,
+          }),
+        });
+        console.log(`--- ${iban.value}`);
+        accounts.push(account);
+        await accountRepository.save(account);
+
+        for (const rawTransaction of rawAccount.transactions ?? []) {
+          const recipientAccount = accounts.find(
+            (a) => a.iban !== account.iban
+          );
+          const transaction = TransactionEntity.from({
+            ...rawTransaction,
+            id: uuidService.generate(),
+            fromAccountId: account.iban,
+            toAccountId: recipientAccount?.iban ?? account.iban,
+            amount: Money.from({
+              amount: rawTransaction.amount,
+              currency: rawTransaction.currency,
+            }),
+          });
+
+          console.log(`- ${transaction.id}`);
+          await transactionRepository.save(transaction);
+        }
+      }
+>>>>>>> 6d4e8ed (clean mysql create db):infrastructure/src/adapters/db/seeds/mysql/01_client.ts
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);
     }
