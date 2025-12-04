@@ -9,9 +9,13 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "mono-build": "pnpm tsc -b tsconfig.build.json",
+<<<<<<< HEAD
     "mysql:seed": "pnpm --filter infrastructure run mysql:seed",
     "mysql:restart": "pnpm --filter infrastructure run mysql:restart",
     "socket": "pnpm --filter sockets run socket"
+=======
+    "seed:mysql": "pnpm --filter infrastructure run seed:mysql"
+>>>>>>> 9e13f8e (create seeds)
   },
   "workspaces": [
     "application",

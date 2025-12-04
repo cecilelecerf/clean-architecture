@@ -5,24 +5,25 @@ import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositor
 import { BcryptEncryptionService } from "@infrastructure/adapters/services/BcryptEncryptionService";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { rawAdvisors } from "../../seeds/advisors";
+import { rawDirectors } from "../../seeds/director";
 
-<<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_advisor.ts
-export async function seedSQLAdministrator(
+<<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/03_director.ts
+export async function seedSQLDirector(
   mysqlClient: MySQLClient
 ): Promise<UserEntity[]> {
+  console.log("-- Création des comptes Directeurs --");
 ========
-export async function seedSQLAdministrator(mysqlClient: MySQLClient) {
-  console.log("aministrator");
->>>>>>>> 9e13f8e (create seeds):infrastructure/src/adapters/db/mysql/seeds/02_advisor.ts
+export async function seedSQLClient(mysqlClient: MySQLClient) {
+  console.log("🌱 Client");
+
+>>>>>>>> 9e13f8e (create seeds):infrastructure/src/adapters/db/mysql/seeds/01_client.ts
   const userRepository = new UserRepositoryMySQL(mysqlClient);
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
 
-  const advisors: UserEntity[] = [];
-
-  for (const raw of rawAdvisors) {
+  const users = [];
+  for (const raw of rawDirectors) {
     try {
       const email = Email.create(raw.email);
       if (email instanceof Error) {
@@ -35,17 +36,21 @@ export async function seedSQLAdministrator(mysqlClient: MySQLClient) {
         email,
         passwordHash,
         id: uuidService.generate(),
-        role: "conseiller",
+        role: "directeur",
         createdAt: clockService.now(),
         isActiveField: true,
-        confirmedAt: clockService.now(),
       });
+<<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/03_director.ts
 
-      advisors.push(user);
+      users.push(user);
+========
+      console.log(user);
+>>>>>>>> 9e13f8e (create seeds):infrastructure/src/adapters/db/mysql/seeds/01_client.ts
       userRepository.save(user);
+      console.log(user.id);
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);
     }
   }
-  return advisors;
+  return users;
 }

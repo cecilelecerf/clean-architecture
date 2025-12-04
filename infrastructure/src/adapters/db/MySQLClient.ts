@@ -2,6 +2,7 @@ import mysql, { Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, resolve } from "path";
+<<<<<<< HEAD
 import path from "path";
 import fs from "fs";
 
@@ -25,6 +26,13 @@ function getPool(): Pool {
   }
   return pool;
 }
+=======
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config({ path: resolve(__dirname, "../../../../.env") });
+
+>>>>>>> 9e13f8e (create seeds)
 /**
  * Wrapper générique autour de mysql2/promise
  * pour centraliser la connexion et exécuter des requêtes SQL typées.

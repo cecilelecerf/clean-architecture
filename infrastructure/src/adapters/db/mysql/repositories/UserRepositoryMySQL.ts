@@ -98,6 +98,7 @@ export class UserRepositoryMySQL implements UserRepository {
   }
 
   async save(user: UserEntity): Promise<void> {
+    console.log("repo");
     await this.client.query<ResultSetHeader>(
       `INSERT INTO users 
       (id, firstname, lastname, email, password_hash, role, is_active, created_at, confirmed_at, modified_at) 

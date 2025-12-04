@@ -1,4 +1,5 @@
 import { MySQLClient } from "../../MySQLClient";
+<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/index.ts
 import { seedSQLAdministrator } from "./01_advisor";
 import { seedSQLClient } from "./02_client";
 import { seedSQLDirector } from "./03_director";
@@ -16,6 +17,17 @@ const all = async () => {
   await generateInternalThreads(directors, advisors, mysqlClient);
   const tags = await generateTags(mysqlClient);
   await generatePosts(advisors, directors, clients, tags, mysqlClient);
+=======
+import { seedSQLClient } from "./01_client";
+import { seedSQLAdministrator } from "./02_advisor";
+import { seedSQLDirector } from "./03_director";
+
+const all = async () => {
+  const mysqlClient = new MySQLClient();
+  await seedSQLClient(mysqlClient);
+  await seedSQLAdministrator(mysqlClient);
+  await seedSQLDirector(mysqlClient);
+>>>>>>> 9e13f8e (create seeds):infrastructure/src/adapters/db/seeds/mysql/index.ts
 };
 all()
   .then(() => {
