@@ -5,7 +5,11 @@ import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositor
 import { BcryptEncryptionService } from "@infrastructure/adapters/services/BcryptEncryptionService";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
+<<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_advisor.ts
 import { rawAdvisors } from "../../seeds/advisors";
+========
+import { rawDirectors } from "../../seeds/director";
+>>>>>>>> 2ce9cab (thread):infrastructure/src/adapters/db/mysql/seeds/03_director.ts
 
 <<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_advisor.ts
 <<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_advisor.ts

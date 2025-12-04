@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/05_internal_thread.ts
 import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/ThreadRepositoryMySQL";
 import { MessageRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/MessageRepositoryMySQL";
@@ -5,6 +6,10 @@ import { MessageRepositoryMySQL } from "@infrastructure/adapters/db/mysql/reposi
 import { ThreadRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/ThreadRepositoryMySQL";
 import { MessageRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/MessageRepositoryMySQL";
 >>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/05_internal_thread.ts
+=======
+import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/ThreadRepositoryMySQL";
+import { MessageRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/MessageRepositoryMySQL";
+>>>>>>> 2ce9cab (thread)
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
@@ -102,11 +107,15 @@ export const generateInternalThreads = async (
       participantsId: adminsInThread,
       title: pick(titles),
       createdAt,
+<<<<<<< HEAD
 <<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/05_internal_thread.ts
       updatedAt: lastUpdatedAt,
 =======
       lastUpdatedAt,
 >>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/05_internal_thread.ts
+=======
+      updatedAt: lastUpdatedAt,
+>>>>>>> 2ce9cab (thread)
       isClose: Math.random() < 0.1,
       type: "internal",
     });

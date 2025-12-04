@@ -5,6 +5,7 @@ import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositor
 import { BcryptEncryptionService } from "@infrastructure/adapters/services/BcryptEncryptionService";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
+<<<<<<< HEAD
 <<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_client.ts
 import { rawDirectors } from "../../seeds/director";
 =======
@@ -35,6 +36,23 @@ export async function seedSQLClient(
 >>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/01_client.ts
 
 >>>>>>>> 9e13f8e (create seeds):infrastructure/src/adapters/db/mysql/seeds/01_client.ts
+=======
+import { rawClients } from "@infrastructure/adapters/db/seeds/clients";
+import { AccountEntity } from "@domain/entities/AccountEntity";
+import { IBAN } from "@domain/values/IBAN";
+import { Money } from "@domain/values/Money";
+import { AccountRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/AccountRepositoryMysql";
+import { TransactionEntity } from "@domain/entities/TransactionEntity";
+import { TransactionRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/TransactionRepositoryMySQL";
+import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
+
+export async function seedSQLClient(
+  mysqlClient: MySQLClient,
+  advisors: UserEntity[]
+): Promise<UserEntity[]> {
+  console.log("-- Création des comptes Client --");
+
+>>>>>>> 2ce9cab (thread)
   const userRepository = new UserRepositoryMySQL(mysqlClient);
   const accountRepository = new AccountRepositoryMySQL(mysqlClient);
   const transactionRepository = new TransactionRepositoryMySQL(mysqlClient);
@@ -42,6 +60,7 @@ export async function seedSQLClient(
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
 
+<<<<<<< HEAD
 <<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/01_client.ts
   const users = [];
   for (const raw of rawDirectors) {
@@ -55,16 +74,46 @@ export async function seedSQLClient(
       const email = Email.create(raw.email);
 
 >>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/01_client.ts
+=======
+  const users: UserEntity[] = [];
+
+  for (const [index, raw] of rawClients.entries()) {
+    try {
+      const email = Email.create(raw.email);
+
+>>>>>>> 2ce9cab (thread)
       if (email instanceof Error) {
         console.warn(email);
         continue;
       }
+<<<<<<< HEAD
+=======
+      const createdAt = clockService.now();
+      let confirmedAt: Date | undefined = undefined;
+
+      // Premier user => toujours confirmé
+      if (index === 0) {
+        confirmedAt = new Date(
+          createdAt.getTime() +
+            Math.random() * (Date.now() - createdAt.getTime())
+        );
+      } else {
+        // Pour les autres, une chance sur 2 d’être confirmé
+        if (Math.random() < 0.5) {
+          confirmedAt = new Date(
+            createdAt.getTime() +
+              Math.random() * (Date.now() - createdAt.getTime())
+          );
+        }
+      }
+>>>>>>> 2ce9cab (thread)
       const passwordHash = await hasher.hash(raw.password);
       const user = UserEntity.from({
         ...raw,
         email,
         passwordHash,
         id: uuidService.generate(),
+<<<<<<< HEAD
         role: "directeur",
         createdAt: clockService.now(),
         isActiveField: true,
@@ -83,6 +132,14 @@ export async function seedSQLClient(
 =======
       users.push(user);
 >>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/01_client.ts
+=======
+        role: "client",
+        createdAt,
+        isActiveField: true,
+        confirmedAt,
+      });
+      users.push(user);
+>>>>>>> 2ce9cab (thread)
       await userRepository.save(user);
       console.log(user.email.value);
 
@@ -128,7 +185,10 @@ export async function seedSQLClient(
           console.log(transaction.id);
         }
       }
+<<<<<<< HEAD
 >>>>>>> 6d4e8ed (clean mysql create db):infrastructure/src/adapters/db/seeds/mysql/01_client.ts
+=======
+>>>>>>> 2ce9cab (thread)
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);
     }

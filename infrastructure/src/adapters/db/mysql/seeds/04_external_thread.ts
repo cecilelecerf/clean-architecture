@@ -1,4 +1,5 @@
 import { UserEntity } from "@domain/entities/UserEntity";
+<<<<<<< HEAD
 <<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/04_external_thread.ts
 import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/ThreadRepositoryMySQL";
 import crypto from "crypto";
@@ -10,6 +11,12 @@ import crypto from "crypto";
 import { MySQLClient } from "../../MySQLClient";
 import { MessageRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/MessageRepositoryMySQL";
 >>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/04_external_thread.ts
+=======
+import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/ThreadRepositoryMySQL";
+import crypto from "crypto";
+import { MySQLClient } from "../../MySQLClient";
+import { MessageRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/MessageRepositoryMySQL";
+>>>>>>> 2ce9cab (thread)
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { MessageEntity } from "@domain/entities/MessageEntity";
@@ -91,11 +98,15 @@ export const generateExternalThreads = async (
       participantsId: [client.id],
       title: pick(titles),
       createdAt,
+<<<<<<< HEAD
 <<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/04_external_thread.ts
       updatedAt: lastUpdatedAt,
 =======
       lastUpdatedAt,
 >>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/04_external_thread.ts
+=======
+      updatedAt: lastUpdatedAt,
+>>>>>>> 2ce9cab (thread)
       isClose: Math.random() < 0.2,
       type: "external",
     });

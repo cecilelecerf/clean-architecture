@@ -22,7 +22,11 @@ export class UserRepositoryMySQL implements UserRepository {
       passwordHash: row.password_hash,
       role: row.role,
       isActiveField: row.is_active,
+<<<<<<< HEAD
       createdAt: row.created_at,
+=======
+      createdAt: row.creadted_at,
+>>>>>>> 2ce9cab (thread)
       confirmedAt: row.confirmed_at,
       modifiedAt: row.modified_at,
     });
@@ -43,7 +47,11 @@ export class UserRepositoryMySQL implements UserRepository {
       passwordHash: row.password_hash,
       role: row.role,
       isActiveField: row.is_active,
+<<<<<<< HEAD
       createdAt: row.created_at,
+=======
+      createdAt: row.creadted_at,
+>>>>>>> 2ce9cab (thread)
       confirmedAt: row.confirmed_at,
       modifiedAt: row.modified_at,
     });
@@ -62,7 +70,11 @@ export class UserRepositoryMySQL implements UserRepository {
         passwordHash: row.password_hash,
         role: row.role,
         isActiveField: row.is_active,
+<<<<<<< HEAD
         createdAt: row.created_at,
+=======
+        createdAt: row.creadted_at,
+>>>>>>> 2ce9cab (thread)
         confirmedAt: row.confirmed_at,
         modifiedAt: row.modified_at,
       })
@@ -90,7 +102,11 @@ export class UserRepositoryMySQL implements UserRepository {
         passwordHash: row.password_hash,
         role: row.role,
         isActiveField: row.is_active,
+<<<<<<< HEAD
         createdAt: row.created_at,
+=======
+        createdAt: row.creadted_at,
+>>>>>>> 2ce9cab (thread)
         confirmedAt: row.confirmed_at,
         modifiedAt: row.modified_at,
       })

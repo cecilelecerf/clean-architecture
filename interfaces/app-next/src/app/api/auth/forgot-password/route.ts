@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD:interfaces/app-next/src/app/api/auth/forgot-password/route.ts
 import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
+=======
+import { forgotPasswordFactory } from '@infrastructure/adapters/db/mysql/factories/users/forgotPasswordFactory';
+>>>>>>> 2ce9cab (thread):interfaces/web/app-next/src/app/api/auth/forgot-password/route.ts
 
 export async function POST(req: NextRequest) {
   try {

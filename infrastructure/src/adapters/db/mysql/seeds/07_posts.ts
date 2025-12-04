@@ -1,9 +1,13 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
+<<<<<<< HEAD
 <<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/07_posts.ts
 import { PostRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/PostRepositoryMySQL";
 =======
 import { PostRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/PostRepositoryMySQL";
 >>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/07_posts.ts
+=======
+import { PostRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/PostRepositoryMySQL";
+>>>>>>> 2ce9cab (thread)
 import { TagEntity } from "@domain/entities/TagEntity";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";

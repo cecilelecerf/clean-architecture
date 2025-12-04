@@ -35,6 +35,7 @@ async function request<T>(
   }
 }
 
+<<<<<<< HEAD:interfaces/app-next/src/lib/apiClient.ts
 type Scope = 'client' | 'director' | 'advisor' | 'other';
 export function post<T, B = unknown>(path: string, body: B, scope?: Scope) {
   const userScope = scope ? `/${scope}` : '';
@@ -53,4 +54,18 @@ export function patch<T, B = unknown>(path: string, body: B, scope?: Scope) {
 export function deleteEntity<T, B = unknown>(path: string, scope?: Scope) {
   const userScope = scope ? `/${scope}` : '';
   return request<T>(`${userScope}${path}`, { method: 'DELETE' });
+=======
+export function post<T, B = unknown>(
+  path: string,
+  body: B,
+  user?: 'client' | 'director' | 'activisor' | 'other',
+) {
+  const addUser = user ? `/${user}` : '';
+  return request<T>(`${addUser}${path}`, { method: 'POST', body });
+}
+
+export function get<T>(path: string, user?: 'client' | 'director' | 'activisor' | 'other') {
+  const addUser = user ? `/${user}` : '';
+  return request<T>(`${addUser}${path}`, { method: 'GET' });
+>>>>>>> 2ce9cab (thread):interfaces/web/app-next/src/lib/apiClient.ts
 }

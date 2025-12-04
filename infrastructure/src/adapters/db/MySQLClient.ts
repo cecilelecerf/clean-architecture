@@ -108,10 +108,14 @@ export class MySQLClient {
   async resetDatabase() {
     try {
 <<<<<<< HEAD
+<<<<<<< HEAD
       const SQL_FOLDER = resolve(__dirname, "./mysql/schemas");
 =======
       const SQL_FOLDER = resolve(__dirname, "./schemas");
 >>>>>>> 6d4e8ed (clean mysql create db)
+=======
+      const SQL_FOLDER = resolve(__dirname, "./mysql/schemas");
+>>>>>>> 2ce9cab (thread)
 
       // Connexion temporaire sans DB pour drop/create
       const tempConn = await mysql.createConnection({

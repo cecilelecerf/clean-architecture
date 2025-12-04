@@ -1,4 +1,5 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
+<<<<<<< HEAD
 <<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/06_tags.ts
 import { TagRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/TagRepositoryMySQL";
 import { TagEntity } from "@domain/entities/TagEntity";
@@ -13,6 +14,13 @@ import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidServi
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { rawTags } from "../raws/tags";
 >>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/06_tags.ts
+=======
+import { TagRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/TagRepositoryMySQL";
+import { TagEntity } from "@domain/entities/TagEntity";
+import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
+import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
+import { rawTags } from "../../seeds/tags";
+>>>>>>> 2ce9cab (thread)
 
 /**
  * Génère une liste de tags prédéfinis et les enregistre dans la base.
