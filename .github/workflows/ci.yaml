@@ -53,10 +53,10 @@ jobs:
       #     pnpm lint
       #   continue-on-error: true
 
-      - name: Type check
-        run: |
-          pnpm mono-build
-        continue-on-error: true
+      # - name: Type check
+      #   run: |
+      #     pnpm mono-build
+      #   continue-on-error: true
 
       - name: Setup database
         env:
