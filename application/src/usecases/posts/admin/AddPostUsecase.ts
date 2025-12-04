@@ -49,7 +49,7 @@ export class AddPostUsecase {
       );
 
     const tags = [];
-    for (const id of [...new Set(tagsId)]) {
+    for (const id of Array.from(new Set(tagsId))) {
       const tag = await this.tagRepository.findById(id);
       if (!tag) return new TagNotFoundError();
       tags.push(tag);

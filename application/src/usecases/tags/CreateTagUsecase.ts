@@ -42,7 +42,8 @@ export class AddTagUseCase {
       return new UserRoleMismatchError(["conseiller", "directeur"], user.role);
 
     const colorVo = Color.from(color);
-    if (colorVo instanceof Error) return colorVo;
+    if (colorVo instanceof ColorInvalidFormatError)
+      return new ColorInvalidFormatError(color);
 
     const tag = TagEntity.from({
       id: this.uuidService.generate(),

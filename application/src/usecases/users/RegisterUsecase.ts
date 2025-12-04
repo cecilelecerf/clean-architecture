@@ -44,8 +44,6 @@ export class RegisterUsecase {
     const existingUser = await this.userRepository.findByEmail(emailVO);
     if (existingUser) return new EmailAlreadyExistsError(emailVO);
 
-    const advisor = await this.userRepository.findLeastAssignedActiveAdvisor();
-    if (!advisor) return new UserNotFoundError();
     const passwordHash = await this.encryptionService.hash(plainedPassword);
 
     const id = this.uuidService.generate();
@@ -60,7 +58,6 @@ export class RegisterUsecase {
       createdAt,
       role: "client",
       isActiveField: false,
-      advisorId: advisor.id,
     });
 
     this.userRepository.save(user);
