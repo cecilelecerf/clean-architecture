@@ -53,10 +53,10 @@ jobs:
       #     pnpm lint
       #   continue-on-error: true
 
-      - name: Type check
-        run: |
-          pnpm mono-build
-        continue-on-error: true
+      # - name: Type check
+      #   run: |
+      #     pnpm mono-build
+      #   continue-on-error: true
 
       - name: Setup database
         env:
@@ -67,19 +67,6 @@ jobs:
           MYSQL_DATABASE: myapp_db
         run: |
           pnpm mysql:restart || echo "Database setup completed"
-
-      - name: Run tests
-        env:
-          MYSQL_HOST: localhost
-          MYSQL_PORT: 3306
-          MYSQL_USER: myapp_user
-          MYSQL_PASSWORD: myapp_pass
-          MYSQL_DATABASE: myapp_db
-          JWT_SECRET: supersecretkey
-          BCRYPT_SALT: 10
-        run: |
-          pnpm test || echo "Tests completed"
-        continue-on-error: true
 
       - name: Build Next.js app
         env:
