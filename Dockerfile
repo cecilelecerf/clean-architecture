@@ -14,7 +14,7 @@ COPY domain/package.json ./domain/package.json
 COPY application/package.json ./application/package.json
 COPY infrastructure/package.json ./infrastructure/package.json
 COPY interfaces/app-next/package.json ./interfaces/app-next/package.json 
-COPY interfaces/sockets/package.json ./interfaces/sockets/package.json
+# COPY interfaces/sockets/package.json ./interfaces/sockets/package.json
 
 # Installer toutes les dépendances
 RUN pnpm install --frozen-lockfile
@@ -30,7 +30,7 @@ COPY --from=deps /app/domain/node_modules ./domain/node_modules
 COPY --from=deps /app/application/node_modules ./application/node_modules
 COPY --from=deps /app/infrastructure/node_modules ./infrastructure/node_modules
 COPY --from=deps /app/interfaces/app-next/node_modules ./interfaces/app-next/node_modules
-COPY --from=deps /app/interfaces/sockets/node_modules ./interfaces/sockets/node_modules
+# COPY --from=deps /app/interfaces/sockets/node_modules ./interfaces/sockets/node_modules
 
 COPY --from=deps /app/pnpm-lock.yaml ./
 
