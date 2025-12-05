@@ -279,7 +279,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       }
     }
 
-    return [...map.values()];
+    return Array.from(map.values());
   }
 
   async findWithUserById(

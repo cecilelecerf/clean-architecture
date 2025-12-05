@@ -3,18 +3,15 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import { transactions } from '@infrastructure/data/transactions';
 import { useRouter } from 'next/navigation';
-import { mockAccounts } from '@infrastructure/data/accounts';
 import { fromColorClasses, textColorClasses, toColorClasses } from '@/utils/color';
 
-const transaction = transactions[0];
 
 export default function TransactionIdPage() {
   const router = useRouter();
   return (
     <>
-      <div className="flex items-center gap-2 mb-6">
+      {/* <div className="flex items-center gap-2 mb-6">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
@@ -63,7 +60,7 @@ export default function TransactionIdPage() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </>
   );
 }
