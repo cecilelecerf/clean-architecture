@@ -1,8 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-<<<<<<< HEAD:interfaces/app-next/src/app/api/auth/register/route.ts
-=======
-import { registerFactory } from '@infrastructure/adapters/db/mysql/factories/users/registerFactory';
->>>>>>> 2ce9cab (thread):interfaces/web/app-next/src/app/api/auth/register/route.ts
 import { userSchema } from '@infrastructure/types/user';
 import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
 import z from 'zod';

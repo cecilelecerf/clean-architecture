@@ -1,26 +1,11 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
-<<<<<<< HEAD
-<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/07_posts.ts
 import { PostRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/PostRepositoryMySQL";
-=======
-import { PostRepositoryMySQL } from "@infrastructure/adapters/repositories/mysql/PostRepositoryMySQL";
->>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/07_posts.ts
-=======
-import { PostRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/PostRepositoryMySQL";
->>>>>>> 2ce9cab (thread)
 import { TagEntity } from "@domain/entities/TagEntity";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/07_posts.ts
 import { pick, rand } from "./utils";
-=======
-
-const rand = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
-const pick = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
->>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/07_posts.ts
 
 const titles = [
   "Nouvelle fonctionnalité en ligne",
@@ -48,10 +33,7 @@ const contents = [
 export const generatePosts = async (
   advisors: UserEntity[],
   directors: UserEntity[],
-<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/07_posts.ts
   clients: UserEntity[],
-=======
->>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/07_posts.ts
   tags: TagEntity[],
   mySqlClient: MySQLClient,
   opts?: {
@@ -83,15 +65,11 @@ export const generatePosts = async (
   const authors = [...advisors, ...directors];
   const posts: PostEntity[] = [];
 
-<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/07_posts.ts
   const createPost = async (
     author: UserEntity,
     client?: UserEntity,
     defineReadBy?: UserEntity
   ) => {
-=======
-  const createPost = async (author: UserEntity) => {
->>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/07_posts.ts
     const createdAt = clockService.nowMinusDays(rand(0, 60));
     const modifiedAt =
       Math.random() < 0.3
@@ -111,7 +89,6 @@ export const generatePosts = async (
       )
     );
 
-<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/07_posts.ts
     const readBy = [];
 
     if (defineReadBy) {
@@ -131,8 +108,6 @@ export const generatePosts = async (
       );
       readBy.push(...readers);
     }
-=======
->>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/07_posts.ts
     const post = PostEntity.from({
       id: uuidService.generate(),
       advisorId: author.id,
@@ -142,12 +117,8 @@ export const generatePosts = async (
       createdAt,
       modifiedAt,
       publishedAt,
-<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/07_posts.ts
       readBy,
       clientId: client?.id,
-=======
-      readBy: [],
->>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/07_posts.ts
     });
 
     posts.push(post);
@@ -156,27 +127,18 @@ export const generatePosts = async (
   };
 
   // 🟩 Post garanti pour le premier director
-<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/07_posts.ts
   await createPost(directors[0], clients[0], clients[0]);
   await createPost(directors[0]);
 
   // 🟩 Post garanti pour le premier advisor
   await createPost(advisors[0], clients[0]);
-=======
-  await createPost(directors[0]);
-
-  // 🟩 Post garanti pour le premier advisor
->>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/07_posts.ts
   await createPost(advisors[0]);
 
   // 🔁 Posts aléatoires supplémentaires
   const remainingCount = Math.max(0, postsCount - 2);
   for (let i = 0; i < remainingCount; i++) {
     await createPost(pick(authors));
-<<<<<<< HEAD:infrastructure/src/adapters/db/mysql/seeds/07_posts.ts
     await createPost(pick(authors), pick(clients));
-=======
->>>>>>> 20507fa (generate thread and posts):infrastructure/src/adapters/db/seeds/mysql/07_posts.ts
   }
 
   return posts;

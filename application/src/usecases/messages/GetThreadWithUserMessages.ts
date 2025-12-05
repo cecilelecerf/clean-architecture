@@ -40,13 +40,9 @@ export class GetThreadMessages {
     if (!thread) return new ThreadNotFoundError();
     if (thread.administratorId && !thread.hasAccess(user.id))
       return new InvalidThreadAccessError(user.id, thread.id);
-<<<<<<< HEAD:application/src/usecases/messages/GetThreadWithUserMessages.ts
     const messages = await this.messageRepository.findAllWithUserByThread(
       thread.id
     );
-=======
-    const messages = await this.messageRepository.findAllByThread(thread.id);
->>>>>>> 2ce9cab (thread):application/src/usecases/messages/GetThreadMessages.ts
     return messages;
   }
 }

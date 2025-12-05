@@ -1,6 +1,6 @@
 import { ThreadId } from "@infrastructure/types/thread";
-import { ButtonBack } from "@/components/ButtonBack";
 import ThreadPageClient from "./threadPageClient";
+import { ButtonBack } from "@/components/ButtonBack";
 
 export default async function ThreadPageServer({ params }: { params: Promise<{ thread_id: ThreadId }> }) {
     const { thread_id } = await params

@@ -1,4 +1,6 @@
 import { User, UserId } from '@infrastructure/types/user';
+import NextAuth from 'next-auth';
+
 declare module 'next-auth' {
   interface Session {
     user: {

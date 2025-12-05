@@ -6,7 +6,7 @@ import { newPostSchema } from '@/utils/endpoint/advisor/feedsEndpoint';
 import { postSchema } from '@infrastructure/types/feed';
 import z from 'zod';
 
-export async function GET(_req: NextRequest, ctx: RouteContext<'/api/advisor/posts/[postId]'>) {
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/advisor/posts/[postId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

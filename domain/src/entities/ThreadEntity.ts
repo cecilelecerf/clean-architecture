@@ -16,10 +16,7 @@ export class ThreadEntity {
     public createdAt: Date,
     public isClose: boolean,
     public type: "external" | "internal",
-<<<<<<< HEAD
     public administratorId?: UserEntity["id"],
-=======
->>>>>>> 2ce9cab (thread)
     public updatedAt?: Date
   ) {}
 
@@ -52,10 +49,7 @@ export class ThreadEntity {
       createdAt,
       isClose,
       type,
-<<<<<<< HEAD
       administratorId,
-=======
->>>>>>> 2ce9cab (thread)
       updatedAt
     );
   }
@@ -87,10 +81,7 @@ export class ThreadEntity {
       createdAt,
       isClose,
       type,
-<<<<<<< HEAD
       administratorId,
-=======
->>>>>>> 2ce9cab (thread)
       updatedAt
     );
   }

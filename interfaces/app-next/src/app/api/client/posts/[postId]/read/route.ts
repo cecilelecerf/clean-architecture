@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function PATCH(
-  _req: NextRequest,
+  req: NextRequest,
   ctx: RouteContext<'/api/client/posts/[postId]/read'>,
 ) {
   try {

@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
 
-export async function GET(_req: NextRequest, ctx: RouteContext<'/api/advisor/users/[userId]'>) {
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/advisor/users/[userId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

@@ -47,7 +47,7 @@ export class UpdateTagUseCase {
     }
     let colorVo;
     if (color) colorVo = Color.from(color);
-    if (colorVo instanceof ColorInvalidFormatError) return colorVo;
+    if (colorVo instanceof Error) return colorVo;
 
     if (label) tag.rename(label);
     if (colorVo) tag.changeColor(colorVo);

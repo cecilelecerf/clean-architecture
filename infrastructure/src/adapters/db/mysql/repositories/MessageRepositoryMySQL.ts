@@ -6,10 +6,7 @@ import {
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
-<<<<<<< HEAD
 import { UserEntity } from "@domain/entities/UserEntity";
-=======
->>>>>>> 2ce9cab (thread)
 
 export class MessageRepositoryMySQL implements MessageRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -97,7 +94,6 @@ export class MessageRepositoryMySQL implements MessageRepository {
       [messageId]
     );
   }
-<<<<<<< HEAD
 
   async findAllWithUserByThread(
     threadId: ThreadEntity["id"]
@@ -151,6 +147,4 @@ export class MessageRepositoryMySQL implements MessageRepository {
     });
     return messages;
   }
-=======
->>>>>>> 2ce9cab (thread)
 }
