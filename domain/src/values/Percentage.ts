@@ -1,4 +1,4 @@
-import { InvalidPercentageError } from "@domain/errors/percentage/InvalidPercentageError";
+import { InvalidPercentageError } from "../errors/percentage/InvalidPercentageError";
 
 export class Percentage {
   private constructor(public readonly value: number) {}

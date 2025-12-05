@@ -1,4 +1,4 @@
-import { Email } from "@domain/values/Email";
+import { Email } from "../values/Email";
 
 export class UserEntity {
   private constructor(

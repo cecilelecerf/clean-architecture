@@ -1,8 +1,8 @@
-import { FactorNegativeError } from "@domain/errors/money/MoneyFactorNegativeError";
-import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
-import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
-import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
+import { FactorNegativeError } from "../errors/money/MoneyFactorNegativeError";
+import { MoneyAmountInvalidError } from "../errors/money/MoneyAmountInvalidError";
+import { MoneyAmountNegativeError } from "../errors/money/MoneyAmountNegativeError";
+import { MoneyCurrencyMissingError } from "../errors/money/MoneyCurrencyMissingError";
+import { MoneyCurrencyMismatchError } from "../errors/money/MoneyCurrencyMismatchError";
 
 export class Money {
   private static readonly SCALE = 2;

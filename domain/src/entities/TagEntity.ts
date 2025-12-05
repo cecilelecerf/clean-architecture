@@ -1,4 +1,4 @@
-import { Color } from "@domain/values/Color";
+import { Color } from "../values/Color";
 
 export class TagEntity {
   private constructor(

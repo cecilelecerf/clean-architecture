@@ -1,4 +1,4 @@
-import { OrderEntity } from "@domain/entities/OrderEntity";
+import { OrderEntity } from "../../entities/OrderEntity";
 
 export class InvalidOrderStatusTransitionError extends Error {
   public readonly statusCode = 409;

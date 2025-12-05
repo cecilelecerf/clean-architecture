@@ -1,4 +1,4 @@
-import { ColorInvalidFormatError } from "@domain/errors/color/ColorInvalidFormatError";
+import { ColorInvalidFormatError } from "../errors/color/ColorInvalidFormatError";
 
 export class Color {
   private constructor(

@@ -1,4 +1,4 @@
-import { Percentage } from "@domain/values/Percentage";
+import { Percentage } from "../values/Percentage";
 
 export class SavingsRateEntity {
   private constructor(

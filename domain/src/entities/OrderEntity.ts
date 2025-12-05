@@ -1,12 +1,12 @@
-import { Money } from "@domain/values/Money";
+import { Money } from "../values/Money";
 import { ActionEntity } from "./ActionEntity";
 import { UserEntity } from "./UserEntity";
-import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
-import { InvalidOrderStatusTransitionError } from "@domain/errors/order/InvalidOrderStatusTransitionError";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
-import { FactorNegativeError } from "@domain/errors/money/MoneyFactorNegativeError";
-import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
-import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
+import { MoneyCurrencyMismatchError } from "../errors/money/MoneyCurrencyMismatchError";
+import { InvalidOrderStatusTransitionError } from "../errors/order/InvalidOrderStatusTransitionError";
+import { MoneyCurrencyMissingError } from "../errors/money/MoneyCurrencyMissingError";
+import { FactorNegativeError } from "../errors/money/MoneyFactorNegativeError";
+import { MoneyAmountInvalidError } from "../errors/money/MoneyAmountInvalidError";
+import { MoneyAmountNegativeError } from "../errors/money/MoneyAmountNegativeError";
 
 export class OrderEntity {
   private constructor(

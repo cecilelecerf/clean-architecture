@@ -1,10 +1,10 @@
-import { IBAN } from "@domain/values/IBAN";
+import { IBAN } from "../values/IBAN";
 import { UserEntity } from "./UserEntity";
-import { Money } from "@domain/values/Money";
-import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
-import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
-import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
+import { Money } from "../values/Money";
+import { MoneyCurrencyMismatchError } from "../errors/money/MoneyCurrencyMismatchError";
+import { MoneyAmountNegativeError } from "../errors/money/MoneyAmountNegativeError";
+import { MoneyAmountInvalidError } from "../errors/money/MoneyAmountInvalidError";
+import { MoneyCurrencyMissingError } from "../errors/money/MoneyCurrencyMissingError";
 
 // TODO : Add in adapter
 // ? add color

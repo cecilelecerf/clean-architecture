@@ -2,23 +2,20 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "strict": true,
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
-    "moduleResolution": "Node",
-    "baseUrl": ".",
-    "composite": true,
+    "strict": true,
+    "skipLibCheck": true,
     "declaration": true,
     "declarationMap": true,
-    "incremental": true,
-    "rootDir": "src",
-    "outDir": "dist",
     "sourceMap": true,
+    "composite": true,
+    "baseUrl": ".",
     "paths": {
-      "@domain/*": ["domain/src/*"],
-      "@application/*": ["application/src/*"],
-      "@infrastructure/*": ["infrastructure/src/*"],
-      "@interfaces/*": ["interfaces/*"]
+      "@domain/*": ["./domain/src/*"],
+      "@application/*": ["./application/src/*"],
+      "@infrastructure/*": ["./infrastructure/src/*"],
+      "@interfaces/*": ["./interfaces/*"]
     }
-  },
-  "exclude": ["node_modules", "dist"]
+  }
 }

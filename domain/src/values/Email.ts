@@ -1,4 +1,4 @@
-import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
+import { EmailInvalidFormatError } from "../errors/email/EmailInvalidFormatError";
 
 export class Email {
   public readonly value: string;

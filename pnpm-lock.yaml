@@ -13,6 +13,10 @@ importers:
         version: 5.9.3
 
   application:
+    dependencies:
+      domain:
+        specifier: workspace:*
+        version: link:../domain
     devDependencies:
       typescript:
         specifier: ^5.6.3
@@ -215,28 +219,6 @@ importers:
         specifier: ^5
         version: 5.9.3
 
-  interfaces/express:
-    dependencies:
-      '@types/body-parser':
-        specifier: ^1.19.6
-        version: 1.19.6
-      '@types/express':
-        specifier: ^5.0.3
-        version: 5.0.6
-      body-parser:
-        specifier: ^2.2.0
-        version: 2.2.1
-      express:
-        specifier: ^5.1.0
-        version: 5.2.1
-      tsconfig-paths:
-        specifier: ^4.2.0
-        version: 4.2.0
-    devDependencies:
-      typescript:
-        specifier: ^5.6.3
-        version: 5.9.3
-
   interfaces/sockets:
     dependencies:
       '@types/body-parser':
@@ -245,6 +227,9 @@ importers:
       '@types/express':
         specifier: ^5.0.3
         version: 5.0.6
+      '@types/socket.io':
+        specifier: ^3.0.2
+        version: 3.0.2
       body-parser:
         specifier: ^2.2.0
         version: 2.2.1
@@ -254,6 +239,9 @@ importers:
       infrastructure:
         specifier: workspace:*
         version: link:../../infrastructure
+      socket.io:
+        specifier: ^4.8.1
+        version: 4.8.1
       ts-pattern:
         specifier: ^5.9.0
         version: 5.9.0
@@ -2074,6 +2062,10 @@ packages:
 
   '@types/serve-static@2.2.0':
     resolution: {integrity: sha512-8mam4H1NHLtu7nmtalF7eyBH14QyOASmcxHhSfEoRyr0nP/YdoesEtU+uSRvMe96TW/HPTtkoKqQLl53N7UXMQ==}
+
+  '@types/socket.io@3.0.2':
+    resolution: {integrity: sha512-pu0sN9m5VjCxBZVK8hW37ZcMe8rjn4HHggBN5CbaRTvFwv5jOmuIRZEuddsBPa9Th0ts0SIo3Niukq+95cMBbQ==}
+    deprecated: This is a stub types definition. socket.io provides its own type definitions, so you do not need this installed.
 
   '@typescript-eslint/eslint-plugin@8.48.1':
     resolution: {integrity: sha512-X63hI1bxl5ohelzr0LY5coufyl0LJNthld+abwxpCoo6Gq+hSqhKwci7MUWkXo67mzgUK6YFByhmaHmUcuBJmA==}
@@ -6174,6 +6166,14 @@ snapshots:
     dependencies:
       '@types/http-errors': 2.0.5
       '@types/node': 24.10.1
+
+  '@types/socket.io@3.0.2':
+    dependencies:
+      socket.io: 4.8.1
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
 
   '@typescript-eslint/eslint-plugin@8.48.1(@typescript-eslint/parser@8.48.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:

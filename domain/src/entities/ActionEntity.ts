@@ -1,4 +1,4 @@
-import { Money } from "@domain/values/Money";
+import { Money } from "../values/Money";
 
 export class ActionEntity {
   private constructor(

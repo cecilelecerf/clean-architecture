@@ -1,7 +1,7 @@
-import { IBANInvalidCheckDigitsError } from "@domain/errors/IBAN/IBANInvalidCheckDigitsError";
-import { IBANInvalidFormatError } from "@domain/errors/IBAN/IBANInvalidFormatError";
-import { IBANTooLongError } from "@domain/errors/IBAN/IBANTooLongError";
-import { IBANTooShortError } from "@domain/errors/IBAN/IBANTooShortError";
+import { IBANInvalidCheckDigitsError } from "../errors/IBAN/IBANInvalidCheckDigitsError";
+import { IBANInvalidFormatError } from "../errors/IBAN/IBANInvalidFormatError";
+import { IBANTooLongError } from "../errors/IBAN/IBANTooLongError";
+import { IBANTooShortError } from "../errors/IBAN/IBANTooShortError";
 
 export class IBAN {
   private constructor(public readonly value: string) {}

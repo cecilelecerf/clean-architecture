@@ -1,4 +1,4 @@
-import { Money } from "@domain/values/Money";
+import { Money } from "../values/Money";
 import { AccountEntity } from "./AccountEntity";
 
 // TODO add label and icon

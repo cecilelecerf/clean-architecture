@@ -1,5 +1,5 @@
 import { createServer } from "http";
-import { MessageWithUser } from "infrastructure/src/types/message";
+import { MessageWithUser } from "@infrastructure/types/message";
 import { Server } from "socket.io";
 import { PostWithTagsAndUser } from "@application/ports/repositories/PostRepository";
 
