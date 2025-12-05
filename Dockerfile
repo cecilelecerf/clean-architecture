@@ -24,8 +24,13 @@ FROM node:20-alpine AS builder
 RUN corepack enable && corepack prepare pnpm@10.24.0 --activate
 WORKDIR /app
 
-# Copier les node_modules depuis deps
+# Copier les node_modules depuis deps 
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/domain/node_modules ./domain/node_modules
+COPY --from=deps /app/application/node_modules ./application/node_modules
+COPY --from=deps /app/infrastructure/node_modules ./infrastructure/node_modules
+COPY --from=deps /app/interfaces/app-next/node_modules ./interfaces/app-next/node_modules
+
 COPY --from=deps /app/pnpm-lock.yaml ./
 
 # Copier tout le code source
