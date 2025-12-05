@@ -13,16 +13,15 @@ COPY pnpm-lock.yaml ./
 COPY domain/package.json ./domain/package.json
 COPY application/package.json ./application/package.json
 COPY infrastructure/package.json ./infrastructure/package.json
-COPY interfaces/app-next/package.json ./interfaces/app-next/package.json
-COPY interfaces/express/package.json ./interfaces/express/package.json
-COPY interfaces/sockets/package.json ./interfaces/sockets/package.json
+COPY interfaces/app-next/package.json ./interfaces/app-next/package.json 
+# COPY interfaces/sockets/package.json ./interfaces/sockets/package.json
 
 # Installer toutes les dépendances
 RUN pnpm install --frozen-lockfile
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.24.0 --activate
 WORKDIR /app
 
 # Copier les node_modules depuis deps
@@ -37,7 +36,7 @@ RUN pnpm build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.24.0 --activate
 WORKDIR /app
 
 ENV NODE_ENV=production
