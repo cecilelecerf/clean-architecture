@@ -2,7 +2,7 @@
 
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.24.0 --activate
 WORKDIR /app
 
 # Copier les fichiers de configuration pnpm et workspace
