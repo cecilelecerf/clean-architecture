@@ -6,7 +6,7 @@ import { threadSchema } from '@infrastructure/types/thread';
 import z from 'zod';
 import { messageSchema } from '@infrastructure/types/message';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

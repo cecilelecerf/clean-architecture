@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/client/threads/[thread_id]'>) {
+export async function GET(_req: NextRequest, ctx: RouteContext<'/api/client/threads/[thread_id]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

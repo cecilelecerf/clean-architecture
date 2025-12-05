@@ -19,7 +19,6 @@ import { useRouter } from 'next/navigation';
 import { ButtonLoading } from '@/components/ButtonLoading';
 import { MessageComponent } from '@/components/Message';
 import { ThreadWithUser } from '@/utils/endpoint/client/threadEndpoints';
-import { Settings } from './Settings';
 import { Flex } from '@radix-ui/themes';
 
 
@@ -88,9 +87,6 @@ const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWit
                     <Button className='ml-2' variant='outline' onClick={() => router.push(`/admin/users/${thread.participants[0].id}`)}>{thread.participants[0].firstname}{" "}
                         {thread.participants[0].lastname}</Button>
                 </span>
-                {!!thread.isClose && (
-                    <Settings {...thread} />
-                )}
             </Flex>
         </Flex>
 

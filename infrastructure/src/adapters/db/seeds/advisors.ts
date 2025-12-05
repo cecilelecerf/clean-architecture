@@ -65,4 +65,10 @@ export const rawAdvisors = [
     email: "hugo.fournier@example.com",
     password: "password123",
   },
+  {
+    firstname: "advisors",
+    lastname: "advisors",
+    email: "advisors@example.com",
+    password: "password123",
+  },
 ];

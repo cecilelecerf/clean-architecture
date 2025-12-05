@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   ctx: RouteContext<'/api/advisor/client-threads/[threadId]'>,
 ) {
   try {
