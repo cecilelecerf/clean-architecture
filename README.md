@@ -57,16 +57,16 @@ Utilisateur : root
 Mot de passe : root
 
 Pour drop et recréer la db avec les tables :
-`pnpm --filter infrastructure mysql:restart`
+`pnpm run mysql:restart`
 
 Pour ajouter un jeu de fausse donnée :
-`pnpm --filter infrastructure seed:mysql`
+`pnpm run mysql:seed`
 
 ## 5️⃣ Démarrer l’application Next.js (API + Web)
 
 Dans le workspace web, lance le serveur de développement :
 
-`pnpm run web:dev`
+`pnpm run dev:web`
 `pnpm eslint --fix .`
 `npnpx prettier --write .`
 L’API et l’interface web seront disponibles sur http://localhost:3000.
