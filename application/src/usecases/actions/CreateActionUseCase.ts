@@ -1,9 +1,14 @@
+import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
 import { ActionRepository } from "@application/ports/repositories/ActionRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ActionEntity } from "@domain/entities/ActionEntity";
+import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
+import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
+import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
 import { Money } from "@domain/values/Money";
 
 interface Props {
@@ -37,7 +42,14 @@ export class CreateActionUsecase {
     priceAmount,
     priceCurrency,
     isAvailable,
-  }: Props) {
+  }: Props): Promise<
+     | UserRoleMismatchError
+     | MoneyCurrencyMissingError
+     | MoneyAmountInvalidError
+     | MoneyAmountNegativeError
+     | UserNotFoundError 
+     | UserNotActiveError
+     | void> {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
