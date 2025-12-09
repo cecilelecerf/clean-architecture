@@ -75,7 +75,6 @@ export class AccountEntity {
     amount: Money
   ):
     | MoneyCurrencyMismatchError
-    | MoneyAmountNegativeError
     | AccountEntity
     | MoneyAmountNegativeError
     | MoneyAmountInvalidError

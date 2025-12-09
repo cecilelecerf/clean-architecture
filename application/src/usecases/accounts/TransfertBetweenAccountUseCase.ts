@@ -5,8 +5,27 @@ import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
+import { AccountNotFoundError } from "@application/errors/accounts/AccountNotFound";
+import { UnauthorizedAccessAccountError } from "@application/errors/accounts/UnauthorizedAccessAccountError";
+import { SameAccountTransferError } from "@application/errors/accounts/SameAccountTransferError";
+import { IBANTooShortError } from "@domain/errors/IBAN/IBANTooShortError";
+import { IBANTooLongError } from "@domain/errors/IBAN/IBANTooLongError";
+import { IBANInvalidFormatError } from "@domain/errors/IBAN/IBANInvalidFormatError";
+import { IBANInvalidCheckDigitsError } from "@domain/errors/IBAN/IBANInvalidCheckDigitsError";
+import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
+import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
+import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
+import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
 
-// TODO: Modiifer la gestion des erreurs
+interface Props {
+  requestUserId: string,
+  fromIbanString: string,
+  toIbanString: string,
+  amountValue: number,
+  amountCurrency: string,
+  label: string,
+  icon: string
+}
 export class TransfertBetweenAccountUsecase {
   constructor(
     private readonly accountRepository: AccountRepository,
@@ -15,40 +34,86 @@ export class TransfertBetweenAccountUsecase {
     private readonly uuidService: UuidService
   ) {}
 
-  public async execute(fromAccountId: IBAN, toAccountId: IBAN, amount: Money, label: string, icon: string) {
-    // TODO : on récupère pas des IBAN mais des string qu'on transforme en type IBAN + vérification que le from est bien celui qui fait la requête + même principe pour l'amount
-    const fromAccount = await this.accountRepository.findByIBAN(fromAccountId);
-    if (!fromAccount)
-      return new Error(`Compte source ${fromAccountId} introuvable`);
+  public async execute({
+    requestUserId,
+    fromIbanString,
+    toIbanString,
+    amountValue,
+    amountCurrency,
+    label,
+    icon
+  }: Props): Promise<
+    | AccountNotFoundError
+    | UnauthorizedAccessAccountError
+    | SameAccountTransferError
+    | IBANTooShortError
+    | IBANTooLongError
+    | IBANInvalidFormatError
+    | IBANInvalidCheckDigitsError
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
+    | MoneyCurrencyMismatchError
+    | void> {
+    const fromIbanResult = IBAN.create(fromIbanString);
+    if (fromIbanResult instanceof Error) {
+      throw fromIbanResult;
+    }
+    const fromIBAN = fromIbanResult;
 
-    const toAccount = await this.accountRepository.findByIBAN(toAccountId);
-    if (!toAccount)
-      return new Error(`Compte destination ${toAccountId} introuvable`);
+    const toIbanResult = IBAN.create(toIbanString);
+    if (toIbanResult instanceof Error) {
+      throw toIbanResult;
+    }
+    const toIBAN = toIbanResult;
 
-    fromAccount.withdraw(amount);
-    toAccount.deposit(amount);
+    const amount = Money.create({ amount: amountValue, currency: amountCurrency });
+    if (amount instanceof Error) {
+      throw amount;
+    }
+
+    const fromAccount = await this.accountRepository.findByIBAN(fromIBAN);
+    if (!fromAccount) return new AccountNotFoundError();
+
+    const toAccount = await this.accountRepository.findByIBAN(toIBAN);
+    if (!toAccount) return new AccountNotFoundError();
+
+    if (fromAccount.userId !== requestUserId) {
+      return new UnauthorizedAccessAccountError();
+    }
+
+    if (fromAccount.iban.is(toAccount.iban)) {
+      return new SameAccountTransferError();
+    }
+
+    const withdrawResult = fromAccount.withdraw(amount);
+    if (withdrawResult instanceof Error) throw withdrawResult;
+
+    const depositResult = toAccount.deposit(amount);
+    if (depositResult instanceof Error) throw depositResult;
+
+    const now = this.clockService.now();
 
     const debitTransaction = TransactionEntity.from({
       id: this.uuidService.generate(),
       fromAccountId: fromAccount.iban,
-      label: label,
-      icon: icon,
       toAccountId: toAccount.iban,
       amount,
+      label,
+      icon,
       type: "debit",
-      date: this.clockService.now(),
+      date: now,
     });
 
-    // Pourquoi créer un crédit et un débit ?
     const creditTransaction = TransactionEntity.from({
       id: this.uuidService.generate(),
-      label: label,
-      icon: icon,
       fromAccountId: fromAccount.iban,
       toAccountId: toAccount.iban,
       amount,
+      label,
+      icon,
       type: "credit",
-      date: this.clockService.now(),
+      date: now,
     });
 
     await this.transactionRepository.save(debitTransaction);
