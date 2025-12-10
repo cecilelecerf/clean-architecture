@@ -11,7 +11,7 @@ import { TokenService } from "@application/ports/services/TokenService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
+import { EmailInvalidFormatError } from "@domain/errors/email";
 import { Email } from "@domain/values/Email";
 
 type Props = {

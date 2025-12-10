@@ -8,8 +8,7 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
-import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
+import { InvalidTitleError,ThreadClosedError } from "@domain/errors/thread"; 
 
 type Props = {
   userId: UserEntity["id"];

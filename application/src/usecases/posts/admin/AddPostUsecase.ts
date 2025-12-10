@@ -10,8 +10,7 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
-import { InvalidPostContentError } from "@domain/errors/posts/InvalidPostContentError";
-import { InvalidPostTitleError } from "@domain/errors/posts/InvalidPostTitleError";
+import { InvalidPostContentError, InvalidPostTitleError } from "@domain/errors/posts"; 
 type Props = { tagsId: TagEntity["id"][]; published?: boolean } & Pick<
   PostEntity,
   "content" | "title" | "advisorId"

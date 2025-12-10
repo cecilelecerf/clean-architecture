@@ -1,10 +1,8 @@
 import { IBAN } from "@domain/values/IBAN";
 import { UserEntity } from "./UserEntity";
-import { Money } from "@domain/values/Money";
-import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
-import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
-import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
+import { Money } from "@domain/values/Money"; 
+import { Color } from "@domain/values/Color";
+import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
 
 export class AccountEntity {
   private constructor(
@@ -12,18 +10,7 @@ export class AccountEntity {
     public userId: UserEntity["id"],
     public name: string,
     public type: "courant" | "epargne",
-    public color:
-      | "yellow"
-      | "red"
-      | "blue"
-      | "green"
-      | "purple"
-      | "orange"
-      | "pink"
-      | "teal"
-      | "brown"
-      | "cyan"
-      | "grey",
+    public color:Color,
     public balance: Money,
     public createdAt: Date,
     public updatedAt?: Date

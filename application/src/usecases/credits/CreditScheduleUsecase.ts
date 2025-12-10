@@ -7,14 +7,10 @@ import { CreditRepository } from "@application/ports/repositories/CreditReposito
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { CreditEntity, MonthlySchedule } from "@domain/entities/CreditEntity";
-import { UserEntity } from "@domain/entities/UserEntity";
-import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
-import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
-import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
-import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
-import { Money } from "@domain/values/Money";
-
+import { UserEntity } from "@domain/entities/UserEntity"; 
+import { CreditAlreadyPaidError } from "@domain/errors/credit";
+import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
+ 
 type Props = {
   clientId: UserEntity["id"];
   creditId: CreditEntity["id"];
@@ -29,9 +25,9 @@ export class CreditScheduleUsecase {
     clientId,
     creditId,
   }: Props): Promise<
+  | MonthlySchedule[]
     | UserNotFoundError
     | UserNotActiveError
-    | MonthlySchedule[]
     | UserRoleMismatchError
     | CreditNotFoundError
     | CreditNotBelongsToClientError

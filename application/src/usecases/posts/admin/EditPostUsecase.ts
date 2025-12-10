@@ -10,8 +10,7 @@ import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { UpdateTagsPostUsecase } from "./UpdateTagsPostUsecase";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
-import { InvalidPostTitleError } from "@domain/errors/posts/InvalidPostTitleError";
-import { InvalidPostContentError } from "@domain/errors/posts/InvalidPostContentError";
+import { InvalidPostTitleError ,InvalidPostContentError} from "@domain/errors/posts"; 
 import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
 type Props = {
   userId: PostEntity["advisorId"];

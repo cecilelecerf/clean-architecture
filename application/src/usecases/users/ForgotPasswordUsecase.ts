@@ -3,7 +3,7 @@ import { EmailService } from "@application/ports/services/EmailService";
 import { TokenService } from "@application/ports/services/TokenService";
 import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { Email } from "@domain/values/Email";
-import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
+import { EmailInvalidFormatError } from "@domain/errors/email";
 
 type Props = {
   email: string;

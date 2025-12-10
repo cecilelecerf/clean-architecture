@@ -7,9 +7,8 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { ThreadAlreadyHasAdvisorError } from "@domain/errors/thread/ThreadAlreadyHasAdvisorError";
-import { ThreadNotActiveError } from "@domain/errors/thread/ThreadNotActiveError";
-type Props = { advisorId: UserEntity["id"]; threadId: UserEntity["id"] };
+import { ThreadAlreadyHasAdvisorError,ThreadNotActiveError } from "@domain/errors/thread";
+ type Props = { advisorId: UserEntity["id"]; threadId: UserEntity["id"] };
 
 export class AdvisorJoinExternalThread {
   constructor(

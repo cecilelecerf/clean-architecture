@@ -1,7 +1,5 @@
-import { IBANInvalidCheckDigitsError } from "@domain/errors/IBAN/IBANInvalidCheckDigitsError";
-import { IBANInvalidFormatError } from "@domain/errors/IBAN/IBANInvalidFormatError";
-import { IBANTooLongError } from "@domain/errors/IBAN/IBANTooLongError";
-import { IBANTooShortError } from "@domain/errors/IBAN/IBANTooShortError";
+import { IBANInvalidCheckDigitsError, IBANInvalidFormatError, IBANTooLongError, IBANTooShortError } from "@domain/errors/IBAN";
+
 
 export class IBAN {
   private constructor(public readonly value: string) {}

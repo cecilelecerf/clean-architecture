@@ -7,7 +7,7 @@ import { EmailService } from "@application/ports/services/EmailService";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
-
+// TODO tu dois pas récupérer un type IBAN | color | Money directement mais des types string par exemple et tu dois les mettre au format IBAN et autre dans le use case
 interface Props {
   iban: IBAN;
   userId: string;
@@ -36,6 +36,7 @@ export class CreateAccountUsecase {
       | UserNotFoundError
       | MissingOrInvalidNameError
       | void> {
+        // TODO : tu ne vérifie pas si le user est actif utilise l'utils findActiveUser()
     const user = await this.userRepository.findById(userId);
     
     if (!user) return new UserNotFoundError();
@@ -45,7 +46,7 @@ export class CreateAccountUsecase {
     }
 
     const today = this.clockService.now();
-
+// TODO créer une method create et ajoute la verification du nom dedans (je pense même que la vérification du nom doit être une method de AccountEntity)
     const account = AccountEntity.from({
       iban,
       userId,

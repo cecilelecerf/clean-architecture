@@ -1,14 +1,11 @@
 import { CreditNotFoundError } from "@application/errors/credits/CreditNotFoundError";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
-import { CreditEntity } from "@domain/entities/CreditEntity";
-import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
-import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
-import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
-import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
+import { CreditEntity } from "@domain/entities/CreditEntity"; 
+import { CreditAlreadyPaidError } from "@domain/errors/credit";
+import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
 
 type Props = {} & Pick<CreditEntity, "id">;
-
+// TODO : il y a du avoir un problème lors de la création des fichiers le nom est pas bon (je pense de ma faute dsl)
 export class GrantCreditUsecase {
   constructor(private readonly creditRepository: CreditRepository) {}
   public async execute({
@@ -22,6 +19,7 @@ export class GrantCreditUsecase {
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
   > {
+    // TODO : faire une vérification de qui fait la requête et son rôle
     const credit = await this.creditRepository.findById(id);
     if (!credit) return new CreditNotFoundError();
 

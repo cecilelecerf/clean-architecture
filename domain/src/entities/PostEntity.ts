@@ -1,8 +1,7 @@
-import { InvalidPostTitleError as InvalidPostTitleError } from "@domain/errors/posts/InvalidPostTitleError";
+import { InvalidPostTitleError,InvalidPostContentError  } from "@domain/errors/posts";
 import { TagEntity } from "./TagEntity";
 import { UserEntity } from "./UserEntity";
-import { InvalidPostContentError } from "@domain/errors/posts/InvalidPostContentError";
-
+ 
 export class PostEntity {
   private constructor(
     public id: string,

@@ -1,11 +1,8 @@
 import { Money } from "@domain/values/Money";
-import { UserEntity } from "./UserEntity";
-import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
-import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
-import { Percentage } from "@domain/values/Percentage";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
-import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
-import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
+import { UserEntity } from "./UserEntity"; 
+import { Percentage } from "@domain/values/Percentage"; 
+import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import { CreditAlreadyPaidError } from "@domain/errors/credit";
 export type MonthlySchedule = {
   capitalPaid: Money;
   month: number;

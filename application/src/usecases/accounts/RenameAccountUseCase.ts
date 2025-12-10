@@ -16,7 +16,8 @@ export class RenameAccountUsecase {
     private readonly clockService: ClockService,
     private readonly userRepository: UserRepository
   ) {}
-
+// TODO : tout le monde peut modifier le nom de l'account ?
+// ? Je pense que tu peux créer une method dans AccountEntity ou tu passes un User et ça te fait la vérification du role si il est actif et si c'est bien son rôle
   public async execute(iban: IBAN, newName: string): Promise<
   | MissingIBANError
   | MissingOrInvalidNameError
@@ -35,6 +36,7 @@ export class RenameAccountUsecase {
 
     const today = this.clockService.now();
 
+    // TODO : je pense qu'il faut faire cela dans une method de AccountEntity et en profiter pour faire la vérification du name dedans
     const updatedAccount = AccountEntity.from({
       iban: existingAccount.iban,
       userId: existingAccount.userId,

@@ -12,8 +12,8 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { MessageEntity } from "@domain/entities/MessageEntity";
-import { ContentEmptyError } from "@domain/errors/message/ContentEmptyError";
-import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
+import { ContentEmptyError } from "@domain/errors/message";
+import { ThreadClosedError } from "@domain/errors/thread";
 
 type Props = {} & Pick<MessageEntity, "content" | "senderId" | "threadId">;
 

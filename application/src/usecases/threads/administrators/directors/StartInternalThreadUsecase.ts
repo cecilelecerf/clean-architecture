@@ -9,7 +9,7 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
+import { InvalidTitleError } from "@domain/errors/thread";
 
 type Props = { administratorId: UserEntity["id"] } & Pick<
   ThreadEntity,

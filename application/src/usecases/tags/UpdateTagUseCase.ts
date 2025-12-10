@@ -7,7 +7,7 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { ColorInvalidFormatError } from "@domain/errors/color/ColorInvalidFormatError";
+import { ColorInvalidFormatError } from "@domain/errors/color";
 import { Color } from "@domain/values/Color";
 
 interface Props {

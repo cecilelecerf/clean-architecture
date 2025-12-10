@@ -4,7 +4,7 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
+import { EmailInvalidFormatError } from "@domain/errors/email";
 import { Email } from "@domain/values/Email";
 
 type Props = {

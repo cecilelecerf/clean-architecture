@@ -1,4 +1,4 @@
-import { ContentEmptyError } from "@domain/errors/message/ContentEmptyError";
+import { ContentEmptyError } from "@domain/errors/message";
 import { ThreadEntity } from "./ThreadEntity";
 import { UserEntity } from "./UserEntity";
 

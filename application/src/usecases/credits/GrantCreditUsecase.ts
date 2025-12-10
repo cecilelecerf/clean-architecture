@@ -8,11 +8,9 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { CreditEntity } from "@domain/entities/CreditEntity";
-import { UserEntity } from "@domain/entities/UserEntity";
-import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
-import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
-import { InvalidPercentageError } from "@domain/errors/percentage/InvalidPercentageError";
+import { UserEntity } from "@domain/entities/UserEntity"; 
+import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import { InvalidPercentageError } from "@domain/errors/percentage";
 import { Money } from "@domain/values/Money";
 import { Percentage } from "@domain/values/Percentage";
 
@@ -74,6 +72,7 @@ export class GrantCreditUsecase {
     if (interestRateVO instanceof Error) return interestRateVO;
 
     // Validation durée
+    // TODO : ceci sont des règles metiers non ? DOnc ça devrait aller dans l'entity
     if (
       !(durationMonths > 0) ||
       !Number.isInteger(durationMonths) ||

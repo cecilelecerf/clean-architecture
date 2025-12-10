@@ -3,14 +3,14 @@ import { OrderRepository } from "@application/ports/repositories/OrderRepository
 import { FeeService } from "@application/ports/services/FeeService";
 import { OrderEntity } from "@domain/entities/OrderEntity";
 
-// TODO: Revoir la gestion des erreurs
+// TODO: repasser sur l'ensemble du fichier
 export class PlaceOrderUsecase {
   public constructor(
     private readonly orderRepository: OrderRepository,
     private readonly actionRepository: ActionRepository,
     private readonly feeService: FeeService
   ) {}
-
+// TODO définir le type de retour
   public async execute(
     userId: string,
     actionId: string,
@@ -18,6 +18,7 @@ export class PlaceOrderUsecase {
     quantity: number
   ) {
     const action = await this.actionRepository.findByISIN(actionId);
+    // TODO : pas une erreur valid
     if (!action) return new Error(`Action ${actionId} introuvable`);
 
     const totalPriceResult = action.currentPrice.multiply(quantity);

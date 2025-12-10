@@ -8,14 +8,9 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { AccountNotFoundError } from "@application/errors/accounts/AccountNotFound";
 import { UnauthorizedAccessAccountError } from "@application/errors/accounts/UnauthorizedAccessAccountError";
 import { SameAccountTransferError } from "@application/errors/accounts/SameAccountTransferError";
-import { IBANTooShortError } from "@domain/errors/IBAN/IBANTooShortError";
-import { IBANTooLongError } from "@domain/errors/IBAN/IBANTooLongError";
-import { IBANInvalidFormatError } from "@domain/errors/IBAN/IBANInvalidFormatError";
-import { IBANInvalidCheckDigitsError } from "@domain/errors/IBAN/IBANInvalidCheckDigitsError";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
-import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
-import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
-import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
+import { IBANInvalidCheckDigitsError, IBANInvalidFormatError, IBANTooLongError, IBANTooShortError } from "@domain/errors/IBAN";
+import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
+ 
 
 interface Props {
   requestUserId: string,
@@ -55,6 +50,7 @@ export class TransfertBetweenAccountUsecase {
     | MoneyAmountNegativeError
     | MoneyCurrencyMismatchError
     | void> {
+      // TODO : ne pas faire de throw mais faire des return
     const fromIbanResult = IBAN.create(fromIbanString);
     if (fromIbanResult instanceof Error) {
       throw fromIbanResult;
@@ -78,6 +74,7 @@ export class TransfertBetweenAccountUsecase {
     const toAccount = await this.accountRepository.findByIBAN(toIBAN);
     if (!toAccount) return new AccountNotFoundError();
 
+    // TODO : aucune vérification du user au prélable
     if (fromAccount.userId !== requestUserId) {
       return new UnauthorizedAccessAccountError();
     }

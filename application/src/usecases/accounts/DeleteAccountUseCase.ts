@@ -5,8 +5,7 @@ import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EmailService } from "@application/ports/services/EmailService";
-import { AccountEntity } from "@domain/entities/AccountEntity";
-import { IBAN } from "@domain/values/IBAN";
+ import { IBAN } from "@domain/values/IBAN";
 
 export class DeleteAccountUsecase {
   public constructor(
@@ -21,8 +20,8 @@ export class DeleteAccountUsecase {
     | AccountNotFoundError
     | UserNotFoundError
     | void> {
+      // TODO Faire une vérification si l'user est bien un client et si il est bien actif (findActifUser())
     if (!accountIBAN) return new MissingIBANError();
-
     if (!requestUserId) return new AccountNotFoundError();
 
     const existingAccount = await this.accountRepository.findByIBAN(accountIBAN);
@@ -31,7 +30,7 @@ export class DeleteAccountUsecase {
     if (existingAccount.userId !== requestUserId) {
       return new UnauthorizedAccessAccountError();
     }
-
+// TODO : pourquoi faire cette vérification ici ?
     const user = await this.userRepository.findById(existingAccount.userId);
     if (!user) return new UserNotFoundError();
 

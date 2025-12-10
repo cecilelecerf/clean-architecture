@@ -9,10 +9,9 @@ import {
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { MessageEntity } from "@domain/entities/MessageEntity";
-import { ThreadEntity } from "@domain/entities/ThreadEntity";
+ import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
+import { ThreadClosedError } from "@domain/errors/thread";
 
 type Props = { userId: UserEntity["id"] } & Pick<ThreadEntity, "id">;
 

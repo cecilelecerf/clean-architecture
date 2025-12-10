@@ -1,12 +1,5 @@
-import { ThreadParticipantAlreadyExistError } from "@domain/errors/thread/ThreadParticipantAlreadyExistError";
-import { UserEntity } from "./UserEntity";
-import { InvalidThreadAccessError } from "@domain/errors/thread/InvalidThreadAccessError";
-import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
-import { AdministratorCannotLeaveThreadError } from "@domain/errors/thread/AdministratorCannotLeaveThreadError";
-import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
-import { ThreadTransferToSameAdministratorError } from "@domain/errors/thread/ThreadTransferToSameAdministratorError";
-import { ThreadNotActiveError } from "@domain/errors/thread/ThreadNotActiveError";
-import { ThreadAlreadyHasAdvisorError } from "@domain/errors/thread/ThreadAlreadyHasAdvisorError";
+ import { AdministratorCannotLeaveThreadError, InvalidThreadAccessError, InvalidTitleError, ThreadAlreadyHasAdvisorError, ThreadClosedError, ThreadNotActiveError, ThreadParticipantAlreadyExistError, ThreadTransferToSameAdministratorError } from "@domain/errors/thread";
+import { UserEntity } from "./UserEntity"; 
 
 export class ThreadEntity {
   private constructor(

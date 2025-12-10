@@ -10,14 +10,12 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
-import { UserEntity } from "@domain/entities/UserEntity";
-import { InvalidTitleError } from "@domain/errors/thread/InvalidTitleError";
+import { UserEntity } from "@domain/entities/UserEntity"; 
 import { SendMessage } from "../../messages/SendMessage";
 import { MessageRepository } from "@application/ports/repositories/MessageRepository";
-import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
-import { InvalidThreadAccessError } from "@domain/errors/thread/InvalidThreadAccessError";
-import { ContentEmptyError } from "@domain/errors/message/ContentEmptyError";
-import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
+import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError"; 
+import { InvalidThreadAccessError, InvalidTitleError, ThreadClosedError } from "@domain/errors/thread";
+import { ContentEmptyError } from "@domain/errors/message";
 
 type Props = {
   clientId: UserEntity["id"];
