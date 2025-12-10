@@ -10,11 +10,12 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async save(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO actions 
-        (isin, name, symbol, market, activity_sector, current_price, currency, is_available, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (isin, name, total_nb, symbol, market, activity_sector, current_price, currency, is_available, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         action.ISIN,
         action.name,
+        action.totalNb,
         action.symbol,
         action.market,
         action.activitySector,
@@ -37,6 +38,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
     return ActionEntity.from({
       ISIN: row.ISIN,
       name: row.name,
+      totalNb: row.totalNb,
       symbol: row.symbol,
       market: row.market,
       activitySector: row.activitySector,
@@ -58,6 +60,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
       ActionEntity.from({
         ISIN: row.ISIN,
         name: row.name,
+        totalNb: row.totalNb,
         symbol: row.symbol,
         market: row.market,
         activitySector: row.activitySector,
@@ -82,6 +85,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
       ActionEntity.from({
         ISIN: row.ISIN,
         name: row.name,
+        totalNb: row.totalNb,
         symbol: row.symbol,
         market: row.market,
         activitySector: row.activitySector,
@@ -106,10 +110,11 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async update(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE actions 
-       SET name = ?, symbol = ?, market = ?, activity_sector = ?, current_price = ?, currency = ?, is_available = ?, updated_at = ? 
+       SET name = ?, total_nb = ?, symbol = ?, market = ?, activity_sector = ?, current_price = ?, currency = ?, is_available = ?, updated_at = ? 
        WHERE isin = ?`,
       [
         action.name,
+        action.totalNb,
         action.symbol,
         action.market,
         action.activitySector,

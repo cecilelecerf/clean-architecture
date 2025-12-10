@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS actions (
   isin CHAR(12) NOT NULL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
+  total_nb INT NOT NULL,
   symbol VARCHAR(10) NOT NULL,
   market VARCHAR(50) NOT NULL,
   activity_sector VARCHAR(50) NOT NULL,
