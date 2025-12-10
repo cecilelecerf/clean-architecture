@@ -27,7 +27,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
     );
   }
 
-  async findById(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
+  async findByISIN(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
     const [rows] = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM actions WHERE isin = ?`,
       [ISIN]

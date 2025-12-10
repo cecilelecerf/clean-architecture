@@ -3,8 +3,8 @@ import { ActionEntity } from "./ActionEntity";
 import { UserEntity } from "./UserEntity";
 import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
 import { InvalidOrderStatusTransitionError } from "@domain/errors/order/InvalidOrderStatusTransitionError";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
 import { FactorNegativeError } from "@domain/errors/money/MoneyFactorNegativeError";
+import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
 import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
 import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
 
@@ -55,13 +55,14 @@ export class OrderEntity {
       status
     );
   }
+
   public getTotal():
     | Money
-    | MoneyCurrencyMismatchError
-    | MoneyAmountNegativeError
-    | MoneyAmountInvalidError
     | FactorNegativeError
-    | MoneyCurrencyMissingError {
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
+    | MoneyCurrencyMismatchError {
     const totalPrice = this.price.multiply(this.quantity);
     if (totalPrice instanceof Error) {
       return totalPrice;

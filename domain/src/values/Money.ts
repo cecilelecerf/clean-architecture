@@ -8,8 +8,8 @@ export class Money {
   private static readonly SCALE = 2;
 
   private constructor(
-    public readonly amount: number,
-    public readonly currency: string
+    public amount: number,
+    public currency: string
   ) {}
 
   public static from({

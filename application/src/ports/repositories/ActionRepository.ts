@@ -1,7 +1,7 @@
 import { ActionEntity } from "@domain/entities/ActionEntity";
 
 export interface ActionRepository {
-  findById(isin: ActionEntity["ISIN"]): Promise<ActionEntity | null>;
+  findByISIN(isin: ActionEntity["ISIN"]): Promise<ActionEntity | null>;
   findAll(): Promise<ActionEntity[]>;
   findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]>;
   setAvailability(action: ActionEntity): Promise<void>;

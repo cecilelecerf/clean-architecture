@@ -7,7 +7,6 @@ import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalid
 import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
 
 // TODO : Add in adapter
-// ? add color
 
 export class AccountEntity {
   private constructor(
@@ -76,7 +75,6 @@ export class AccountEntity {
     amount: Money
   ):
     | MoneyCurrencyMismatchError
-    | MoneyAmountNegativeError
     | AccountEntity
     | MoneyAmountNegativeError
     | MoneyAmountInvalidError
