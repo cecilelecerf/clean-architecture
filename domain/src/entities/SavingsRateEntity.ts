@@ -4,10 +4,19 @@ export class SavingsRateEntity {
   private constructor(
     public id: string,
     public rate: Percentage,
-    public effectiveDate: Date
+    public effectiveDate: Date,
+    public createdAt: Date,
+    public updatedAt?: Date
   ) {}
 
-  public static from({ id, rate, effectiveDate }: SavingsRateEntity) {
-    return new SavingsRateEntity(id, rate, effectiveDate);
+  public static from({ id, rate, effectiveDate, createdAt, updatedAt }: Pick<
+    SavingsRateEntity,
+    | "id"
+    | "rate"
+    | "effectiveDate"
+    | "createdAt"
+    | "updatedAt"
+  >) {
+    return new SavingsRateEntity(id, rate, effectiveDate, createdAt, updatedAt);
   }
 }
