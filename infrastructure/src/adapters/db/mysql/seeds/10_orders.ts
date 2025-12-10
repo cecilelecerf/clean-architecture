@@ -5,7 +5,7 @@ import { Money } from "@domain/values/Money";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { OrderRepositoryMySQL } from "../repositories/OrderRepositoryMySQL";
-import { pick, rand } from "./utils";
+import { pick } from "./utils";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 
@@ -43,7 +43,6 @@ export async function generateOrders(
 
             const user = pick(clients);
             const action = pick(actions);
-
 
             if (!user || !action) {
                 console.warn("Utilisateur ou action manquant pour l'ordre");
