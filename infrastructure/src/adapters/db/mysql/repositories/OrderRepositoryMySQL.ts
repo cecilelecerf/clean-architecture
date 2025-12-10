@@ -12,8 +12,8 @@ export class OrderRepositoryMySQL implements OrderRepository {
   async save(order: OrderEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO orders 
-       (id, user_id, actionId, type, quantity, price_amount, price_currency, fee_currency, fee_amount, date, status) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, user_id, action_id, type, quantity, price_amount, price_currency, fee_amount, fee_currency, order_date, status, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         order.id,
         order.userId,
@@ -26,6 +26,8 @@ export class OrderRepositoryMySQL implements OrderRepository {
         order.fee.currency,
         order.date,
         order.status,
+        order.createdAt,
+        order.updatedAt ?? null
       ]
     );
   }
@@ -50,6 +52,8 @@ export class OrderRepositoryMySQL implements OrderRepository {
       fee: Money.from({ amount: row.feeAmount, currency: row.feeCurrency }),
       date: row.date,
       status: row.status,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt ?? null
     });
   }
 
@@ -72,6 +76,8 @@ export class OrderRepositoryMySQL implements OrderRepository {
         fee: Money.from({ amount: row.feeAmount, currency: row.feeCurrency }),
         date: row.date,
         status: row.status,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt ?? null
       })
     );
   }
@@ -97,6 +103,8 @@ export class OrderRepositoryMySQL implements OrderRepository {
         fee: Money.from({ amount: row.feeAmount, currency: row.feeCurrency }),
         date: row.date,
         status: row.status,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt ?? null
       })
     );
   }
@@ -119,6 +127,8 @@ export class OrderRepositoryMySQL implements OrderRepository {
         fee: Money.from({ amount: row.feeAmount, currency: row.feeCurrency }),
         date: row.date,
         status: row.status,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt ?? null
       })
     );
   }
@@ -126,7 +136,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
   async update(order: OrderEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE orders 
-       SET user_id = ?, action_id = ?, type = ?, quantity = ?, price_amount = ?, price_currency = ?, fee_amount = ?, fee_currency = ?, date = ?, status = ? 
+       SET user_id = ?, action_id = ?, type = ?, quantity = ?, price_amount = ?, price_currency = ?, fee_amount = ?, fee_currency = ?, order_date = ?, status = ?, created_at = ?, updated_at = ?
        WHERE id = ?`,
       [
         order.userId,
@@ -140,6 +150,8 @@ export class OrderRepositoryMySQL implements OrderRepository {
         order.date,
         order.status,
         order.id,
+        order.createdAt,
+        order.updatedAt || new Date()
       ]
     );
   }

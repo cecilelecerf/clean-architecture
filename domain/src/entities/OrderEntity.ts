@@ -18,7 +18,9 @@ export class OrderEntity {
     public price: Money,
     public fee: Money,
     public date: Date,
-    public status: "pending" | "executed" | "cancelled"
+    public status: "pending" | "executed" | "cancelled",
+    public createdAt: Date,
+    public updatedAt?: Date
   ) {}
 
   public static from({
@@ -31,6 +33,8 @@ export class OrderEntity {
     fee,
     date,
     status,
+    createdAt,
+    updatedAt
   }: Pick<
     OrderEntity,
     | "id"
@@ -42,6 +46,8 @@ export class OrderEntity {
     | "fee"
     | "date"
     | "status"
+    | "createdAt"
+    | "updatedAt"
   >) {
     return new OrderEntity(
       id,
@@ -52,7 +58,9 @@ export class OrderEntity {
       price,
       fee,
       date,
-      status
+      status,
+      createdAt,
+      updatedAt
     );
   }
 
@@ -99,4 +107,9 @@ export class OrderEntity {
   public isSell(): boolean {
     return this.type === "sell";
   }
+
+  public static defaultFee(): Money {
+    return Money.create({ amount: 1, currency: 'EUR' }) as Money;
+  }
+
 }
