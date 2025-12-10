@@ -11,5 +11,8 @@ CREATE TABLE IF NOT EXISTS credits (
     monthly_currency CHAR(3) NOT NULL,
     remaining_amount DECIMAL(15,2) NOT NULL,
     remaining_currency CHAR(3) NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME,
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

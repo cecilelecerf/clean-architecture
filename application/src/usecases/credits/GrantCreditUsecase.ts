@@ -95,6 +95,7 @@ export class GrantCreditUsecase {
       startDate,
       monthlyPayment: initialAmountVO, // placeholder
       remainingBalance: initialAmountVO,
+      createdAt: startDate
     });
 
     const monthlyPayment = tempCredit.calculateMonthlyPayment();
