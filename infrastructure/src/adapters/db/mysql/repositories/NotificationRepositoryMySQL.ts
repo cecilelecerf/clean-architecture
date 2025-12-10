@@ -9,17 +9,18 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
   async save(notification: NotificationEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO notifications 
-       (id, advisor_id, client_id, title, content, created_at, is_read, type)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, advisor_id, client_id, title, content, is_read, type, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         notification.id,
         notification.advisorId,
         notification.clientId,
         notification.title,
         notification.content,
-        notification.createdAt,
         notification.isRead ? 1 : 0,
         notification.type,
+        notification.createdAt,
+        notification.updatedAt ?? null
       ]
     );
   }
@@ -39,9 +40,10 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
       clientId: row.clientId,
       title: row.title,
       content: row.content,
-      createdAt: row.createdAt,
       isRead: !!row.isRead,
       type: row.type,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt ?? null
     });
   }
 
@@ -59,9 +61,10 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
         clientId: row.clientId,
         title: row.title,
         content: row.content,
-        createdAt: row.createdAt,
         isRead: !!row.isRead,
         type: row.type,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt ?? null
       })
     );
   }
@@ -80,9 +83,10 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
         clientId: row.clientId,
         title: row.title,
         content: row.content,
-        createdAt: row.createdAt,
         isRead: !!row.isRead,
         type: row.type,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt ?? null
       })
     );
   }
@@ -102,9 +106,10 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
         clientId: row.clientId,
         title: row.title,
         content: row.content,
-        createdAt: row.createdAt,
         isRead: !!row.isRead,
         type: row.type,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt ?? null
       })
     );
   }
@@ -112,7 +117,7 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
   async update(notification: NotificationEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE notifications 
-       SET title = ?, content = ?, isRead = ?, type = ? 
+       SET title = ?, content = ?, isRead = ?, type = ?, updatedAt = ?
        WHERE id = ?`,
       [
         notification.title,
@@ -120,6 +125,7 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
         notification.isRead ? 1 : 0,
         notification.type,
         notification.id,
+        notification.updatedAt || new Date()
       ]
     );
   }
