@@ -1,8 +1,4 @@
-import { InvalidThreadParticipantsError } from "@application/errors/threads/InvalidThreadParticipantsError";
-import { NoAdvisorFoundError } from "@application/errors/threads/NoAdvisorFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
@@ -13,7 +9,8 @@ import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity"; 
 import { SendMessage } from "../../messages/SendMessage";
 import { MessageRepository } from "@application/ports/repositories/MessageRepository";
-import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError"; 
+ import { ThreadNotFoundError,NoAdvisorFoundError } from "@application/errors/threads";
+
 import { InvalidThreadAccessError, InvalidTitleError, ThreadClosedError } from "@domain/errors/thread";
 import { ContentEmptyError } from "@domain/errors/message";
 

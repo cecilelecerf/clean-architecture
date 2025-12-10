@@ -1,7 +1,5 @@
-import { InvalidThreadParticipantsError } from "@application/errors/threads/InvalidThreadParticipantsError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+import { InvalidThreadParticipantsError } from "@application/errors/threads";
+import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";

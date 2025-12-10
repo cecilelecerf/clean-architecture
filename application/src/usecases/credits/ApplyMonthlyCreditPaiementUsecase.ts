@@ -1,4 +1,4 @@
-import { CreditNotFoundError } from "@application/errors/credits/CreditNotFoundError";
+import { CreditNotFoundError } from "@application/errors/credits";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { CreditEntity } from "@domain/entities/CreditEntity"; 
 import { CreditAlreadyPaidError } from "@domain/errors/credit";

@@ -1,6 +1,4 @@
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
 import { ActionRepository } from "@application/ports/repositories/ActionRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
  import { findActiveUser } from "@application/utils/userValidators";

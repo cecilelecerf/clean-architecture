@@ -1,6 +1,5 @@
 import { UserRepository } from "@application/ports/repositories/UserRepository";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
 import { UserEntity } from "@domain/entities/UserEntity";
 
 export async function findActiveUser(

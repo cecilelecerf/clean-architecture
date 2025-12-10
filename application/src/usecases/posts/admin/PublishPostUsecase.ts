@@ -1,8 +1,5 @@
-import { PostNotFoundError } from "@application/errors/posts/PostNotFoundError";
-import { InvalidPostAccessError } from "@application/errors/posts/InvalidPostAccessError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+import { PostNotFoundError,InvalidPostAccessError } from "@application/errors/posts";
+ import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
 import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";

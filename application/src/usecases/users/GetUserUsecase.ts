@@ -1,6 +1,6 @@
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRepository } from "@application/ports/repositories/UserRepository";
+
+import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
+ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 

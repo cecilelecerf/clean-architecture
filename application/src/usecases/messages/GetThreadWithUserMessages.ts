@@ -1,7 +1,5 @@
-import { InvalidThreadAccessError } from "@application/errors/threads/InvalidThreadAccessError";
-import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { InvalidThreadAccessError,ThreadNotFoundError } from "@application/errors/threads";
+ import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
 import {
   MessageRepository,
   MessageWithUser,

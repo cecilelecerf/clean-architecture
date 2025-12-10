@@ -1,6 +1,5 @@
-import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { ThreadNotFoundError } from "@application/errors/threads";
+import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
 import {
   ThreadEntityWithUsers,
   ThreadRepository,

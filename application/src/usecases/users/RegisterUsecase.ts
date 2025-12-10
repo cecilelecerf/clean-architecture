@@ -1,13 +1,12 @@
-import { EmailAlreadyExistsError } from "@application/errors/users/EmailAlreadyExistsError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { EmailAlreadyExistsError,UserNotFoundError } from "@application/errors/users";
+ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { EmailService } from "@application/ports/services/EmailService";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { EmailInvalidFormatError } from "@domain/errors/email";
+import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import { Email } from "@domain/values/Email";
 
 type Props = {

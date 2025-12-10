@@ -5,9 +5,7 @@ import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
-import { AccountNotFoundError } from "@application/errors/accounts/AccountNotFound";
-import { UnauthorizedAccessAccountError } from "@application/errors/accounts/UnauthorizedAccessAccountError";
-import { SameAccountTransferError } from "@application/errors/accounts/SameAccountTransferError";
+import { AccountNotFoundError,UnauthorizedAccessAccountError,SameAccountTransferError } from "@application/errors/accounts";
 import { IBANInvalidCheckDigitsError, IBANInvalidFormatError, IBANTooLongError, IBANTooShortError } from "@domain/errors/IBAN";
 import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
  

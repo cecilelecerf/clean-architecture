@@ -1,7 +1,5 @@
-import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+ import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
+import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
 import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";

@@ -3,11 +3,9 @@ import { SavingsRateEntity } from "@domain/entities/SavingsRateEntity";
 import { Percentage } from "@domain/values/Percentage";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
-import { UuidService } from "@application/ports/services/UuidService";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { InvalidPercentageError } from "@domain/errors/percentage";
+ import { UuidService } from "@application/ports/services/UuidService";
+import { UserNotFoundError,UserNotActiveError,UserRoleMismatchError } from "@application/errors/users";
+ import { InvalidPercentageError } from "@domain/errors/percentage";
 
 // TODO: je pense que pour la Date il ne faut pas récup un type Date
 interface Props {

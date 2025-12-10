@@ -1,13 +1,11 @@
 import { findActiveUser } from "@application/utils/userValidators";
 import { PostRepository } from "../../../ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
-import { UserEntity } from "@domain/entities/UserEntity";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
-import { PostEntity } from "@domain/entities/PostEntity";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { UserEntity } from "@domain/entities/UserEntity"; 
+import { PostEntity } from "@domain/entities/PostEntity"; 
 import { TagEntity } from "@domain/entities/TagEntity";
-import { InvalidPaginationLimitError } from "@application/errors/posts/InvalidPaginationLimitError";
+import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import { InvalidPaginationLimitError } from "@application/errors/posts";
 
 type Props = {
   fromDate?: Date;

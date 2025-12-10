@@ -1,10 +1,9 @@
-import { InvalidCredentialsError } from "@application/errors/users/InvalidCredentialsError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { InvalidCredentialsError ,UserNotFoundError} from "@application/errors/users";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { EmailInvalidFormatError } from "@domain/errors/email";
+import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import { Email } from "@domain/values/Email";
 
 type Props = {

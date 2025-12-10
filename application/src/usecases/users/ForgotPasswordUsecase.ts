@@ -1,9 +1,9 @@
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EmailService } from "@application/ports/services/EmailService";
 import { TokenService } from "@application/ports/services/TokenService";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { UserNotFoundError } from "@application/errors/users";
 import { Email } from "@domain/values/Email";
-import { EmailInvalidFormatError } from "@domain/errors/email";
+import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 
 type Props = {
   email: string;

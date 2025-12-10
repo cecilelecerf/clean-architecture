@@ -1,5 +1,5 @@
-import { MissingOrInvalidNameError } from "@application/errors/accounts/MissingOrInvalidNameError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { MissingOrInvalidNameError } from "@application/errors/accounts";
+import { UserNotFoundError } from "@application/errors/users";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";

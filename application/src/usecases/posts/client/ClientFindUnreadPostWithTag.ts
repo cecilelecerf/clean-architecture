@@ -2,9 +2,7 @@ import { findActiveUser } from "@application/utils/userValidators";
 import { PostRepository, PostWithTagsAndUser } from "../../../ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
+import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
 
 type Props = {
     clientId: UserEntity["id"];

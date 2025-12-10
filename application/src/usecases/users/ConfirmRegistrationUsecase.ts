@@ -1,6 +1,5 @@
-import { InvalidTokenError } from "@application/errors/users/InvalidTokenError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { InvalidTokenError,UserNotFoundError } from "@application/errors/users";
+ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { TokenService } from "@application/ports/services/TokenService";
 import { UserEntity } from "@domain/entities/UserEntity";

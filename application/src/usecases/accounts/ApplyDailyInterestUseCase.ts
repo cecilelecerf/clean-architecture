@@ -1,4 +1,4 @@
-import { RateNotFoundError } from "@application/errors/accounts/RateNotFoundError";
+import { RateNotFoundError } from "@application/errors/accounts";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { SavingRateRepository } from "@application/ports/repositories/SavingRateRepository";
 import { TransactionRepository } from "@application/ports/repositories/TransactionRepository";

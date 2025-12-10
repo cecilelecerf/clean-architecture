@@ -1,6 +1,5 @@
-import { PostNotFoundError } from "@application/errors/posts/PostNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { PostNotFoundError } from "@application/errors/posts";
+import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
 import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
