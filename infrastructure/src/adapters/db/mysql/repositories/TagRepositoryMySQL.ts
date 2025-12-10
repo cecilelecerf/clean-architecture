@@ -10,7 +10,7 @@ export class TagRepositoryMySQL implements TagRepository {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO tags (id, label, color, created_at, modified_at) 
         VALUES (?, ?, ?, ?, ?)`,
-      [tag.id, tag.label, tag.color, tag.createdAt, tag.modifiedAt || null]
+      [tag.id, tag.label, tag.color.toString(), tag.createdAt, tag.modifiedAt || null]
     );
   }
 
@@ -48,7 +48,7 @@ export class TagRepositoryMySQL implements TagRepository {
       `UPDATE tags
        SET label = ?, color = ?, modified_at = ? 
        WHERE id = ?`,
-      [tag.label, tag.color, tag.modifiedAt || new Date(), tag.id]
+      [tag.label, tag.color.toString(), tag.modifiedAt || new Date(), tag.id]
     );
   }
 
