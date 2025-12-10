@@ -14,14 +14,16 @@ export class CreditEntity {
     public id: string,
     public userId: UserEntity["id"],
     public initialAmount: Money,
-    // ? taux d'interet annuel
+    // taux d'interet annuel
     public interestRate: Percentage,
-    // ? sur le total;
+    // taux assurance;
     public insuranceRate: Percentage,
     public durationMonths: number,
     public startDate: Date,
     public monthlyPayment: Money,
-    public remainingBalance: Money
+    public remainingBalance: Money,
+    public createdAt: Date,
+    public updatedAt?: Date
   ) {}
   public static from({
     id,
@@ -33,6 +35,8 @@ export class CreditEntity {
     monthlyPayment,
     durationMonths,
     remainingBalance,
+    createdAt,
+    updatedAt
   }: Pick<
     CreditEntity,
     | "id"
@@ -44,6 +48,8 @@ export class CreditEntity {
     | "monthlyPayment"
     | "durationMonths"
     | "remainingBalance"
+    | "createdAt"
+    | "updatedAt"
   >) {
     return new CreditEntity(
       id,
@@ -54,11 +60,13 @@ export class CreditEntity {
       durationMonths,
       startDate,
       monthlyPayment,
-      remainingBalance
+      remainingBalance,
+      createdAt,
+      updatedAt
     );
   }
 
-  /** 🧮 Calcule la mensualité */
+  /** Calcule la mensualité */
   public calculateMonthlyPayment():
     | Money
     | MoneyCurrencyMissingError
@@ -118,7 +126,7 @@ export class CreditEntity {
     return this.remainingBalance;
   }
 
-  /** 📆 Calcule le plan d’amortissement complet */
+  /** Calcule le plan d’amortissement complet */
   public calculateAmortizationSchedule():
     | MonthlySchedule[]
     | MoneyCurrencyMissingError

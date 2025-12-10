@@ -36,6 +36,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
         amount: row.remainingAmount,
         currency: row.remainingCurrency,
       }),
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt ?? null,
     });
   }
 
@@ -64,6 +66,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
           amount: row.remainingAmount,
           currency: row.remainingCurrency,
         }),
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt ?? null,
       })
     );
   }
@@ -92,6 +96,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
           amount: row.remainingAmount,
           currency: row.remainingCurrency,
         }),
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt ?? null,
       })
     );
   }
@@ -99,8 +105,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
   async save(credit: CreditEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO credits 
-        (id, user_id, initial_amount, initial_currency, interest_rate, insurance_rate, duration_months, start_date, monthly_amount, monthly_currency, remaining_amount, remaining_currency)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (id, user_id, initial_amount, initial_currency, interest_rate, insurance_rate, duration_months, start_date, monthly_amount, monthly_currency, remaining_amount, remaining_currency, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         credit.id,
         credit.userId,
@@ -114,6 +120,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
         credit.monthlyPayment.currency,
         credit.remainingBalance.amount,
         credit.remainingBalance.currency,
+        credit.createdAt,
+        credit.updatedAt ?? null,
       ]
     );
   }
@@ -121,7 +129,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
   async update(credit: CreditEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE credits
-       SET user_id = ?, initial_amount = ?, initial_currency = ?, interest_rate = ?, insurance_rate = ?, duration_months = ?, start_date = ?, monthly_amount = ?, monthly_currency = ?, remaining_amount = ?, remaining_currency = ?
+       SET user_id = ?, initial_amount = ?, initial_currency = ?, interest_rate = ?, insurance_rate = ?, duration_months = ?, start_date = ?, monthly_amount = ?, monthly_currency = ?, remaining_amount = ?, remaining_currency = ?, created_at = ?, updated_at = ? 
        WHERE id = ?`,
       [
         credit.userId,
@@ -135,6 +143,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
         credit.monthlyPayment.currency,
         credit.remainingBalance.amount,
         credit.remainingBalance.currency,
+        credit.createdAt,
+        credit.updatedAt,
         credit.id,
       ]
     );
