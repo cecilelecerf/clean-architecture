@@ -6,8 +6,6 @@ import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegati
 import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
 import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
 
-// TODO : Add in adapter
-
 export class AccountEntity {
   private constructor(
     public iban: IBAN,

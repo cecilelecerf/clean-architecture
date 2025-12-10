@@ -47,6 +47,24 @@ export class AccountRepositoryMySQL implements AccountRepository {
     });
   }
 
+  async findAllSavingsAccounts(): Promise<AccountEntity[]> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT * FROM accounts WHERE type = 'epargne'`
+    );
+    return rows.map((row) =>
+      AccountEntity.from({
+        iban: row.iban,
+        userId: row.user_id,
+        name: row.name,
+        type: row.type,
+        color: row.color,
+        balance: Money.from({ amount: row.balance, currency: row.currency }),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      })
+    );
+  }
+
   async save(account: AccountEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO accounts 
