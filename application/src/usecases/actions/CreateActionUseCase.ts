@@ -1,6 +1,7 @@
 import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
 import { ActionRepository } from "@application/ports/repositories/ActionRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { ClockService } from "@application/ports/services/ClockService";
  import { findActiveUser } from "@application/utils/userValidators";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { MoneyAmountInvalidError, MoneyAmountNegativeError,MoneyCurrencyMissingError } from "@domain/errors/money";
@@ -22,7 +23,8 @@ interface Props {
 export class CreateActionUsecase {
   public constructor(
     private readonly actionRepository: ActionRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly clockService: ClockService
 ) {}
 
   // Création des actions que pour les user ayant le rôle de directeur
@@ -48,8 +50,7 @@ export class CreateActionUsecase {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    // TODO : attention il y a le rôle conseiller aussi pour le if tu peux faire un si il n'a pas le rôle directeur
-    if (user.hasRole({ role: "client" }))
+    if (user.hasRole({ role: "client" }) || user.hasRole({ role: "conseiller" }))
       return new UserRoleMismatchError(["directeur"], user.role);
 
     const price = Money.create({
@@ -58,6 +59,8 @@ export class CreateActionUsecase {
     });
 
     if (price instanceof Error) return price;
+
+    const today = this.clockService.now();
 
     const action = ActionEntity.from({
       ISIN,
@@ -68,8 +71,7 @@ export class CreateActionUsecase {
       activitySector,
       currentPrice: price,
       isAvailable,
-      // TODO: utiliser le service
-      createdAt: new Date(),
+      createdAt: today,
       updatedAt: undefined
     });
 
