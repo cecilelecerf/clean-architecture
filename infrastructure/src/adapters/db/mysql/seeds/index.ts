@@ -6,6 +6,11 @@ import { generateExternalThreads } from "./04_external_thread";
 import { generateInternalThreads } from "./05_internal_thread";
 import { generateTags } from "./06_tags";
 import { generatePosts } from "./07_posts";
+import { generateActions } from "./08_action";
+import { generateSavingsRate } from "./09_savingsrate";
+import { generateOrders } from "./10_orders";
+import { generateNotifications } from "./11_notification";
+import { generateCredits } from "./12_credits";
 
 const all = async () => {
   const mysqlClient = new MySQLClient();
@@ -16,6 +21,11 @@ const all = async () => {
   await generateInternalThreads(directors, advisors, mysqlClient);
   const tags = await generateTags(mysqlClient);
   await generatePosts(advisors, directors, clients, tags, mysqlClient);
+  const actions = await generateActions(mysqlClient);
+  await generateSavingsRate(mysqlClient);
+  await generateOrders(mysqlClient, clients, actions);
+  await generateNotifications(mysqlClient, advisors, clients);
+  await generateCredits(mysqlClient, clients);
 };
 all()
   .then(() => {
