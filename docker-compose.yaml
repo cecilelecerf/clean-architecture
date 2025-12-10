@@ -9,7 +9,7 @@ services:
       - "3307:3306"
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
-      - ./infrastructure/src/adapters/db/schemas:/docker-entrypoint-initdb.d
+      - ./infrastructure/src/adapters/db/mysql/schemas:/docker-entrypoint-initdb.d
     command: --default-authentication-plugin=mysql_native_password
   phpmyadmin:
     image: phpmyadmin
