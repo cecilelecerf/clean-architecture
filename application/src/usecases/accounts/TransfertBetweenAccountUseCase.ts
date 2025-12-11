@@ -8,7 +8,9 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { AccountNotFoundError,UnauthorizedAccessAccountError,SameAccountTransferError } from "@application/errors/accounts";
 import { IBANInvalidCheckDigitsError, IBANInvalidFormatError, IBANTooLongError, IBANTooShortError } from "@domain/errors/IBAN";
 import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
- 
+import { findActiveUser } from "@application/utils/userValidators";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { UserNotActiveError, UserNotFoundError } from "@application/errors/users";
 
 interface Props {
   requestUserId: string,
@@ -24,7 +26,8 @@ export class TransfertBetweenAccountUsecase {
     private readonly accountRepository: AccountRepository,
     private readonly transactionRepository: TransactionRepository,
     private readonly clockService: ClockService,
-    private readonly uuidService: UuidService
+    private readonly uuidService: UuidService,
+    private readonly userRepository: UserRepository
   ) {}
 
   public async execute({
@@ -47,23 +50,24 @@ export class TransfertBetweenAccountUsecase {
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
     | MoneyCurrencyMismatchError
+    | UserNotFoundError 
+    | UserNotActiveError
     | void> {
-      // TODO : ne pas faire de throw mais faire des return
     const fromIbanResult = IBAN.create(fromIbanString);
     if (fromIbanResult instanceof Error) {
-      throw fromIbanResult;
+      return fromIbanResult;
     }
     const fromIBAN = fromIbanResult;
 
     const toIbanResult = IBAN.create(toIbanString);
     if (toIbanResult instanceof Error) {
-      throw toIbanResult;
+      return toIbanResult;
     }
     const toIBAN = toIbanResult;
 
     const amount = Money.create({ amount: amountValue, currency: amountCurrency });
     if (amount instanceof Error) {
-      throw amount;
+      return amount;
     }
 
     const fromAccount = await this.accountRepository.findByIBAN(fromIBAN);
@@ -72,7 +76,9 @@ export class TransfertBetweenAccountUsecase {
     const toAccount = await this.accountRepository.findByIBAN(toIBAN);
     if (!toAccount) return new AccountNotFoundError();
 
-    // TODO : aucune vérification du user au prélable
+    const user = await findActiveUser(this.userRepository, requestUserId);
+    if (user instanceof Error) return user;
+
     if (fromAccount.userId !== requestUserId) {
       return new UnauthorizedAccessAccountError();
     }
