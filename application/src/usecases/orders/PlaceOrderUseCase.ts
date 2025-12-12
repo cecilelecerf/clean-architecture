@@ -1,47 +1,56 @@
+import { ActionNotFoundError } from "@application/errors/actions";
 import { ActionRepository } from "@application/ports/repositories/ActionRepository";
 import { OrderRepository } from "@application/ports/repositories/OrderRepository";
-import { FeeService } from "@application/ports/services/FeeService";
+import { ClockService } from "@application/ports/services/ClockService";
+import { UuidService } from "@application/ports/services/UuidService";
 import { OrderEntity } from "@domain/entities/OrderEntity";
+import { FactorNegativeError, MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMissingError } from "@domain/errors/money";
 
-// TODO: repasser sur l'ensemble du fichier
 export class PlaceOrderUsecase {
   public constructor(
     private readonly orderRepository: OrderRepository,
     private readonly actionRepository: ActionRepository,
-    private readonly feeService: FeeService
+    private readonly uuidService: UuidService,
+    private readonly clockService: ClockService
   ) {}
-// TODO définir le type de retour
+
   public async execute(
     userId: string,
     actionId: string,
     type: "buy" | "sell",
     quantity: number
-  ) {
+  ): Promise<
+        | ActionNotFoundError
+        | FactorNegativeError 
+        | MoneyCurrencyMissingError 
+        | MoneyAmountInvalidError 
+        | MoneyAmountNegativeError
+        | void
+      > {
     const action = await this.actionRepository.findByISIN(actionId);
-    // TODO : pas une erreur valid
-    if (!action) return new Error(`Action ${actionId} introuvable`);
+    if (!action) return new ActionNotFoundError;
 
     const totalPriceResult = action.currentPrice.multiply(quantity);
     if (totalPriceResult instanceof Error) return totalPriceResult;
     const totalPrice = totalPriceResult;
 
-    // TODO : fee service doesn't exist create a calculate in order ?
-    const feeResult = await this.feeService.calculateFee(totalPrice);
-    if (feeResult instanceof Error) return feeResult;
-    const fee = feeResult;
+    const today = this.clockService.now();
 
-    // TODO use clock service and uuid service
-    const order = OrderEntity.from({
-      id: crypto.randomUUID(),
+    const order = OrderEntity.create({
+      id: this.uuidService.generate(),
       userId,
       actionId: action.ISIN,
       type,
       quantity,
       price: totalPrice,
-      fee,
-      date: new Date(),
+      date: today,
       status: "pending",
+      createdAt: today
     });
+
+    if (order instanceof Error) {
+      return order;
+    }
 
     await this.orderRepository.save(order);
   }

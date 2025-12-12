@@ -19,6 +19,50 @@ export class OrderEntity {
     public updatedAt?: Date
   ) {}
 
+  public static create({
+    id,
+    userId,
+    actionId,
+    type,
+    quantity,
+    price,
+    date,
+    status,
+    createdAt,
+    updatedAt
+  }: Pick<
+    OrderEntity,
+    | "id"
+    | "userId"
+    | "actionId"
+    | "type"
+    | "quantity"
+    | "price"
+    | "date"
+    | "status"
+    | "createdAt"
+    | "updatedAt"
+  >) {
+    const feeMoney = Money.create({ amount: 1, currency: price.currency });
+    if (feeMoney instanceof Error) {
+      return feeMoney;
+    }
+
+    return new OrderEntity(
+      id,
+      userId,
+      actionId,
+      type,
+      quantity,
+      price,
+      feeMoney,
+      date,
+      status,
+      createdAt,
+      updatedAt
+    );
+  }
+
   public static from({
     id,
     userId,
@@ -73,6 +117,7 @@ export class OrderEntity {
     }
     return totalPrice.add(this.fee);
   }
+
   public markExecuted(): OrderEntity | InvalidOrderStatusTransitionError {
     if (this.status !== "pending") {
       return new InvalidOrderStatusTransitionError(
@@ -96,6 +141,7 @@ export class OrderEntity {
     this.status = "cancelled";
     return this;
   }
+
   public isBuy(): boolean {
     return this.type === "buy";
   }
