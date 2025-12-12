@@ -6,11 +6,11 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
  import { UuidService } from "@application/ports/services/UuidService";
 import { UserNotFoundError,UserNotActiveError,UserRoleMismatchError } from "@application/errors/users";
  import { InvalidPercentageError } from "@domain/errors/percentage";
+import { ClockService } from "@application/ports/services/ClockService";
 
-// TODO: je pense que pour la Date il ne faut pas récup un type Date
 interface Props {
   rate : number;
-  effectiveDate : Date;
+  effectiveDate : string;
   userId: string;
 }
 
@@ -18,7 +18,8 @@ export class SetSavingsRateUsecase {
   public constructor(
     private readonly configRepository: SavingRateRepository,
     private readonly userRepository: UserRepository,
-    private readonly uuidService: UuidService
+    private readonly uuidService: UuidService,
+    private readonly clockService: ClockService
   ) {}
 
   // Enregistrement du taux d'interêt que pour les user ayant le rôle de directeur
@@ -35,19 +36,24 @@ export class SetSavingsRateUsecase {
     > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-    // TODO : attention le rôle conseiller existe
-    if (user.hasRole({ role: "client" }))
+    if (user.hasRole({ role: "client" }) ||
+      (user.hasRole({ role: "conseiller" })))
       return new UserRoleMismatchError(["directeur"], user.role);
 
     const percentage = Percentage.create(rate);
     if (percentage instanceof Error) {
       return percentage;
     }
-// TODO : use service
+
+    const effectiveDateResult = this.clockService.toDate(effectiveDate);
+
+    const today = this.clockService.now();
+
     const savingsRate = SavingsRateEntity.from({
       id: this.uuidService.generate(),
       rate: percentage,
-      effectiveDate: effectiveDate,
+      effectiveDate: effectiveDateResult,
+      createdAt: today
     });
 
     await this.configRepository.save(savingsRate);

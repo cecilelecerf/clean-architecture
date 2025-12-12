@@ -5,4 +5,5 @@ export interface ClockService {
   nowMinus(ms: number): Date;
   addDays(date: Date, days: number): Date;
   addMinutes(date: Date, minutes: number): Date;
+  toDate(date: string): Date;
 }

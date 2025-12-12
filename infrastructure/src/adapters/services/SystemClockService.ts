@@ -44,4 +44,8 @@ export class SystemClockService implements ClockService {
   nowPlus(ms: number): Date {
     return new Date(Date.now() + ms);
   }
+
+  toDate(date: string): Date {
+    return new Date(date);
+  }
 }
