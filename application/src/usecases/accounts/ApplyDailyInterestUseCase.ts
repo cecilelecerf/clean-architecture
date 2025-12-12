@@ -5,6 +5,7 @@ import { TransactionRepository } from "@application/ports/repositories/Transacti
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
+import { FactorNegativeError, MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMissingError } from "@domain/errors/money";
 
 
 export class ApplyDailyInterestUseCase {
@@ -15,7 +16,13 @@ export class ApplyDailyInterestUseCase {
     private readonly clockService: ClockService,
     private readonly uuidService: UuidService
   ) {}
-   async execute(): Promise<void | RateNotFoundError> {
+   async execute(): Promise<
+    | void 
+    | RateNotFoundError
+    | FactorNegativeError 
+    | MoneyCurrencyMissingError 
+    | MoneyAmountInvalidError 
+    | MoneyAmountNegativeError> {
     const rate = await this.configRepository.findCurrent();
 
     if (!rate) return new RateNotFoundError();
@@ -29,8 +36,7 @@ export class ApplyDailyInterestUseCase {
         const dailyRateDecimal = rate.rate.toDecimal() / 365;
         const interestResult = account.balance.multiply(dailyRateDecimal);
 
-        // return l'error
-         if (interestResult instanceof Error) continue;
+        if (interestResult instanceof Error) return interestResult;
         const interestMoney = interestResult;
 
         account.deposit(interestMoney);
