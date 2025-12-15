@@ -1,7 +1,5 @@
 import { FactorNegativeError, MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
 
- 
-
 export class Money {
   private static readonly SCALE = 2;
 

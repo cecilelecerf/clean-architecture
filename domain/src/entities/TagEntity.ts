@@ -1,5 +1,6 @@
 import { Color } from "@domain/values/Color";
 
+// TODO: modifier la propriété modifiedAt en updatedAt
 export class TagEntity {
   private constructor(
     public id: string,
