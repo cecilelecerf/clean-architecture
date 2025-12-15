@@ -71,7 +71,7 @@ export const generatePosts = async (
     defineReadBy?: UserEntity
   ) => {
     const createdAt = clockService.nowMinusDays(rand(0, 60));
-    const modifiedAt =
+    const updatedAt =
       Math.random() < 0.3
         ? clockService.addDays(createdAt, rand(1, 10))
         : undefined;
@@ -115,7 +115,7 @@ export const generatePosts = async (
       content: pick(contents),
       tagsId: tagsForPost,
       createdAt,
-      modifiedAt,
+      updatedAt,
       publishedAt,
       readBy,
       clientId: client?.id,

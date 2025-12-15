@@ -11,7 +11,7 @@ export class PostEntity {
     public tagsId: TagEntity["id"][],
     public createdAt: Date,
     public readBy: UserEntity["id"][] = [],
-    public modifiedAt?: Date,
+    public updatedAt?: Date,
     public publishedAt?: Date,
     public clientId?: UserEntity["id"]
   ) {}
@@ -23,7 +23,7 @@ export class PostEntity {
     content,
     tagsId,
     createdAt,
-    modifiedAt,
+    updatedAt,
     publishedAt,
     clientId,
   }: Pick<
@@ -34,7 +34,7 @@ export class PostEntity {
     | "content"
     | "tagsId"
     | "createdAt"
-    | "modifiedAt"
+    | "updatedAt"
     | "publishedAt"
     | "clientId"
   >): PostEntity | InvalidPostContentError | InvalidPostTitleError {
@@ -51,7 +51,7 @@ export class PostEntity {
       tagsId,
       createdAt,
       [],
-      modifiedAt,
+      updatedAt,
       publishedAt,
       clientId
     );
@@ -64,7 +64,7 @@ export class PostEntity {
     content,
     tagsId,
     createdAt,
-    modifiedAt,
+    updatedAt,
     publishedAt,
     readBy,
     clientId,
@@ -76,7 +76,7 @@ export class PostEntity {
     | "content"
     | "tagsId"
     | "createdAt"
-    | "modifiedAt"
+    | "updatedAt"
     | "publishedAt"
     | "readBy"
     | "clientId"
@@ -89,7 +89,7 @@ export class PostEntity {
       tagsId,
       createdAt,
       readBy,
-      modifiedAt,
+      updatedAt,
       publishedAt,
       clientId
     );
@@ -102,7 +102,7 @@ export class PostEntity {
     const verifiedContent = PostEntity.verifyContent(newContent);
     if (verifiedContent instanceof Error) return verifiedContent;
     this.content = verifiedContent;
-    this.modifiedAt = now;
+    this.updatedAt = now;
     return this;
   }
 
@@ -113,7 +113,7 @@ export class PostEntity {
     const verifiedTitle = PostEntity.verifyTitle(newTitle);
     if (verifiedTitle instanceof Error) return verifiedTitle;
     this.title = verifiedTitle;
-    this.modifiedAt = now;
+    this.updatedAt = now;
     return this;
   }
 

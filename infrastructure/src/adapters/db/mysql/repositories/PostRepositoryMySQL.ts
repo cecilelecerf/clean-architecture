@@ -21,7 +21,7 @@ export class PostRepositoryMySQL implements PostRepository {
         post.title,
         post.content,
         post.createdAt,
-        post.modifiedAt || null,
+        post.updatedAt || null,
         post.publishedAt || null,
         post.clientId || null,
       ]
@@ -65,7 +65,7 @@ export class PostRepositoryMySQL implements PostRepository {
       content: row.content,
       tagsId,
       createdAt: row.created_at,
-      modifiedAt: row.modified_at ?? undefined,
+      updatedAt: row.modified_at ?? undefined,
       publishedAt: row.published_at ?? undefined,
       readBy: readsId,
       clientId: row.client_id ?? undefined,
@@ -98,7 +98,7 @@ export class PostRepositoryMySQL implements PostRepository {
           content: row.content,
           tagsId,
           createdAt: row.created_at,
-          modifiedAt: row.modified_at ?? undefined,
+          updatedAt: row.modified_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
           readBy: readsId,
           clientId: row.client_id ?? undefined,
@@ -133,7 +133,7 @@ export class PostRepositoryMySQL implements PostRepository {
           content: row.content,
           tagsId,
           createdAt: row.created_at,
-          modifiedAt: row.modified_at ?? undefined,
+          updatedAt: row.modified_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
           readBy: readsId,
           clientId: row.client_id ?? undefined,
@@ -150,7 +150,7 @@ export class PostRepositoryMySQL implements PostRepository {
       [
         post.title,
         post.content,
-        post.modifiedAt || new Date(),
+        post.updatedAt || new Date(),
         post.publishedAt || null,
         post.id,
       ]
@@ -323,7 +323,7 @@ export class PostRepositoryMySQL implements PostRepository {
             label: tagRow.label,
             color: tagRow.color,
             createdAt: tagRow.created_at,
-            modifiedAt: tagRow.modified_at,
+            updatedAt: tagRow.modified_at,
           })
         );
         const advisor = UserEntity.from({
@@ -336,7 +336,7 @@ export class PostRepositoryMySQL implements PostRepository {
           isActiveField: row.advisor_is_active,
           createdAt: row.advisor_created_at,
           confirmedAt: row.advisor_confirmed_at,
-          modifiedAt: row.advisor_modified_at,
+          updatedAt: row.advisor_modified_at,
         });
         const post = PostEntity.from({
           id: row.id,
@@ -345,7 +345,7 @@ export class PostRepositoryMySQL implements PostRepository {
           content: row.content,
           tagsId,
           createdAt: row.created_at,
-          modifiedAt: row.modified_at ?? undefined,
+          updatedAt: row.modified_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
           readBy: readsId,
           clientId: row.client_id ?? undefined,
@@ -394,7 +394,7 @@ export class PostRepositoryMySQL implements PostRepository {
         label: tagRow.label,
         color: tagRow.color,
         createdAt: tagRow.created_at,
-        modifiedAt: tagRow.modified_at,
+        updatedAt: tagRow.modified_at,
       })
     );
     const advisor = UserEntity.from({
@@ -407,7 +407,7 @@ export class PostRepositoryMySQL implements PostRepository {
       isActiveField: row.advisor_is_active,
       createdAt: row.advisor_created_at,
       confirmedAt: row.advisor_confirmed_at,
-      modifiedAt: row.advisor_modified_at,
+      updatedAt: row.advisor_modified_at,
     });
     const post = PostEntity.from({
       id: row.id,
@@ -416,7 +416,7 @@ export class PostRepositoryMySQL implements PostRepository {
       content: row.content,
       tagsId,
       createdAt: row.created_at,
-      modifiedAt: row.modified_at ?? undefined,
+      updatedAt: row.modified_at ?? undefined,
       publishedAt: row.published_at ?? undefined,
       readBy: readsId,
       clientId: row.client_id ?? undefined,
@@ -467,7 +467,7 @@ export class PostRepositoryMySQL implements PostRepository {
             label: tagRow.label,
             color: tagRow.color,
             createdAt: tagRow.created_at,
-            modifiedAt: tagRow.modified_at,
+            updatedAt: tagRow.modified_at,
           })
         );
         const advisor = UserEntity.from({
@@ -480,7 +480,7 @@ export class PostRepositoryMySQL implements PostRepository {
           isActiveField: row.advisor_is_active,
           createdAt: row.advisor_created_at,
           confirmedAt: row.advisor_confirmed_at,
-          modifiedAt: row.advisor_modified_at,
+          updatedAt: row.advisor_modified_at,
         });
         const post = PostEntity.from({
           id: row.id,
@@ -489,7 +489,7 @@ export class PostRepositoryMySQL implements PostRepository {
           content: row.content,
           tagsId,
           createdAt: row.created_at,
-          modifiedAt: row.modified_at ?? undefined,
+          updatedAt: row.modified_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
           readBy: readsId,
           clientId: row.client_id ?? undefined,
