@@ -1,6 +1,8 @@
-
-import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
- import { UserRepository } from "@application/ports/repositories/UserRepository";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 
@@ -8,7 +10,7 @@ type Props = {
   userId: UserEntity["id"];
 };
 
-export class GetUserUsecase {
+export class GetMeUsecase {
   public constructor(private readonly userRepository: UserRepository) {}
 
   public async execute({

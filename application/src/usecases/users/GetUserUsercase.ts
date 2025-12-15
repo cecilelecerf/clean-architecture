@@ -1,12 +1,15 @@
-
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 
 type Props = { clientId: UserEntity["id"]; advisorId: UserEntity["id"] };
 
-export class AdvisorGetClientUsercase {
+export class GetUserUsercase {
   public constructor(private readonly userRepository: UserRepository) {}
 
   public async execute({
