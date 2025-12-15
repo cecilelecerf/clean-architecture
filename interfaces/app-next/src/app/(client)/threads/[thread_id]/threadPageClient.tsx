@@ -16,7 +16,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { ArrowRight } from 'lucide-react';
 import { clientEndpoints } from '@/utils/endpoint/client';
 import { ThreadWithUser } from '@/utils/endpoint/client/threadEndpoints';
-import { MessageComponent } from '@/components/Message';
+import { MessageComponent } from '@/components/threads/Message';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {

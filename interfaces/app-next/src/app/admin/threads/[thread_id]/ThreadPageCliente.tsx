@@ -14,8 +14,6 @@ import { useRouter } from 'next/navigation';
 import { MessageComponent } from '@/components/threads/Message';
 import { ThreadWithUser } from '@/utils/endpoint/client/threadEndpoints';
 import { Flex } from '@radix-ui/themes';
-import { JoinThread } from './Join';
-import { Settings } from './Settings';
 import { PostMessage } from '@/components/threads/PostMessage';
 
 
@@ -74,9 +72,6 @@ const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWit
                     <Button className='ml-2' variant='outline' onClick={() => router.push(`/admin/users/${thread.participants[0].id}`)}>{thread.participants[0].firstname}{" "}
                         {thread.participants[0].lastname}</Button>
                 </span>
-                {!!thread.isClose && (
-                    <Settings {...thread} />
-                )}
             </Flex>
         </Flex>
 
@@ -89,13 +84,7 @@ const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWit
         {match({ haveAdministrator: !!thread.administratorId, isClose: thread.isClose })
             .with({ isClose: true }, () =>
                 <p className='w-full bg-red-200 text-red-900 rounded-sm text-center p-2 font-bold'>Discussion fermée</p>)
-            .with({ haveAdministrator: true }, () =>
-                <PostMessage threadId={thread.id} />
-            )
-            .with({ haveAdministrator: false }, () =>
-                <JoinThread threadId={thread.id} />
-            )
-            .exhaustive()
+            .otherwise(() => <PostMessage threadId={thread.id} />)
         }
 
     </div>

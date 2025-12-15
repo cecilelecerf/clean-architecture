@@ -1,5 +1,5 @@
 "use client"
-import { ButtonLoading } from "@/components/ButtonLoading";
+import { ButtonLoading } from "@/components/buttons/ButtonLoading";
 import { SwitchComponent } from "@/components/SwitchComponent";
 import { Tag } from "@/components/Tag";
 import { Badge } from "@/components/ui/badge";

@@ -6,7 +6,7 @@ import { toStringTypeAccount } from '@/utils/toStringTypeAccount';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { match } from 'ts-pattern';
-import { ButtonLink } from '@/components/ButtonLink';
+import { ButtonLink } from '@/components/buttons/ButtonLink';
 import { clientEndpoints } from '@/utils/endpoint/client';
 
 export default function AccountsPage() {

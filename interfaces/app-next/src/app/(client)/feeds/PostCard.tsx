@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { Check } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { clientEndpoints } from "@/utils/endpoint/client";
-import { ButtonLoading } from "@/components/ButtonLoading";
+import { ButtonLoading } from "@/components/buttons/ButtonLoading";
 
 type PostCardProps = {
     post: PostWithTagsAndUser;

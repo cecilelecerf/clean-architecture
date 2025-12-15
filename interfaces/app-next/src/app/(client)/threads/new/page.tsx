@@ -1,7 +1,7 @@
 "use client"
 import { NewThread } from "@/app/api/client/threads/route";
 import FormWrapper, { Field } from "@/components/FromWrapper";
-import { ButtonBack } from "@/components/ButtonBack";
+import { ButtonBack } from "@/components/buttons/ButtonBack";
 import { Thread } from "@infrastructure/types/thread";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

@@ -1,5 +1,5 @@
 "use client"
-import { ButtonBack } from "@/components/ButtonBack";
+import { ButtonBack } from "@/components/buttons/ButtonBack";
 import FormWrapper, { Field } from "@/components/FromWrapper";
 import { socket } from "@/lib/socket";
 import { advisorEndpoint } from "@/utils/endpoint/advisor";

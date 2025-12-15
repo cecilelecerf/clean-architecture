@@ -74,4 +74,18 @@ export const threadsEndpoint = createEndpointsNodes({
           }),
       }),
   },
+  getAll: () =>
+    queryOptions({
+      queryKey: ['threads', 'list'],
+      queryFn: () =>
+        get('/threads', 'advisor').then((data) => {
+          return safeParseWithLog(threadsWithUserSchema.array(), data);
+        }),
+    }),
+  get: ({ id }: { id: ThreadId }) =>
+    queryOptions({
+      queryKey: ['threads', id, 'single'],
+      queryFn: () =>
+        get(`/threads/${id}`, 'advisor').then((data) => threadsWithUserSchema.parse(data)),
+    }),
 });

@@ -14,4 +14,4 @@ export const threadSchema = z.object({
   isClose: z.boolean(),
 });
 
-export type Thread = z.infer<typeof threadIdSchema>;
+export type Thread = z.infer<typeof threadSchema>;
