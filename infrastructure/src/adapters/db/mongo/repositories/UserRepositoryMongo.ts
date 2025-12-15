@@ -4,7 +4,6 @@ import { UserEntity } from "@domain/entities/UserEntity";
 import { Email } from "@domain/values/Email";
 import { UserModel } from "../models/UserModel";
 
-// TODO: finish function
 export class UserRepositoryMongo implements UserRepository {
     constructor(private readonly client: MongoClient) {}
 
@@ -80,7 +79,35 @@ export class UserRepositoryMongo implements UserRepository {
 
     async findAllByRoleAndIsActif(
         role?: UserEntity["role"]
-    ): Promise<UserEntity[]> {}
+    ): Promise<UserEntity[]> {
+        await this.client.connect();
+
+        const query: Record<string, any> = {
+            isActive: true,
+            confirmedAt: { $ne: null },
+        };
+
+        if (role) {
+            query.role = role;
+        }
+
+        const docs = await UserModel.find(query).lean();
+
+        return docs.map((doc) =>
+            UserEntity.from({
+                id: doc._id.toString(),
+                firstname: doc.firstname,
+                lastname: doc.lastname,
+                email: doc.email,
+                passwordHash: doc.passwordHash,
+                role: doc.role,
+                isActiveField: doc.isActive,
+                createdAt: doc.createdAt,
+                confirmedAt: doc.confirmedAt,
+                modifiedAt: doc.updatedAt,
+            })
+        );
+    }
 
     async save(user: UserEntity): Promise<void> {
         await this.client.connect();
