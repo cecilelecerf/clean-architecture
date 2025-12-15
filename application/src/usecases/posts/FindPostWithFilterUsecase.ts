@@ -1,9 +1,13 @@
 import { findActiveUser } from "@application/utils/userValidators";
-import { PostRepository } from "../../../ports/repositories/PostRepository";
+import { PostRepository } from "../../ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
-import { PostEntity } from "@domain/entities/PostEntity"; 
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
+import { PostEntity } from "@domain/entities/PostEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { InvalidPaginationLimitError } from "@application/errors/posts/InvalidPaginationLimitError";
 
@@ -14,10 +18,11 @@ type Props = {
   title?: string;
   page?: number;
   limit?: number;
-  administratorId: UserEntity["id"];
+  userId: UserEntity["id"];
+  status?: boolean;
 };
 
-export class ClientFindPostWithFilterUsecase {
+export class FindPostWithFilterUsecase {
   constructor(
     private postRepository: PostRepository,
     private readonly userRepository: UserRepository
@@ -30,7 +35,8 @@ export class ClientFindPostWithFilterUsecase {
     title,
     page = 1,
     limit = 10,
-    administratorId,
+    userId,
+    status,
   }: Props): Promise<
     | {
         posts: PostEntity[];
@@ -41,12 +47,15 @@ export class ClientFindPostWithFilterUsecase {
     | UserRoleMismatchError
     | InvalidPaginationLimitError
   > {
-    const user = await findActiveUser(this.userRepository, administratorId);
+    const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-    if (!user.hasRole({ role: "client" }))
-      return new UserRoleMismatchError(["client"], user.role);
-    if (limit === 0) return new InvalidPaginationLimitError(limit);
 
+    if (limit === 0) return new InvalidPaginationLimitError(limit);
+    let effectiveStatus = status;
+
+    if (user.hasRole({ role: "client" })) {
+      effectiveStatus = true;
+    }
     const posts =
       await this.postRepository.findAllPaginatedWithTagsAndUserByFilters(
         {
@@ -54,7 +63,7 @@ export class ClientFindPostWithFilterUsecase {
           dateTo: toDate,
           tagsId,
           title,
-          status: true,
+          status: effectiveStatus,
         },
         { page, limit }
       );

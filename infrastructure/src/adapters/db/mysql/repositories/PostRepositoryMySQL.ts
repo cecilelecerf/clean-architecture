@@ -427,9 +427,19 @@ export class PostRepositoryMySQL implements PostRepository {
   async findAllUnreadWithTags(
     userId: UserEntity["id"]
   ): Promise<PostWithTagsAndUser[]> {
+    // ✅ UNE SEULE requête avec tous les JOINs
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
-      p.*,
+      p.id AS post_id,
+      p.advisor_id,
+      p.title,
+      p.content,
+      p.created_at AS post_created_at,
+      p.modified_at AS post_modified_at,
+      p.published_at,
+      p.client_id,
+      
+      -- Advisor
       u.id AS advisor_id,
       u.firstname AS advisor_firstname,
       u.lastname AS advisor_lastname,
@@ -439,37 +449,50 @@ export class PostRepositoryMySQL implements PostRepository {
       u.is_active AS advisor_is_active,
       u.created_at AS advisor_created_at,
       u.confirmed_at AS advisor_confirmed_at,
-      u.modified_at AS advisor_modified_at
+      u.modified_at AS advisor_modified_at,
+      
+      -- Tags (peut être NULL si pas de tags)
+      t.id AS tag_id,
+      t.label AS tag_label,
+      t.color AS tag_color,
+      t.created_at AS tag_created_at,
+      t.modified_at AS tag_modified_at,
+      
+      -- ReadBy (agrégé en JSON)
+      GROUP_CONCAT(DISTINCT pr_all.user_id) AS read_by_ids
+      
     FROM posts p
-    JOIN users u ON u.id = p.advisor_id
+    
+    -- Join avec l'advisor (obligatoire)
+    INNER JOIN users u ON u.id = p.advisor_id
+    
+    -- Join pour filtrer les posts NON LUS par cet utilisateur
     LEFT JOIN post_user_read pr ON pr.post_id = p.id AND pr.user_id = ?
-    WHERE pr.user_id IS NULL AND p.published_at IS NOT NULL
-    ORDER BY p.created_at DESC`,
-      [userId]
+    
+    -- Join pour récupérer TOUS les utilisateurs qui ont lu (pour le champ readBy)
+    LEFT JOIN post_user_read pr_all ON pr_all.post_id = p.id
+    
+    -- Join avec les tags (optionnel)
+    LEFT JOIN post_tag pt ON pt.post_id = p.id
+    LEFT JOIN tags t ON t.id = pt.tag_id
+    
+    WHERE pr.user_id IS NULL 
+      AND p.published_at IS NOT NULL
+      AND (p.client_id IS NULL OR p.client_id = ?)
+      
+    GROUP BY p.id, t.id
+    ORDER BY p.published_at DESC`,
+      [userId, userId]
     );
 
-    const posts = await Promise.all(
-      rows.map(async (row) => {
-        const tagRows = await this.client.query<RowDataPacket[]>(
-          `SELECT t.* FROM post_tag pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = ? `,
-          [row.id]
-        );
+    // ✅ Grouper les résultats par post (car un post peut avoir plusieurs tags)
+    const postsMap = new Map<string, PostWithTagsAndUser>();
 
-        const readRows = await this.client.query<RowDataPacket[]>(
-          `SELECT user_id FROM post_user_read WHERE post_id = ?`,
-          [row.id]
-        );
-        const readsId = readRows.map((r) => r.user_id);
-        const tagsId = tagRows.map((r) => r.id);
-        const tags = tagRows.map((tagRow) =>
-          TagEntity.from({
-            id: tagRow.id,
-            label: tagRow.label,
-            color: tagRow.color,
-            createdAt: tagRow.created_at,
-            updatedAt: tagRow.modified_at,
-          })
-        );
+    for (const row of rows) {
+      const postId = row.post_id;
+
+      if (!postsMap.has(postId)) {
+        // Créer l'advisor (une seule fois par post)
         const advisor = UserEntity.from({
           id: row.advisor_id,
           firstname: row.advisor_firstname,
@@ -482,21 +505,52 @@ export class PostRepositoryMySQL implements PostRepository {
           confirmedAt: row.advisor_confirmed_at,
           updatedAt: row.advisor_modified_at,
         });
+
+        // Parser les IDs des utilisateurs qui ont lu
+        const readByIds = row.read_by_ids
+          ? row.read_by_ids.split(",").filter(Boolean)
+          : [];
+
+        // Créer le post
         const post = PostEntity.from({
-          id: row.id,
+          id: postId,
           advisorId: row.advisor_id,
           title: row.title,
           content: row.content,
-          tagsId,
-          createdAt: row.created_at,
-          updatedAt: row.modified_at ?? undefined,
+          tagsId: [], // On va remplir ça après
+          createdAt: row.post_created_at,
+          updatedAt: row.post_modified_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
-          readBy: readsId,
+          readBy: readByIds,
           clientId: row.client_id ?? undefined,
         });
-        return Object.assign(post, { tags, advisor });
-      })
-    );
-    return posts;
+
+        // Combiner post + advisor + tags vides pour l'instant
+        postsMap.set(
+          postId,
+          Object.assign(post, {
+            advisor,
+            tags: [] as TagEntity[],
+          })
+        );
+      }
+
+      // Ajouter le tag s'il existe
+      if (row.tag_id) {
+        const tag = TagEntity.from({
+          id: row.tag_id,
+          label: row.tag_label,
+          color: row.tag_color,
+          createdAt: row.tag_created_at,
+          updatedAt: row.tag_modified_at,
+        });
+
+        const postWithData = postsMap.get(postId)!;
+        postWithData.tags.push(tag);
+        postWithData.tagsId.push(row.tag_id);
+      }
+    }
+
+    return Array.from(postsMap.values());
   }
 }
