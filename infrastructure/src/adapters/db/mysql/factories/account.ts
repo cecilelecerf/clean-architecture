@@ -30,32 +30,29 @@ export const accountFactory = () => {
         clockService,
         uuidService
     );
-
     const createAccount = new CreateAccountUsecase(
         accountRepository,
         emailService,
         userRepository,
         clockService,
     );
-
     const deleteAccount = new DeleteAccountUsecase(
         accountRepository,
         emailService,
         userRepository
     );
-
     const renameAccount = new RenameAccountUsecase(
         accountRepository,
         emailService,
         clockService,
         userRepository
     );
-
     const transfertBetweenAccount = new TransfertBetweenAccountUsecase(
         accountRepository,
         transactionRepository,
         clockService,
-        uuidService
+        uuidService,
+        userRepository
     );
 
     return {
