@@ -13,6 +13,11 @@ MYSQL_PASSWORD=myapp_pass
 MYSQL_DATABASE=myapp_db
 MYSQL_ROOT_PASSWORD=root
 
+MONGO_URI=mongodb://localhost:27400
+MONGO_USERNAME=root
+MONGO_PASSWORD=true5ecur3
+MONGO_DB_NAME=myapp_db
+
 # JWT
 JWT_SECRET=supersecretkey
 
@@ -61,6 +66,17 @@ Pour drop et recréer la db avec les tables :
 
 Pour ajouter un jeu de fausse donnée :
 `pnpm run mysql:seed`
+
+MongoDB sera disponible sur localhost:27400
+Utilisateur : root
+
+Mot de passe : true5ecur3
+
+Pour drop et recréer la db avec les tables :
+`pnpm run mongo:restart`
+
+Pour ajouter un jeu de fausse donnée :
+`pnpm run mongo:seed`
 
 ## 5️⃣ Démarrer l’application Next.js (API + Web)
 
