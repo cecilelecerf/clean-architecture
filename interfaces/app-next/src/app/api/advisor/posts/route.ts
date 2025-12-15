@@ -73,10 +73,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       postSchema
-        .omit({ createdAt: true, modifiedAt: true, publishedAt: true })
+        .omit({ createdAt: true, updatedAt: true, publishedAt: true })
         .extend({
           createdAt: z.date(),
-          modifiedAt: z.date().optional(),
+          updatedAt: z.date().optional(),
           publishedAt: z.date().optional(),
         })
         .parse(result),

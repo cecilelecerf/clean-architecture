@@ -60,8 +60,8 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/advisor/po
     console.log(result);
     return NextResponse.json(
       postSchema
-        .omit({ modifiedAt: true, publishedAt: true, createdAt: true })
-        .extend({ modifiedAt: z.date(), publishedAt: z.date(), createdAt: z.date() })
+        .omit({ updatedAt: true, publishedAt: true, createdAt: true })
+        .extend({ updatedAt: z.date(), publishedAt: z.date(), createdAt: z.date() })
         .parse(result),
     );
   } catch (err) {
