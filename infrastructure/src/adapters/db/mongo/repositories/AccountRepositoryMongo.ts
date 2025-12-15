@@ -26,14 +26,14 @@ export class AccountRepositoryMongo implements AccountRepository {
             if (color instanceof Error) throw color;
 
             return AccountEntity.from({
-            iban,
-            userId: doc.userId,
-            name: doc.name,
-            type: doc.type,
-            color,
-            balance,
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt,
+                iban,
+                userId: doc.userId,
+                name: doc.name,
+                type: doc.type,
+                color,
+                balance,
+                createdAt: doc.createdAt,
+                updatedAt: doc.updatedAt,
             });
         });
     }

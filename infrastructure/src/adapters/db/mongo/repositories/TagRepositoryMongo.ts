@@ -8,7 +8,6 @@ import { Color } from "@domain/values/Color";
 export class TagRepositoryMongo implements TagRepository {
     constructor(private readonly client: MongoClient) {}
 
-    // TODO: create save function
     async save(tag: TagEntity): Promise<void> {
         await this.client.connect();
                                               
