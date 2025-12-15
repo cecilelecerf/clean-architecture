@@ -45,7 +45,7 @@ Construit chaque workspace dans le bon ordre :
 
 🔹 L’ordre est important car application dépend de domain et infrastructure dépend des deux précédents.
 
-## 4️⃣ Démarrer MySQL et phpMyAdmin
+## 4️⃣ Démarrer MySQL et phpMyAdmin & MongoDB
 
 Lance les conteneurs Docker :
 
