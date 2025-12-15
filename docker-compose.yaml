@@ -20,3 +20,12 @@ services:
       MYSQL_ROOT_PASSWORD: root
     ports:
       - "8081:80"
+  
+  db_mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27400:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: true5ecur3

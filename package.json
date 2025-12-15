@@ -10,6 +10,8 @@
     "mono-build": "pnpm tsc -b tsconfig.build.json",
     "mysql:seed": "pnpm --filter infrastructure run mysql:seed",
     "mysql:restart": "pnpm --filter infrastructure run mysql:restart",
+    "mongo:seed": "pnpm --filter infrastructure run mongo:seed",
+    "mongo:restart": "pnpm --filter infrastructure run mongo:restart",
     "socket": "pnpm --filter sockets run socket"
   },
   "workspaces": [
