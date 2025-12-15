@@ -7,6 +7,6 @@ export interface UserInterface {
     isActiveField: boolean,
     createdAt: Date,
     confirmedAt: Date,
-    modifiedAt: Date,
+    updatedAt: Date,
     advisorId: string
 }

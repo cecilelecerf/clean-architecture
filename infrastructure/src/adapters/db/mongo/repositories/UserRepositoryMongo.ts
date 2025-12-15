@@ -26,7 +26,7 @@ export class UserRepositoryMongo implements UserRepository {
             isActiveField: doc.isActiveField,
             createdAt: doc.createdAt,
             confirmedAt: doc.confirmedAt ?? null,
-            modifiedAt: doc.modifiedAt ?? null,
+            updatedAt: doc.updatedAt ?? null,
             advisorId: doc.advisorId ?? null
         });
     }
@@ -47,7 +47,7 @@ export class UserRepositoryMongo implements UserRepository {
             isActiveField: doc.isActiveField,
             createdAt: doc.createdAt,
             confirmedAt: doc.confirmedAt ?? null,
-            modifiedAt: doc.modifiedAt ?? null,
+            updatedAt: doc.updatedAt ?? null,
             advisorId: doc.advisorId ?? null
         });
     }
@@ -71,7 +71,7 @@ export class UserRepositoryMongo implements UserRepository {
                 isActiveField: doc.isActiveField,
                 createdAt: doc.createdAt,
                 confirmedAt: doc.confirmedAt ?? null,
-                modifiedAt: doc.modifiedAt ?? null,
+                updatedAt: doc.updatedAt ?? null,
                 advisorId: doc.advisorId ?? null
             });
         })
@@ -104,7 +104,7 @@ export class UserRepositoryMongo implements UserRepository {
                 isActiveField: doc.isActive,
                 createdAt: doc.createdAt,
                 confirmedAt: doc.confirmedAt,
-                modifiedAt: doc.updatedAt,
+                updatedAt: doc.updatedAt,
             })
         );
     }
@@ -121,12 +121,31 @@ export class UserRepositoryMongo implements UserRepository {
             isActiveField: user.isActiveField,
             createdAt: user.createdAt,
             confirmedAt: user.confirmedAt ?? null,
-            modifiedAt: user.modifiedAt ?? null,
+            updatedAt: user.updatedAt ?? null,
             advisorId: user.advisorId ?? null
         } as any);
     }
 
-    async update(user: UserEntity): Promise<void> {}
+    async update(user: UserEntity): Promise<void> {
+        await this.client.connect();
+                        
+        await UserModel.updateOne(
+            { _id: user.id },
+            {
+                $set: {
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    email: user.email,
+                    passwordHash: user.passwordHash,
+                    role: user.role,
+                    isActiveField: user.isActiveField,
+                    confirmedAt: user.confirmedAt ?? null,
+                    updatedAt: user.updatedAt || new Date(),
+                    advisorId: user.advisorId ?? null
+                },
+            }
+        );
+    }
 
     async delete(id: UserEntity["id"]): Promise<void> {
         await this.client.connect();

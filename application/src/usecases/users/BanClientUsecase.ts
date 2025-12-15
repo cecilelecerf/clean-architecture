@@ -32,7 +32,7 @@ export class BanClientUsecase {
       return new UserRoleMismatchError(["client"], user.role);
 
     user.ban();
-    user.modifiedAt = this.clockService.now();
+    user.updatedAt = this.clockService.now();
 
     await this.userRepository.update(user);
     return user;

@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS users (
     is_active BOOLEAN DEFAULT TRUE NOT NULL,
     created_at DATETIME NOT NULL,
     confirmed_at DATETIME,
-    modified_at DATETIME
+    updated_at DATETIME
 );

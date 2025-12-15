@@ -24,7 +24,7 @@ export class UserRepositoryMySQL implements UserRepository {
       isActiveField: row.is_active,
       createdAt: row.created_at,
       confirmedAt: row.confirmed_at,
-      modifiedAt: row.modified_at,
+      updatedAt: row.modified_at,
     });
   }
 
@@ -45,7 +45,7 @@ export class UserRepositoryMySQL implements UserRepository {
       isActiveField: row.is_active,
       createdAt: row.created_at,
       confirmedAt: row.confirmed_at,
-      modifiedAt: row.modified_at,
+      updatedAt: row.modified_at,
     });
   }
 
@@ -64,7 +64,7 @@ export class UserRepositoryMySQL implements UserRepository {
         isActiveField: row.is_active,
         createdAt: row.created_at,
         confirmedAt: row.confirmed_at,
-        modifiedAt: row.modified_at,
+        updatedAt: row.modified_at,
       })
     );
   }
@@ -92,7 +92,7 @@ export class UserRepositoryMySQL implements UserRepository {
         isActiveField: row.is_active,
         createdAt: row.created_at,
         confirmedAt: row.confirmed_at,
-        modifiedAt: row.modified_at,
+        updatedAt: row.modified_at,
       })
     );
   }
@@ -100,7 +100,7 @@ export class UserRepositoryMySQL implements UserRepository {
   async save(user: UserEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO users 
-      (id, firstname, lastname, email, password_hash, role, is_active, created_at, confirmed_at, modified_at) 
+      (id, firstname, lastname, email, password_hash, role, is_active, created_at, confirmed_at, updated_at) 
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         user.id,
@@ -112,7 +112,7 @@ export class UserRepositoryMySQL implements UserRepository {
         user.isActiveField,
         user.createdAt,
         user.confirmedAt ?? null,
-        user.modifiedAt ?? null,
+        user.updatedAt ?? null,
       ]
     );
   }
@@ -128,7 +128,7 @@ export class UserRepositoryMySQL implements UserRepository {
          is_active = ?, 
          created_at = ?, 
          confirmed_at = ?, 
-         modified_at = ? 
+         updated_at = ? 
       WHERE id = ?`,
       [
         user.firstname,
@@ -139,7 +139,7 @@ export class UserRepositoryMySQL implements UserRepository {
         user.isActiveField,
         user.createdAt,
         user.confirmedAt ?? null,
-        user.modifiedAt ?? null,
+        user.updatedAt ?? null,
         user.id,
       ]
     );

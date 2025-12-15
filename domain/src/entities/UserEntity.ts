@@ -12,7 +12,7 @@ export class UserEntity {
     public isActiveField: boolean,
     public createdAt: Date,
     public confirmedAt?: Date,
-    public modifiedAt?: Date,
+    public updatedAt?: Date,
     public advisorId?: UserEntity["id"]
   ) {}
 
@@ -26,7 +26,7 @@ export class UserEntity {
     isActiveField,
     confirmedAt,
     createdAt,
-    modifiedAt,
+    updatedAt,
     advisorId,
   }: Pick<
     UserEntity,
@@ -39,7 +39,7 @@ export class UserEntity {
     | "confirmedAt"
     | "createdAt"
     | "isActiveField"
-    | "modifiedAt"
+    | "updatedAt"
     | "advisorId"
   >) {
     return new UserEntity(
@@ -52,7 +52,7 @@ export class UserEntity {
       isActiveField,
       createdAt,
       confirmedAt,
-      modifiedAt,
+      updatedAt,
       advisorId
     );
   }
