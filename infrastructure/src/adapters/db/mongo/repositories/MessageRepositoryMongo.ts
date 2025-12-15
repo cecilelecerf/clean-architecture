@@ -1,9 +1,10 @@
-import { MessageRepository } from "@application/ports/repositories/MessageRepository";
+import { MessageRepository, MessageWithUser } from "@application/ports/repositories/MessageRepository";
 import { MongoClient } from "../../MongoClient";
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { MessageModel } from "../models/MessageModel";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { UserModel } from "../models/UserModel";
 
 export class MessageRepositoryMongo implements MessageRepository {
     constructor(private readonly client: MongoClient) {}
@@ -58,7 +59,7 @@ export class MessageRepositoryMongo implements MessageRepository {
 
         const existingUserReadIds = existingDoc.readBy || [];
 
-        const usersToAdd = message.readBy.filter((id) => !existingUserReadIds.includes(id));
+        const usersToAdd = message.readBy.filter((id: string) => !existingUserReadIds.includes(id));
         if (usersToAdd.length > 0) {
             await MessageModel.updateOne(
                 { _id: message.id },
@@ -66,7 +67,7 @@ export class MessageRepositoryMongo implements MessageRepository {
             );
         }
 
-        const usersToRemove = existingUserReadIds.filter((id) => !message.readBy.includes(id));
+        const usersToRemove = existingUserReadIds.filter((id: string) => !message.readBy.includes(id));
         if (usersToRemove.length > 0) {
             await MessageModel.updateOne(
                 { _id: message.id },
@@ -82,46 +83,46 @@ export class MessageRepositoryMongo implements MessageRepository {
         await MessageModel.deleteOne({ _id: messageId });
     }
 
-    // TODO: fix error
     async findAllWithUserByThread(threadId: string): Promise<MessageWithUser[]> {
         await this.client.connect();
 
         const docs = await MessageModel.find({ threadId })
-            .sort({ sentAt: 1 })
-            .populate<{ sender: any }>("senderId")
-            .lean();
+        .sort({ sentAt: 1 })
+        .lean();
 
-        // const userIds = Array.from(new Set(docs.map(d => d.senderId)));
-        // const users = await UserModel.find({ _id: { $in: userIds } }).lean();
-        // const usersMap = new Map(users.map(u => [u._id.toString(), u]));
+        const userIds = Array.from(new Set(docs.map(d => d.senderId.toString())));
+        const users = await UserModel.find({ _id: { $in: userIds } }).lean();
+        const usersMap = new Map(users.map(u => [u._id.toString(), u]));
 
-        return docs.map((doc) => {
+        const messages: MessageWithUser[] = docs.map(doc => {
             const message = MessageEntity.from({
-                id: doc._id.toString(),
-                threadId: doc.threadId,
-                senderId: doc.senderId,
-                content: doc.content,
-                sentAt: doc.sentAt,
-                readBy: doc.readBy || [],
+            id: doc._id.toString(),
+            threadId: doc.threadId,
+            senderId: doc.senderId.toString(),
+            content: doc.content,
+            sentAt: doc.sentAt,
+            readBy: doc.readBy || [],
             });
 
-            // const senderDoc = usersMap.get(doc.senderId);
-            // if (!senderDoc) throw new Error(`User ${doc.senderId} not found`); 
-            // const sender = UserEntity.from({
-            //     id: senderDoc._id.toString(),
-            //     firstname: senderDoc.firstname,
-            //     lastname: senderDoc.lastname,
-            //     email: senderDoc.email,
-            //     passwordHash: senderDoc.passwordHash,
-            //     role: senderDoc.role,
-            //     isActiveField: senderDoc.isActive,
-            //     createdAt: senderDoc.createdAt,
-            //     confirmedAt: senderDoc.confirmedAt,
-            //     modifiedAt: senderDoc.updatedAt,
-            // });
+            const senderDoc = usersMap.get(doc.senderId.toString());
+            if (!senderDoc) throw new Error(`User ${doc.senderId} not found`);
 
-            // return Object.assign(message, { sender });
+            const sender = UserEntity.from({
+            id: senderDoc._id.toString(),
+            firstname: senderDoc.firstname,
+            lastname: senderDoc.lastname,
+            email: senderDoc.email,
+            passwordHash: senderDoc.passwordHash,
+            role: senderDoc.role,
+            isActiveField: senderDoc.isActive,
+            createdAt: senderDoc.createdAt,
+            confirmedAt: senderDoc.confirmedAt,
+            modifiedAt: senderDoc.updatedAt,
+            });
+
+            return Object.assign(message, { sender });
         });
-    }
 
+        return messages;
+    }
 }
