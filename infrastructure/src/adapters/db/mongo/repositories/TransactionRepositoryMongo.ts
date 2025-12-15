@@ -5,14 +5,33 @@ import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { TransactionModel } from "../models/TransactionModel";
 import { Money } from "@domain/values/Money";
 
-// TODO: finish function
 export class TransactionRepositoryMongo implements TransactionRepository {
     constructor(private readonly client: MongoClient) {}
 
-    // async findByDateRange(
-    //     startDate: Date,
-    //     endDate: Date
-    // ): Promise<TransactionEntity[]> {}
+    async findByDateRange(
+        startDate: Date,
+        endDate: Date
+    ): Promise<TransactionEntity[]> {
+        await this.client.connect();
+        const docs = await TransactionModel.find({
+            date: { $gte: startDate, $lte: endDate },
+        })
+            .sort({ date: 1 }) 
+            .lean();
+        
+        return docs.map((doc) =>
+            TransactionEntity.from({
+                id: doc._id.toString(),
+                fromAccountId: doc.fromAccountId as IBAN,
+                toAccountId: doc.toAccountId as IBAN,
+                amount: Money.from({ amount: doc.amount, currency: doc.currency }),
+                label: doc.label,
+                icon: doc.icon,
+                date: doc.date,
+                type: doc.type,
+            })
+        );
+    }
 
     async findByIban(iban: IBAN): Promise<TransactionEntity[]> {
         await this.client.connect();
