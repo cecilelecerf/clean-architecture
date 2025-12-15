@@ -4,7 +4,6 @@ import { TagEntity } from "@domain/entities/TagEntity";
 import { TagModel } from "../models/TagModel";
 import { Color } from "@domain/values/Color";
 
-//TODO : modifier les modifiedAt en updateAt
 export class TagRepositoryMongo implements TagRepository {
     constructor(private readonly client: MongoClient) {}
 
@@ -32,7 +31,7 @@ export class TagRepositoryMongo implements TagRepository {
             label: doc.label,
             color,
             createdAt: doc.createdAt,
-            modifiedAt: doc.updatedAt ?? null,
+            updatedAt: doc.updatedAt ?? null,
         });
     }
 
@@ -50,7 +49,7 @@ export class TagRepositoryMongo implements TagRepository {
                 label: doc.label,
                 color,
                 createdAt: doc.createdAt,
-                modifiedAt: doc.updatedAt ?? null,
+                updatedAt: doc.updatedAt ?? null,
             });
         })
     }
@@ -64,7 +63,7 @@ export class TagRepositoryMongo implements TagRepository {
                 $set: {
                     label: tag.label,
                     color: tag.color,
-                    modifiedAt: tag.modifiedAt || new Date(),
+                    updatedAt: tag.updatedAt || new Date(),
                 },
             }
         );

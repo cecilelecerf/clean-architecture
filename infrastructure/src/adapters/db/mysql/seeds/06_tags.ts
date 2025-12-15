@@ -27,8 +27,7 @@ export const generateTags = async (
       id: uuidService.generate(),
       label: raw.label,
       color: c,
-      createdAt: now,
-      modifiedAt: now,
+      createdAt: now
     });
 
     await tagRepository.save(tag);

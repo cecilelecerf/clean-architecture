@@ -31,8 +31,7 @@ export const generateTagsMongo = async (
       id: uuidService.generate(),
       label: raw.label,
       color,
-      createdAt: now,
-      modifiedAt: now,
+      createdAt: now
     });
 
     await tagRepository.save(tag);

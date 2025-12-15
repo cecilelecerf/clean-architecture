@@ -8,9 +8,9 @@ export class TagRepositoryMySQL implements TagRepository {
 
   async save(tag: TagEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO tags (id, label, color, created_at, modified_at) 
+      `INSERT INTO tags (id, label, color, created_at, updated_at) 
         VALUES (?, ?, ?, ?, ?)`,
-      [tag.id, tag.label, tag.color.toString(), tag.createdAt, tag.modifiedAt || null]
+      [tag.id, tag.label, tag.color.toString(), tag.createdAt, tag.updatedAt || null]
     );
   }
 
@@ -26,7 +26,7 @@ export class TagRepositoryMySQL implements TagRepository {
       label: row.label,
       color: row.color,
       createdAt: row.createdAt,
-      modifiedAt: row.modifiedAt,
+      updatedAt: row.updatedAt,
     });
   }
 
@@ -38,7 +38,7 @@ export class TagRepositoryMySQL implements TagRepository {
         label: row.label,
         color: row.color,
         createdAt: row.createdAt,
-        modifiedAt: row.modifiedAt,
+        updatedAt: row.updatedAt,
       })
     );
   }
@@ -46,9 +46,9 @@ export class TagRepositoryMySQL implements TagRepository {
   async update(tag: TagEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE tags
-       SET label = ?, color = ?, modified_at = ? 
+       SET label = ?, color = ?, updated_at = ? 
        WHERE id = ?`,
-      [tag.label, tag.color.toString(), tag.modifiedAt || new Date(), tag.id]
+      [tag.label, tag.color.toString(), tag.updatedAt || new Date(), tag.id]
     );
   }
 
