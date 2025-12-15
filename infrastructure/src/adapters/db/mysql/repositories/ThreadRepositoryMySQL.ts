@@ -187,14 +187,13 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
   /**
    * Récupère les threads ouverts pour un participant donné avec les informations de l'administrateur
    */
-  async findAllExternalThreadWithUserByUserId(
+  async findAllWithUserByParticipantId(
     participantId: string
   ): Promise<ThreadEntityWithUsers[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `
     SELECT 
       t.*,
-      
       admin.id AS admin_id,
       admin.firstname AS admin_firstname,
       admin.lastname AS admin_lastname,
@@ -203,23 +202,25 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       admin.created_at AS admin_created_at,
       admin.is_active AS admin_is_active,
       admin.password_hash AS admin_password_hash,
+      admin.modified_at AS admin_modified_at,
+      admin.confirmed_at AS admin_confirmed_at,
       p.id AS participant_id,
       p.firstname AS participant_firstname,
       p.lastname AS participant_lastname,
       p.email AS participant_email,
       p.role AS participant_role,
       p.created_at AS participant_created_at,
-      p.is_active AS participant_is_active
-
+      p.is_active AS participant_is_active,
+      p.modified_at AS participant_modified_at,
+      p.confirmed_at AS participant_confirmed_at
     FROM threads t
     LEFT JOIN users admin ON t.administrator_id = admin.id
     LEFT JOIN thread_participant tp ON t.id = tp.thread_id
     LEFT JOIN users p ON tp.user_id = p.id
-    WHERE t.is_close = 0
-      AND (tp.user_id = ? OR t.administrator_id = ?)
+    WHERE t.is_close = 0 AND tp.user_id = ?
     ORDER BY t.updated_at DESC, t.created_at DESC
     `,
-      [participantId, participantId]
+      [participantId]
     );
     const map = new Map<number, ThreadEntityWithUsers>();
 
@@ -237,6 +238,8 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
               role: row.admin_role,
               isActiveField: row.admin_is_active,
               createdAt: row.admin_created_at,
+              updatedAt: row.admin_modified_at,
+              confirmedAt: row.admin_confirmed_at,
             })
           : null;
 
@@ -273,8 +276,11 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
               isActiveField: row.participant_is_active,
               createdAt: row.participant_created_at,
               passwordHash: row.participant_password_hash,
+              updatedAt: row.participant_modified_at,
+              confirmedAt: row.participant_confirmed_at,
             })
           );
+          thread.participantsId.push(row.participant_id);
         }
       }
     }
@@ -377,6 +383,8 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           admin.created_at as admin_created_at,
           admin.is_active as admin_is_active,
           admin.password_hash as admin_password_hash,
+          admin.modified_at AS admin_modified_at,
+          admin.confirmed_at AS admin_confirmed_at,
           p.id as participant_id,
           p.firstname as participant_firstname,
           p.lastname as participant_lastname,
@@ -384,7 +392,9 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           p.role as participant_role,
           p.created_at as participant_created_at,
           p.is_active as participant_is_active,
-          p.password_hash as participant_password_hash
+          p.password_hash as participant_password_hash,
+          p.modified_at AS participant_modified_at,
+          p.confirmed_at AS participant_confirmed_at
     FROM threads t
     JOIN users admin ON t.administrator_id = admin.id
     JOIN thread_participant tp ON t.id = tp.thread_id
@@ -418,6 +428,8 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           createdAt: new Date(row.admin_created_at),
           isActiveField: row.admin_is_active === 1,
           passwordHash: row.admin_password_hash,
+          updatedAt: row.admin_modified_at,
+          confirmedAt: row.admin_confirmed_at,
         });
 
         thread.participants = [];
@@ -435,6 +447,8 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           createdAt: new Date(row.participant_created_at),
           isActiveField: row.participant_is_active === 1,
           passwordHash: row.participant_password_hash,
+          updatedAt: row.participant_modified_at,
+          confirmedAt: row.participant_confirmed_at,
         })
       );
 
@@ -458,7 +472,9 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       p.role as participant_role,
       p.created_at as participant_created_at,
       p.is_active as participant_is_active,
-      p.password_hash as participant_password_hash
+      p.password_hash as participant_password_hash,
+      p.modified_at AS participant_modified_at,
+      p.confirmed_at AS participant_confirmed_at
       FROM threads t
       JOIN thread_participant tp ON t.id = tp.thread_id
       JOIN users p ON tp.user_id = p.id AND p.is_active = 1 AND p.confirmed_at IS NOT NULL
@@ -491,6 +507,8 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
               createdAt: new Date(row.admin_created_at),
               isActiveField: row.admin_is_active === 1,
               passwordHash: row.admin_password_hash,
+              updatedAt: row.admin_modified_at,
+              confirmedAt: row.admin_confirmed_at,
             })
           : null;
 
@@ -509,6 +527,8 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           createdAt: new Date(row.participant_created_at),
           isActiveField: row.participant_is_active === 1,
           passwordHash: row.participant_password_hash,
+          updatedAt: row.participant_modified_at,
+          confirmedAt: row.participant_confirmed_at,
         })
       );
 

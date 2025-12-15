@@ -1,5 +1,7 @@
-
-import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import {
   ThreadEntityWithUsers,
   ThreadRepository,
@@ -18,10 +20,9 @@ export class ClientGetAllThreadUsecase {
     const user = await findActiveUser(this.userRepository, clientId);
     if (user instanceof Error) return user;
 
-    const threads =
-      await this.threadRepository.findAllExternalThreadWithUserByUserId(
-        clientId
-      );
+    const threads = await this.threadRepository.findAllWithUserByParticipantId(
+      clientId
+    );
     return threads;
   }
 }

@@ -24,7 +24,7 @@ export interface ThreadRepository {
     administratorId: UserEntity["id"]
   ): Promise<ThreadEntityWithUsers[]>;
   findAllWithUserByAdministratorNullable(): Promise<ThreadEntityWithUsers[]>;
-  findAllExternalThreadWithUserByUserId(
+  findAllWithUserByParticipantId(
     participantId: UserEntity["id"]
   ): Promise<ThreadEntityWithUsers[]>;
 }

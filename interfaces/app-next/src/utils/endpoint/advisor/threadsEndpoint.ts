@@ -12,16 +12,16 @@ export const threadsEndpoint = createEndpointsNodes({
   messages: {
     getAll: ({ id }: { id: ThreadId }) =>
       queryOptions({
-        queryKey: ['client-threads', id, 'messages', 'list'],
+        queryKey: ['threads', id, 'messages', 'list'],
         queryFn: () =>
-          get(`/client-threads/${id}/messages`, 'advisor').then((data) =>
+          get(`/threads/${id}/messages`, 'advisor').then((data) =>
             safeParseWithLog(messageWithUserSchema.array(), data),
           ),
       }),
     post: ({ threadId }: { threadId: ThreadId }) =>
       mutationOptions({
         mutationFn: (content: string) =>
-          post(`/threads/${threadId}/messages/new`, { content }, 'client').then((data) =>
+          post(`/threads/${threadId}/messages`, { content }, 'advisor').then((data) =>
             safeParseWithLog(messageWithUserSchema, data),
           ),
       }),

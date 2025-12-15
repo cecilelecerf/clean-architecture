@@ -1,23 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../../../auth/[...nextauth]/route';
+import { authOptions } from '../../auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
 
-export async function GET(
-  req: NextRequest,
-  ctx: RouteContext<'/api/advisor/client-threads/users/[userId]'>,
-) {
+export async function GET(req: NextRequest) {
   try {
+    console.log('enter');
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    const { userId } = await ctx.params;
-
-    const result = await threadsFactory().advisors.advisorGetAllByClientThread.execute({
-      clientId: userId,
+    const result = await threadsFactory().director.directorFindAllThread.execute({
       advisorId: session.user.id,
     });
+    console.log(result);
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },

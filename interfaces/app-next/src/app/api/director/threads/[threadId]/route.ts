@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getThreadMessagesFactory } from '@infrastructure/adapters/db/mysql/factories/messages/getThreadMessagesFactory';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-export async function GET(
-  req: NextRequest,
-  ctx: RouteContext<'/api/advisor/client-threads/[threadId]/messages'>,
-) {
+import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/director/threads/[threadId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -13,19 +10,15 @@ export async function GET(
     }
     const { threadId } = await ctx.params;
 
-    const messages = await getThreadMessagesFactory().execute({
-      userId: session.user.id,
-      id: threadId,
-    });
-    console.log(messages);
-    if (messages instanceof Error) {
+    const thread = await threadsFactory().findThreadWithUser.execute(threadId, session.user.id);
+    if (thread instanceof Error) {
       return NextResponse.json(
-        { name: messages.name, message: messages.message },
-        { status: messages.statusCode ?? 404 },
+        { name: thread.name, message: thread.message },
+        { status: thread.statusCode ?? 404 },
       );
     }
 
-    return NextResponse.json(messages);
+    return NextResponse.json(thread);
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: err.message || 'Erreur serveur' }, { status: 500 });

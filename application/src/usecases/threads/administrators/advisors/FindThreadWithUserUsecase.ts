@@ -1,11 +1,15 @@
 import { ThreadNotFoundError } from "@application/errors/threads";
-import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import {
   ThreadEntityWithUsers,
   ThreadRepository,
 } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
+import { InvalidThreadAccessError } from "@domain/errors/thread";
 
 export class FindThreadWithUserUsecase {
   constructor(
@@ -20,11 +24,14 @@ export class FindThreadWithUserUsecase {
     | UserNotFoundError
     | UserNotActiveError
     | ThreadNotFoundError
+    | InvalidThreadAccessError
   > {
     const user = await findActiveUser(this.userRepository, clientId);
     if (user instanceof Error) return user;
     const thread = await this.threadRepository.findWithUserById(threadId);
     if (!thread) return new ThreadNotFoundError();
+    if (!thread.hasAccess(user.id))
+      return new InvalidThreadAccessError(user.id, thread.id);
     return thread;
   }
 }

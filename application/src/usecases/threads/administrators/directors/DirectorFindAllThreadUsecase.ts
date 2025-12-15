@@ -10,36 +10,31 @@ import {
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
-type Props = { advisorId: UserEntity["id"]; clientId: UserEntity["id"] };
+type Props = { advisorId: UserEntity["id"] };
 
-export class AdvisorGetAllThreadByClientUsecase {
+export class DirectorFindAllThreadUsecase {
   constructor(
     private readonly threadRepository: ThreadRepository,
     private readonly userRepository: UserRepository
   ) {}
   async execute({
     advisorId,
-    clientId,
   }: Props): Promise<
     | ThreadEntityWithUsers[]
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
   > {
-    const user = await findActiveUser(this.userRepository, clientId);
-    if (user instanceof Error) return user;
     const advisor = await findActiveUser(this.userRepository, advisorId);
     if (advisor instanceof Error) return advisor;
 
-    if (!advisor.hasRole({ role: "conseiller" }))
-      return new UserRoleMismatchError(["conseiller"], advisor.role);
+    if (!advisor.hasRole({ role: "directeur" }))
+      return new UserRoleMismatchError(["directeur"], advisor.role);
 
-    if (!user.hasRole({ role: "client" }))
-      return new UserRoleMismatchError(["client"], user.role);
-
-    const threads = await this.threadRepository.findAllWithUserByParticipantId(
-      user.id
-    );
-    return threads;
+    const threadsParticipant =
+      await this.threadRepository.findAllWithUserByParticipantId(advisor.id);
+    const threadsAdmin =
+      await this.threadRepository.findAllWithUserByAdministratorId(advisor.id);
+    return threadsAdmin.concat(threadsParticipant);
   }
 }

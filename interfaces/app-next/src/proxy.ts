@@ -30,6 +30,6 @@ export const config = {
     '/investments/:path*',
     '/threads/:path*',
     '/admin/:path*',
-    '/advisor/:path*',
+    '/director/:path*',
   ],
 };

@@ -6,6 +6,7 @@ import { useQueries } from '@tanstack/react-query';
 import { match } from 'ts-pattern';
 import { useEffect, useRef, useState } from 'react';
 import { socket } from '@/lib/socket';
+import { Button } from '@/components/ui/button';
 import { UserDto } from '@infrastructure/types/user';
 import { MessageWithUser } from '@infrastructure/types/message';
 import { advisorEndpoint } from '@/utils/endpoint/advisor';
@@ -39,6 +40,7 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
 const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWithUser, messages: MessageWithUser[], userId: UserDto["id"] }) => {
     const [messages, setMessages] = useState<MessageWithUser[]>(messagesData);
     const bottomRef = useRef<HTMLDivElement | null>(null);
+    const router = useRouter()
 
     useEffect(() => {
         if (!socket) return;

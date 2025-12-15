@@ -248,6 +248,9 @@ importers:
       '@types/express':
         specifier: ^5.0.3
         version: 5.0.6
+      '@types/socket.io':
+        specifier: ^3.0.2
+        version: 3.0.2
       body-parser:
         specifier: ^2.2.0
         version: 2.2.1
@@ -257,6 +260,9 @@ importers:
       infrastructure:
         specifier: workspace:*
         version: link:../../infrastructure
+      socket.io:
+        specifier: ^4.8.1
+        version: 4.8.1
       ts-pattern:
         specifier: ^5.9.0
         version: 5.9.0
@@ -2081,6 +2087,10 @@ packages:
   '@types/serve-static@2.2.0':
     resolution: {integrity: sha512-8mam4H1NHLtu7nmtalF7eyBH14QyOASmcxHhSfEoRyr0nP/YdoesEtU+uSRvMe96TW/HPTtkoKqQLl53N7UXMQ==}
 
+  '@types/socket.io@3.0.2':
+    resolution: {integrity: sha512-pu0sN9m5VjCxBZVK8hW37ZcMe8rjn4HHggBN5CbaRTvFwv5jOmuIRZEuddsBPa9Th0ts0SIo3Niukq+95cMBbQ==}
+    deprecated: This is a stub types definition. socket.io provides its own type definitions, so you do not need this installed.
+
   '@types/webidl-conversions@7.0.3':
     resolution: {integrity: sha512-CiJJvcRtIgzadHCYXw7dqEnMNRjhGZlYK05Mj9OyktqV8uVT8fD2BFOB7S1uwBE3Kj2Z+4UyPmFw/Ixgw/LAlA==}
 
@@ -3410,6 +3420,7 @@ packages:
   next@16.0.0:
     resolution: {integrity: sha512-nYohiNdxGu4OmBzggxy9rczmjIGI+TpR5vbKTsE1HqYwNm1B+YSiugSrFguX6omMOKnDHAmBPY4+8TNJk0Idyg==}
     engines: {node: '>=20.9.0'}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -6254,6 +6265,14 @@ snapshots:
     dependencies:
       '@types/http-errors': 2.0.5
       '@types/node': 24.10.2
+
+  '@types/socket.io@3.0.2':
+    dependencies:
+      socket.io: 4.8.1
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
 
   '@types/webidl-conversions@7.0.3': {}
 

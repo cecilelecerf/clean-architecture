@@ -1,7 +1,7 @@
 "use client"
 import { ThreadCard } from "@/components/threads/ThreadCard";
 import { socket } from "@/lib/socket";
-import { advisorEndpoint } from "@/utils/endpoint/advisor";
+import { directorEndpoints } from "@/utils/endpoint/director";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -9,7 +9,7 @@ import { match } from "ts-pattern";
 
 export default function ClientsThreadsPage() {
     const router = useRouter()
-    const query = useQuery(advisorEndpoint.thread.getAll())
+    const query = useQuery(directorEndpoints.threads.getAll())
     useEffect(() => {
         if (query.status === "success") {
             query.data.forEach((thread) => {

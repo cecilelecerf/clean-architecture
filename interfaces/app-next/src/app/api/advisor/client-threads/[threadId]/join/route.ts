@@ -13,7 +13,7 @@ export async function POST(
     }
     const { threadId } = await ctx.params;
 
-    const thread = await threadsFactory().advisorJoinExternalThread.execute({
+    const thread = await threadsFactory().advisors.advisorJoinExternalThread.execute({
       threadId: threadId,
       advisorId: session.user.id,
     });
