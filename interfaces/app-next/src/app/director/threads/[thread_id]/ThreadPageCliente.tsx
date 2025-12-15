@@ -40,7 +40,6 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
 const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWithUser, messages: MessageWithUser[], userId: UserDto["id"] }) => {
     const [messages, setMessages] = useState<MessageWithUser[]>(messagesData);
     const bottomRef = useRef<HTMLDivElement | null>(null);
-    const router = useRouter()
 
     useEffect(() => {
         if (!socket) return;

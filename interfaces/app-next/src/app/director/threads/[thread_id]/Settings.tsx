@@ -16,8 +16,9 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { match } from "ts-pattern"
 type Props = {} & ThreadWithUser
-export const Settings = ({ administrator, participants }: Props) => {
-
+export const Settings = ({ administrator, participants, isClose, id }: Props) => {
+    const { data: session } = useSession();
+    if (!session?.user?.id) return <div>Unauthorized</div>;
     return (
         <Dialog>
             <DialogTrigger asChild><Button size="icon" variant="ghost"><SettingsIcon /></Button></DialogTrigger>
@@ -42,12 +43,28 @@ export const Settings = ({ administrator, participants }: Props) => {
                         </Flex>
                     )}
                 </Flex>
+                {session.user.id === administrator.id && (
+                    <>
+                        {!isClose &&
+                            <Flex justify="between">
+                                <p>Fermer la conversation ?</p>
+                                <ButtonLoading loading={false} variant="destructive" size="icon">
+                                    <X />
+                                </ButtonLoading>
+                            </Flex>
+                        }
+                        <Flex justify="between">
+                            <p>Transférer la conversation</p>
+                            <AdvisorsList threadId={id} userRole={session.user.role} />
+                        </Flex>
+                    </>
+                )}
             </DialogContent>
-        </Dialog>
+        </Dialog >
     )
 }
 
-const AdvisorsList = ({ threadId }: { threadId: ThreadId }) => {
+const AdvisorsList = ({ threadId, userRole }: { threadId: ThreadId, userRole?: "conseiller" | "directeur" }) => {
     const router = useRouter()
     const { data: session } = useSession()
     const query = useQuery(advisorEndpoint.users.getAll({ role: "conseiller" }))

@@ -29,7 +29,7 @@ export default function ClientsThreadsPage() {
                         <ThreadCard
                             thread={thread}
                             key={thread.id}
-                            onClick={() => router.push(`/admin/threads/${thread.id}`)}
+                            onClick={() => router.push(`/director/threads/${thread.id}`)}
                         />
                     ))}
                 </div>
