@@ -1,0 +1,109 @@
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { MongoClient } from "../../MongoClient";
+import { UserEntity } from "@domain/entities/UserEntity";
+import { Email } from "@domain/values/Email";
+import { UserModel } from "../models/UserModel";
+
+// TODO: finish function
+export class UserRepositoryMongo implements UserRepository {
+    constructor(private readonly client: MongoClient) {}
+
+    async findById(id: UserEntity["id"]): Promise<UserEntity | null> {
+        await this.client.connect();
+                        
+        const doc = await UserModel.findOne({ _id: id }).lean();
+        if (!doc) return null;
+
+        const email = Email.create(doc.email);
+        if (email instanceof Error) throw email;
+
+        return UserEntity.from({
+            id: doc._id.toString(),
+            firstname: doc.firstname,
+            lastname: doc.lastname,
+            email: email,
+            passwordHash: doc.passwordHash,
+            role: doc.role,
+            isActiveField: doc.isActiveField,
+            createdAt: doc.createdAt,
+            confirmedAt: doc.confirmedAt ?? null,
+            modifiedAt: doc.modifiedAt ?? null,
+            advisorId: doc.advisorId ?? null
+        });
+    }
+
+    async findByEmail(email: Email): Promise<UserEntity | null> {
+        await this.client.connect();
+                        
+        const doc = await UserModel.findOne({ email: email }).lean();
+        if (!doc) return null;
+
+        return UserEntity.from({
+            id: doc._id.toString(),
+            firstname: doc.firstname,
+            lastname: doc.lastname,
+            email: email,
+            passwordHash: doc.passwordHash,
+            role: doc.role,
+            isActiveField: doc.isActiveField,
+            createdAt: doc.createdAt,
+            confirmedAt: doc.confirmedAt ?? null,
+            modifiedAt: doc.modifiedAt ?? null,
+            advisorId: doc.advisorId ?? null
+        });
+    }
+
+    async findAll(): Promise<UserEntity[]> {
+        await this.client.connect();
+        
+        const docs = await UserModel.find().lean();
+        
+        return docs.map((doc) => {
+            const email = Email.create(doc.email);
+            if (email instanceof Error) throw email;
+
+            return UserEntity.from({
+                id: doc._id.toString(),
+                firstname: doc.firstname,
+                lastname: doc.lastname,
+                email: email,
+                passwordHash: doc.passwordHash,
+                role: doc.role,
+                isActiveField: doc.isActiveField,
+                createdAt: doc.createdAt,
+                confirmedAt: doc.confirmedAt ?? null,
+                modifiedAt: doc.modifiedAt ?? null,
+                advisorId: doc.advisorId ?? null
+            });
+        })
+    }
+
+    async findAllByRoleAndIsActif(
+        role?: UserEntity["role"]
+    ): Promise<UserEntity[]> {}
+
+    async save(user: UserEntity): Promise<void> {
+        await this.client.connect();
+                        
+        await UserModel.create({
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            passwordHash: user.passwordHash,
+            role: user.role,
+            isActiveField: user.isActiveField,
+            createdAt: user.createdAt,
+            confirmedAt: user.confirmedAt ?? null,
+            modifiedAt: user.modifiedAt ?? null,
+            advisorId: user.advisorId ?? null
+        } as any);
+    }
+
+    async update(user: UserEntity): Promise<void> {}
+
+    async delete(id: UserEntity["id"]): Promise<void> {
+        await this.client.connect();
+                        
+        await UserModel.deleteOne({ _id: id });
+    }
+}

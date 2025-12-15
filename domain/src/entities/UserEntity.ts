@@ -1,5 +1,6 @@
 import { Email } from "@domain/values/Email";
 
+// TODO : modifiedAt -> updatedAt
 export class UserEntity {
   private constructor(
     public id: string,
