@@ -1,21 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
-import { User } from '@infrastructure/types/user';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/users/[userId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-
-    const { searchParams } = new URL(req.url);
-    const role = searchParams.getAll('role')[0] as User['role'] | undefined;
-    const result = await usersFactory().getUsersByRole.execute({
-      userId: session.user.id,
-      role,
+    const { userId } = await ctx.params;
+    if (!userId) {
+      return NextResponse.json({ message: 'Missing userId' }, { status: 400 });
+    }
+    const result = await usersFactory().getUser.execute({
+      clientId: userId,
+      advisorId: session.user.id,
     });
     if (result instanceof Error) {
       return NextResponse.json(
