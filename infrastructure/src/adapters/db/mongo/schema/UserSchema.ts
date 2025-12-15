@@ -10,7 +10,6 @@ export const UserSchema = new Schema<UserInterface>(
     role: { type: String, enum: ["client", "conseiller", "directeur"], required: true },
     isActiveField: {type: Boolean, required: true},
     confirmedAt: { type: Date, required: false },
-    modifiedAt: { type: Date, required: false },
     advisorId: { type: String, required: false }
   },
   {
