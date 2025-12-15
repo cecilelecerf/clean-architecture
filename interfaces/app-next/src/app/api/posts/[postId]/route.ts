@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../../auth/[...nextauth]/route';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/client/posts/[postId]'>) {
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/posts/[postId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/client/posts
 
     const { postId } = await ctx.params;
 
-    const result = await postsFactory().client.clientFindPostByIdWithTags.execute({
+    const result = await postsFactory().getPostByIdWithTags.execute({
       userId: session.user.id,
       id: postId,
     });

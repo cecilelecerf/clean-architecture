@@ -4,7 +4,7 @@ import { tagSchema } from '@infrastructure/types/feed';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/advisor/tags/[tagId]'>) {
+export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/tags/[tagId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -34,7 +34,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/advisor/ta
     );
   }
 }
-export async function DELETE(req: NextRequest, ctx: RouteContext<'/api/advisor/tags/[tagId]'>) {
+export async function DELETE(req: NextRequest, ctx: RouteContext<'/api/tags/[tagId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });

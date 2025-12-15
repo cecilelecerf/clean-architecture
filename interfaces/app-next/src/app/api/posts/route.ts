@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { querySchema } from '@/utils/endpoint/client/feedsEndpoint';
 import { newPostSchema } from '@/utils/endpoint/advisor/feedsEndpoint';
 import { postSchema } from '@infrastructure/types/feed';
 import z from 'zod';
-import { querySchema } from '@/utils/endpoint/client/feedsEndpoint';
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,21 +15,18 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-
     const paramsObj: Record<string, string | boolean | number> = {};
     searchParams.forEach((val, key) => {
-      if (key === 'status') return (paramsObj[key] = val === 'true');
       if (key === 'limit' || key === 'page') return (paramsObj[key] = Number(val));
       paramsObj[key] = val;
     });
     const parsed = querySchema.parse(paramsObj);
-    const result = await postsFactory().admin.adminFindPostWithFilter.execute({
+    const result = await postsFactory().getPostWithFilter.execute({
       page: parsed.page,
       limit: parsed.limit,
       tagsId: parsed.tagsId,
-      status: parsed.status,
       title: parsed.title,
-      administratorId: session.user.id,
+      userId: session.user.id,
       fromDate: parsed.fromDate && new Date(parsed.fromDate),
       toDate: parsed.toDate && new Date(parsed.toDate),
     });
@@ -57,7 +54,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const payload = newPostSchema.parse(body);
 
-    const result = await postsFactory().admin.addPost.execute({
+    const result = await postsFactory().addPost.execute({
       advisorId: session.user.id,
       title: payload.title,
       content: payload.content,

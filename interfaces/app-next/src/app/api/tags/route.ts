@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { tagsFactory } from '@infrastructure/adapters/db/mysql/factories/tags';
 import { getServerSession } from 'next-auth';
 import { tagSchema } from '@infrastructure/types/feed';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '../auth/[...nextauth]/route';
 import { newTagSchema } from '@/utils/endpoint/advisor/feedsEndpoint';
 
 export async function GET() {
