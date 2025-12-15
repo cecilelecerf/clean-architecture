@@ -13,6 +13,7 @@ import { AccountRepositoryMySQL } from "@infrastructure/adapters/db/mysql/reposi
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { TransactionRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/TransactionRepositoryMySQL";
 import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
+import { Color } from "@domain/values/Color";
 
 export async function seedSQLClient(
   mysqlClient: MySQLClient,
@@ -79,10 +80,15 @@ export async function seedSQLClient(
           );
           continue;
         }
+
+        const color = Color.from(rawAccount.color);
+          if (color instanceof Error) continue;
+
         const account = AccountEntity.from({
           ...rawAccount,
           iban,
           createdAt: clockService.now(),
+          color,
           userId: user.id,
           balance: Money.from({
             amount: rawAccount.balance,
