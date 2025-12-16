@@ -4,12 +4,7 @@ import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/reposit
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { MessageRepositoryMySQL } from "../repositories/MessageRepositoryMySQL";
-import { LeaveThreadUsecase } from "@application/usecases/threads/LeaveThreadUsecase";
-import { AdvisorGetAllThreadUsecase } from "@application/usecases/threads/administrators/advisors/AdvisorGetAllThreadUsecase";
-import { ClientGetAllThreadUsecase } from "@application/usecases/threads/clients/ClientGetAllThreadUsecase";
-import { FindThreadWithUserUsecase } from "@application/usecases/threads/administrators/advisors/FindThreadWithUserUsecase";
-import { AdvisorJoinExternalThread } from "@application/usecases/threads/administrators/advisors/AdvisorJoinExternalThread";
-import { AdvisorGetAllThreadByClientUsecase } from "@application/usecases/threads/administrators/advisors/AdvisorGetAllThreadByClientUsecase";
+import { LeaveThreadUsecase } from "@application/usecases/threads/LeaveThreadUsecase"; 
 import { StartExternalThreadUsecase } from "@application/usecases/threads/StartExternalThreadUsecase";
 import { AddParticipantUsecase } from "@application/usecases/threads/admin/AddParticipantUsecase";
 import { CloseThreadUsecase } from "@application/usecases/threads/admin/CloseThreadUsecase";
@@ -17,6 +12,9 @@ import { RemoveParticipantUsecase } from "@application/usecases/threads/admin/Re
 import { StartInternalThreadUsecase } from "@application/usecases/threads/StartInternalThreadUsecase";
 import { TransferThreadUsecase } from "@application/usecases/threads/admin/TransferThreadUsecase";
 import { UpdateThreadTitleUsecase } from "@application/usecases/threads/admin/UpdateThreadTitleUsecase";
+import { GetAdvisorThreadsUsecase } from "@application/usecases/threads/GetAdvisorThreadsUsecase"; 
+import { GetExternalThreadsByUserUsecase } from "@application/usecases/threads/GetExternalThreadsByUserUsecase";
+import { AdminJoinThreadUsecase } from "@application/usecases/threads/admin/AdminJoinThreadUsecase";
 export const threadsFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);
@@ -37,15 +35,7 @@ export const threadsFactory = () => {
     threadRepository,
     clockService
   );
-  const advisorGetAllThread = new AdvisorGetAllThreadUsecase(
-    threadRepository,
-    userRepository
-  );
-  const advisorGetAllByClientThread = new AdvisorGetAllThreadByClientUsecase(
-    threadRepository,
-    userRepository
-  );
-  const clientGetAllThread = new ClientGetAllThreadUsecase(
+  const advisorGetAllThread = new GetAdvisorThreadsUsecase(
     threadRepository,
     userRepository
   );
@@ -54,7 +44,7 @@ export const threadsFactory = () => {
     threadRepository,
     clockService
   );
-  const findThreadWithUser = new FindThreadWithUserUsecase(
+  const getExternalByUser = new GetExternalThreadsByUserUsecase(
     threadRepository,
     userRepository
   );
@@ -84,7 +74,7 @@ export const threadsFactory = () => {
     threadRepository,
     clockService
   );
-  const advisorJoinExternalThread = new AdvisorJoinExternalThread(
+  const adminJoinThread = new AdminJoinThreadUsecase(
     threadRepository,
     userRepository
   );
@@ -92,16 +82,14 @@ export const threadsFactory = () => {
   return {
     startExternalThread,
     addParticipant,
-    advisorGetAllThread,
-    clientGetAllThread,
-    closeThread,
-    findThreadWithUser,
+    advisorGetAllThread, 
+    closeThread, 
+    getExternalByUser,
     leaveThread,
     removeParticipant,
     startInternalThread,
     transferThread,
     updateThreadTitle,
-    advisorJoinExternalThread,
-    advisorGetAllByClientThread,
+    adminJoinThread, 
   };
 };

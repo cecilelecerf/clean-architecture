@@ -22,7 +22,7 @@ export class GetAdvisorThreadsUsecase {
     const user = await findActiveUser(this.userRepository, administratorId);
     if (user instanceof Error) return user;
     const administratorThread =
-      await this.threadRepository.findAllWithUserByAdministratorId(user.id);
+      await this.threadRepository.findAllWithUserByAdministratorIdAndType(user.id, "external");
     const nullableAdministratorThread =
       await this.threadRepository.findAllWithUserByAdministratorNullable();
     const threads: ThreadEntityWithUsers[] = [

@@ -10,7 +10,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/threads/[th
     }
     const { threadId } = await ctx.params;
 
-    const thread = await threadsFactory().advisorJoinExternalThread.execute({
+    const thread = await threadsFactory().adminJoinThread.execute({
       threadId: threadId,
       advisorId: session.user.id,
     });

@@ -129,7 +129,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
         })
     }
 
-    async findAllExternalThreadWithUserByUserId(
+    async findAllWithUserByParticipantIdAndType(
         participantId: string
     ): Promise<ThreadEntityWithUsers[]> {
         await this.client.connect();
@@ -279,7 +279,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
         return Object.assign(thread, { administrator, participants });
     }
 
-    async findAllWithUserByAdministratorId(
+    async findAllWithUserByAdministratorIdAndType(
         administratorId: UserEntity["id"]
     ): Promise<ThreadEntityWithUsers[]> {
         await this.client.connect();

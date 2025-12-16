@@ -187,8 +187,10 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
   /**
    * Récupère les threads ouverts pour un participant donné avec les informations de l'administrateur
    */
-  async findAllExternalThreadWithUserByUserId(
-    participantId: string
+  async findAllWithUserByParticipantIdAndType(
+    participantId: string,
+        type: ThreadEntity["type"]
+
   ): Promise<ThreadEntityWithUsers[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `
@@ -215,11 +217,10 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     LEFT JOIN users admin ON t.administrator_id = admin.id
     LEFT JOIN thread_participant tp ON t.id = tp.thread_id
     LEFT JOIN users p ON tp.user_id = p.id
-    WHERE t.is_close = 0
-      AND (tp.user_id = ? OR t.administrator_id = ?)
+    WHERE t.is_close = 0 AND tp.user_id = ? AND t.type = ?
     ORDER BY t.updated_at DESC, t.created_at DESC
     `,
-      [participantId, participantId]
+      [participantId, type]
     );
     const map = new Map<number, ThreadEntityWithUsers>();
 
@@ -364,8 +365,9 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     return Object.assign(thread, { administrator, participants });
   }
 
-  async findAllWithUserByAdministratorId(
-    administratorId: UserEntity["id"]
+  async findAllWithUserByAdministratorIdAndType(
+    administratorId: UserEntity["id"],
+    type: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT t.*, 
@@ -389,9 +391,9 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     JOIN users admin ON t.administrator_id = admin.id
     JOIN thread_participant tp ON t.id = tp.thread_id
     JOIN users p ON tp.user_id = p.id AND p.is_active = 1 AND p.confirmed_at IS NOT NULL
-    WHERE t.administrator_id = ?
+    WHERE t.administrator_id = ? AND t.type = ?
     `,
-      [administratorId]
+      [administratorId, type]
     );
 
     const threadsMap = new Map<string, ThreadEntityWithUsers>();
