@@ -9,7 +9,7 @@ import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 type Props = { advisorId: UserEntity["id"]; clientId: UserEntity["id"] };
 
-export class AdvisorGetAllThreadByClientUsecase {
+export class GetClientThreadsUsecase {
   constructor(
     private readonly threadRepository: ThreadRepository,
     private readonly userRepository: UserRepository

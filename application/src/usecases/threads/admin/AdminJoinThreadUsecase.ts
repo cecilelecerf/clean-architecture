@@ -5,10 +5,10 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { ThreadAlreadyHasAdvisorError,ThreadNotActiveError } from "@domain/errors/thread";
+import { InvalidThreadTypeError, ThreadAlreadyHasAdvisorError,ThreadNotActiveError } from "@domain/errors/thread";
  type Props = { advisorId: UserEntity["id"]; threadId: UserEntity["id"] };
 
-export class AdvisorJoinExternalThread {
+export class AdminJoinThreadUsecase {
   constructor(
     private readonly threadRepository: ThreadRepository,
     private readonly userRepository: UserRepository
@@ -23,14 +23,14 @@ export class AdvisorJoinExternalThread {
     | ThreadNotFoundError
     | UserRoleMismatchError
     | ThreadNotActiveError
-    | ThreadAlreadyHasAdvisorError
+    | ThreadAlreadyHasAdvisorError|InvalidThreadTypeError
   > {
     const advisor = await findActiveUser(this.userRepository, advisorId);
     if (advisor instanceof Error) return advisor;
 
     const thread = await this.threadRepository.findById(threadId);
     if (!thread) return new ThreadNotFoundError();
-
+ 
     if (!advisor.hasRole({ role: "conseiller" }))
       return new UserRoleMismatchError(["conseiller"], advisor.role);
 

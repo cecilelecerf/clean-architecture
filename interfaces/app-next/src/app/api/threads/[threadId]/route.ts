@@ -6,7 +6,7 @@ import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/thre
 // GET PATCH DELETE
 export async function GET(
   req: NextRequest,
-  ctx: RouteContext<'/api/advisor/client-threads/[threadId]'>,
+  ctx: RouteContext<'/api/threads/[threadId]'>,
 ) {
   try {
     const session = await getServerSession(authOptions);

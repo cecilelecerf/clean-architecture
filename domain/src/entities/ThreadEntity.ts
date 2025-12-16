@@ -1,5 +1,6 @@
  import { AdministratorCannotLeaveThreadError, InvalidThreadAccessError, InvalidTitleError, ThreadAlreadyHasAdvisorError, ThreadClosedError, ThreadNotActiveError, ThreadParticipantAlreadyExistError, ThreadTransferToSameAdministratorError } from "@domain/errors/thread";
 import { UserEntity } from "./UserEntity"; 
+import { InvalidThreadTypeError } from "@domain/errors/thread";
 
 export class ThreadEntity {
   private constructor(
@@ -169,7 +170,7 @@ export class ThreadEntity {
   }
   private ensureCanAssignAdvisorInExternal():
     | ThreadNotActiveError
-    | ThreadAlreadyHasAdvisorError
+    | ThreadAlreadyHasAdvisorError|InvalidThreadTypeError
     | void {
     if (this.isClose) {
       return new ThreadNotActiveError("Le thread n'est plus actif.");
@@ -180,6 +181,7 @@ export class ThreadEntity {
         "Ce thread a déjà un conseiller."
       );
     }
+    if(this.type!=="external") return new InvalidThreadTypeError(this.id, this.type, "external")
   }
 
   public assignAdvisor(

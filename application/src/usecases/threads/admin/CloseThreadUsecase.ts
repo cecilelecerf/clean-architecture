@@ -36,7 +36,7 @@ export class CloseThreadUsecase {
 
     thread.close(this.clockService.now());
 
-    this.threadRepository.save(thread);
+    this.threadRepository.update(thread);
     return thread;
   }
 }
