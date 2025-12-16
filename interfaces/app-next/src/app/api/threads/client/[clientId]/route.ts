@@ -11,9 +11,10 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/threads/clie
     }
     const { clientId } = await ctx.params;
 
-    const result = await threadsFactory().advisorGetAllByClientThread.execute({
-      clientId,
-      advisorId: session.user.id,
+    const result = await threadsFactory().getThreadsByUserAndTypeUsecase.execute({
+    userId:  clientId,
+    type: "external",
+    advisorId: session.user.id,
     });
     if (result instanceof Error) {
       return NextResponse.json(

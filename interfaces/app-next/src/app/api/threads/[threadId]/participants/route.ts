@@ -1,2 +1,0 @@
-// POST
-// ajouter un participant

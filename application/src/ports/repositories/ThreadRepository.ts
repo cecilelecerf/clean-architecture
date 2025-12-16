@@ -22,11 +22,11 @@ export interface ThreadRepository {
   ): Promise<ThreadEntityWithUsers | null>;
   findAllWithUserByAdministratorIdAndType(
     administratorId: UserEntity["id"],
-    type : ThreadEntity["type"]
+    type ?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]>;
   findAllWithUserByAdministratorNullable(): Promise<ThreadEntityWithUsers[]>;
   findAllWithUserByParticipantIdAndType(
-    participantId: UserEntity["id"],    type : ThreadEntity["type"]
+    participantId: UserEntity["id"],    type ?: ThreadEntity["type"]
 
   ): Promise<ThreadEntityWithUsers[]>;
 }

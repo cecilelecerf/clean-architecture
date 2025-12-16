@@ -189,9 +189,19 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
    */
   async findAllWithUserByParticipantIdAndType(
     participantId: string,
-        type: ThreadEntity["type"]
+        type?: ThreadEntity["type"]
 
   ): Promise<ThreadEntityWithUsers[]> {
+
+      const conditions = ["t.administrator_id = ?"];
+  const params: any[] = [participantId];
+
+  if (type) {
+    conditions.push("t.type = ?");
+    params.push(type);
+  }
+
+  const whereClause = conditions.join(" AND ");
     const rows = await this.client.query<RowDataPacket[]>(
       `
     SELECT 
@@ -217,7 +227,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     LEFT JOIN users admin ON t.administrator_id = admin.id
     LEFT JOIN thread_participant tp ON t.id = tp.thread_id
     LEFT JOIN users p ON tp.user_id = p.id
-    WHERE t.is_close = 0 AND tp.user_id = ? AND t.type = ?
+    WHERE ${whereClause} 
     ORDER BY t.updated_at DESC, t.created_at DESC
     `,
       [participantId, type]
@@ -367,8 +377,17 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
 
   async findAllWithUserByAdministratorIdAndType(
     administratorId: UserEntity["id"],
-    type: ThreadEntity["type"]
+    type?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]> {
+      const conditions = ["t.administrator_id = ?"];
+  const params: any[] = [administratorId];
+
+  if (type) {
+    conditions.push("t.type = ?");
+    params.push(type);
+  }
+
+  const whereClause = conditions.join(" AND ");
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT t.*, 
           admin.id as admin_id,
@@ -391,9 +410,10 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     JOIN users admin ON t.administrator_id = admin.id
     JOIN thread_participant tp ON t.id = tp.thread_id
     JOIN users p ON tp.user_id = p.id AND p.is_active = 1 AND p.confirmed_at IS NOT NULL
-    WHERE t.administrator_id = ? AND t.type = ?
-    `,
-      [administratorId, type]
+    WHERE ${whereClause}
+    ORDER BY t.created_at DESC`
+    ,
+      
     );
 
     const threadsMap = new Map<string, ThreadEntityWithUsers>();
@@ -451,6 +471,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
   async findAllWithUserByAdministratorNullable(): Promise<
     ThreadEntityWithUsers[]
   > {
+    
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT t.*,
       p.id as participant_id,

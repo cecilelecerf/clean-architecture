@@ -13,8 +13,9 @@ import { StartInternalThreadUsecase } from "@application/usecases/threads/StartI
 import { TransferThreadUsecase } from "@application/usecases/threads/admin/TransferThreadUsecase";
 import { UpdateThreadTitleUsecase } from "@application/usecases/threads/admin/UpdateThreadTitleUsecase";
 import { GetAdvisorThreadsUsecase } from "@application/usecases/threads/GetAdvisorThreadsUsecase"; 
-import { GetExternalThreadsByUserUsecase } from "@application/usecases/threads/GetExternalThreadsByUserUsecase";
-import { AdminJoinThreadUsecase } from "@application/usecases/threads/admin/AdminJoinThreadUsecase";
+ import { AdminJoinThreadUsecase } from "@application/usecases/threads/admin/AdminJoinThreadUsecase";
+import { GetThreadsByUserAndTypeUsecase } from "@application/usecases/threads/GetThreadsByUserAndTypeUsecase";
+import { GetThreadByIdUsecase } from "@application/usecases/threads/GetThreadByIdUsecase";
 export const threadsFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);
@@ -30,6 +31,13 @@ export const threadsFactory = () => {
     uuidService,
     clockService
   );
+
+  const startInternalThread = new StartInternalThreadUsecase(
+    threadRepository,
+    userRepository,
+    uuidService,
+    clockService
+  );
   const addParticipant = new AddParticipantUsecase(
     userRepository,
     threadRepository,
@@ -39,15 +47,17 @@ export const threadsFactory = () => {
     threadRepository,
     userRepository
   );
+    const getThreadsByUserAndTypeUsecase = new GetThreadsByUserAndTypeUsecase(
+    threadRepository,
+    userRepository
+  );
+  const getThreadById = new GetThreadByIdUsecase(threadRepository, userRepository)
   const closeThread = new CloseThreadUsecase(
     userRepository,
     threadRepository,
     clockService
   );
-  const getExternalByUser = new GetExternalThreadsByUserUsecase(
-    threadRepository,
-    userRepository
-  );
+
   const leaveThread = new LeaveThreadUsecase(
     userRepository,
     threadRepository,
@@ -56,12 +66,6 @@ export const threadsFactory = () => {
   const removeParticipant = new RemoveParticipantUsecase(
     userRepository,
     threadRepository,
-    clockService
-  );
-  const startInternalThread = new StartInternalThreadUsecase(
-    threadRepository,
-    userRepository,
-    uuidService,
     clockService
   );
   const transferThread = new TransferThreadUsecase(
@@ -84,12 +88,13 @@ export const threadsFactory = () => {
     addParticipant,
     advisorGetAllThread, 
     closeThread, 
-    getExternalByUser,
+    getThreadsByUserAndTypeUsecase,
     leaveThread,
     removeParticipant,
     startInternalThread,
     transferThread,
     updateThreadTitle,
     adminJoinThread, 
+    getThreadById
   };
 };
