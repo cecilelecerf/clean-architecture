@@ -17,7 +17,7 @@ export async function PATCH(
     const body = await req.json();
     const payload = z.object({ advisor: userIdSchema }).parse(body);
 
-    const thread = await threadsFactory().advisors.transferThread.execute({
+    const thread = await threadsFactory().transferThread.execute({
       id: threadId,
       administratorId: session.user.id,
       newAdministratorId: payload.advisor,

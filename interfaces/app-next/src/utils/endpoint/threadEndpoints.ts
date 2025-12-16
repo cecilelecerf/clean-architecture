@@ -1,5 +1,5 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
-import {  get, patch, post } from '@/lib/apiClient';
+import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import { Thread, ThreadId, threadSchema } from '@infrastructure/types/thread';
 import { userDtoSchema, UserId } from '@infrastructure/types/user';
 import { messageWithUserSchema } from '@infrastructure/types/message';
@@ -33,15 +33,15 @@ export type ThreadWithAdminOnly = z.infer<typeof threadWithAdminOnlySchema>;
 export const threadsEndpoint = createEndpointsNodes({
   // GET /api/threads
   // Liste des threads selon le rôle + filtres optionnels
-  getAll: ({type}: {type?: Thread["type"]} ) =>
+  getAll: ({ type }: { type?: Thread['type'] }) =>
     queryOptions({
       queryKey: ['threads', 'list', type],
       queryFn: () => {
         const params = new URLSearchParams();
-        if (type) params.set('type',type);
-         
+        if (type) params.set('type', type);
+
         return get(`/threads?${params.toString()}`).then((data) =>
-          safeParseWithLog(threadWithUserSchema.array(), data)
+          safeParseWithLog(threadWithUserSchema.array(), data),
         );
       },
     }),
@@ -52,9 +52,7 @@ export const threadsEndpoint = createEndpointsNodes({
     queryOptions({
       queryKey: ['threads', threadId],
       queryFn: () =>
-        get(`/threads/${threadId}`).then((data) =>
-          safeParseWithLog(threadWithUserSchema, data)
-        ),
+        get(`/threads/${threadId}`).then((data) => safeParseWithLog(threadWithUserSchema, data)),
     }),
 
   // GET /api/threads/user/:userId
@@ -64,7 +62,7 @@ export const threadsEndpoint = createEndpointsNodes({
       queryKey: ['threads', 'client', userId],
       queryFn: () =>
         get(`/threads/user/${userId}`).then((data) =>
-          safeParseWithLog(threadWithAdminOnlySchema.array(), data)
+          safeParseWithLog(threadWithAdminOnlySchema.array(), data),
         ),
     }),
 
@@ -75,23 +73,23 @@ export const threadsEndpoint = createEndpointsNodes({
       queryKey: ['threads', 'client', clientId],
       queryFn: () =>
         get(`/threads/client/${clientId}/client`).then((data) =>
-          safeParseWithLog(threadWithAdminOnlySchema.array(), data)
+          safeParseWithLog(threadWithAdminOnlySchema.array(), data),
         ),
     }),
 
   // POST /api/threads
   // Créer un nouveau thread (externe ou interne)
-  create: ({type}:{type: Thread["type"]}) =>
+  create: ({ type }: { type: Thread['type'] }) =>
     mutationOptions({
-      mutationFn: (data: NewThread) =>{
+      mutationFn: (data: NewThread) => {
         const params = new URLSearchParams();
-        if (type) params.set('type', type); 
-        
+        if (type) params.set('type', type);
+
         return post(`/threads?${params.toString()}`, data).then((data) =>
-          safeParseWithLog(threadSchema, data)
+          safeParseWithLog(threadSchema, data),
         );
       },
-       onSuccess: () => {
+      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['threads', 'list', type] });
       },
     }),
@@ -100,14 +98,12 @@ export const threadsEndpoint = createEndpointsNodes({
   // Modifier un thread (titre, etc.)
   update: ({ threadId }: { threadId: ThreadId }) =>
     mutationOptions({
-      mutationFn: (data: { title?: string }) =>
-        patch(`/threads/${threadId}`, data),
+      mutationFn: (data: { title?: string }) => patch(`/threads/${threadId}`, data),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['threads', threadId] });
         queryClient.invalidateQueries({ queryKey: ['threads', 'list'] });
       },
     }),
-
 
   // POST /api/threads/:threadId/close
   // Fermer un thread
@@ -146,7 +142,7 @@ export const threadsEndpoint = createEndpointsNodes({
   // ============================================================================
   // MESSAGES
   // ============================================================================
-  
+
   messages: {
     // GET /api/threads/:threadId/messages
     // Liste des messages d'un thread
@@ -155,7 +151,7 @@ export const threadsEndpoint = createEndpointsNodes({
         queryKey: ['threads', threadId, 'messages'],
         queryFn: () =>
           get(`/threads/${threadId}/messages`).then((data) =>
-            safeParseWithLog(messageWithUserSchema.array(), data)
+            safeParseWithLog(messageWithUserSchema.array(), data),
           ),
       }),
 
@@ -163,8 +159,7 @@ export const threadsEndpoint = createEndpointsNodes({
     // Envoyer un message dans un thread
     send: ({ threadId }: { threadId: ThreadId }) =>
       mutationOptions({
-        mutationFn: (data: { content: string }) =>
-          post(`/threads/${threadId}/messages`, data),
+        mutationFn: (data: { content: string }) => post(`/threads/${threadId}/messages`, data),
         onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: ['threads', threadId, 'messages'],
@@ -173,6 +168,38 @@ export const threadsEndpoint = createEndpointsNodes({
           queryClient.invalidateQueries({
             queryKey: ['threads', 'list'],
           });
+        },
+      }),
+  },
+
+  // ============================================================================
+  // MESSAGES
+  // ============================================================================
+
+  participants: {
+    // DELETE /api/threads/:threadId/participants/:userId
+    // Supprtion d'un participant
+    remove: ({ threadId }: { threadId: ThreadId }) =>
+      mutationOptions({
+        mutationFn: ({ userId }: { userId: UserId }) =>
+          deleteEntity(`/threads/${threadId}/participants/${userId}`).then((data) =>
+            safeParseWithLog(threadSchema, data),
+          ),
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['threads', threadId] });
+        },
+      }),
+
+    // POST /api/threads/:threadId/messages
+    // Envoyer un message dans un thread
+    add: ({ threadId }: { threadId: ThreadId }) =>
+      mutationOptions({
+        mutationFn: ({ userId }: { userId: UserId }) =>
+          post(`/threads/${threadId}/participants/${userId}`, {}).then((data) =>
+            safeParseWithLog(threadSchema, data),
+          ),
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['threads', threadId] });
         },
       }),
   },

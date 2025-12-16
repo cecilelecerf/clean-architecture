@@ -6,23 +6,21 @@ import { useQueries } from '@tanstack/react-query';
 import { match } from 'ts-pattern';
 import { useEffect, useRef, useState } from 'react';
 import { socket } from '@/lib/socket';
-import { Button } from '@/components/ui/button';
 import { UserDto } from '@infrastructure/types/user';
 import { MessageWithUser } from '@infrastructure/types/message';
-import { advisorEndpoint } from '@/utils/endpoint/advisor';
-import { useRouter } from 'next/navigation';
 import { MessageComponent } from '@/components/threads/Message';
-import { ThreadWithUser } from '@/utils/endpoint/client/threadEndpoints';
 import { Flex } from '@radix-ui/themes';
 import { PostMessage } from '@/components/threads/PostMessage';
 import { Settings } from './Settings';
+import { endpoints } from '@/utils/endpoint';
+import { ThreadWithUser } from '@/utils/endpoint/threadEndpoints';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
     const queries = useQueries({
         queries: [
-            advisorEndpoint.thread.client.get({ id: threadId }),
-            advisorEndpoint.thread.messages.getAll({ id: threadId })
+            endpoints.threads.get({ threadId }),
+            endpoints.threads.messages.getAll({ threadId })
         ]
     })
 

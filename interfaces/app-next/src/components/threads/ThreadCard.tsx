@@ -1,5 +1,5 @@
+import { ThreadWithUser } from "@/utils/endpoint/threadEndpoints";
 import { Card } from "../ui/card";
-import { ThreadWithUser } from "@/utils/endpoint/client/threadEndpoints";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 
 type Props = { thread: ThreadWithUser, onClick: () => void }

@@ -13,7 +13,7 @@ import { match } from "ts-pattern"
 export const UserThread = ({ userId }: { userId: UserId }) => {
     const { data: session } = useSession()
     const router = useRouter()
-    const query = useQuery(endpoints.threads.getAll({ userId }))
+    const query = useQuery(endpoints.threads.getByUser({ userId }))
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: 'pending' }, () => "pendign")

@@ -58,13 +58,13 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       `SELECT user_id FROM thread_participant WHERE thread_id = ?`,
       [thread.id]
     );
-     const existingParticipantIds = existingParticipantRows.map(
+    const existingParticipantIds = existingParticipantRows.map(
       (r) => r.user_id
     );
-     const participantsToAdd = thread.participantsId.filter(
+    const participantsToAdd = thread.participantsId.filter(
       (id) => !existingParticipantIds.includes(id)
     );
-     for (const participantId of participantsToAdd) {
+    for (const participantId of participantsToAdd) {
       await this.client.query<ResultSetHeader>(
         `INSERT INTO thread_participant (thread_id, user_id) VALUES (?, ?)`,
         [thread.id, participantId]
@@ -186,19 +186,17 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
    */
   async findAllWithUserByParticipantIdAndType(
     participantId: string,
-        type?: ThreadEntity["type"]
-
+    type?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]> {
+    const conditions = ["tp.user_id = ?"];
+    const params: any[] = [participantId];
 
-      const conditions = ["tp.user_id = ?"];
-  const params: any[] = [participantId];
+    if (type) {
+      conditions.push("t.type = ?");
+      params.push(type);
+    }
 
-  if (type) {
-    conditions.push("t.type = ?");
-    params.push(type);
-  }
-
-  const whereClause = conditions.join(" AND ");
+    const whereClause = conditions.join(" AND ");
     const rows = await this.client.query<RowDataPacket[]>(
       `
     SELECT 
@@ -211,7 +209,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       admin.created_at AS admin_created_at,
       admin.is_active AS admin_is_active,
       admin.password_hash AS admin_password_hash,
-      admin.modified_at AS admin_modified_at,
+      admin.updated_at AS admin_updated_at,
       admin.confirmed_at AS admin_confirmed_at,
       p.id AS participant_id,
       p.firstname AS participant_firstname,
@@ -220,7 +218,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       p.role AS participant_role,
       p.created_at AS participant_created_at,
       p.is_active AS participant_is_active,
-      p.modified_at AS participant_modified_at,
+      p.updated_at AS participant_modified_at,
       p.confirmed_at AS participant_confirmed_at
     FROM threads t
     LEFT JOIN users admin ON t.administrator_id = admin.id
@@ -230,7 +228,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     ORDER BY t.updated_at DESC, t.created_at DESC
     `,
       params
-    ); 
+    );
     const map = new Map<string, ThreadEntityWithUsers>();
 
     for (const row of rows) {
@@ -247,7 +245,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
               role: row.admin_role,
               isActiveField: row.admin_is_active,
               createdAt: row.admin_created_at,
-              updatedAt: row.admin_modified_at,
+              updatedAt: row.admin_updated_at,
               confirmedAt: row.admin_confirmed_at,
             })
           : null;
@@ -258,7 +256,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           participantsId: [],
           title: row.title,
           createdAt: new Date(row.created_at),
-          updatedAt:new Date(row.updated_at) ,
+          updatedAt: new Date(row.updated_at),
           isClose: row.is_close === 1,
           type: row.type,
         });
@@ -339,7 +337,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       participantsId: [],
       title: threadRow.title,
       createdAt: new Date(threadRow.created_at),
-      updatedAt:new Date(threadRow.updated_at),
+      updatedAt: new Date(threadRow.updated_at),
       isClose: threadRow.is_close === 1,
       type: threadRow.type,
     });
@@ -381,14 +379,14 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     administratorId: UserEntity["id"],
     type?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]> {
-  const conditions = ["t.administrator_id = ?"];
-  const params: any[] = [administratorId];
-   if (type) {
-    conditions.push("t.type = ?");
-    params.push(type);
-  }
+    const conditions = ["t.administrator_id = ?"];
+    const params: any[] = [administratorId];
+    if (type) {
+      conditions.push("t.type = ?");
+      params.push(type);
+    }
 
-  const whereClause = conditions.join(" AND "); 
+    const whereClause = conditions.join(" AND ");
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT t.*, 
           admin.id as admin_id,
@@ -399,7 +397,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           admin.created_at as admin_created_at,
           admin.is_active as admin_is_active,
           admin.password_hash as admin_password_hash,
-          admin.modified_at AS admin_modified_at,
+          admin.updated_at AS admin_updated_at,
           admin.confirmed_at AS admin_confirmed_at,
           p.id as participant_id,
           p.firstname as participant_firstname,
@@ -409,18 +407,17 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           p.created_at as participant_created_at,
           p.is_active as participant_is_active,
           p.password_hash as participant_password_hash,
-          p.modified_at AS participant_modified_at,
+          p.updated_at AS participant_modified_at,
           p.confirmed_at AS participant_confirmed_at
     FROM threads t
     JOIN users admin ON t.administrator_id = admin.id
     JOIN thread_participant tp ON t.id = tp.thread_id
     JOIN users p ON tp.user_id = p.id AND p.is_active = 1 AND p.confirmed_at IS NOT NULL
     WHERE ${whereClause}
-    ORDER BY t.created_at DESC`
-    ,params
-      
+    ORDER BY t.created_at DESC`,
+      params
     );
-     const threadsMap = new Map<string, ThreadEntityWithUsers>();
+    const threadsMap = new Map<string, ThreadEntityWithUsers>();
 
     for (const row of rows) {
       if (!threadsMap.has(row.id)) {
@@ -430,7 +427,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           participantsId: [],
           title: row.title,
           createdAt: new Date(row.created_at),
-          updatedAt: new Date(row.updated_at) ,
+          updatedAt: new Date(row.updated_at),
           isClose: row.is_close === 1,
           type: row.type,
         }) as ThreadEntityWithUsers;
@@ -444,7 +441,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           createdAt: new Date(row.admin_created_at),
           isActiveField: row.admin_is_active === 1,
           passwordHash: row.admin_password_hash,
-          updatedAt: row.admin_modified_at,
+          updatedAt: row.admin_updated_at,
           confirmedAt: row.admin_confirmed_at,
         });
 
@@ -479,7 +476,6 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
   async findAllWithUserByAdministratorNullable(): Promise<
     ThreadEntityWithUsers[]
   > {
-    
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT t.*,
       p.id as participant_id,
@@ -490,7 +486,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       p.created_at as participant_created_at,
       p.is_active as participant_is_active,
       p.password_hash as participant_password_hash,
-      p.modified_at AS participant_modified_at,
+      p.updated_at AS participant_modified_at,
       p.confirmed_at AS participant_confirmed_at
       FROM threads t
       JOIN thread_participant tp ON t.id = tp.thread_id
@@ -509,7 +505,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           participantsId: [],
           title: row.title,
           createdAt: new Date(row.created_at),
-          updatedAt:new Date(row.updated_at),
+          updatedAt: new Date(row.updated_at),
           isClose: row.is_close === 1,
           type: row.type,
         }) as ThreadEntityWithUsers;
@@ -524,7 +520,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
               createdAt: new Date(row.admin_created_at),
               isActiveField: row.admin_is_active === 1,
               passwordHash: row.admin_password_hash,
-              updatedAt: row.admin_modified_at,
+              updatedAt: row.admin_updated_at,
               confirmedAt: row.admin_confirmed_at,
             })
           : null;

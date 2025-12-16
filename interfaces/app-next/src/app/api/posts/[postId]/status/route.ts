@@ -9,7 +9,7 @@ import {
   UserRoleMismatchError,
 } from '@application/errors/users';
 import { PostNotFoundError, InvalidPostAccessError } from '@application/errors/posts';
-import { publishActionSchema } from '@/utils/endpoint/advisor/feedsEndpoint';
+import { publishActionSchema } from '@/utils/endpoint/feedsEndpoint';
 
 export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/posts/[postId]/status'>) {
   try {
