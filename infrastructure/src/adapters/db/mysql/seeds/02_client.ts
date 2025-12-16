@@ -66,8 +66,8 @@ export async function seedSQLClient(
         role: "client",
         createdAt,
         isActiveField: true, 
-                                                updatedAt:   Math.random() < 0.3
-                                                        ? clockService.addDays(createdAt, rand(1, 10))
+                                   confirmedAt : confirmedAt ?? new Date(createdAt),   
+        updatedAt:   Math.random() < 0.3? clockService.addDays(createdAt, rand(1, 10))
                                                         :  clockService.nowMinusDays(rand(0, 60))
       });
       users.push(user);

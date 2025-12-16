@@ -62,6 +62,7 @@ export const feedsEndpoint = createEndpointsNodes({
             params.set('tagsId', filters.tagsId.join(','));
           if (filters.fromDate) params.set('fromDate', filters.fromDate);
           if (filters.toDate) params.set('toDate', filters.toDate);
+          if (filters.status !==undefined) params.set('status', String(filters.status));
           return get(`/posts?${params.toString()}`).then((data) =>
             safeParseWithLog(
               z.object({ posts: postWithTagsAndUserSchema.array(), total: z.number() }),

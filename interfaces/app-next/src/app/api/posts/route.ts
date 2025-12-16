@@ -17,9 +17,10 @@ export async function GET(req: NextRequest) {
     const paramsObj: Record<string, string | boolean | number> = {};
     searchParams.forEach((val, key) => {
       if (key === 'limit' || key === 'page') return (paramsObj[key] = Number(val));
+      if (key === 'status' ) return (paramsObj[key] =val ==="true");
       paramsObj[key] = val;
     });
-    const parsed = querySchema.parse(paramsObj);
+     const parsed = querySchema.parse(paramsObj);
     const result = await postsFactory().getPostWithFilter.execute({
       page: parsed.page,
       limit: parsed.limit,
@@ -28,6 +29,7 @@ export async function GET(req: NextRequest) {
       userId: session.user.id,
       fromDate: parsed.fromDate && new Date(parsed.fromDate),
       toDate: parsed.toDate && new Date(parsed.toDate),
+      status: parsed.status
     });
 
     if (result instanceof Error) {

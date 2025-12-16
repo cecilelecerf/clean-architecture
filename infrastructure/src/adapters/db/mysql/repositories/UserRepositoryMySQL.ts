@@ -80,7 +80,9 @@ export class UserRepositoryMySQL implements UserRepository {
       query += " AND role = ?";
       params.push(role);
     }
+    console.log(params)
     const rows = await this.client.query<RowDataPacket[]>(query, params);
+    console.log(rows)
     return rows.map((row) =>
       UserEntity.from({
         id: row.id,
