@@ -5,7 +5,7 @@ import { Money } from "@domain/values/Money";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { OrderRepositoryMySQL } from "../repositories/OrderRepositoryMySQL";
-import { pick } from "./utils";
+import { pick, rand } from "./utils";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 
@@ -48,7 +48,7 @@ export async function generateOrders(
                 console.warn("Utilisateur ou action manquant pour l'ordre");
                 continue;
             }
-                
+                const createdAt =  clockService.now()
             const order = OrderEntity.from({
                 id: uuidService.generate(),
                 userId: user.id,
@@ -59,7 +59,10 @@ export async function generateOrders(
                 fee: fee,
                 date: raw.date,
                 status: raw.status as "pending" | "executed" | "cancelled",
-                createdAt: clockService.now()
+                createdAt,
+                updatedAt:   Math.random() < 0.3
+                        ? clockService.addDays(createdAt, rand(1, 10))
+                        :  clockService.nowMinusDays(rand(0, 60))
             });
                         
             orders.push(order);

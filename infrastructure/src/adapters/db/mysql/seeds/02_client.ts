@@ -14,6 +14,7 @@ import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { TransactionRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/TransactionRepositoryMySQL";
 import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
 import { Color } from "@domain/values/Color";
+import { rand } from "./utils";
 
 export async function seedSQLClient(
   mysqlClient: MySQLClient,
@@ -64,8 +65,10 @@ export async function seedSQLClient(
         id: uuidService.generate(),
         role: "client",
         createdAt,
-        isActiveField: true,
-        confirmedAt,
+        isActiveField: true, 
+                                                updatedAt:   Math.random() < 0.3
+                                                        ? clockService.addDays(createdAt, rand(1, 10))
+                                                        :  clockService.nowMinusDays(rand(0, 60))
       });
       users.push(user);
       await userRepository.save(user);

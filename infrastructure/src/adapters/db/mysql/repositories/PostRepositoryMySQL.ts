@@ -13,7 +13,7 @@ export class PostRepositoryMySQL implements PostRepository {
 
   async save(post: PostEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO posts (id, advisor_id, title, content, created_at, modified_at, published_at, client_id) 
+      `INSERT INTO posts (id, advisor_id, title, content, created_at, updated_at, published_at, client_id) 
        VALUES (?, ?, ?, ?, ?, ?, ?,?)`,
       [
         post.id,
@@ -65,7 +65,7 @@ export class PostRepositoryMySQL implements PostRepository {
       content: row.content,
       tagsId,
       createdAt: row.created_at,
-      updatedAt: row.modified_at ?? undefined,
+      updatedAt: row.updated_at ?? undefined,
       publishedAt: row.published_at ?? undefined,
       readBy: readsId,
       clientId: row.client_id ?? undefined,
@@ -98,7 +98,7 @@ export class PostRepositoryMySQL implements PostRepository {
           content: row.content,
           tagsId,
           createdAt: row.created_at,
-          updatedAt: row.modified_at ?? undefined,
+          updatedAt: row.updated_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
           readBy: readsId,
           clientId: row.client_id ?? undefined,
@@ -133,7 +133,7 @@ export class PostRepositoryMySQL implements PostRepository {
           content: row.content,
           tagsId,
           createdAt: row.created_at,
-          updatedAt: row.modified_at ?? undefined,
+          updatedAt: row.updated_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
           readBy: readsId,
           clientId: row.client_id ?? undefined,
@@ -145,7 +145,7 @@ export class PostRepositoryMySQL implements PostRepository {
   async update(post: PostEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE posts
-       SET title = ?, content = ?, modified_at = ?, published_at = ?
+       SET title = ?, content = ?, updated_at = ?, published_at = ?
        WHERE id = ?`,
       [
         post.title,
@@ -285,7 +285,7 @@ export class PostRepositoryMySQL implements PostRepository {
         u.is_active AS advisor_is_active,
         u.created_at AS advisor_created_at,
         u.confirmed_at AS advisor_confirmed_at,
-        u.modified_at AS advisor_modified_at
+        u.updated_at AS advisor_updated_at
       FROM posts p JOIN users u ON u.id = p.advisor_id
       ${tagJoin}
       ${whereSQL}
@@ -323,7 +323,7 @@ export class PostRepositoryMySQL implements PostRepository {
             label: tagRow.label,
             color: tagRow.color,
             createdAt: tagRow.created_at,
-            updatedAt: tagRow.modified_at,
+            updatedAt: tagRow.updated_at,
           })
         );
         const advisor = UserEntity.from({
@@ -336,7 +336,7 @@ export class PostRepositoryMySQL implements PostRepository {
           isActiveField: row.advisor_is_active,
           createdAt: row.advisor_created_at,
           confirmedAt: row.advisor_confirmed_at,
-          updatedAt: row.advisor_modified_at,
+          updatedAt: row.advisor_updated_at,
         });
         const post = PostEntity.from({
           id: row.id,
@@ -345,7 +345,7 @@ export class PostRepositoryMySQL implements PostRepository {
           content: row.content,
           tagsId,
           createdAt: row.created_at,
-          updatedAt: row.modified_at ?? undefined,
+          updatedAt: row.updated_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
           readBy: readsId,
           clientId: row.client_id ?? undefined,
@@ -371,7 +371,7 @@ export class PostRepositoryMySQL implements PostRepository {
         u.is_active AS advisor_is_active,
         u.created_at AS advisor_created_at,
         u.confirmed_at AS advisor_confirmed_at,
-        u.modified_at AS advisor_modified_at
+        u.updated_at AS advisor_updated_at
        FROM posts p JOIN users u ON u.id = p.advisor_id WHERE p.id = ?`,
       [id]
     );
@@ -394,7 +394,7 @@ export class PostRepositoryMySQL implements PostRepository {
         label: tagRow.label,
         color: tagRow.color,
         createdAt: tagRow.created_at,
-        updatedAt: tagRow.modified_at,
+        updatedAt: tagRow.updated_at,
       })
     );
     const advisor = UserEntity.from({
@@ -407,7 +407,7 @@ export class PostRepositoryMySQL implements PostRepository {
       isActiveField: row.advisor_is_active,
       createdAt: row.advisor_created_at,
       confirmedAt: row.advisor_confirmed_at,
-      updatedAt: row.advisor_modified_at,
+      updatedAt: row.advisor_updated_at,
     });
     const post = PostEntity.from({
       id: row.id,
@@ -416,7 +416,7 @@ export class PostRepositoryMySQL implements PostRepository {
       content: row.content,
       tagsId,
       createdAt: row.created_at,
-      updatedAt: row.modified_at ?? undefined,
+      updatedAt: row.updated_at ?? undefined,
       publishedAt: row.published_at ?? undefined,
       readBy: readsId,
       clientId: row.client_id ?? undefined,
@@ -435,7 +435,7 @@ export class PostRepositoryMySQL implements PostRepository {
       p.title,
       p.content,
       p.created_at AS post_created_at,
-      p.modified_at AS post_modified_at,
+      p.updated_at AS post_updated_at,
       p.published_at,
       p.client_id,
       
@@ -449,14 +449,14 @@ export class PostRepositoryMySQL implements PostRepository {
       u.is_active AS advisor_is_active,
       u.created_at AS advisor_created_at,
       u.confirmed_at AS advisor_confirmed_at,
-      u.modified_at AS advisor_modified_at,
+      u.updated_at AS advisor_updated_at,
       
       -- Tags (peut être NULL si pas de tags)
       t.id AS tag_id,
       t.label AS tag_label,
       t.color AS tag_color,
       t.created_at AS tag_created_at,
-      t.modified_at AS tag_modified_at,
+      t.updated_at AS tag_updated_at,
       
       -- ReadBy (agrégé en JSON)
       GROUP_CONCAT(DISTINCT pr_all.user_id) AS read_by_ids
@@ -503,7 +503,7 @@ export class PostRepositoryMySQL implements PostRepository {
           isActiveField: row.advisor_is_active,
           createdAt: row.advisor_created_at,
           confirmedAt: row.advisor_confirmed_at,
-          updatedAt: row.advisor_modified_at,
+          updatedAt: row.advisor_updated_at,
         });
 
         // Parser les IDs des utilisateurs qui ont lu
@@ -519,7 +519,7 @@ export class PostRepositoryMySQL implements PostRepository {
           content: row.content,
           tagsId: [], // On va remplir ça après
           createdAt: row.post_created_at,
-          updatedAt: row.post_modified_at ?? undefined,
+          updatedAt: row.post_updated_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
           readBy: readByIds,
           clientId: row.client_id ?? undefined,
@@ -542,7 +542,7 @@ export class PostRepositoryMySQL implements PostRepository {
           label: row.tag_label,
           color: row.tag_color,
           createdAt: row.tag_created_at,
-          updatedAt: row.tag_modified_at,
+          updatedAt: row.tag_updated_at,
         });
 
         const postWithData = postsMap.get(postId)!;

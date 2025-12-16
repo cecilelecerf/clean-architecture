@@ -21,7 +21,7 @@ export class PostRepositoryMongo implements PostRepository {
         tagsId: post.tagsId,
         createdAt: post.createdAt,
         readBy: post.readBy,
-        modifiedAt: post.modifiedAt ?? null,
+        updatedAt: post.updatedAt ?? null,
         publishedAt: post.publishedAt,
         clientId: post.clientId
       } as any);
@@ -41,7 +41,7 @@ export class PostRepositoryMongo implements PostRepository {
         tagsId: doc.tagsId,
         createdAt: doc.createdAt,
         readBy: doc.readBy,
-        modifiedAt: doc.modifiedAt ?? null,
+        updatedAt: doc.updatedAt ?? null,
         publishedAt: doc.publishedAt ?? null,
         clientId: doc.clientId ?? null
       });
@@ -61,7 +61,7 @@ export class PostRepositoryMongo implements PostRepository {
           tagsId: doc.tagsId,
           createdAt: doc.createdAt,
           readBy: doc.readBy,
-          modifiedAt: doc.modifiedAt ?? null,
+          updatedAt: doc.updatedAt ?? null,
           publishedAt: doc.publishedAt ?? null,
           clientId: doc.clientId ?? null
         });
@@ -84,7 +84,7 @@ export class PostRepositoryMongo implements PostRepository {
                 content: doc.content,
                 tagsId: doc.tagsId,
                 createdAt: doc.createdAt,
-                modifiedAt: doc.modifiedAt ?? null,
+                updatedAt: doc.updatedAt ?? null,
                 publishedAt: doc.publishedAt ?? null,
                 readBy: doc.readBy,
                 clientId: doc.clientId ?? null,
@@ -101,7 +101,7 @@ export class PostRepositoryMongo implements PostRepository {
             $set: {
                 title: post.title,
                 content: post.content,
-                modifiedAt: post.modifiedAt || new Date(),
+                updatedAt: post.updatedAt || new Date(),
                 publishedAt: post.publishedAt || null,
                 tagsId: post.tagsId,
                 readBy: post.readBy,
@@ -131,7 +131,7 @@ export class PostRepositoryMongo implements PostRepository {
           tagsId: doc.tagsId,
           createdAt: doc.createdAt,
           readBy: doc.readBy,
-          modifiedAt: doc.modifiedAt ?? null,
+          updatedAt: doc.updatedAt ?? null,
           publishedAt: doc.publishedAt ?? null,
           clientId: doc.clientId ?? null
         });
@@ -208,7 +208,7 @@ export class PostRepositoryMongo implements PostRepository {
             isActiveField: doc.advisor.isActive,
             createdAt: doc.advisor.createdAt,
             confirmedAt: doc.advisor.confirmedAt,
-            modifiedAt: doc.advisor.modifiedAt,
+            updatedAt: doc.advisor.updatedAt,
           });
 
           const tags = doc.tags.map((tag: any) =>{
@@ -221,7 +221,7 @@ export class PostRepositoryMongo implements PostRepository {
               label: tag.label,
               color: colorResult,
               createdAt: tag.createdAt,
-              modifiedAt: tag.modifiedAt,
+              updatedAt: tag.updatedAt,
             })
           }); 
 
@@ -232,7 +232,7 @@ export class PostRepositoryMongo implements PostRepository {
             content: doc.content,
             tagsId: doc.tagsId,
             createdAt: doc.createdAt,
-            modifiedAt: doc.modifiedAt ?? undefined,
+            updatedAt: doc.updatedAt ?? undefined,
             publishedAt: doc.publishedAt ?? undefined,
             readBy: doc.readBy ?? [],
             clientId: doc.clientId ?? undefined,
@@ -273,7 +273,7 @@ export class PostRepositoryMongo implements PostRepository {
             label: tagDoc.label,
             color,
             createdAt: tagDoc.createdAt,
-            modifiedAt: tagDoc.modifiedAt,
+            updatedAt: tagDoc.updatedAt,
           })
         );
       }
@@ -290,7 +290,7 @@ export class PostRepositoryMongo implements PostRepository {
         isActiveField: advisorDoc.isActive,
         createdAt: advisorDoc.createdAt,
         confirmedAt: advisorDoc.confirmedAt,
-        modifiedAt: advisorDoc.modifiedAt,
+        updatedAt: advisorDoc.updatedAt,
       });
 
       const post = PostEntity.from({
@@ -300,7 +300,7 @@ export class PostRepositoryMongo implements PostRepository {
         content: doc.content,
         tagsId: doc.tagsId,
         createdAt: doc.createdAt,
-        modifiedAt: doc.modifiedAt ?? undefined,
+        updatedAt: doc.updatedAt ?? undefined,
         publishedAt: doc.publishedAt ?? undefined,
         readBy: doc.readBy ?? [],
         clientId: doc.clientId ?? undefined,
@@ -336,7 +336,7 @@ export class PostRepositoryMongo implements PostRepository {
             label: tagDoc.label,
             color,
             createdAt: tagDoc.createdAt,
-            modifiedAt: tagDoc.modifiedAt,
+            updatedAt: tagDoc.updatedAt,
           });
         });
 
@@ -353,7 +353,7 @@ export class PostRepositoryMongo implements PostRepository {
           isActiveField: advisorDoc.isActive,
           createdAt: advisorDoc.createdAt,
           confirmedAt: advisorDoc.confirmedAt,
-          modifiedAt: advisorDoc.modifiedAt,
+          updatedAt: advisorDoc.updatedAt,
         });
 
         const post = PostEntity.from({
@@ -363,7 +363,7 @@ export class PostRepositoryMongo implements PostRepository {
           content: doc.content,
           tagsId: doc.tagsId,
           createdAt: doc.createdAt,
-          modifiedAt: doc.modifiedAt ?? undefined,
+          updatedAt: doc.updatedAt ?? undefined,
           publishedAt: doc.publishedAt ?? undefined,
           readBy: doc.readBy,
           clientId: doc.clientId ?? undefined,

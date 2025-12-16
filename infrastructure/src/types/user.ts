@@ -12,7 +12,7 @@ export const userSchema = z.object({
   isActiveField: z.preprocess((val) => val === 1 || val === true, z.boolean()),
   createdAt: z.iso.datetime(),
   confirmedAt: z.iso.datetime().nullable(),
-  modifiedAt: z.iso.datetime().nullable(),
+  updatedAt: z.iso.datetime().nullable(),
 });
 export type User = z.infer<typeof userSchema>;
 
