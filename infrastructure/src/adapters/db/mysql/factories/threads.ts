@@ -4,8 +4,7 @@ import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/reposit
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { MessageRepositoryMySQL } from "../repositories/MessageRepositoryMySQL";
- 
-import { LeaveThreadUsecase } from "@application/usecases/threads/LeaveThreadUsecase"; 
+import { LeaveThreadUsecase } from "@application/usecases/threads/LeaveThreadUsecase";
 import { StartExternalThreadUsecase } from "@application/usecases/threads/StartExternalThreadUsecase";
 import { AddParticipantUsecase } from "@application/usecases/threads/admin/AddParticipantUsecase";
 import { CloseThreadUsecase } from "@application/usecases/threads/admin/CloseThreadUsecase";
@@ -13,11 +12,11 @@ import { RemoveParticipantUsecase } from "@application/usecases/threads/admin/Re
 import { StartInternalThreadUsecase } from "@application/usecases/threads/StartInternalThreadUsecase";
 import { TransferThreadUsecase } from "@application/usecases/threads/admin/TransferThreadUsecase";
 import { UpdateThreadTitleUsecase } from "@application/usecases/threads/admin/UpdateThreadTitleUsecase";
-import { GetAdvisorThreadsUsecase } from "@application/usecases/threads/GetAdvisorThreadsUsecase"; 
- import { AdminJoinThreadUsecase } from "@application/usecases/threads/admin/AdminJoinThreadUsecase";
+import { GetAdvisorThreadsUsecase } from "@application/usecases/threads/GetAdvisorThreadsUsecase";
+import { AdminJoinThreadUsecase } from "@application/usecases/threads/admin/AdminJoinThreadUsecase";
 import { GetThreadsByUserAndTypeUsecase } from "@application/usecases/threads/GetThreadsByUserAndTypeUsecase";
 import { GetThreadByIdUsecase } from "@application/usecases/threads/GetThreadByIdUsecase";
- export const threadsFactory = () => {
+export const threadsFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);
   const threadRepository = new ThreadRepositoryMySQL(client);
@@ -48,11 +47,14 @@ import { GetThreadByIdUsecase } from "@application/usecases/threads/GetThreadByI
     threadRepository,
     userRepository
   );
-    const getThreadsByUserAndTypeUsecase = new GetThreadsByUserAndTypeUsecase(
+  const getThreadsByUserAndTypeUsecase = new GetThreadsByUserAndTypeUsecase(
     threadRepository,
     userRepository
   );
-  const getThreadById = new GetThreadByIdUsecase(threadRepository, userRepository)
+  const getThreadById = new GetThreadByIdUsecase(
+    threadRepository,
+    userRepository
+  );
   const closeThread = new CloseThreadUsecase(
     userRepository,
     threadRepository,
@@ -84,30 +86,18 @@ import { GetThreadByIdUsecase } from "@application/usecases/threads/GetThreadByI
     userRepository
   );
 
-  const advisorGetAllByParticipantThread =
-    new AdvisorGetAllByParticipantThreadUsecase(
-      threadRepository,
-      userRepository
-    );
-
-  const directorFindAllThread = new DirectorFindAllThreadUsecase(
-    threadRepository,
-    userRepository
-  );
-
   return {
- 
     startExternalThread,
     addParticipant,
-    advisorGetAllThread, 
-    closeThread, 
+    advisorGetAllThread,
+    closeThread,
     getThreadsByUserAndTypeUsecase,
     leaveThread,
     removeParticipant,
     startInternalThread,
     transferThread,
     updateThreadTitle,
-    adminJoinThread, 
-    getThreadById
-   };
+    adminJoinThread,
+    getThreadById,
+  };
 };

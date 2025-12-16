@@ -8,12 +8,8 @@ import { useEffect, useRef, useState } from 'react';
 import { socket } from '@/lib/socket';
 import { UserDto } from '@infrastructure/types/user';
 import { Message, MessageWithUser } from '@infrastructure/types/message';
-import { post } from '@/lib/apiClient';
- import { Spinner } from '@/components/ui/spinner';
-import { ArrowRight } from 'lucide-react'; 
- import { endpoints } from '@/utils/endpoint';
+import { endpoints } from '@/utils/endpoint';
 import { ThreadWithUser } from '@/utils/endpoint/threadEndpoints';
-import { NewMessage } from '@/app/api/threads/[threadId]/messages/route';
 import { MessageComponent } from '@/components/threads/Message';
 import { PostMessage } from '@/components/threads/PostMessage';
 
@@ -22,7 +18,7 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
     const queries = useQueries({
         queries: [
             endpoints.threads.get({ threadId }),
-            endpoints.threads.messages.getAll({  threadId })
+            endpoints.threads.messages.getAll({ threadId })
         ]
     })
     const { data: session } = useSession();

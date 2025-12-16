@@ -9,20 +9,20 @@ import { socket } from '@/lib/socket';
 import { Button } from '@/components/ui/button';
 import { UserDto } from '@infrastructure/types/user';
 import { MessageWithUser } from '@infrastructure/types/message';
- import { useRouter } from 'next/navigation';
-import { MessageComponent } from '@/components/threads/Message';
- import { Flex } from '@radix-ui/themes';
-import { JoinThread } from './Join';
-import { Settings } from './Settings';
-import { PostMessage } from '@/components/threads/PostMessage';
-import { endpoints } from '@/utils/endpoint';
+import { useRouter } from 'next/navigation';
 import { ThreadWithUser } from '@/utils/endpoint/threadEndpoints';
+import { Settings } from './Settings';
+import { Flex } from '@radix-ui/themes';
+import { JoinThread } from './Join';
+import { endpoints } from '@/utils/endpoint';
+import { MessageComponent } from '@/components/threads/Message';
+import { PostMessage } from '@/components/threads/PostMessage';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
     const queries = useQueries({
         queries: [
-            endpoints.threads.get({  threadId }),
+            endpoints.threads.get({ threadId }),
             endpoints.threads.messages.getAll({ threadId })
         ]
     })
