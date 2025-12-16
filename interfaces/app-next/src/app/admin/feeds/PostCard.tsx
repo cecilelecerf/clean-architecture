@@ -1,6 +1,6 @@
 "use client"
 import { useSession } from "next-auth/react";
-import { PostWithTagsAndUser } from "@/utils/endpoint/advisor/feedsEndpoint";
+import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint";
 import { useRouter } from "next/navigation";
 import { Tag } from "@/components/Tag";
 import { Badge } from "@/components/ui/badge";

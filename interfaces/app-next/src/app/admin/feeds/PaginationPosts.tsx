@@ -1,5 +1,5 @@
 "use client"
-import { FiltersProps } from "@/utils/endpoint/client/feedsEndpoint"
+import { FiltersProps } from "@/utils/endpoint/feedsEndpoint"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 
 

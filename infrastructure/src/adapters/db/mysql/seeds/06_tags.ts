@@ -5,6 +5,7 @@ import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidServi
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { rawTags } from "../../seeds/tags";
 import { Color } from "@domain/values/Color";
+import { rand } from "./utils";
 
 /**
  * Génère une liste de tags prédéfinis et les enregistre dans la base.
@@ -27,7 +28,10 @@ export const generateTags = async (
       id: uuidService.generate(),
       label: raw.label,
       color: c,
-      createdAt: now
+      createdAt: now,
+                                      updatedAt:   Math.random() < 0.3
+                                              ? clockService.addDays(now, rand(1, 10))
+                                              :  clockService.nowMinusDays(rand(0, 60))
     });
 
     await tagRepository.save(tag);

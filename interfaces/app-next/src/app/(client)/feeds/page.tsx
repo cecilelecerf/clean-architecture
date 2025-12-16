@@ -1,8 +1,8 @@
 "use client"
-import { FiltersProps } from "@/utils/endpoint/client/feedsEndpoint"
-import { useState } from "react";
+ import { useState } from "react";
 import { Posts } from "./Posts";
 import { PostFilters } from "./PostFilters";
+import { FiltersProps } from "@/utils/endpoint/feedsEndpoint";
 
 export default function PostsPage() {
     const [filters, setFilters] = useState<FiltersProps>({

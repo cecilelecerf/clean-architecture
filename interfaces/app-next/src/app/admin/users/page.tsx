@@ -2,13 +2,13 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { advisorEndpoint } from "@/utils/endpoint/advisor";
+import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 
 export default function AdminUsersPage() {
-    const query = useQuery(advisorEndpoint.users.getAll({ role: "client" }))
+    const query = useQuery(endpoints.users.getAll({ role: "client" }))
     const router = useRouter()
     return match(query)
         .with({ status: "error" }, () => "error")

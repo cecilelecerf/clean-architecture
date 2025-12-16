@@ -8,12 +8,12 @@ import { SystemClockService } from "@infrastructure/adapters/services/SystemCloc
 import { RegisterUsecase } from "@application/usecases/users/RegisterUsecase";
 import { LogoutUsecase } from "@application/usecases/users/LogoutUsecase";
 import { LoginUsecase } from "@application/usecases/users/LoginUsecase";
-import { GetUserUsecase } from "@application/usecases/users/GetUserUsecase";
+import { GetMeUsecase } from "@application/usecases/users/GetMeUsecase";
 import { ForgotPasswordUsecase } from "@application/usecases/users/ForgotPasswordUsecase";
 import { ConfirmRegistrationUsecase } from "@application/usecases/users/ConfirmRegistrationUsecase";
 import { BanClientUsecase } from "@application/usecases/users/BanClientUsecase";
-import { GetUsersByRoleUseCase } from "@application/usecases/users/advisors/GetUsersByRoleUseCase";
-import { AdvisorGetClientUsercase } from "@application/usecases/users/advisors/AdvisorGetClientUsercase";
+import { GetUsersByRoleUseCase } from "@application/usecases/users/GetUsersByRoleUseCase";
+import { GetUserUsercase } from "@application/usecases/users/GetUserUsercase";
 
 export const usersFactory = () => {
   const client = new MySQLClient();
@@ -39,7 +39,7 @@ export const usersFactory = () => {
     encryptionService,
     tokenService
   );
-  const getUser = new GetUserUsecase(userRepository);
+  const getMe = new GetMeUsecase(userRepository);
   const forgotPassword = new ForgotPasswordUsecase(
     userRepository,
     emailService,
@@ -52,17 +52,17 @@ export const usersFactory = () => {
   );
   const banClient = new BanClientUsecase(userRepository, clockService);
   const getUsersByRole = new GetUsersByRoleUseCase(userRepository);
-  const advisorGetClient = new AdvisorGetClientUsercase(userRepository);
+  const getUser = new GetUserUsercase(userRepository);
 
   return {
     register,
     logout,
     login,
     getUser,
+    getMe,
     forgotPassword,
     confirmRegistration,
     banClient,
     getUsersByRole,
-    advisorGetClient,
   };
 };

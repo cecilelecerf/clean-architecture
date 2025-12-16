@@ -129,7 +129,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
         })
     }
 
-    async findAllExternalThreadWithUserByUserId(
+    async findAllWithUserByParticipantIdAndType(
         participantId: string
     ): Promise<ThreadEntityWithUsers[]> {
         await this.client.connect();
@@ -165,7 +165,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
                 isActiveField: adminDoc.isActive,
                 createdAt: adminDoc.createdAt,
                 confirmedAt: adminDoc.confirmedAt,
-                modifiedAt: adminDoc.updatedAt,
+                updatedAt: adminDoc.updatedAt,
                 })
             : null;
 
@@ -183,7 +183,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
                 isActiveField: pDoc.isActive,
                 createdAt: pDoc.createdAt,
                 confirmedAt: pDoc.confirmedAt,
-                modifiedAt: pDoc.updatedAt,
+                updatedAt: pDoc.updatedAt,
                 });
             }
             );
@@ -238,7 +238,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
                 isActiveField: adminDoc.isActive,
                 passwordHash: adminDoc.passwordHash,
                 confirmedAt: adminDoc.confirmedAt,
-                modifiedAt: adminDoc.updatedAt,
+                updatedAt: adminDoc.updatedAt,
             })
             : null;
 
@@ -256,7 +256,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
                 isActiveField: pDoc.isActive,
                 createdAt: pDoc.createdAt,
                 confirmedAt: pDoc.confirmedAt,
-                modifiedAt: pDoc.updatedAt,
+                updatedAt: pDoc.updatedAt,
                 });
             }
         );
@@ -279,7 +279,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
         return Object.assign(thread, { administrator, participants });
     }
 
-    async findAllWithUserByAdministratorId(
+    async findAllWithUserByAdministratorIdAndType(
         administratorId: UserEntity["id"]
     ): Promise<ThreadEntityWithUsers[]> {
         await this.client.connect();
@@ -320,7 +320,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
                     isActiveField: adminDoc.isActive,
                     passwordHash: adminDoc.passwordHash,
                     confirmedAt: adminDoc.confirmedAt,
-                    modifiedAt: adminDoc.updatedAt,
+                    updatedAt: adminDoc.updatedAt,
                 })
                 : null;
 
@@ -357,7 +357,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
                 isActiveField: pDoc.isActive,
                 passwordHash: pDoc.passwordHash,
                 confirmedAt: pDoc.confirmedAt,
-                modifiedAt: pDoc.updatedAt,
+                updatedAt: pDoc.updatedAt,
                 });
                 thread!.participants.push(participant);
             }
@@ -431,7 +431,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
                         isActiveField: pDoc.isActive,
                         passwordHash: pDoc.passwordHash,
                         confirmedAt: pDoc.confirmedAt,
-                        modifiedAt: pDoc.updatedAt,
+                        updatedAt: pDoc.updatedAt,
                     });
                     thread!.participants.push(participant);
                 }

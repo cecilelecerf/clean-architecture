@@ -5,7 +5,7 @@ export interface PostInterface {
     tagsId: string[],
     createdAt: Date,
     readBy: string[],
-    modifiedAt: Date,
+    updatedAt: Date,
     publishedAt: Date,
     clientId: string[]
 }

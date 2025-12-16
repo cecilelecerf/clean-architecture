@@ -117,7 +117,7 @@ export class MessageRepositoryMongo implements MessageRepository {
             isActiveField: senderDoc.isActive,
             createdAt: senderDoc.createdAt,
             confirmedAt: senderDoc.confirmedAt,
-            modifiedAt: senderDoc.updatedAt,
+            updatedAt: senderDoc.updatedAt,
             });
 
             return Object.assign(message, { sender });

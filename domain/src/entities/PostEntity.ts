@@ -1,7 +1,10 @@
-import { InvalidPostTitleError,InvalidPostContentError  } from "@domain/errors/posts";
+import {
+  InvalidPostTitleError,
+  InvalidPostContentError,
+} from "@domain/errors/posts";
 import { TagEntity } from "./TagEntity";
 import { UserEntity } from "./UserEntity";
- 
+
 export class PostEntity {
   private constructor(
     public id: string,
@@ -134,8 +137,17 @@ export class PostEntity {
     return trimedTitle;
   }
 
-  public published(now: Date) {
-    this.publishedAt = now;
+  public updateStatus(status: boolean, now: Date) {
+    if (status) {
+      if (!this.publishedAt) {
+        this.publishedAt = now;
+      }
+    } else {
+      this.publishedAt = undefined;
+    }
+
+    this.updatedAt = now;
+    return this;
   }
 
   public permissionToModify(user: UserEntity): boolean {

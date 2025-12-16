@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Mail, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
-import { advisorEndpoint } from "@/utils/endpoint/advisor";
+import { endpoints } from "@/utils/endpoint";
 import { UserId } from "@infrastructure/types/user";
 import { match } from "ts-pattern";
 
 export const UserInfo = ({ userId }: { userId: UserId }) => {
-    const query = useQuery(advisorEndpoint.users.get({ id: userId }))
+    const query = useQuery(endpoints.users.get({ id: userId }))
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: 'pending' }, () => "pendign")

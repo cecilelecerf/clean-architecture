@@ -1,17 +1,16 @@
 "use client"
-import { PostWithTagsAndUser } from "@/utils/endpoint/advisor/feedsEndpoint"
-import { useQuery } from "@tanstack/react-query"
+ import { useQuery } from "@tanstack/react-query"
 import { match } from "ts-pattern"
 import { PostCard } from "./PostCard"
 import { PaginationPosts } from "./PaginationPosts"
 import { useEffect, useState } from "react"
 import { socket } from "@/lib/socket"
-import { queryClient } from "@/lib/queryClient"
-import { FiltersProps } from "@/utils/endpoint/client/feedsEndpoint"
-import { clientEndpoints } from "@/utils/endpoint/client"
+import { queryClient } from "@/lib/queryClient" 
+import { FiltersProps, PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint"
+import { endpoints } from "@/utils/endpoint"
 
 export const Posts = ({ filters, onPaginationChange }: { filters: FiltersProps, onPaginationChange: (pageNumber: number) => void }) => {
-    const query = useQuery(clientEndpoints.feeds.posts.getAll({ filters }))
+    const query = useQuery(endpoints.feeds.posts.getAll({ filters }))
     useEffect(() => {
         if (!socket) return;
         const eventName = `post:status`;

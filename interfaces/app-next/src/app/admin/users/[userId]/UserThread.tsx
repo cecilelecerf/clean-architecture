@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatDateFrench } from "@/utils/date/formatDateFrench"
-import { advisorEndpoint } from "@/utils/endpoint/advisor"
+import { endpoints } from "@/utils/endpoint"
 import { UserId } from "@infrastructure/types/user"
 import { Box, Flex } from "@radix-ui/themes"
 import { useQuery } from "@tanstack/react-query"
@@ -13,7 +13,7 @@ import { match } from "ts-pattern"
 export const UserThread = ({ userId }: { userId: UserId }) => {
     const { data: session } = useSession()
     const router = useRouter()
-    const query = useQuery(advisorEndpoint.thread.client.getAllByUser({ userId }))
+    const query = useQuery(endpoints.threads.getAll({ userId }))
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: 'pending' }, () => "pendign")

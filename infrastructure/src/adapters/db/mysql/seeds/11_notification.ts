@@ -5,7 +5,7 @@ import { rawNotifications } from "../../seeds/notifications";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { pick } from "./utils";
+import { pick, rand } from "./utils";
 
 export async function generateNotifications(
   mysqlClient: MySQLClient,
@@ -23,7 +23,8 @@ export async function generateNotifications(
         try {
             const advisor = pick(advisors);
             const client = pick(clients);
-            
+                            const createdAt =  clockService.now()
+
             const notification = NotificationEntity.from({
                 id: uuidService.generate(),
                 advisorId: advisor.id,
@@ -32,7 +33,10 @@ export async function generateNotifications(
                 content: raw.content,
                 isRead: false,
                 type: raw.type as "info" | "alert" | "reminder",
-                createdAt: clockService.now()
+                createdAt,
+                                updatedAt:   Math.random() < 0.3
+                                        ? clockService.addDays(createdAt, rand(1, 10))
+                                        :  clockService.nowMinusDays(rand(0, 60))
             });
                         
 

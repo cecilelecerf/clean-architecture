@@ -2,8 +2,8 @@
 import { ButtonBack } from "@/components/ButtonBack";
 import FormWrapper, { Field } from "@/components/FromWrapper";
 import { socket } from "@/lib/socket";
-import { advisorEndpoint } from "@/utils/endpoint/advisor";
-import { NewPost } from "@/utils/endpoint/advisor/feedsEndpoint";
+import { endpoints } from "@/utils/endpoint";
+import { NewPost } from "@/utils/endpoint/feedsEndpoint";
 import { Post } from "@infrastructure/types/feed";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -26,7 +26,7 @@ export default function PostsPage() {
         },
     ];
 
-    const mutate = useMutation<Post, Error, NewPost>(advisorEndpoint.feeds.posts.add())
+    const mutate = useMutation<Post, Error, NewPost>(endpoints.feeds.posts.add())
 
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
