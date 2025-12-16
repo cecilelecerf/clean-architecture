@@ -6,4 +6,4 @@ export * from "./ThreadClosedError"
 export * from "./ThreadNotActiveError"
 export * from "./ThreadParticipantAlreadyExistError"
 export * from "./ThreadTransferToSameAdministratorError"
- 
+ export * from "./InvalidThreadTypeError"

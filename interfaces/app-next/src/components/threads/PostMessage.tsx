@@ -1,7 +1,7 @@
 import { ButtonLoading } from "@/components/buttons/ButtonLoading";
 import { Input } from "@/components/ui/input";
 import { socket } from "@/lib/socket";
-import { advisorEndpoint } from "@/utils/endpoint/advisor";
+import { endpoints } from "@/utils/endpoint";
 import { ThreadId } from "@infrastructure/types/thread";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
@@ -9,9 +9,9 @@ import { useState } from "react";
 
 export const PostMessage = ({ threadId }: { threadId: ThreadId }) => {
     const [input, setInput] = useState("");
-    const sendMessageMutate = useMutation(advisorEndpoint.thread.messages.post({ threadId }))
+    const sendMessageMutate = useMutation(endpoints.threads.messages.send({ threadId }))
     const handlePress = () => {
-        input.length && sendMessageMutate.mutate(input, {
+        input.length && sendMessageMutate.mutate({content :input}, {
             onSuccess: (data) => {
                 socket.emit("thread:new_message", { message: data });
                 setInput("")

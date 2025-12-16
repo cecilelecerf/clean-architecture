@@ -6,6 +6,7 @@ import { BcryptEncryptionService } from "@infrastructure/adapters/services/Bcryp
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { rawAdvisors } from "../../seeds/advisors";
+import { rand } from "./utils";
 
 export async function seedSQLAdministrator(
   mysqlClient: MySQLClient
@@ -25,15 +26,19 @@ export async function seedSQLAdministrator(
         continue;
       }
       const passwordHash = await hasher.hash(raw.password);
+      const now = clockService.now()
       const user = UserEntity.from({
         ...raw,
         email,
         passwordHash,
         id: uuidService.generate(),
         role: "conseiller",
-        createdAt: clockService.now(),
+        createdAt: now,
         isActiveField: true,
-        confirmedAt: clockService.now(),
+        confirmedAt: now,
+                                        updatedAt:   Math.random() < 0.3
+                                                ? clockService.addDays(now, rand(1, 10))
+                                                :  clockService.nowMinusDays(rand(0, 60))
       });
 
       advisors.push(user);

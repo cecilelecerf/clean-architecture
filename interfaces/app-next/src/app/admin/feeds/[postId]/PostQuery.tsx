@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { socket } from "@/lib/socket";
-import { advisorEndpoint } from "@/utils/endpoint/advisor";
-import { NewPost, PostWithTagsAndUser } from "@/utils/endpoint/advisor/feedsEndpoint";
+import { endpoints } from "@/utils/endpoint";
+import { NewPost, PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint";
 import { PostId } from "@infrastructure/types/feed";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Edit, Save, X } from "lucide-react";
@@ -20,7 +20,7 @@ type Props = { postId: PostId }
 
 export const PostQuery = ({ postId }: Props) => {
 
-    const query = useQuery(advisorEndpoint.feeds.posts.get({ id: postId }));
+    const query = useQuery(endpoints.feeds.posts.get({ id: postId }));
 
     return match(query)
         .with({ status: "error" }, () => "error")
@@ -34,8 +34,8 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
     const [post, setPost] = useState<PostWithTagsAndUser>(postData)
     const [editValues, setEditValues] = useState<NewPost | null>(null);
 
-    const editMutation = useMutation(advisorEndpoint.feeds.posts.edit({ id: post.id }));
-    const actionMutation = useMutation(advisorEndpoint.feeds.posts.status({ id: post.id }));
+    const editMutation = useMutation(endpoints.feeds.posts.edit({ id: post.id }));
+    const actionMutation = useMutation(endpoints.feeds.posts.status({ id: post.id }));
 
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;

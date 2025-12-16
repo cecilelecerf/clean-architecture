@@ -8,60 +8,60 @@ import { SystemClockService } from "@infrastructure/adapters/services/SystemCloc
 import { RegisterUsecase } from "@application/usecases/users/RegisterUsecase";
 import { LogoutUsecase } from "@application/usecases/users/LogoutUsecase";
 import { LoginUsecase } from "@application/usecases/users/LoginUsecase";
-import { GetUserUsecase } from "@application/usecases/users/GetUserUsecase";
+import { GetMeUsecase } from "@application/usecases/users/GetUserUsecase";
 import { ForgotPasswordUsecase } from "@application/usecases/users/ForgotPasswordUsecase";
 import { ConfirmRegistrationUsecase } from "@application/usecases/users/ConfirmRegistrationUsecase";
 import { BanClientUsecase } from "@application/usecases/users/BanClientUsecase";
 import { GetUsersByRoleUseCase } from "@application/usecases/users/advisors/GetUsersByRoleUseCase";
-import { AdvisorGetClientUsercase } from "@application/usecases/users/advisors/AdvisorGetClientUsercase";
+import { GetUserUsercase } from "@application/usecases/users/advisors/AdvisorGetClientUsercase";
 
 export const usersFactory = () => {
-    const client = new MongoClient();
-    const userRepository = new UserRepositoryMongo(client);
-    const encryptionService = new BcryptEncryptionService();
-    const tokenService = new JwtTokenService();
-    const uuidSerivce = new NodeUuidService();
-    const emailService = new NodeEmailService();
-    const clockService = new SystemClockService();
+  const client = new MongoClient();
+  const userRepository = new UserRepositoryMongo(client);
+  const encryptionService = new BcryptEncryptionService();
+  const tokenService = new JwtTokenService();
+  const uuidSerivce = new NodeUuidService();
+  const emailService = new NodeEmailService();
+  const clockService = new SystemClockService();
 
-    const register = new RegisterUsecase(
-        userRepository,
-        encryptionService,
-        uuidSerivce,
-        clockService,
-        emailService,
-        tokenService
-    );
-    const logout = new LogoutUsecase(tokenService);
-    const login = new LoginUsecase(
-        userRepository,
-        encryptionService,
-        tokenService
-    );
-    const getUser = new GetUserUsecase(userRepository);
-    const forgotPassword = new ForgotPasswordUsecase(
-        userRepository,
-        emailService,
-        tokenService
-    );
-    const confirmRegistration = new ConfirmRegistrationUsecase(
-        userRepository,
-        clockService,
-        tokenService
-    );
-    const banClient = new BanClientUsecase(userRepository, clockService);
-    const getUsersByRole = new GetUsersByRoleUseCase(userRepository);
-    const advisorGetClient = new AdvisorGetClientUsercase(userRepository);
+  const register = new RegisterUsecase(
+    userRepository,
+    encryptionService,
+    uuidSerivce,
+    clockService,
+    emailService,
+    tokenService
+  );
+  const logout = new LogoutUsecase(tokenService);
+  const login = new LoginUsecase(
+    userRepository,
+    encryptionService,
+    tokenService
+  );
+  const getUser = new GetMeUsecase(userRepository);
+  const forgotPassword = new ForgotPasswordUsecase(
+    userRepository,
+    emailService,
+    tokenService
+  );
+  const confirmRegistration = new ConfirmRegistrationUsecase(
+    userRepository,
+    clockService,
+    tokenService
+  );
+  const banClient = new BanClientUsecase(userRepository, clockService);
+  const getUsersByRole = new GetUsersByRoleUseCase(userRepository);
+  const advisorGetClient = new GetUserUsercase(userRepository);
 
-    return {
-        register,
-        logout,
-        login,
-        getUser,
-        forgotPassword,
-        confirmRegistration,
-        banClient,
-        getUsersByRole,
-        advisorGetClient,
-    };
-}
+  return {
+    register,
+    logout,
+    login,
+    getUser,
+    forgotPassword,
+    confirmRegistration,
+    banClient,
+    getUsersByRole,
+    advisorGetClient,
+  };
+};

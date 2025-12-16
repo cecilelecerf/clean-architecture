@@ -35,22 +35,17 @@ async function request<T>(
   }
 }
 
-type Scope = 'client' | 'director' | 'advisor' | 'other';
-export function post<T, B = unknown>(path: string, body: B, scope?: Scope) {
-  const userScope = scope ? `/${scope}` : '';
-  return request<T>(`${userScope}${path}`, { method: 'POST', body });
+ export function post<T, B = unknown>(path: string, body: B) {
+  return request<T>(path, { method: 'POST', body });
 }
 
-export function get<T>(path: string, scope?: Scope) {
-  const userScope = scope ? `/${scope}` : '';
-  return request<T>(`${userScope}${path}`, { method: 'GET' });
+export function get<T>(path: string) {
+  return request<T>(path, { method: 'GET' });
 }
 
-export function patch<T, B = unknown>(path: string, body: B, scope?: Scope) {
-  const userScope = scope ? `/${scope}` : '';
-  return request<T>(`${userScope}${path}`, { method: 'PATCH', body });
+export function patch<T, B = unknown>(path: string, body: B) {
+  return request<T>(path, { method: 'PATCH', body });
 }
-export function deleteEntity<T, B = unknown>(path: string, scope?: Scope) {
-  const userScope = scope ? `/${scope}` : '';
-  return request<T>(`${userScope}${path}`, { method: 'DELETE' });
+export function deleteEntity<T, B = unknown>(path: string) {
+  return request<T>(path, { method: 'DELETE' });
 }

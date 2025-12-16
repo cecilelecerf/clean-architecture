@@ -3,7 +3,7 @@ import { ThreadCard } from "@/components/threads/ThreadCard";
 import { Card } from "@/components/ui/card";
 import { socket } from "@/lib/socket";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
-import { advisorEndpoint } from "@/utils/endpoint/advisor";
+import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -11,7 +11,7 @@ import { match } from "ts-pattern";
 
 export default function ThreadsPage() {
     const router = useRouter()
-    const query = useQuery(advisorEndpoint.thread.client.getAll())
+    const query = useQuery(endpoints.threads.getAll({type:"external"}))
     useEffect(() => {
         if (query.status === "success") {
             query.data.forEach((thread) => {

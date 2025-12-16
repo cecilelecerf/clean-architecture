@@ -113,7 +113,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
       u.is_active,
       u.created_at AS user_created_at,
       u.confirmed_at,
-      u.modified_at AS user_modified_at
+      u.updated_at AS user_updated_at
       FROM messages m
       JOIN users u ON m.sender_id = u.id
       WHERE m.thread_id = ?
@@ -141,7 +141,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
         isActiveField: row.is_active,
         createdAt: row.user_created_at,
         confirmedAt: row.confirmed_at,
-        modifiedAt: row.user_modified_at,
+        updatedAt: row.user_updated_at,
       });
       return Object.assign(message, { sender });
     });

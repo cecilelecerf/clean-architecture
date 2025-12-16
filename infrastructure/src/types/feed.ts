@@ -10,7 +10,7 @@ export const tagSchema = z.object({
   label: z.string(),
   color: colorSchema,
   createdAt: z.iso.datetime(),
-  modifiedAt: z.iso.datetime().nullable(),
+  updatedAt: z.iso.datetime().nullable(),
 });
 export type Tag = z.infer<typeof tagSchema>;
 
@@ -25,7 +25,7 @@ export const postSchema = z.object({
   tagsId: tagIdSchema.array(),
   createdAt: z.iso.datetime(),
   readBy: userIdSchema.array(),
-  modifiedAt: z.iso.datetime().optional(),
+  updatedAt: z.iso.datetime().optional(),
   publishedAt: z.iso.datetime().optional(),
   clientIt: userIdSchema.optional(),
 });

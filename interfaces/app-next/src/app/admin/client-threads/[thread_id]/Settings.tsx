@@ -3,8 +3,8 @@ import { ButtonLoading } from "@/components/buttons/ButtonLoading"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { advisorEndpoint } from "@/utils/endpoint/advisor"
-import { ThreadWithUser } from "@/utils/endpoint/client/threadEndpoints"
+import { endpoints } from "@/utils/endpoint"
+import { ThreadWithUser } from "@/utils/endpoint/threadEndpoints"
 import { ThreadId } from "@infrastructure/types/thread"
 import { User } from "@infrastructure/types/user"
 import { Flex } from "@radix-ui/themes"
@@ -41,9 +41,9 @@ export const Settings = ({ id, isClose }: Props) => {
 const AdvisorsList = ({ threadId }: { threadId: ThreadId }) => {
     const router = useRouter()
     const { data: session } = useSession()
-    const query = useQuery(advisorEndpoint.users.getAll({ role: "conseiller" }))
+    const query = useQuery(endpoints.users.getAll({ role: "conseiller" }))
     const [advisorId, setAdvisorId] = useState<User["id"] | null>(null)
-    const transfer = useMutation(advisorEndpoint.thread.client.transfer({ threadId }))
+    const transfer = useMutation(endpoints.threads.transfer({ threadId }))
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: "pending" }, () => "pending")
@@ -63,7 +63,7 @@ const AdvisorsList = ({ threadId }: { threadId: ThreadId }) => {
                     </SelectContent>
                 </Select>
                 {advisorId && (
-                    <ButtonLoading loading={transfer.isPending} onClick={() => transfer.mutate({ userId: advisorId, }, { onSuccess: () => router.push("/admin/client-threads") })}>Transférer</ButtonLoading>
+                    <ButtonLoading loading={transfer.isPending} onClick={() => transfer.mutate({ newAdministratorId: advisorId, }, { onSuccess: () => router.push("/admin/client-threads") })}>Transférer</ButtonLoading>
                 )}
             </>
         ))

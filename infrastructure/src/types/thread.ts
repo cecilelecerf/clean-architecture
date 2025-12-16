@@ -9,8 +9,8 @@ export const threadSchema = z.object({
   participantsId: userIdSchema.array(),
   title: z.string(),
   createdAt: z.iso.datetime(),
-  type: z.enum(["external", "internal"]),
   updatedAt: z.iso.datetime(),
+  type: z.enum(["external", "internal"]),
   isClose: z.boolean(),
 });
 

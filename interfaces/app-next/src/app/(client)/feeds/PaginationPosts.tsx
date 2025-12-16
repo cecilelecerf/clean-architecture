@@ -1,6 +1,6 @@
 "use client"
-import { FiltersProps } from "@/utils/endpoint/client/feedsEndpoint"
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { FiltersProps } from "@/utils/endpoint/feedsEndpoint"
 
 
 type Props = { filters: FiltersProps, totalPage: number, onPaginationChange: (page: number) => void }

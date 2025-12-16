@@ -7,11 +7,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { match } from 'ts-pattern';
 import { ButtonLink } from '@/components/buttons/ButtonLink';
-import { clientEndpoints } from '@/utils/endpoint/client';
-
+ 
+ import { endpoints } from '@/utils/endpoint';
+ 
 export default function AccountsPage() {
   const router = useRouter();
-  const query = useQuery(clientEndpoints.accounts.getAll())
+  const query = useQuery(endpoints.accounts.getAll())
 
   return (
     <>

@@ -6,6 +6,7 @@ import { BcryptEncryptionService } from "@infrastructure/adapters/services/Bcryp
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { rawDirectors } from "../../seeds/director";
+import { rand } from "./utils";
 
 export async function seedSQLDirector(
   mysqlClient: MySQLClient
@@ -33,6 +34,10 @@ export async function seedSQLDirector(
         role: "directeur",
         createdAt: clockService.now(),
         isActiveField: true,
+                confirmedAt: clockService.now(),
+                                                updatedAt:   Math.random() < 0.3
+                                                        ? clockService.addDays(clockService.now(), rand(1, 10))
+                                                        :  clockService.nowMinusDays(rand(0, 60))
       });
 
       users.push(user);

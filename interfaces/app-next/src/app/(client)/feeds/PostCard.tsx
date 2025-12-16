@@ -1,13 +1,13 @@
 "use client"
-import { PostWithTagsAndUser } from "@/utils/endpoint/advisor/feedsEndpoint";
-import { useRouter } from "next/navigation";
+ import { useRouter } from "next/navigation";
 import { Tag } from "@/components/Tag";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { useSession } from "next-auth/react";
 import { Check } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { clientEndpoints } from "@/utils/endpoint/client";
 import { ButtonLoading } from "@/components/buttons/ButtonLoading";
+import { endpoints } from "@/utils/endpoint";
+import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint";
 
 type PostCardProps = {
     post: PostWithTagsAndUser;
@@ -16,7 +16,7 @@ type PostCardProps = {
 export const PostCard = ({ post }: PostCardProps) => {
     const router = useRouter();
     const { data: session } = useSession()
-    const markAsReadMutation = useMutation(clientEndpoints.feeds.posts.markAsRead())
+    const markAsReadMutation = useMutation(endpoints.feeds.posts.markAsRead())
 
     const isRead = post.readBy.includes(session.user.id)
     return (

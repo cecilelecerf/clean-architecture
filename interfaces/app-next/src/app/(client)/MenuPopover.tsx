@@ -2,18 +2,17 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { PostWithTagsAndUser } from "@/utils/endpoint/advisor/feedsEndpoint"
-import { clientEndpoints } from "@/utils/endpoint/client"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover" 
+import { endpoints } from "@/utils/endpoint"
+import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Bell } from "lucide-react"
-import { useSession } from "next-auth/react"
-import Link from "next/link"
+ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { match } from "ts-pattern"
 
 export const MenuPopover = () => {
-    const query = useQuery(clientEndpoints.feeds.posts.getUnread())
+    const query = useQuery(endpoints.feeds.posts.getUnread())
 
     return match(query)
         .with({ status: "error" }, () => "error")
@@ -24,7 +23,7 @@ export const MenuPopover = () => {
 
 const DisplayPopover = ({ posts }: { posts: PostWithTagsAndUser[] }) => {
     const router = useRouter()
-    const markAsReadMutation = useMutation(clientEndpoints.feeds.posts.markAsRead())
+    const markAsReadMutation = useMutation(endpoints.feeds.posts.markAsRead())
     const postCount = posts.length
     return (
         <Popover>
