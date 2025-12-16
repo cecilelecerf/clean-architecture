@@ -19,13 +19,13 @@ export const accountsEndpoint = createEndpointsNodes({
     queryOptions({
       queryKey: ['accounts', 'list'],
       queryFn: () =>
-        get('/accounts', 'client').then((data) => {
+        get('/accounts').then((data) => {
           return safeParseWithLog(accountSchema.array(), data);
         }),
     }),
   get: ({ id }: { id: AccountId }) =>
     queryOptions({
       queryKey: ['accounts', id],
-      queryFn: () => get(`/accounts/${id}`, 'client').then((data) => accountSchema.parse(data)),
+      queryFn: () => get(`/accounts/${id}`).then((data) => accountSchema.parse(data)),
     }),
 });

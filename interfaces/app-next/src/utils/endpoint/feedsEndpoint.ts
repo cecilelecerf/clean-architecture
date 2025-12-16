@@ -2,11 +2,11 @@ import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { PostId, postSchema, TagId, tagSchema } from '@infrastructure/types/feed';
-import { queryClient } from '@/lib/queryClient';
+import { PostId, postSchema, TagId, tagIdSchema, tagSchema } from '@infrastructure/types/feed';
 import z from 'zod';
+ import { queryClient } from '@/lib/queryClient';
 import { userDtoSchema } from '@infrastructure/types/user';
-import { feedsQueryKeys, FiltersProps } from '../client/feedsEndpoint';
+
 
 export const postWithTagsAndUserSchema = postSchema.extend({
   tags: tagSchema.array(),
@@ -24,6 +24,30 @@ export const publishActionSchema = z.object({
 });
 type PublishAction = z.infer<typeof publishActionSchema>;
 
+export const feedsQueryKeys = {
+  posts: {
+    list: (filters: FiltersProps) => ['posts', 'list', filters ?? {}] as const,
+    unread: () => ['posts', 'unread'] as const,
+    detail: (id: PostId) => ['posts', 'detail', id] as const,
+  },
+  tags: {
+    list: ['tags', 'list'] as const,
+    detail: (id: TagId) => ['tags', 'detail', id] as const,
+  },
+};
+
+export const querySchema = z.object({
+  page: z.number().optional(),
+  limit: z.number().optional(),
+  tagsId: tagIdSchema.array().optional(),
+  status: z.boolean().optional(),
+  fromDate: z.iso.datetime().optional(),
+  toDate: z.iso.datetime().optional(),
+  title: z.string().optional(),
+});
+
+export type FiltersProps = z.infer<typeof querySchema>;
+
 export const feedsEndpoint = createEndpointsNodes({
   posts: {
     getAll: ({ filters }: { filters?: FiltersProps }) =>
@@ -36,11 +60,9 @@ export const feedsEndpoint = createEndpointsNodes({
           if (filters.limit) params.set('limit', String(filters.limit));
           if (filters.tagsId && filters.tagsId.length > 0)
             params.set('tagsId', filters.tagsId.join(','));
-          if (typeof filters.status === 'boolean')
-            params.set('status', filters.status ? 'true' : 'false');
           if (filters.fromDate) params.set('fromDate', filters.fromDate);
           if (filters.toDate) params.set('toDate', filters.toDate);
-          return get(`/posts?${params.toString()}`, 'advisor').then((data) =>
+          return get(`/posts?${params.toString()}`).then((data) =>
             safeParseWithLog(
               z.object({ posts: postWithTagsAndUserSchema.array(), total: z.number() }),
               data,
@@ -48,16 +70,40 @@ export const feedsEndpoint = createEndpointsNodes({
           );
         },
       }),
+    getUnread: () =>
+      queryOptions({
+        queryKey: feedsQueryKeys.posts.unread(),
+        queryFn: () => {
+          return get(`/posts/unread`).then((data) =>
+            safeParseWithLog(postWithTagsAndUserSchema.array(), data),
+          );
+        },
+      }),
     get: ({ id }: { id: PostId }) =>
       queryOptions({
         queryKey: feedsQueryKeys.posts.detail(id),
         queryFn: () =>
-          get(`/posts/${id}`, 'advisor').then((data) => postWithTagsAndUserSchema.parse(data)),
+          get(`/posts/${id}`).then((data) => postWithTagsAndUserSchema.parse(data)),
       }),
+    markAsRead: () =>
+      mutationOptions({
+        mutationFn: ({ postId }: { postId: PostId }) =>
+          patch(`/posts/${postId}/read`, {}),
+        onSuccess: async ({ postId }: { postId: PostId }) => {
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.posts.detail(postId) }),
+            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.posts.unread() }),
+            queryClient.invalidateQueries({
+              queryKey: ['posts', 'list'],
+            }),
+          ]);
+        },
+      }),
+
     add: () =>
       mutationOptions({
         mutationFn: ({ ...payload }: NewPost) =>
-          post(`/posts`, { ...payload }, 'advisor').then((data) => postSchema.parse(data)),
+          post(`/posts`, { ...payload }).then((data) => postSchema.parse(data)),
         onSuccess: () =>
           queryClient.invalidateQueries({
             predicate: (query) => query.queryKey[0] === 'posts' && query.queryKey[1] === 'list',
@@ -66,7 +112,7 @@ export const feedsEndpoint = createEndpointsNodes({
     edit: ({ id }: { id: PostId }) =>
       mutationOptions({
         mutationFn: ({ ...payload }: Partial<NewPost>) =>
-          patch(`/posts/${id}`, { ...payload }, 'advisor').then((data) => postSchema.parse(data)),
+          patch(`/posts/${id}`, { ...payload }).then((data) => postSchema.parse(data)),
         onSuccess: async () => {
           await Promise.all([
             queryClient.invalidateQueries({ queryKey: feedsQueryKeys.posts.detail(id) }),
@@ -79,7 +125,7 @@ export const feedsEndpoint = createEndpointsNodes({
 
     delete: ({ id }: { id: PostId }) =>
       mutationOptions({
-        mutationFn: () => deleteEntity(`/posts/${id}`, 'advisor'),
+        mutationFn: () => deleteEntity(`/posts/${id}`),
         onSuccess: async () => {
           await Promise.all([
             queryClient.invalidateQueries({ queryKey: feedsQueryKeys.posts.detail(id) }),
@@ -93,7 +139,7 @@ export const feedsEndpoint = createEndpointsNodes({
     status: ({ id }: { id: PostId }) =>
       mutationOptions({
         mutationFn: ({ status }: PublishAction) =>
-          patch(`/posts/${id}/status`, { status }, 'advisor').then((data) =>
+          patch(`/posts/${id}/status`, { status }).then((data) =>
             postSchema.parse(data),
           ),
         onSuccess: async () => {
@@ -111,43 +157,7 @@ export const feedsEndpoint = createEndpointsNodes({
       queryOptions({
         queryKey: feedsQueryKeys.tags.list,
         queryFn: () =>
-          get('/tags', 'advisor').then((data) => safeParseWithLog(tagSchema.array(), data)),
-      }),
-
-    get: ({ id }: { id: TagId }) =>
-      queryOptions({
-        queryKey: feedsQueryKeys.tags.detail(id),
-        queryFn: () => get(`/tags/${id}`, 'advisor').then((data) => tagSchema.parse(data)),
-      }),
-
-    add: () =>
-      mutationOptions({
-        mutationFn: ({ ...payload }: NewTag) =>
-          post(`/tags/new`, { ...payload }, 'advisor').then((data) => tagSchema.parse(data)),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: feedsQueryKeys.tags.list }),
-      }),
-
-    edit: ({ id }: { id: TagId }) =>
-      mutationOptions({
-        mutationFn: ({ ...payload }: Partial<NewTag>) =>
-          patch(`/tags/${id}`, { ...payload }, 'advisor').then((data) => tagSchema.parse(data)),
-        onSuccess: async () => {
-          await Promise.all([
-            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.tags.detail(id) }),
-            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.tags.list }),
-          ]);
-        },
-      }),
-
-    delete: ({ id }: { id: TagId }) =>
-      mutationOptions({
-        mutationFn: () => deleteEntity(`/tags/${id}`, 'advisor'),
-        onSuccess: async () => {
-          await Promise.all([
-            queryClient.removeQueries({ queryKey: feedsQueryKeys.tags.detail(id) }),
-            queryClient.invalidateQueries({ queryKey: feedsQueryKeys.tags.list }),
-          ]);
-        },
+          get('/tags').then((data) => safeParseWithLog(tagSchema.array(), data)),
       }),
   },
 });

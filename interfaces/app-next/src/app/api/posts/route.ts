@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
-import { querySchema } from '@/utils/endpoint/client/feedsEndpoint';
-import { newPostSchema } from '@/utils/endpoint/advisor/feedsEndpoint';
-import { postSchema } from '@infrastructure/types/feed';
+ import { postSchema } from '@infrastructure/types/feed';
 import z from 'zod';
+import { newPostSchema, querySchema } from '@/utils/endpoint/feedsEndpoint';
 
 export async function GET(req: NextRequest) {
   try {

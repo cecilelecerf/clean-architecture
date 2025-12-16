@@ -10,7 +10,7 @@ export const usersEndpoint = createEndpointsNodes({
       queryKey: ['users', 'list', role ?? 'all'],
       queryFn: () => {
         const roleParams = !!role ? `?role=${role}` : '';
-        return get(`/users${roleParams}`, 'advisor').then((data) => {
+        return get(`/users${roleParams}`).then((data) => {
           return safeParseWithLog(userSchema.array(), data);
         });
       },
@@ -18,6 +18,6 @@ export const usersEndpoint = createEndpointsNodes({
   get: ({ id }: { id: UserId }) =>
     queryOptions({
       queryKey: ['users', id],
-      queryFn: () => get(`/users/${id}`, 'advisor').then((data) => userSchema.parse(data)),
+      queryFn: () => get(`/users/${id}`).then((data) => userSchema.parse(data)),
     }),
 });
