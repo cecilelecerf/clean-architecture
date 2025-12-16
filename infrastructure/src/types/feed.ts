@@ -10,7 +10,7 @@ export const tagSchema = z.object({
   label: z.string(),
   color: colorSchema,
   createdAt: z.iso.datetime(),
-  modifiedAt: z.iso.datetime().nullable(),
+  updatedAt: z.iso.datetime().nullable(),
 });
 export type Tag = z.infer<typeof tagSchema>;
 

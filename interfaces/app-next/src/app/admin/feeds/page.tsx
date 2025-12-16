@@ -1,5 +1,5 @@
 "use client"
-import { FiltersProps } from "@/utils/endpoint/client/feedsEndpoint"
+import { FiltersProps } from "@/utils/endpoint/feedsEndpoint"
 import { useState } from "react";
 import { Posts } from "./Posts";
 import { PostFilters } from "./PostFilters";

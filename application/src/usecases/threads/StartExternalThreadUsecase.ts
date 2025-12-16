@@ -62,14 +62,15 @@ export class StartExternalThreadUsecase {
 
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
-
-    const thread = ThreadEntity.create({
+     const thread = ThreadEntity.create({
       id,
       createdAt,
+      updatedAt: createdAt,
       type: "external",
       participantsId: [clientId],
       title,
       isClose: false,
+      administratorId:null
     });
     if (thread instanceof Error) return thread;
     await this.threadRepository.save(thread);
@@ -86,7 +87,7 @@ export class StartExternalThreadUsecase {
       threadId: thread.id,
     });
     if (message instanceof Error) return message;
-
+console.log(thread)
     return thread;
   }
 }

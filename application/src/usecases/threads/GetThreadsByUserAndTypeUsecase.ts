@@ -27,7 +27,8 @@ export class GetThreadsByUserAndTypeUsecase {
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user; 
-
+    console.log("usecase")
+console.log(type)
     if(type === "external"){
       if(advisorId){
         const advisor = await findActiveUser(this.userRepository, advisorId);
@@ -40,7 +41,6 @@ export class GetThreadsByUserAndTypeUsecase {
       return new UserRoleMismatchError(["conseiller", "client"], user.role);
 
     }else if(type==="internal") {
-
           if (user.hasRole({ role: "client" }))
       return new UserRoleMismatchError(["conseiller", "directeur"], user.role);
     }
@@ -49,7 +49,8 @@ export class GetThreadsByUserAndTypeUsecase {
       await this.threadRepository.findAllWithUserByAdministratorIdAndType(
         userId, type
       );
-          const threadsParticipant =
+      console.log(threadsAdmin)
+           const threadsParticipant =
       await this.threadRepository.findAllWithUserByParticipantIdAndType(
         userId, type
       );

@@ -1,12 +1,11 @@
 "use client"
-import { NewThread } from "@/app/api/client/threads/route";
-import FormWrapper, { Field } from "@/components/FromWrapper";
+ import FormWrapper, { Field } from "@/components/FromWrapper";
 import { ButtonBack } from "@/components/ButtonBack";
 import { Thread } from "@infrastructure/types/thread";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
-import { clientEndpoints } from "@/utils/endpoint/client";
+import { FormEvent, useState } from "react";import { endpoints } from "@/utils/endpoint";
+import { NewThread } from "@/app/api/threads/route";
 
 export default function NewThreadPage() {
     const router = useRouter()
@@ -25,7 +24,7 @@ export default function NewThreadPage() {
         },
     ];
 
-    const mutate = useMutation<Thread, Error, NewThread>(clientEndpoints.threads.post())
+    const mutate = useMutation(endpoints.threads.create({type: "external"}))
 
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();

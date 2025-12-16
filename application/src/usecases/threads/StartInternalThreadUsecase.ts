@@ -77,6 +77,7 @@ export class StartInternalThreadUsecase {
       administratorId,
       title,
       isClose: false,
+      updatedAt:createdAt
     });
 
     if (thread instanceof Error) return thread;

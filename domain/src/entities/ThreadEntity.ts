@@ -10,8 +10,8 @@ export class ThreadEntity {
     public createdAt: Date,
     public isClose: boolean,
     public type: "external" | "internal",
-    public administratorId?: UserEntity["id"],
-    public updatedAt?: Date
+    public administratorId: UserEntity["id"]|null,
+    public updatedAt: Date
   ) {}
 
   public static create({
@@ -33,7 +33,7 @@ export class ThreadEntity {
     | "title"
     | "isClose"
     | "type"
-  >): ThreadEntity | InvalidTitleError {
+  >): ThreadEntity | InvalidTitleError { 
     const verifiedTitle = this.validateTitle(title);
     if (verifiedTitle instanceof Error) return verifiedTitle;
     return new ThreadEntity(

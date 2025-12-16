@@ -9,21 +9,21 @@ import { socket } from '@/lib/socket';
 import { Button } from '@/components/ui/button';
 import { UserDto } from '@infrastructure/types/user';
 import { MessageWithUser } from '@infrastructure/types/message';
-import { advisorEndpoint } from '@/utils/endpoint/advisor';
-import { useRouter } from 'next/navigation';
+ import { useRouter } from 'next/navigation';
 import { MessageComponent } from '@/components/Message';
-import { ThreadWithUser } from '@/utils/endpoint/client/threadEndpoints';
+import { ThreadWithUser } from '@/utils/endpoint/threadEndpoints';
 import { Settings } from './Settings';
 import { Flex } from '@radix-ui/themes';
 import { PostMessage } from './PostMessage';
 import { JoinThread } from './Join';
+import { endpoints } from '@/utils/endpoint';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
     const queries = useQueries({
         queries: [
-            advisorEndpoint.thread.client.get({ id: threadId }),
-            advisorEndpoint.thread.messages.getAll({ id: threadId })
+            endpoints.threads.get({  threadId }),
+            endpoints.threads.messages.getAll({ threadId })
         ]
     })
 

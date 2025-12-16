@@ -58,16 +58,13 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       `SELECT user_id FROM thread_participant WHERE thread_id = ?`,
       [thread.id]
     );
-    console.log(existingParticipantRows);
-    const existingParticipantIds = existingParticipantRows.map(
+     const existingParticipantIds = existingParticipantRows.map(
       (r) => r.user_id
     );
-    console.log(existingParticipantIds);
-    const participantsToAdd = thread.participantsId.filter(
+     const participantsToAdd = thread.participantsId.filter(
       (id) => !existingParticipantIds.includes(id)
     );
-    console.log(participantsToAdd);
-    for (const participantId of participantsToAdd) {
+     for (const participantId of participantsToAdd) {
       await this.client.query<ResultSetHeader>(
         `INSERT INTO thread_participant (thread_id, user_id) VALUES (?, ?)`,
         [thread.id, participantId]
@@ -193,7 +190,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
 
   ): Promise<ThreadEntityWithUsers[]> {
 
-      const conditions = ["t.administrator_id = ?"];
+      const conditions = ["tp.user_id = ?"];
   const params: any[] = [participantId];
 
   if (type) {
@@ -230,9 +227,9 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     WHERE ${whereClause} 
     ORDER BY t.updated_at DESC, t.created_at DESC
     `,
-      [participantId, type]
-    );
-    const map = new Map<number, ThreadEntityWithUsers>();
+      params
+    ); 
+    const map = new Map<string, ThreadEntityWithUsers>();
 
     for (const row of rows) {
       let thread = map.get(row.id);
@@ -257,7 +254,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           participantsId: [],
           title: row.title,
           createdAt: new Date(row.created_at),
-          updatedAt: row.updated_at ? new Date(row.updated_at) : undefined,
+          updatedAt:new Date(row.updated_at) ,
           isClose: row.is_close === 1,
           type: row.type,
         });
@@ -335,9 +332,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       participantsId: [],
       title: threadRow.title,
       createdAt: new Date(threadRow.created_at),
-      updatedAt: threadRow.updated_at
-        ? new Date(threadRow.updated_at)
-        : undefined,
+      updatedAt:new Date(threadRow.updated_at),
       isClose: threadRow.is_close === 1,
       type: threadRow.type,
     });
@@ -379,15 +374,14 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     administratorId: UserEntity["id"],
     type?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]> {
-      const conditions = ["t.administrator_id = ?"];
+  const conditions = ["t.administrator_id = ?"];
   const params: any[] = [administratorId];
-
-  if (type) {
+   if (type) {
     conditions.push("t.type = ?");
     params.push(type);
   }
 
-  const whereClause = conditions.join(" AND ");
+  const whereClause = conditions.join(" AND "); 
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT t.*, 
           admin.id as admin_id,
@@ -412,11 +406,10 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     JOIN users p ON tp.user_id = p.id AND p.is_active = 1 AND p.confirmed_at IS NOT NULL
     WHERE ${whereClause}
     ORDER BY t.created_at DESC`
-    ,
+    ,params
       
     );
-
-    const threadsMap = new Map<string, ThreadEntityWithUsers>();
+     const threadsMap = new Map<string, ThreadEntityWithUsers>();
 
     for (const row of rows) {
       if (!threadsMap.has(row.id)) {
@@ -426,7 +419,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           participantsId: [],
           title: row.title,
           createdAt: new Date(row.created_at),
-          updatedAt: row.updated_at ? new Date(row.updated_at) : undefined,
+          updatedAt: new Date(row.updated_at) ,
           isClose: row.is_close === 1,
           type: row.type,
         }) as ThreadEntityWithUsers;
@@ -499,7 +492,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           participantsId: [],
           title: row.title,
           createdAt: new Date(row.created_at),
-          updatedAt: row.updated_at ? new Date(row.updated_at) : undefined,
+          updatedAt:new Date(row.updated_at),
           isClose: row.is_close === 1,
           type: row.type,
         }) as ThreadEntityWithUsers;

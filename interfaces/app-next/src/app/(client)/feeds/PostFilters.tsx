@@ -6,8 +6,8 @@ import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CalendarFilter } from "../../../components/CalendarFilter";
 import { Slider } from "@/components/ui/slider";
-import { FiltersProps } from "@/utils/endpoint/client/feedsEndpoint"
-
+import { FiltersProps } from "@/utils/endpoint/feedsEndpoint";
+ 
 type PostFiltersProps = {
     filters: FiltersProps;
     onChange: (filters: FiltersProps) => void;

@@ -11,19 +11,19 @@ import { Input } from '@/components/ui/input';
 import { UserDto } from '@infrastructure/types/user';
 import { Message, MessageWithUser } from '@infrastructure/types/message';
 import { post } from '@/lib/apiClient';
-import { NewMessage } from '@/app/api/client/threads/[thread_id]/messages/new/route';
-import { Spinner } from '@/components/ui/spinner';
-import { ArrowRight } from 'lucide-react';
-import { clientEndpoints } from '@/utils/endpoint/client';
-import { ThreadWithUser } from '@/utils/endpoint/client/threadEndpoints';
+ import { Spinner } from '@/components/ui/spinner';
+import { ArrowRight } from 'lucide-react'; 
 import { MessageComponent } from '@/components/Message';
+import { endpoints } from '@/utils/endpoint';
+import { ThreadWithUser } from '@/utils/endpoint/threadEndpoints';
+import { NewMessage } from '@/app/api/threads/[threadId]/messages/route';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
     const queries = useQueries({
         queries: [
-            clientEndpoints.threads.get({ id: threadId }),
-            clientEndpoints.threads.messages.getAll({ id: threadId })
+            endpoints.threads.get({ threadId }),
+            endpoints.threads.messages.getAll({  threadId })
         ]
     })
     const { data: session } = useSession();
@@ -43,7 +43,7 @@ const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWit
     const bottomRef = useRef<HTMLDivElement | null>(null);
 
     const sendMessageMutate = useMutation({
-        mutationFn: (content: string) => post<Message, NewMessage>(`/threads/${thread.id}/messages/new`, { content }, "client"),
+        mutationFn: (content: string) => post<Message, NewMessage>(`/threads/${thread.id}/messages/new`, { content }),
         onSuccess: (data) => {
             socket.emit("thread:new_message", { message: data });
             setInput("")

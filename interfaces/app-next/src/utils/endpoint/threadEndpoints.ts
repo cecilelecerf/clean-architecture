@@ -7,6 +7,7 @@ import z from 'zod';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
+import { NewThread } from '@/app/api/threads/route';
 
 // ============================================================================
 // SCHEMAS
@@ -32,19 +33,15 @@ export type ThreadWithAdminOnly = z.infer<typeof threadWithAdminOnlySchema>;
 export const threadsEndpoint = createEndpointsNodes({
   // GET /api/threads
   // Liste des threads selon le rôle + filtres optionnels
-  getAll: (filters?: { 
-    type?: 'external' | 'internal'; 
-    status?: 'open' | 'closed';
-  }) =>
+  getAll: ({type}: {type?: Thread["type"]} ) =>
     queryOptions({
-      queryKey: ['threads', 'list', filters],
+      queryKey: ['threads', 'list', type],
       queryFn: () => {
         const params = new URLSearchParams();
-        if (filters?.type) params.set('type', filters.type);
-        if (filters?.status) params.set('status', filters.status);
-        
+        if (type) params.set('type',type);
+         
         return get(`/threads?${params.toString()}`).then((data) =>
-          safeParseWithLog(threadWithAdminOnlySchema.array(), data)
+          safeParseWithLog(threadWithUserSchema.array(), data)
         );
       },
     }),
@@ -60,29 +57,42 @@ export const threadsEndpoint = createEndpointsNodes({
         ),
     }),
 
-  // GET /api/threads/client/:clientId
-  // Threads d'un client spécifique (conseiller/directeur)
+  // GET /api/threads/user/:userId
+  // Threads d'un user spécifique
+  getByUser: ({ userId }: { userId: UserId }) =>
+    queryOptions({
+      queryKey: ['threads', 'client', userId],
+      queryFn: () =>
+        get(`/threads/user/${userId}`).then((data) =>
+          safeParseWithLog(threadWithAdminOnlySchema.array(), data)
+        ),
+    }),
+
+  // GET /api/threads/user/:userI/client
+  // Threads d'un user spécifique (conseiller/directeur)
   getByClient: ({ clientId }: { clientId: UserId }) =>
     queryOptions({
       queryKey: ['threads', 'client', clientId],
       queryFn: () =>
-        get(`/threads/client/${clientId}`).then((data) =>
+        get(`/threads/client/${clientId}/client`).then((data) =>
           safeParseWithLog(threadWithAdminOnlySchema.array(), data)
         ),
     }),
 
   // POST /api/threads
   // Créer un nouveau thread (externe ou interne)
-  create: () =>
+  create: ({type}:{type: Thread["type"]}) =>
     mutationOptions({
-      mutationFn: (data: {
-        type: 'external' | 'internal';
-        title: string;
-        initialMessage?: string; // Requis si type === 'external'
-        participantsId?: UserId[]; // Requis si type === 'internal'
-      }) => post<Thread>('/threads', data),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['threads', 'list'] });
+      mutationFn: (data: NewThread) =>{
+        const params = new URLSearchParams();
+        if (type) params.set('type', type); 
+        
+        return post(`/threads?${params.toString()}`, data).then((data) =>
+          safeParseWithLog(threadSchema, data)
+        );
+      },
+       onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['threads', 'list', type] });
       },
     }),
 

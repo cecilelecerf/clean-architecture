@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
+import { threadSchema } from '@infrastructure/types/thread';
+import { messageSchema } from '@infrastructure/types/message';
+import z from 'zod';
+import { userIdSchema } from '@infrastructure/types/user';
 
 export async function GET(
   req: NextRequest,
@@ -11,10 +15,9 @@ export async function GET(
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-
     const { searchParams } = new URL(req.url);
     const type = searchParams.get('type') as 'external' | 'internal' | null;
-
+console.log(type)
     const thread = await threadsFactory().getThreadsByUserAndTypeUsecase.execute({userId:session.user.id, type : type ??undefined});
     if (thread instanceof Error) {
       return NextResponse.json(
@@ -30,6 +33,10 @@ export async function GET(
   }
 }
 
+const newThreadSchmea = threadSchema
+  .pick({ title: true,  })
+  .extend({ messageContent: messageSchema.shape.content, type : threadSchema.shape.type.optional(), participantsId : userIdSchema.array().optional() });
+export type NewThread = z.infer<typeof newThreadSchmea>;
 
 
 export async function POST(req: NextRequest) {
@@ -39,15 +46,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { type, title, participantsId, initialMessage } = body;
-     
-    if (type === 'external') { 
-
+    const { searchParams } = new URL(req.url);
+    const type = searchParams.get('type') as 'external' | 'internal' | null;
+    const json = await req.json();
+    const data = newThreadSchmea.parse(json); 
+    if (type === 'external') {  
     const  result = await threadsFactory().startExternalThread.execute({
-        clientId: session.user.id,
-        title,
-        messageContent: initialMessage,
+        clientId: session.user.id, ...data
       });
             if (result instanceof Error) {
       return NextResponse.json(
@@ -57,11 +62,10 @@ export async function POST(req: NextRequest) {
       
     }
     return NextResponse.json(result, { status: 201 });
-    } else if (type === 'internal') { 
+    } else if (data.type === 'internal') { 
     const  result = await threadsFactory().startInternalThread.execute({
         administratorId: session.user.id,
-        title,
-        participantsId,
+        ...data, participantsId: data.participantsId ?? []
       });
       if (result instanceof Error) {
       return NextResponse.json(
