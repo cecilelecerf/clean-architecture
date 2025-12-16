@@ -4,19 +4,19 @@ import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/reposit
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { MessageRepositoryMySQL } from "../repositories/MessageRepositoryMySQL";
-import { CloseThreadUsecase } from "@application/usecases/threads/CloseThreadUsecase";
 import { LeaveThreadUsecase } from "@application/usecases/threads/LeaveThreadUsecase";
-import { StartExternalThreadUsecase } from "@application/usecases/threads/clients/StartExternalThreadUsecase";
-import { AddParticipantUsecase } from "@application/usecases/threads/administrators/advisors/AddParticipantUsecase";
 import { AdvisorGetAllThreadUsecase } from "@application/usecases/threads/administrators/advisors/AdvisorGetAllThreadUsecase";
 import { ClientGetAllThreadUsecase } from "@application/usecases/threads/clients/ClientGetAllThreadUsecase";
 import { FindThreadWithUserUsecase } from "@application/usecases/threads/administrators/advisors/FindThreadWithUserUsecase";
-import { RemoveParticipantUsecase } from "@application/usecases/threads/administrators/RemoveParticipantUsecase";
-import { StartInternalThreadUsecase } from "@application/usecases/threads/administrators/directors/StartInternalThreadUsecase";
-import { TransferThreadUsecase } from "@application/usecases/threads/administrators/TransferThreadUsecase";
-import { UpdateThreadTitleUsecase } from "@application/usecases/threads/administrators/UpdateThreadTitleUsecase";
 import { AdvisorJoinExternalThread } from "@application/usecases/threads/administrators/advisors/AdvisorJoinExternalThread";
 import { AdvisorGetAllThreadByClientUsecase } from "@application/usecases/threads/administrators/advisors/AdvisorGetAllThreadByClientUsecase";
+import { StartExternalThreadUsecase } from "@application/usecases/threads/StartExternalThreadUsecase";
+import { AddParticipantUsecase } from "@application/usecases/threads/admin/AddParticipantUsecase";
+import { CloseThreadUsecase } from "@application/usecases/threads/admin/CloseThreadUsecase";
+import { RemoveParticipantUsecase } from "@application/usecases/threads/admin/RemoveParticipantUsecase";
+import { StartInternalThreadUsecase } from "@application/usecases/threads/StartInternalThreadUsecase";
+import { TransferThreadUsecase } from "@application/usecases/threads/admin/TransferThreadUsecase";
+import { UpdateThreadTitleUsecase } from "@application/usecases/threads/admin/UpdateThreadTitleUsecase";
 export const threadsFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);

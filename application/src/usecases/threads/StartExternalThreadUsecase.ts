@@ -1,4 +1,8 @@
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
@@ -6,12 +10,20 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
-import { UserEntity } from "@domain/entities/UserEntity"; 
-import { SendMessage } from "../../messages/SendMessage";
+import { UserEntity } from "@domain/entities/UserEntity";
+import { SendMessage } from "../messages/SendMessage";
 import { MessageRepository } from "@application/ports/repositories/MessageRepository";
- import { ThreadNotFoundError,NoAdvisorFoundError } from "@application/errors/threads";
+import {
+  ThreadNotFoundError,
+  NoAdvisorFoundError,
+  InvalidThreadParticipantsError,
+} from "@application/errors/threads";
 
-import { InvalidThreadAccessError, InvalidTitleError, ThreadClosedError } from "@domain/errors/thread";
+import {
+  InvalidThreadAccessError,
+  InvalidTitleError,
+  ThreadClosedError,
+} from "@domain/errors/thread";
 import { ContentEmptyError } from "@domain/errors/message";
 
 type Props = {

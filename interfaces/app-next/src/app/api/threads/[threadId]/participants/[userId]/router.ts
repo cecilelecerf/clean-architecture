@@ -1,0 +1,2 @@
+// DELETE
+// retirer un participant

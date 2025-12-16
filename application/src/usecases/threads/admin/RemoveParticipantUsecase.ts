@@ -1,5 +1,13 @@
-import { InvalidThreadAccessError,ThreadNotFoundError } from "@application/errors/threads";
- import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
+import {
+  InvalidThreadAccessError,
+  ThreadNotFoundError,
+  ParticipantNotFoundError,
+} from "@application/errors/threads";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
@@ -9,9 +17,10 @@ import { UserEntity } from "@domain/entities/UserEntity";
 import { ThreadClosedError } from "@domain/errors/thread";
 
 type Props = {
-  userId: UserEntity["id"];
+  participantId: UserEntity["id"];
   administratorId: UserEntity["id"];
-} & Pick<ThreadEntity, "id">;
+  threadId: ThreadEntity["id"];
+};
 
 export class RemoveParticipantUsecase {
   constructor(
@@ -19,9 +28,10 @@ export class RemoveParticipantUsecase {
     private readonly threadRepository: ThreadRepository,
     private readonly clockService: ClockService
   ) {}
+
   public async execute({
-    id,
-    userId,
+    threadId,
+    participantId,
     administratorId,
   }: Props): Promise<
     | ThreadEntity
@@ -29,10 +39,15 @@ export class RemoveParticipantUsecase {
     | InvalidThreadAccessError
     | UserNotFoundError
     | UserNotActiveError
+    | UserRoleMismatchError
     | ThreadClosedError
+    | ParticipantNotFoundError
   > {
-    const user = await findActiveUser(this.userRepository, userId);
-    if (user instanceof Error) return user;
+    const participant = await findActiveUser(
+      this.userRepository,
+      participantId
+    );
+    if (participant instanceof Error) return participant;
 
     const administrator = await findActiveUser(
       this.userRepository,
@@ -40,19 +55,27 @@ export class RemoveParticipantUsecase {
     );
     if (administrator instanceof Error) return administrator;
 
-    const thread = await this.threadRepository.findById(id);
+    const thread = await this.threadRepository.findById(threadId);
     if (!thread) return new ThreadNotFoundError();
 
-    if (!thread.isAdministrator(administrator.id))
+    if (!thread.isAdministrator(administrator.id)) {
       return new InvalidThreadAccessError(administrator.id, thread.id);
+    }
 
-    const updateThread = thread.removeParticipant(
-      user.id,
+    const expectedRole =
+      thread.type === "external" ? "conseiller" : "directeur";
+    if (!administrator.hasRole({ role: expectedRole })) {
+      return new UserRoleMismatchError([expectedRole], administrator.role);
+    }
+
+    const updatedThread = thread.removeParticipant(
+      participant.id,
       this.clockService.now()
     );
-    if (updateThread instanceof Error) return updateThread;
+    if (updatedThread instanceof Error) return updatedThread;
 
-    this.threadRepository.save(updateThread);
-    return updateThread;
+    await this.threadRepository.update(updatedThread);
+
+    return updatedThread;
   }
 }

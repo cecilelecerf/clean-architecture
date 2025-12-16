@@ -1,5 +1,9 @@
 import { InvalidThreadParticipantsError } from "@application/errors/threads";
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
@@ -42,16 +46,25 @@ export class StartInternalThreadUsecase {
     if (!administrator?.hasRole({ role: "directeur" }))
       return new UserRoleMismatchError(["directeur"], administrator.role);
 
-    participantsId.map(async (participantId) => {
-      const participant = await findActiveUser(
-        this.userRepository,
-        participantId
-      );
-      if (participant instanceof Error) return participant;
+    const participantsValidation = await Promise.all(
+      participantsId.map(async (participantId) => {
+        const participant = await findActiveUser(
+          this.userRepository,
+          participantId
+        );
+        if (participant instanceof Error) return participant;
 
-      if (!participant?.hasRole({ role: "conseiller" }))
-        return new UserRoleMismatchError(["conseiller"], participant.role);
-    });
+        if (!participant.hasRole({ role: "conseiller" })) {
+          return new UserRoleMismatchError(["conseiller"], participant.role);
+        }
+
+        return participant;
+      })
+    );
+    const firstError = participantsValidation.find(
+      (result) => result instanceof Error
+    );
+    if (firstError) return firstError;
 
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
@@ -68,7 +81,7 @@ export class StartInternalThreadUsecase {
 
     if (thread instanceof Error) return thread;
 
-    this.threadRepository.save(thread);
+    await this.threadRepository.save(thread);
     return thread;
   }
 }
