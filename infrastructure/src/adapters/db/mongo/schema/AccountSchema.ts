@@ -4,7 +4,13 @@ import { AccountInterface } from "../interface/AccountInterface";
 export const AccountSchema = new Schema<AccountInterface>(
   {
     iban: { type: String, required: true },
-    userId: { type: String, required: true },
+    owner: {
+      type: {
+        role: { type: String, enum: ["bank", "client"], required: true },
+        userId: { type: String, required: false },
+      },
+      required: true
+    },
     name: { type: String, required: true },
     type: { type: String, enum: ["courant", "epargne"], required: true },
     color: { type: String, required: true },

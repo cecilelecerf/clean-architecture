@@ -1,6 +1,7 @@
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { AccountOwner } from "@domain/values/AccountOwner";
 import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
@@ -17,7 +18,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
     return rows.map((row) =>
       AccountEntity.from({
         iban: row.iban,
-        userId: row.user_id,
+        owner: AccountOwner.from({role: row.role, userId: row.userId}),
         name: row.name,
         type: row.type,
         color: row.color,
@@ -37,7 +38,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
     const row = rows[0];
     return AccountEntity.from({
       iban: row.iban,
-      userId: row.user_id,
+      owner: AccountOwner.from({role: row.role, userId: row.userId}),
       name: row.name,
       type: row.type,
       color: row.color,
@@ -54,7 +55,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
     return rows.map((row) =>
       AccountEntity.from({
         iban: row.iban,
-        userId: row.user_id,
+        owner: AccountOwner.from({role: row.role, userId: row.userId}),
         name: row.name,
         type: row.type,
         color: row.color,
@@ -65,14 +66,33 @@ export class AccountRepositoryMySQL implements AccountRepository {
     );
   }
 
+  async findBankInterestAccount(): Promise<AccountEntity | null> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      "SELECT * FROM accounts WHERE type = 'epargne' AND owner_type = 'bank'"
+    );
+    if (rows.length === 0) return null;
+    const row = rows[0];
+    return AccountEntity.from({
+      iban: row.iban,
+      owner: AccountOwner.from({role: row.role, userId: row.userId}),
+      name: row.name,
+      type: row.type,
+      color: row.color,
+      balance: Money.from({ amount: row.balance, currency: row.currency }),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    });
+  }
+
   async save(account: AccountEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO accounts 
-        (iban, user_id, name, type, balance, currency, created_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        (iban, role, user_id, name, type, balance, currency, created_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         account.iban.value,
-        account.userId,
+        account.owner.role,
+        account.owner.userId,
         account.name,
         account.type,
         account.balance.amount,
@@ -85,10 +105,11 @@ export class AccountRepositoryMySQL implements AccountRepository {
   async update(account: AccountEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE accounts 
-       SET user_id = ?, name = ?, type = ?, balance = ?, currency = ?, updated_at = ? 
+       SET user_id = ?, role = ?, name = ?, type = ?, balance = ?, currency = ?, updated_at = ? 
        WHERE iban = ?`,
       [
-        account.userId,
+        account.owner.userId,
+        account.owner.role,
         account.name,
         account.type,
         account.balance.amount,

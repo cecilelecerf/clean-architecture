@@ -14,6 +14,7 @@ import { Money } from "@domain/values/Money";
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
 import { Color } from "@domain/values/Color";
+import { AccountOwner } from "@domain/values/AccountOwner";
 
 export async function seedMongoClient(
   mongoClient: MongoClient,
@@ -81,7 +82,10 @@ export async function seedMongoClient(
         const account = AccountEntity.from({
           ...rawAccount,
           iban,
-          userId: user.id,
+          owner: AccountOwner.from({
+            role: 'client',
+            userId: user.id
+          }),
           createdAt: clockService.now(),
           color,
           balance: Money.from({

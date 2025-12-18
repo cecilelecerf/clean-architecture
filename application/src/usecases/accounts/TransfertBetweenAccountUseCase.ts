@@ -79,7 +79,7 @@ export class TransfertBetweenAccountUsecase {
     const user = await findActiveUser(this.userRepository, requestUserId);
     if (user instanceof Error) return user;
 
-    if (fromAccount.userId !== requestUserId) {
+    if (fromAccount.owner.userId !== requestUserId) {
       return new UnauthorizedAccessAccountError();
     }
 
@@ -88,10 +88,10 @@ export class TransfertBetweenAccountUsecase {
     }
 
     const withdrawResult = fromAccount.withdraw(amount);
-    if (withdrawResult instanceof Error) throw withdrawResult;
+    if (withdrawResult instanceof Error) return withdrawResult;
 
     const depositResult = toAccount.deposit(amount);
-    if (depositResult instanceof Error) throw depositResult;
+    if (depositResult instanceof Error) return depositResult;
 
     const now = this.clockService.now();
 
