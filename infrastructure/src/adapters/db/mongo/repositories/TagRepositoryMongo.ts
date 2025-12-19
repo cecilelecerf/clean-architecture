@@ -5,73 +5,71 @@ import { TagModel } from "../models/TagModel";
 import { Color } from "@domain/values/Color";
 
 export class TagRepositoryMongo implements TagRepository {
-    constructor(private readonly client: MongoClient) {}
+  constructor(private readonly client: MongoClient) {}
 
-    async save(tag: TagEntity): Promise<void> {
-        await this.client.connect();
-                                              
-        await TagModel.create({
-            label: tag.label,
-            color: tag.color,
-            createdAt: tag.createdAt
-        } as any);
-    }
+  private mapDocToTag(doc: any): TagEntity {
+    const color = Color.from(doc.color);
+    if (color instanceof Error) throw color;
 
-    async findById(id: TagEntity["id"]): Promise<TagEntity | null> {
-        await this.client.connect();
-                
-        const doc = await TagModel.findOne({ _id: id }).lean();
-        if (!doc) return null;
+    return TagEntity.from({
+      id: doc._id.toString(),
+      label: doc.label,
+      color,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    });
+  }
 
-        const color = Color.from(doc.color);
-        if (color instanceof Error) throw color;
+  /** Sauvegarder un tag */
+  async save(tag: TagEntity): Promise<void> {
+    await this.client.connect();
 
-        return TagEntity.from({
-            id: doc._id.toString(),
-            label: doc.label,
-            color,
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt ?? null,
-        });
-    }
+    await TagModel.create({
+      label: tag.label,
+      color: tag.color.getValue(),
+      createdAt: tag.createdAt,
+    });
+  }
 
-    async findAll(): Promise<TagEntity[]> {
-        await this.client.connect();
-        
-        const docs = await TagModel.find().lean();
-        
-        return docs.map((doc) => {
-            const color = Color.from(doc.color);
-            if (color instanceof Error) throw color;
+  /** Trouver un tag par ID */
+  async findById(id: TagEntity["id"]): Promise<TagEntity | null> {
+    await this.client.connect();
 
-            return TagEntity.from({
-                id: doc._id.toString(),
-                label: doc.label,
-                color,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt ?? null,
-            });
-        })
-    }
+    const doc = await TagModel.findById(id).lean();
+    if (!doc) return null;
 
-    async update(tag: TagEntity): Promise<void> {
-        await this.client.connect();
-                                                
-        await TagModel.updateOne(
-            { _id: tag.id },
-            {
-                $set: {
-                    label: tag.label,
-                    color: tag.color,
-                    updatedAt: tag.updatedAt || new Date(),
-                },
-            }
-        );
-    }
+    return this.mapDocToTag(doc);
+  }
 
-    async delete(id: TagEntity["id"]): Promise<void> {
-        await this.client.connect();
-                                        
-        await TagModel.deleteOne({ _id: id });
-    }
+  /** Tous les tags */
+  async findAll(): Promise<TagEntity[]> {
+    await this.client.connect();
+
+    const docs = await TagModel.find().sort({ label: 1 }).lean();
+
+    return docs.map((doc) => this.mapDocToTag(doc));
+  }
+
+  /** Mettre à jour un tag */
+  async update(tag: TagEntity): Promise<void> {
+    await this.client.connect();
+
+    await TagModel.updateOne(
+      { _id: tag.id },
+      {
+        $set: {
+          label: tag.label,
+          color: tag.color.getValue(),
+          updatedAt: tag.updatedAt,
+        },
+      }
+    );
+  }
+
+  /** Supprimer un tag */
+  async delete(id: TagEntity["id"]): Promise<void> {
+    await this.client.connect();
+
+    await TagModel.deleteOne({ _id: id });
+  }
 }

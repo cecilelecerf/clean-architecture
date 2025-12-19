@@ -17,8 +17,7 @@ import { Color } from "@domain/values/Color";
 import { AccountOwner } from "@domain/values/AccountOwner";
 
 export async function seedMongoClient(
-  mongoClient: MongoClient,
-  advisors: UserEntity[]
+  mongoClient: MongoClient
 ): Promise<UserEntity[]> {
   console.log("-- Création des comptes Client (Mongo) --");
 
@@ -83,15 +82,15 @@ export async function seedMongoClient(
           ...rawAccount,
           iban,
           owner: AccountOwner.from({
-            role: 'client',
-            userId: user.id
+            role: "client",
+            userId: user.id,
           }),
           createdAt: clockService.now(),
           color,
           balance: Money.from({
             amount: rawAccount.balance,
             currency: rawAccount.currency,
-          })
+          }),
         });
 
         await accountRepository.save(account);

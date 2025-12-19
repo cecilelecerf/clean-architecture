@@ -1,378 +1,293 @@
-import { PostRepository, PostWithTagsAndUser } from "@application/ports/repositories/PostRepository";
+import {
+  PostRepository,
+  PostWithTagsAndUser,
+} from "@application/ports/repositories/PostRepository";
 import { MongoClient } from "../../MongoClient";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { PostModel } from "../models/PostModel";
 import { Color } from "@domain/values/Color";
-import { TagModel } from "../models/TagModel";
-import { UserModel } from "../models/UserModel";
+import { ColorInvalidFormatError } from "@domain/errors/color";
 
 export class PostRepositoryMongo implements PostRepository {
-    constructor(private readonly client: MongoClient) {}
+  constructor(private readonly client: MongoClient) {}
 
-    async save(post: PostEntity): Promise<void> {
-      await this.client.connect();
-                              
-      await PostModel.create({
-        advisorId: post.advisorId,
-        title: post.title,
-        content: post.content,
-        tagsId: post.tagsId,
-        createdAt: post.createdAt,
-        readBy: post.readBy,
-        updatedAt: post.updatedAt ?? null,
-        publishedAt: post.publishedAt,
-        clientId: post.clientId
-      } as any);
+  private mapDocToPost(doc: any): PostEntity {
+    return PostEntity.from({
+      id: doc._id.toString(),
+      advisorId: doc.advisorId?.toString() || doc.advisorId,
+      title: doc.title,
+      content: doc.content,
+      tagsId: doc.tagsId || [],
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt ?? null,
+      publishedAt: doc.publishedAt ?? null,
+      readBy: doc.readBy || [],
+      clientId: doc.clientId ?? null,
+    });
+  }
+
+  private mapDocToAdvisor(doc: any): UserEntity {
+    return UserEntity.from({
+      id: doc._id.toString(),
+      firstname: doc.firstname,
+      lastname: doc.lastname,
+      email: doc.email,
+      passwordHash: doc.passwordHash,
+      role: doc.role,
+      isActiveField: doc.isActive,
+      createdAt: doc.createdAt,
+      confirmedAt: doc.confirmedAt,
+      updatedAt: doc.updatedAt,
+    });
+  }
+
+  private mapDocToTag(doc: any): TagEntity | undefined {
+    const color = Color.from(doc.color);
+    if (color instanceof ColorInvalidFormatError) {
+      return;
     }
 
-    async findById(id: PostEntity["id"]): Promise<PostEntity | null> {
-      await this.client.connect();
-      
-      const doc = await PostModel.findOne({ _id: id }).lean();
-      if (!doc) return null;
+    return TagEntity.from({
+      id: doc._id.toString(),
+      label: doc.label,
+      color,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    });
+  }
 
-      return PostEntity.from({
-        id: doc._id.toString(),
-        advisorId: doc.advisorId,
-        title: doc.title,
-        content: doc.content,
-        tagsId: doc.tagsId,
-        createdAt: doc.createdAt,
-        readBy: doc.readBy,
-        updatedAt: doc.updatedAt ?? null,
-        publishedAt: doc.publishedAt ?? null,
-        clientId: doc.clientId ?? null
-      });
-    }
+  private combinePostWithTagsAndUser(
+    doc: any,
+    advisor: UserEntity,
+    tags: TagEntity[]
+  ): PostWithTagsAndUser {
+    const post = this.mapDocToPost(doc);
+    return Object.assign(post, { advisor, tags });
+  }
 
-    async findAllByAdvisorId(advisorId: UserEntity["id"]): Promise<PostEntity[]> {
-      await this.client.connect();
-      
-      const docs = await PostModel.find({ advisorId }).lean();
+  /** 📬 Sauvegarder un post */
+  async save(post: PostEntity): Promise<void> {
+    await this.client.connect();
 
-      return docs.map((doc) => {
-        return PostEntity.from({
-          id: doc._id.toString(),
-          advisorId: doc.advisorId,
-          title: doc.title,
-          content: doc.content,
-          tagsId: doc.tagsId,
-          createdAt: doc.createdAt,
-          readBy: doc.readBy,
-          updatedAt: doc.updatedAt ?? null,
-          publishedAt: doc.publishedAt ?? null,
-          clientId: doc.clientId ?? null
-        });
-      })
-    }
-    
-    async findAllRecent(limit: number = 10): Promise<PostEntity[]> {
-        await this.client.connect();
+    await PostModel.create({
+      advisorId: post.advisorId,
+      title: post.title,
+      content: post.content,
+      tagsId: post.tagsId,
+      createdAt: post.createdAt,
+      readBy: post.readBy,
+      updatedAt: post.updatedAt ?? null,
+      publishedAt: post.publishedAt,
+      clientId: post.clientId,
+    });
+  }
 
-        const docs = await PostModel.find({})
-            .sort({ createdAt: -1 })
-            .limit(limit)
-            .lean();
+  /** 🔍 Trouver un post par ID */
+  async findById(id: PostEntity["id"]): Promise<PostEntity | null> {
+    await this.client.connect();
 
-        return docs.map((doc) =>
-            PostEntity.from({
-                id: doc._id.toString(),
-                advisorId: doc.advisorId,
-                title: doc.title,
-                content: doc.content,
-                tagsId: doc.tagsId,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt ?? null,
-                publishedAt: doc.publishedAt ?? null,
-                readBy: doc.readBy,
-                clientId: doc.clientId ?? null,
-            })
-        );
-    }
+    const doc = await PostModel.findById(id).lean();
+    if (!doc) return null;
 
-    async update(post: PostEntity): Promise<void> {
-      await this.client.connect();
-                                      
-      await PostModel.findByIdAndUpdate(
-        post.id,
-        {
-            $set: {
-                title: post.title,
-                content: post.content,
-                updatedAt: post.updatedAt || new Date(),
-                publishedAt: post.publishedAt || null,
-                tagsId: post.tagsId,
-                readBy: post.readBy,
-            },
+    return this.mapDocToPost(doc);
+  }
+
+  /** 🔍 Tous les posts d'un advisor */
+  async findAllByAdvisorId(advisorId: UserEntity["id"]): Promise<PostEntity[]> {
+    await this.client.connect();
+
+    const docs = await PostModel.find({ advisorId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return docs.map((doc) => this.mapDocToPost(doc));
+  }
+
+  /** 🔍 Posts récents */
+  async findAllRecent(limit: number = 10): Promise<PostEntity[]> {
+    await this.client.connect();
+
+    const docs = await PostModel.find({})
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+    return docs.map((doc) => this.mapDocToPost(doc));
+  }
+
+  /** 🔄 Mettre à jour un post */
+  async update(post: PostEntity): Promise<void> {
+    await this.client.connect();
+
+    await PostModel.findByIdAndUpdate(
+      post.id,
+      {
+        $set: {
+          title: post.title,
+          content: post.content,
+          updatedAt: post.updatedAt || new Date(),
+          publishedAt: post.publishedAt || null,
+          tagsId: post.tagsId,
+          readBy: post.readBy,
         },
-        { new: true }
-      );
-    }
+      },
+      { new: true }
+    );
+  }
 
-    async delete(id: PostEntity["id"]): Promise<void> {
-      await this.client.connect();
-                                      
-      await PostModel.deleteOne({ _id: id });
-    }
+  /** ❌ Supprimer un post */
+  async delete(id: PostEntity["id"]): Promise<void> {
+    await this.client.connect();
 
-    async findAllByTags(tagId: TagEntity["id"]): Promise<PostEntity[]> {
-      await this.client.connect();
-      
-      const docs = await PostModel.find({ tagsId: tagId }).lean();
+    await PostModel.deleteOne({ _id: id });
+  }
 
-      return docs.map((doc) => {
-        return PostEntity.from({
-          id: doc._id.toString(),
-          advisorId: doc.advisorId,
-          title: doc.title,
-          content: doc.content,
-          tagsId: doc.tagsId,
-          createdAt: doc.createdAt,
-          readBy: doc.readBy,
-          updatedAt: doc.updatedAt ?? null,
-          publishedAt: doc.publishedAt ?? null,
-          clientId: doc.clientId ?? null
-        });
+  /** 🔍 Posts par tag */
+  async findAllByTags(tagId: TagEntity["id"]): Promise<PostEntity[]> {
+    await this.client.connect();
+
+    const docs = await PostModel.find({ tagsId: tagId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return docs.map((doc) => this.mapDocToPost(doc));
+  }
+
+  /** 🔍 Post avec tags et user par ID (refactorisé avec populate) */
+  async findWithTagsAndUserById(
+    id: PostEntity["id"]
+  ): Promise<PostWithTagsAndUser | null> {
+    await this.client.connect();
+
+    const doc = await PostModel.findById(id)
+      .populate({
+        path: "advisorId",
+        select:
+          "firstname lastname email passwordHash role isActive createdAt confirmedAt updatedAt",
       })
+      .populate({
+        path: "tagsId",
+        select: "label color createdAt updatedAt",
+      })
+      .lean();
+
+    if (!doc) return null;
+    if (!doc.advisorId) throw new Error(`Advisor not found for post: ${id}`);
+
+    const advisor = this.mapDocToAdvisor(doc.advisorId);
+
+    const tags: TagEntity[] = (doc.tagsId || [])
+      .map((tagDoc: any) => this.mapDocToTag(tagDoc))
+      .filter((tag: TagEntity) => !!tag);
+    return this.combinePostWithTagsAndUser(doc, advisor, tags);
+  }
+
+  /** 🔍 Posts paginés avec filtres */
+  async findAllPaginatedWithTagsAndUserByFilters(
+    filters: {
+      dateFrom?: Date;
+      dateTo?: Date;
+      tagsId?: string[];
+      title?: string;
+      status?: boolean;
+    },
+    pagination: { page: number; limit: number }
+  ): Promise<{ posts: PostWithTagsAndUser[]; total: number }> {
+    await this.client.connect();
+
+    const match: any = {};
+
+    if (filters.dateFrom) {
+      match.createdAt = { ...(match.createdAt || {}), $gte: filters.dateFrom };
+    }
+    if (filters.dateTo) {
+      match.createdAt = { ...(match.createdAt || {}), $lte: filters.dateTo };
+    }
+    if (filters.title) {
+      match.title = { $regex: filters.title, $options: "i" };
+    }
+    if (typeof filters.status === "boolean") {
+      match.publishedAt = filters.status ? { $ne: null } : null;
+    }
+    if (filters.tagsId?.length) {
+      match.tagsId = { $in: filters.tagsId };
     }
 
-     async findAllPaginatedWithTagsAndUserByFilters(
-        filters: {
-          dateFrom?: Date;
-          dateTo?: Date;
-          tagsId?: string[];
-          title?: string;
-          status?: boolean;
-        },
-        pagination: { page: number; limit: number }
-      ): Promise<{ posts: PostWithTagsAndUser[]; total: number }> {
-        await this.client.connect();
+    const skip = (pagination.page - 1) * pagination.limit;
+    const limit = pagination.limit;
 
-        const match: any = {};
+    const docs = await PostModel.find(match)
+      .populate({
+        path: "advisorId",
+        select:
+          "firstname lastname email passwordHash role isActive createdAt confirmedAt updatedAt",
+      })
+      .populate({
+        path: "tagsId",
+        select: "label color createdAt updatedAt",
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean<any[]>();
 
-        if (filters.dateFrom) {
-          match.createdAt = { ...(match.createdAt || {}), $gte: filters.dateFrom };
-        }
-        if (filters.dateTo) {
-          match.createdAt = { ...(match.createdAt || {}), $lte: filters.dateTo };
-        }
-        if (filters.title) {
-          match.title = { $regex: filters.title, $options: "i" };
-        }
-        if (typeof filters.status === "boolean") {
-          match.publishedAt = filters.status ? { $ne: null } : null;
-        }
-        if (filters.tagsId?.length) {
-          match.tagsId = { $in: filters.tagsId };
-        }
+    const total = await PostModel.countDocuments(match);
 
-        const skip = (pagination.page - 1) * pagination.limit;
-        const limit = pagination.limit;
+    const posts: PostWithTagsAndUser[] = docs
+      .map((doc) => {
+        if (!doc.advisorId) return null;
 
-        const docs = await PostModel.aggregate([
-          { $match: match },
-          {
-            $lookup: {
-              from: "users",
-              localField: "advisorId",
-              foreignField: "_id",
-              as: "advisor",
-            },
-          },
-          { $unwind: "$advisor" },
-          {
-            $lookup: {
-              from: "tags",
-              localField: "tagsId",
-              foreignField: "_id",
-              as: "tags",
-            },
-          },
-          { $sort: { createdAt: -1 } },
-          { $skip: skip },
-          { $limit: limit },
-        ]).exec();
+        const advisor = this.mapDocToAdvisor(doc.advisorId);
 
-        const total = await PostModel.countDocuments(match);
+        const tags: TagEntity[] = (doc.tagsId || [])
+          .map((tagDoc: any) => this.mapDocToTag(tagDoc))
+          .filter((tag: TagEntity) => !!tag);
+        return this.combinePostWithTagsAndUser(doc, advisor, tags);
+      })
+      .filter((post): post is PostWithTagsAndUser => post !== null);
 
-        const posts: PostWithTagsAndUser[] = docs.map((doc: any) => {
-          const advisor = UserEntity.from({
-            id: doc.advisor._id.toString(),
-            firstname: doc.advisor.firstname,
-            lastname: doc.advisor.lastname,
-            email: doc.advisor.email,
-            passwordHash: doc.advisor.passwordHash,
-            role: doc.advisor.role,
-            isActiveField: doc.advisor.isActive,
-            createdAt: doc.advisor.createdAt,
-            confirmedAt: doc.advisor.confirmedAt,
-            updatedAt: doc.advisor.updatedAt,
-          });
+    return { posts, total: Math.ceil(total / pagination.limit) };
+  }
 
-          const tags = doc.tags.map((tag: any) =>{
-            const colorResult = Color.from(tag.color);
-            if (colorResult instanceof Error) {
-              return colorResult;
-            }
-            TagEntity.from({
-              id: tag._id.toString(),
-              label: tag.label,
-              color: colorResult,
-              createdAt: tag.createdAt,
-              updatedAt: tag.updatedAt,
-            })
-          }); 
+  /** 🔍 Posts non lus avec tags */
+  async findAllUnreadWithTags(
+    userId: UserEntity["id"]
+  ): Promise<PostWithTagsAndUser[]> {
+    await this.client.connect();
 
-          const post = PostEntity.from({
-            id: doc._id.toString(),
-            advisorId: doc.advisorId.toString(),
-            title: doc.title,
-            content: doc.content,
-            tagsId: doc.tagsId,
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt ?? undefined,
-            publishedAt: doc.publishedAt ?? undefined,
-            readBy: doc.readBy ?? [],
-            clientId: doc.clientId ?? undefined,
-          });
+    const docs = await PostModel.find({
+      publishedAt: { $ne: null },
+      readBy: { $nin: [userId] },
+      $or: [{ clientId: null }, { clientId: userId }],
+    })
+      .populate({
+        path: "advisorId",
+        select:
+          "firstname lastname email passwordHash role isActive createdAt confirmedAt updatedAt",
+      })
+      .populate({
+        path: "tagsId",
+        select: "label color createdAt updatedAt",
+      })
+      .sort({ publishedAt: -1 })
+      .lean<any[]>();
 
-          return Object.assign(post, { tags, advisor });
-        });
+    const posts: PostWithTagsAndUser[] = docs
+      .map((doc) => {
+        if (!doc.advisorId) return null;
 
-        return { posts, total: Math.ceil(total / pagination.limit) };
-      }
-    
-    async findWithTagsAndUserById(
-        id: PostEntity["id"]
-    ): Promise<PostWithTagsAndUser | null> {
-      await this.client.connect();
+        const advisor = this.mapDocToAdvisor(doc.advisorId);
 
-      const doc = await PostModel.findById(id).lean();
-      if (!doc) return null;
+        const tags: TagEntity[] = (doc.tagsId || [])
+          .map((tagDoc: any) => this.mapDocToTag(tagDoc))
+          .filter((tag: TagEntity) => !!tag);
 
-      const tags: TagEntity[] = [];
-      for (const tagId of doc.tagsId) {
-        const tagDoc = await TagModel.findById(tagId).lean();
-        if (!tagDoc) continue;
+        return this.combinePostWithTagsAndUser(doc, advisor, tags);
+      })
+      .filter((post): post is PostWithTagsAndUser => post !== null);
 
-        let color = Color.from(tagDoc.color);
-        if (color instanceof Error) {
-          console.warn(`Couleur invalide pour le tag ${tagId}: ${color.message}`);
-          const fallback = Color.from("#000000");
-          if (fallback instanceof Error) {
-            throw new Error("Fallback color failed");
-          }
-          color = fallback;
-        }
-
-        tags.push(
-          TagEntity.from({
-            id: tagDoc._id.toString(),
-            label: tagDoc.label,
-            color,
-            createdAt: tagDoc.createdAt,
-            updatedAt: tagDoc.updatedAt,
-          })
-        );
-      }
-
-      const advisorDoc = await UserModel.findById(doc.advisorId).lean();
-      if (!advisorDoc) throw new Error(`Advisor not found: ${doc.advisorId}`);
-      const advisor = UserEntity.from({
-        id: advisorDoc._id.toString(),
-        firstname: advisorDoc.firstname,
-        lastname: advisorDoc.lastname,
-        email: advisorDoc.email,
-        passwordHash: advisorDoc.passwordHash,
-        role: advisorDoc.role,
-        isActiveField: advisorDoc.isActive,
-        createdAt: advisorDoc.createdAt,
-        confirmedAt: advisorDoc.confirmedAt,
-        updatedAt: advisorDoc.updatedAt,
-      });
-
-      const post = PostEntity.from({
-        id: doc._id.toString(),
-        advisorId: doc.advisorId,
-        title: doc.title,
-        content: doc.content,
-        tagsId: doc.tagsId,
-        createdAt: doc.createdAt,
-        updatedAt: doc.updatedAt ?? undefined,
-        publishedAt: doc.publishedAt ?? undefined,
-        readBy: doc.readBy ?? [],
-        clientId: doc.clientId ?? undefined,
-      });
-
-      return Object.assign(post, { tags, advisor });
-    }
-
-    async findAllUnreadWithTags(
-        userId: UserEntity["id"]
-    ): Promise<PostWithTagsAndUser[]> {
-      await this.client.connect();
-
-      const postDocs = await PostModel.find({
-        publishedAt: { $ne: null },
-        readBy: { $nin: [userId] },
-      }).sort({ createdAt: -1 }).lean();
-
-      const posts: PostWithTagsAndUser[] = [];
-
-      for (const doc of postDocs) {
-        const tagDocs = await TagModel.find({ _id: { $in: doc.tagsId } }).lean();
-        const tags: TagEntity[] = tagDocs.map(tagDoc => {
-          let color = Color.from(tagDoc.color);
-          if (color instanceof Error) {
-            console.warn(`Couleur invalide pour le tag ${tagDoc._id}: ${color.message}`);
-            const fallback = Color.from("#000000");
-            if (fallback instanceof Error) throw new Error("Fallback color failed");
-            color = fallback;
-          }
-          return TagEntity.from({
-            id: tagDoc._id.toString(),
-            label: tagDoc.label,
-            color,
-            createdAt: tagDoc.createdAt,
-            updatedAt: tagDoc.updatedAt,
-          });
-        });
-
-        const advisorDoc = await UserModel.findById(doc.advisorId).lean();
-        if (!advisorDoc) continue;
-
-        const advisor = UserEntity.from({
-          id: advisorDoc._id.toString(),
-          firstname: advisorDoc.firstname,
-          lastname: advisorDoc.lastname,
-          email: advisorDoc.email,
-          passwordHash: advisorDoc.passwordHash,
-          role: advisorDoc.role,
-          isActiveField: advisorDoc.isActive,
-          createdAt: advisorDoc.createdAt,
-          confirmedAt: advisorDoc.confirmedAt,
-          updatedAt: advisorDoc.updatedAt,
-        });
-
-        const post = PostEntity.from({
-          id: doc._id.toString(),
-          advisorId: doc.advisorId,
-          title: doc.title,
-          content: doc.content,
-          tagsId: doc.tagsId,
-          createdAt: doc.createdAt,
-          updatedAt: doc.updatedAt ?? undefined,
-          publishedAt: doc.publishedAt ?? undefined,
-          readBy: doc.readBy,
-          clientId: doc.clientId ?? undefined,
-        });
-
-        posts.push(Object.assign(post, { tags, advisor }));
-      }
-
-      return posts;
-    }
-      
+    return posts;
+  }
 }

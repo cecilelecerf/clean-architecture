@@ -7,12 +7,7 @@ import { UserModel } from "../models/UserModel";
 export class UserRepositoryMongo implements UserRepository {
   constructor(private readonly client: MongoClient) {}
 
-  async findById(id: UserEntity["id"]): Promise<UserEntity | null> {
-    await this.client.connect();
-
-    const doc = await UserModel.findOne({ _id: id }).lean();
-    if (!doc) return null;
-
+  private mapDocToUser(doc: any): UserEntity {
     const email = Email.create(doc.email);
     if (email instanceof Error) throw email;
 
@@ -20,60 +15,46 @@ export class UserRepositoryMongo implements UserRepository {
       id: doc._id.toString(),
       firstname: doc.firstname,
       lastname: doc.lastname,
-      email: email,
+      email,
       passwordHash: doc.passwordHash,
       role: doc.role,
-      isActiveField: doc.isActiveField,
-      createdAt: doc.createdAt,
-      confirmedAt: doc.confirmedAt ?? null,
-      updatedAt: doc.updatedAt ?? null,
-    });
-  }
-
-  async findByEmail(email: Email): Promise<UserEntity | null> {
-    await this.client.connect();
-
-    const doc = await UserModel.findOne({ email: email }).lean();
-    if (!doc) return null;
-
-    return UserEntity.from({
-      id: doc._id.toString(),
-      firstname: doc.firstname,
-      lastname: doc.lastname,
-      email: email,
-      passwordHash: doc.passwordHash,
-      role: doc.role,
-      isActiveField: doc.isActiveField,
+      isActiveField: doc.isActive,
       createdAt: doc.createdAt,
       confirmedAt: doc.confirmedAt ?? null,
       updatedAt: doc.updatedAt,
     });
   }
 
+  /** Trouver un utilisateur par ID */
+  async findById(id: UserEntity["id"]): Promise<UserEntity | null> {
+    await this.client.connect();
+
+    const doc = await UserModel.findById(id).lean();
+    if (!doc) return null;
+
+    return this.mapDocToUser(doc);
+  }
+
+  /** Trouver un utilisateur par email */
+  async findByEmail(email: Email): Promise<UserEntity | null> {
+    await this.client.connect();
+
+    const doc = await UserModel.findOne({ email: email.value }).lean();
+    if (!doc) return null;
+
+    return this.mapDocToUser(doc);
+  }
+
+  /** Tous les utilisateurs */
   async findAll(): Promise<UserEntity[]> {
     await this.client.connect();
 
-    const docs = await UserModel.find().lean();
+    const docs = await UserModel.find().sort({ createdAt: -1 }).lean();
 
-    return docs.map((doc) => {
-      const email = Email.create(doc.email);
-      if (email instanceof Error) throw email;
-
-      return UserEntity.from({
-        id: doc._id.toString(),
-        firstname: doc.firstname,
-        lastname: doc.lastname,
-        email: email,
-        passwordHash: doc.passwordHash,
-        role: doc.role,
-        isActiveField: doc.isActiveField,
-        createdAt: doc.createdAt,
-        confirmedAt: doc.confirmedAt ?? null,
-        updatedAt: doc.updatedAt,
-      });
-    });
+    return docs.map((doc) => this.mapDocToUser(doc));
   }
 
+  /** Utilisateurs actifs par rôle */
   async findAllByRoleAndIsActif(
     role?: UserEntity["role"]
   ): Promise<UserEntity[]> {
@@ -88,40 +69,31 @@ export class UserRepositoryMongo implements UserRepository {
       query.role = role;
     }
 
-    const docs = await UserModel.find(query).lean();
+    const docs = await UserModel.find(query)
+      .sort({ lastname: 1, firstname: 1 })
+      .lean();
 
-    return docs.map((doc) =>
-      UserEntity.from({
-        id: doc._id.toString(),
-        firstname: doc.firstname,
-        lastname: doc.lastname,
-        email: doc.email,
-        passwordHash: doc.passwordHash,
-        role: doc.role,
-        isActiveField: doc.isActive,
-        createdAt: doc.createdAt,
-        confirmedAt: doc.confirmedAt,
-        updatedAt: doc.updatedAt,
-      })
-    );
+    return docs.map((doc) => this.mapDocToUser(doc));
   }
 
+  /** Sauvegarder un utilisateur */
   async save(user: UserEntity): Promise<void> {
     await this.client.connect();
 
     await UserModel.create({
       firstname: user.firstname,
       lastname: user.lastname,
-      email: user.email,
+      email: user.email.value,
       passwordHash: user.passwordHash,
       role: user.role,
-      isActiveField: user.isActiveField,
+      isActive: user.isActiveField,
       createdAt: user.createdAt,
       confirmedAt: user.confirmedAt ?? null,
       updatedAt: user.updatedAt,
-    } as any);
+    });
   }
 
+  /** Mettre à jour un utilisateur */
   async update(user: UserEntity): Promise<void> {
     await this.client.connect();
 
@@ -131,10 +103,10 @@ export class UserRepositoryMongo implements UserRepository {
         $set: {
           firstname: user.firstname,
           lastname: user.lastname,
-          email: user.email,
+          email: user.email.value,
           passwordHash: user.passwordHash,
           role: user.role,
-          isActiveField: user.isActiveField,
+          isActive: user.isActiveField,
           confirmedAt: user.confirmedAt ?? null,
           updatedAt: user.updatedAt,
         },
@@ -142,6 +114,7 @@ export class UserRepositoryMongo implements UserRepository {
     );
   }
 
+  /** Supprimer un utilisateur */
   async delete(id: UserEntity["id"]): Promise<void> {
     await this.client.connect();
 

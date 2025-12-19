@@ -4,126 +4,114 @@ import { NotificationEntity } from "@domain/entities/NotificationEntity";
 import { NotificationModel } from "../models/NotificationModel";
 
 export class NotificationRepositoryMongo implements NotificationRepository {
-    constructor(private readonly client: MongoClient) {}
+  constructor(private readonly client: MongoClient) {}
 
-    async save(notification: NotificationEntity): Promise<void> {
-        await this.client.connect();
-                        
-        await NotificationModel.create({
-            advisorId: notification.advisorId,
-            clientId: notification.clientId,
-            title: notification.title,
-            content: notification.content,
-            isRead: notification.isRead,
-            type: notification.type,
-            createdAt: notification.createdAt
-        } as any);
-    }
+  private mapDocToNotification(doc: any): NotificationEntity {
+    return NotificationEntity.from({
+      id: doc._id.toString(),
+      advisorId: doc.advisorId,
+      clientId: doc.clientId,
+      title: doc.title,
+      content: doc.content,
+      isRead: doc.isRead,
+      type: doc.type,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    });
+  }
 
-    async findById(id: NotificationEntity["id"]): Promise<NotificationEntity | null> {
-        await this.client.connect();
-                
-        const doc = await NotificationModel.findOne({ _id: id }).lean();
-        if (!doc) return null;
+  /** Sauvegarder une notification */
+  async save(notification: NotificationEntity): Promise<void> {
+    await this.client.connect();
 
-        return NotificationEntity.from({
-            id: doc._id.toString(),
-            advisorId: doc.advisorId,
-            clientId: doc.clientId,
-            title: doc.title,
-            content: doc.content,
-            isRead: doc.isRead,
-            type: doc.type,
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt,
-        });
-    }
+    await NotificationModel.create({
+      advisorId: notification.advisorId,
+      clientId: notification.clientId,
+      title: notification.title,
+      content: notification.content,
+      isRead: notification.isRead,
+      type: notification.type,
+      createdAt: notification.createdAt,
+    });
+  }
 
-    async findAllByClientId(clientId: NotificationEntity["clientId"]): Promise<NotificationEntity[]> {
-        await this.client.connect();
-                
-        const docs = await NotificationModel.find({ clientId }).lean();
-        
-        return docs.map((doc) => {
-            return NotificationEntity.from({
-                id: doc._id.toString(),
-                advisorId: doc.advisorId,
-                clientId: doc.clientId,
-                title: doc.title,
-                content: doc.content,
-                isRead: doc.isRead,
-                type: doc.type,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt,
-            });
-        })
-    }
+  /** Trouver une notification par ID */
+  async findById(
+    id: NotificationEntity["id"]
+  ): Promise<NotificationEntity | null> {
+    await this.client.connect();
 
-    async findAllByAdvisorId(advisorId: NotificationEntity["advisorId"]): Promise<NotificationEntity[]> {
-        await this.client.connect();
-                
-        const docs = await NotificationModel.find({ advisorId }).lean();
+    const doc = await NotificationModel.findById(id).lean();
+    if (!doc) return null;
 
-        return docs.map((doc) => {
-            return NotificationEntity.from({
-                id: doc._id.toString(),
-                advisorId: doc.advisorId,
-                clientId: doc.clientId,
-                title: doc.title,
-                content: doc.content,
-                isRead: doc.isRead,
-                type: doc.type,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt,
-            });
-        })
-    }
+    return this.mapDocToNotification(doc);
+  }
 
-    async findRecentByClientId(clientId: NotificationEntity["clientId"],limit: number = 10): Promise<NotificationEntity[]> {
-        await this.client.connect();
-                
-        const docs = await NotificationModel.find({ clientId })
-            .sort({ createdAt: -1 })
-            .limit(limit)
-            .lean();
+  /** Toutes les notifications d'un client */
+  async findAllByClientId(
+    clientId: NotificationEntity["clientId"]
+  ): Promise<NotificationEntity[]> {
+    await this.client.connect();
 
-        return docs.map((doc) => {
-            return NotificationEntity.from({
-                id: doc._id.toString(),
-                advisorId: doc.advisorId,
-                clientId: doc.clientId,
-                title: doc.title,
-                content: doc.content,
-                isRead: doc.isRead,
-                type: doc.type,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt,
-            });
-        })
-    }
+    const docs = await NotificationModel.find({ clientId })
+      .sort({ createdAt: -1 })
+      .lean();
 
-    async update(notification: NotificationEntity): Promise<void> {
-        await this.client.connect();
-                        
-        await NotificationModel.updateOne(
-            { _id: notification.id },
-            {
-                $set: {
-                    advisorId: notification.advisorId,
-                    clientId: notification.clientId,
-                    title: notification.title,
-                    content: notification.content,
-                    isRead: notification.isRead,
-                    type: notification.type,
-                    updatedAt: notification.updatedAt || new Date(),
-                },
-            }
-        );
-    }
+    return docs.map((doc) => this.mapDocToNotification(doc));
+  }
 
-    async delete(id: NotificationEntity["id"]): Promise<void> {
-        await this.client.connect();
-                        
-        await NotificationModel.deleteOne({ _id: id });
-    }
+  /** Toutes les notifications d'un conseiller */
+  async findAllByAdvisorId(
+    advisorId: NotificationEntity["advisorId"]
+  ): Promise<NotificationEntity[]> {
+    await this.client.connect();
+
+    const docs = await NotificationModel.find({ advisorId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return docs.map((doc) => this.mapDocToNotification(doc));
+  }
+
+  /** Notifications récentes d'un client */
+  async findRecentByClientId(
+    clientId: NotificationEntity["clientId"],
+    limit: number = 10
+  ): Promise<NotificationEntity[]> {
+    await this.client.connect();
+
+    const docs = await NotificationModel.find({ clientId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+    return docs.map((doc) => this.mapDocToNotification(doc));
+  }
+
+  /** Mettre à jour une notification */
+  async update(notification: NotificationEntity): Promise<void> {
+    await this.client.connect();
+
+    await NotificationModel.updateOne(
+      { _id: notification.id },
+      {
+        $set: {
+          advisorId: notification.advisorId,
+          clientId: notification.clientId,
+          title: notification.title,
+          content: notification.content,
+          isRead: notification.isRead,
+          type: notification.type,
+          updatedAt: notification.updatedAt || new Date(),
+        },
+      }
+    );
+  }
+
+  /** Supprimer une notification */
+  async delete(id: NotificationEntity["id"]): Promise<void> {
+    await this.client.connect();
+
+    await NotificationModel.deleteOne({ _id: id });
+  }
 }

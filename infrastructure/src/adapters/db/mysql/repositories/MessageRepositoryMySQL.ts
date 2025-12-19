@@ -11,7 +11,6 @@ import { UserEntity } from "@domain/entities/UserEntity";
 export class MessageRepositoryMySQL implements MessageRepository {
   constructor(private readonly client: MySQLClient) {}
 
-  // 🔧 Méthode helper pour mapper un row SQL vers MessageEntity
   private mapRowToMessage(row: RowDataPacket): MessageEntity {
     return MessageEntity.from({
       id: row.id || row.message_id,
@@ -23,7 +22,6 @@ export class MessageRepositoryMySQL implements MessageRepository {
     });
   }
 
-  // 🔧 Méthode helper pour mapper un row SQL vers UserEntity (sender)
   private mapRowToSender(row: RowDataPacket): UserEntity {
     return UserEntity.from({
       id: row.user_id,
@@ -39,19 +37,16 @@ export class MessageRepositoryMySQL implements MessageRepository {
     });
   }
 
-  // 🔧 Méthode helper pour mettre à jour la relation many-to-many message_user_read
   private async updateMessageReaders(
     messageId: string,
     newReaderIds: string[]
   ): Promise<void> {
-    // Récupérer les lecteurs existants
     const existingRows = await this.client.query<RowDataPacket[]>(
       `SELECT user_id FROM message_user_read WHERE message_id = ?`,
       [messageId]
     );
     const existingIds = existingRows.map((r) => r.user_id);
 
-    // Ajouter les nouveaux lecteurs
     const idsToAdd = newReaderIds.filter((id) => !existingIds.includes(id));
     for (const userId of idsToAdd) {
       await this.client.query<ResultSetHeader>(
@@ -60,7 +55,6 @@ export class MessageRepositoryMySQL implements MessageRepository {
       );
     }
 
-    // Supprimer les anciens lecteurs
     const idsToRemove = existingIds.filter((id) => !newReaderIds.includes(id));
     for (const userId of idsToRemove) {
       await this.client.query<ResultSetHeader>(
@@ -70,7 +64,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
     }
   }
 
-  /** 📬 Sauvegarder un message */
+  /** Sauvegarder un message */
   async save(message: MessageEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO messages (id, thread_id, sender_id, content, sent_at)
@@ -84,7 +78,6 @@ export class MessageRepositoryMySQL implements MessageRepository {
       ]
     );
 
-    // Le sender lit automatiquement son propre message
     await this.client.query<ResultSetHeader>(
       `INSERT INTO message_user_read (message_id, user_id, read_at)
        VALUES (?, ?, ?)`,
@@ -92,33 +85,29 @@ export class MessageRepositoryMySQL implements MessageRepository {
     );
   }
 
-  /** 🔍 Tous les messages d'un thread */
+  /** Tous les messages d'un thread */
   async findAllByThread(
     threadId: ThreadEntity["id"]
   ): Promise<MessageEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT *
-       FROM messages
-       WHERE thread_id = ?
-       ORDER BY sent_at ASC`,
+      `SELECT * FROM messages WHERE thread_id = ? ORDER BY sent_at ASC`,
       [threadId]
     );
 
     return rows.map((row) => this.mapRowToMessage(row));
   }
 
-  /** 🔄 Mettre à jour un message */
+  /** Mettre à jour un message */
   async update(message: MessageEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE messages SET content = ? WHERE id = ?`,
       [message.content, message.id]
     );
 
-    // Mettre à jour les lecteurs via la méthode helper
     await this.updateMessageReaders(message.id, message.readBy);
   }
 
-  /** ❌ Supprimer un message */
+  /** Supprimer un message */
   async delete(messageId: MessageEntity["id"]): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `DELETE FROM messages WHERE id = ?`,
@@ -126,7 +115,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
     );
   }
 
-  /** 🔍 Messages avec sender par thread */
+  /** Messages avec sender par thread */
   async findAllWithUserByThread(
     threadId: ThreadEntity["id"]
   ): Promise<MessageWithUser[]> {

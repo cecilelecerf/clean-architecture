@@ -5,134 +5,114 @@ import { ActionModel } from "../models/ActionModel";
 import { Money } from "@domain/values/Money";
 
 export class ActionRepositoryMongo implements ActionRepository {
-    constructor(private readonly client: MongoClient) {}
-    
-    async save(action: ActionEntity): Promise<void> {
-        await this.client.connect();
-        
-        await ActionModel.create({
-            ISIN: action.ISIN,
-            name: action.name,
-            totalNb: action.totalNb,
-            symbol: action.symbol,
-            market: action.market,
-            activitySector: action.activitySector,
-            currentPrice: {
-                amount: action.currentPrice.amount,
-                currency: action.currentPrice.currency,
-            },
-            isAvailable: action.isAvailable,
-            createdAt: action.createdAt
-        });
-    }
+  constructor(private readonly client: MongoClient) {}
 
-    async findByISIN(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
-        await this.client.connect();
+  private mapDocToAction(doc: any): ActionEntity {
+    const currentPrice = Money.create(doc.currentPrice);
+    if (currentPrice instanceof Error) throw currentPrice;
 
-        const doc = await ActionModel.findOne({ ISIN: ISIN }).lean();
-        if (!doc) return null;
+    return ActionEntity.from({
+      ISIN: doc.ISIN,
+      name: doc.name,
+      totalNb: doc.totalNb,
+      symbol: doc.symbol,
+      market: doc.market,
+      activitySector: doc.activitySector,
+      currentPrice,
+      isAvailable: doc.isAvailable,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    });
+  }
 
-        const currentPrice = Money.create(doc.currentPrice);
-        if (currentPrice instanceof Error) throw currentPrice;
-        
-        return ActionEntity.from({
-            ISIN,
-            name: doc.name,
-            totalNb: doc.totalNb,
-            symbol: doc.symbol,
-            market: doc.market,
-            activitySector: doc.activitySector,
-            currentPrice,
-            isAvailable: doc.isAvailable,
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt,
-        });
-    }
+  /** Sauvegarder une action */
+  async save(action: ActionEntity): Promise<void> {
+    await this.client.connect();
 
-    async findAll(): Promise<ActionEntity[]> {
-        await this.client.connect();
+    await ActionModel.create({
+      ISIN: action.ISIN,
+      name: action.name,
+      totalNb: action.totalNb,
+      symbol: action.symbol,
+      market: action.market,
+      activitySector: action.activitySector,
+      currentPrice: {
+        amount: action.currentPrice.amount,
+        currency: action.currentPrice.currency,
+      },
+      isAvailable: action.isAvailable,
+      createdAt: action.createdAt,
+    });
+  }
 
-        const docs = await ActionModel.find().lean();
+  /** Trouver une action par ISIN */
+  async findByISIN(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
+    await this.client.connect();
 
-        return docs.map((doc) => {
-            const currentPrice = Money.create(doc.currentPrice);
-            if (currentPrice instanceof Error) throw currentPrice;
+    const doc = await ActionModel.findOne({ ISIN }).lean();
+    if (!doc) return null;
 
-            return ActionEntity.from({
-                ISIN: doc.ISIN,
-                name: doc.name,
-                totalNb: doc.totalNb,
-                symbol: doc.symbol,
-                market: doc.market,
-                activitySector: doc.activitySector,
-                currentPrice,
-                isAvailable: doc.isAvailable,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt,
-            });
-        })
-    }
+    return this.mapDocToAction(doc);
+  }
 
-    async findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]> {
-        await this.client.connect();
+  /** Toutes les actions */
+  async findAll(): Promise<ActionEntity[]> {
+    await this.client.connect();
 
-        const docs = await ActionModel.find({ isAvailable }).lean();
+    const docs = await ActionModel.find().sort({ name: 1 }).lean();
 
-        return docs.map((doc) => {
-            const currentPrice = Money.create(doc.currentPrice);
-            if (currentPrice instanceof Error) throw currentPrice;
+    return docs.map((doc) => this.mapDocToAction(doc));
+  }
 
-            return ActionEntity.from({
-                ISIN: doc.ISIN,
-                name: doc.name,
-                totalNb: doc.totalNb,
-                symbol: doc.symbol,
-                market: doc.market,
-                activitySector: doc.activitySector,
-                currentPrice,
-                isAvailable: doc.isAvailable,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt,
-            });
-        })
-    }
+  /** Actions par disponibilité */
+  async findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]> {
+    await this.client.connect();
 
-    async setAvailability(action: ActionEntity): Promise<void> {
-        await this.client.connect();
+    const docs = await ActionModel.find({ isAvailable })
+      .sort({ name: 1 })
+      .lean();
 
-        await ActionModel.updateOne(
-            { _id: action.ISIN },
-            { $set: { isAvailable: action.isAvailable } }
-        );
-    }
+    return docs.map((doc) => this.mapDocToAction(doc));
+  }
 
-    async update(action: ActionEntity): Promise<void> {
-        await this.client.connect();
-        
-        await ActionModel.updateOne(
-            { iban: action.ISIN },
-            {
-                $set: {
-                    ISIN: action.ISIN,
-                    name: action.name,
-                    totalNb: action.totalNb,
-                    symbol: action.symbol,
-                    market: action.market,
-                    activitySector: action.activitySector,
-                    currentPrice: {
-                        amount: action.currentPrice.amount,
-                        currency: action.currentPrice.currency,
-                    },
-                    isAvailable: action.isAvailable,
-                    updatedAt: action.updatedAt || new Date(),
-                },
-            }
-        );
-    }
+  /** Modifier la disponibilité */
+  async setAvailability(action: ActionEntity): Promise<void> {
+    await this.client.connect();
 
-    async delete(ISIN: ActionEntity["ISIN"]): Promise<void> {
-        await this.client.connect();
-        
-        await ActionModel.deleteOne({ ISIN: ISIN });
-    }
+    await ActionModel.updateOne(
+      { ISIN: action.ISIN },
+      { $set: { isAvailable: action.isAvailable } }
+    );
+  }
+
+  /** Mettre à jour une action */
+  async update(action: ActionEntity): Promise<void> {
+    await this.client.connect();
+
+    await ActionModel.updateOne(
+      { ISIN: action.ISIN },
+      {
+        $set: {
+          name: action.name,
+          totalNb: action.totalNb,
+          symbol: action.symbol,
+          market: action.market,
+          activitySector: action.activitySector,
+          currentPrice: {
+            amount: action.currentPrice.amount,
+            currency: action.currentPrice.currency,
+          },
+          isAvailable: action.isAvailable,
+          updatedAt: action.updatedAt,
+        },
+      }
+    );
+  }
+
+  /** Supprimer une action */
+  async delete(ISIN: ActionEntity["ISIN"]): Promise<void> {
+    await this.client.connect();
+
+    await ActionModel.deleteOne({ ISIN });
+  }
 }

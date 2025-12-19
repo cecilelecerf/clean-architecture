@@ -1,128 +1,112 @@
-import { MessageRepository, MessageWithUser } from "@application/ports/repositories/MessageRepository";
+import {
+  MessageRepository,
+  MessageWithUser,
+} from "@application/ports/repositories/MessageRepository";
 import { MongoClient } from "../../MongoClient";
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { MessageModel } from "../models/MessageModel";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { UserModel } from "../models/UserModel";
 
 export class MessageRepositoryMongo implements MessageRepository {
-    constructor(private readonly client: MongoClient) {}
+  constructor(private readonly client: MongoClient) {}
 
-    async save(message: MessageEntity): Promise<void> {
-        await this.client.connect();
-                        
-        await MessageModel.create({
-            threadId: message.threadId,
-            senderId: message.senderId,
-            content: message.content,
-            sentAt: message.sentAt,
-            readBy: message.readBy
-        } as any);
-    }
+  private mapDocToMessage(doc: any): MessageEntity {
+    return MessageEntity.from({
+      id: doc._id.toString(),
+      threadId: doc.threadId?.toString() || doc.threadId,
+      senderId: doc.senderId?.toString() || doc.senderId,
+      content: doc.content,
+      sentAt: doc.sentAt,
+      readBy: doc.readBy || [],
+    });
+  }
 
-    async findAllByThread(threadId: ThreadEntity["id"]): Promise<MessageEntity[]> {
-        await this.client.connect();
-                
-        const docs = await MessageModel.find({ threadId }).lean();
+  private mapDocToSender(doc: any): UserEntity {
+    return UserEntity.from({
+      id: doc._id.toString(),
+      firstname: doc.firstname,
+      lastname: doc.lastname,
+      email: doc.email,
+      passwordHash: doc.passwordHash,
+      role: doc.role,
+      isActiveField: doc.isActive,
+      createdAt: doc.createdAt,
+      confirmedAt: doc.confirmedAt,
+      updatedAt: doc.updatedAt,
+    });
+  }
 
-        return docs.map((doc) => {
-            return MessageEntity.from({
-                id: doc._id.toString(),
-                threadId: doc.threadId,
-                senderId: doc.senderId,
-                content: doc.content,
-                sentAt: doc.sentAt,
-                readBy: doc.readBy
-            });
-        })
-    }
+  /** 📬 Sauvegarder un message */
+  async save(message: MessageEntity): Promise<void> {
+    await this.client.connect();
 
-    async update(message: MessageEntity): Promise<void> {
-        await this.client.connect();
-                        
-        await MessageModel.updateOne(
-            { _id: message.id },
-            {
-                $set: {
-                    threadId: message.threadId,
-                    senderId: message.senderId,
-                    content: message.content,
-                    sentAt: message.sentAt,
-                    readBy: message.readBy,
-                },
-            }
-        );
+    await MessageModel.create({
+      threadId: message.threadId,
+      senderId: message.senderId,
+      content: message.content,
+      sentAt: message.sentAt,
+      readBy: message.readBy,
+    });
+  }
 
-        const existingDoc = await MessageModel.findById(message.id).lean();
-        if (!existingDoc) return;
+  /** 🔍 Tous les messages d'un thread */
+  async findAllByThread(
+    threadId: ThreadEntity["id"]
+  ): Promise<MessageEntity[]> {
+    await this.client.connect();
 
-        const existingUserReadIds = existingDoc.readBy || [];
+    const docs = await MessageModel.find({ threadId })
+      .sort({ sentAt: 1 })
+      .lean();
 
-        const usersToAdd = message.readBy.filter((id: string) => !existingUserReadIds.includes(id));
-        if (usersToAdd.length > 0) {
-            await MessageModel.updateOne(
-                { _id: message.id },
-                { $addToSet: { readBy: { $each: usersToAdd } } }
-            );
-        }
+    return docs.map((doc) => this.mapDocToMessage(doc));
+  }
 
-        const usersToRemove = existingUserReadIds.filter((id: string) => !message.readBy.includes(id));
-        if (usersToRemove.length > 0) {
-            await MessageModel.updateOne(
-                { _id: message.id },
-                { $pull: { readBy: { $in: usersToRemove } } }
-            );
-        }
+  /** 🔄 Mettre à jour un message */
+  async update(message: MessageEntity): Promise<void> {
+    await this.client.connect();
 
-    }
+    await MessageModel.findByIdAndUpdate(
+      message.id,
+      {
+        $set: {
+          content: message.content,
+          readBy: message.readBy,
+        },
+      },
+      { new: true }
+    );
+  }
 
-    async delete(messageId: MessageEntity["id"]): Promise<void> {
-        await this.client.connect();
-                        
-        await MessageModel.deleteOne({ _id: messageId });
-    }
+  /** ❌ Supprimer un message */
+  async delete(messageId: MessageEntity["id"]): Promise<void> {
+    await this.client.connect();
 
-    async findAllWithUserByThread(threadId: string): Promise<MessageWithUser[]> {
-        await this.client.connect();
+    await MessageModel.deleteOne({ _id: messageId });
+  }
 
-        const docs = await MessageModel.find({ threadId })
-        .sort({ sentAt: 1 })
-        .lean();
+  /** 🔍 Messages avec sender par thread */
+  async findAllWithUserByThread(threadId: string): Promise<MessageWithUser[]> {
+    await this.client.connect();
 
-        const userIds = Array.from(new Set(docs.map(d => d.senderId.toString())));
-        const users = await UserModel.find({ _id: { $in: userIds } }).lean();
-        const usersMap = new Map(users.map(u => [u._id.toString(), u]));
+    const docs = await MessageModel.find({ threadId })
+      .populate({
+        path: "senderId",
+      })
+      .sort({ sentAt: 1 })
+      .lean<any[]>();
 
-        const messages: MessageWithUser[] = docs.map(doc => {
-            const message = MessageEntity.from({
-            id: doc._id.toString(),
-            threadId: doc.threadId,
-            senderId: doc.senderId.toString(),
-            content: doc.content,
-            sentAt: doc.sentAt,
-            readBy: doc.readBy || [],
-            });
+    return docs.map((doc) => {
+      const message = this.mapDocToMessage(doc);
 
-            const senderDoc = usersMap.get(doc.senderId.toString());
-            if (!senderDoc) throw new Error(`User ${doc.senderId} not found`);
+      if (!doc.senderId) {
+        throw new Error(`Sender not found for message ${doc._id}`);
+      }
 
-            const sender = UserEntity.from({
-            id: senderDoc._id.toString(),
-            firstname: senderDoc.firstname,
-            lastname: senderDoc.lastname,
-            email: senderDoc.email,
-            passwordHash: senderDoc.passwordHash,
-            role: senderDoc.role,
-            isActiveField: senderDoc.isActive,
-            createdAt: senderDoc.createdAt,
-            confirmedAt: senderDoc.confirmedAt,
-            updatedAt: senderDoc.updatedAt,
-            });
+      const sender = this.mapDocToSender(doc.senderId);
 
-            return Object.assign(message, { sender });
-        });
-
-        return messages;
-    }
+      return Object.assign(message, { sender });
+    });
+  }
 }

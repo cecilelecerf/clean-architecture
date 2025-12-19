@@ -8,53 +8,58 @@ import { Money } from "@domain/values/Money";
 export class TransactionRepositoryMongo implements TransactionRepository {
   constructor(private readonly client: MongoClient) {}
 
+  private mapDocToTransaction(doc: any): TransactionEntity {
+    const amount = Money.create(doc.amount);
+    if (amount instanceof Error) throw amount;
+
+    const fromAccountId = IBAN.create(doc.fromAccountId);
+    if (fromAccountId instanceof Error) throw fromAccountId;
+
+    const toAccountId = IBAN.create(doc.toAccountId);
+    if (toAccountId instanceof Error) throw toAccountId;
+
+    return TransactionEntity.from({
+      id: doc._id.toString(),
+      fromAccountId,
+      toAccountId,
+      amount,
+      label: doc.label,
+      icon: doc.icon,
+      date: doc.date,
+      type: doc.type,
+    });
+  }
+
+  /** Transactions par période */
   async findByDateRange(
     startDate: Date,
     endDate: Date
   ): Promise<TransactionEntity[]> {
     await this.client.connect();
+
     const docs = await TransactionModel.find({
       date: { $gte: startDate, $lte: endDate },
     })
-      .sort({ date: 1 })
+      .sort({ date: -1 })
       .lean();
 
-    return docs.map((doc) =>
-      TransactionEntity.from({
-        id: doc._id.toString(),
-        fromAccountId: doc.fromAccountId as IBAN,
-        toAccountId: doc.toAccountId as IBAN,
-        amount: Money.from({ amount: doc.amount, currency: doc.currency }),
-        label: doc.label,
-        icon: doc.icon,
-        date: doc.date,
-        type: doc.type,
-      })
-    );
+    return docs.map((doc) => this.mapDocToTransaction(doc));
   }
 
+  /** Transactions par IBAN */
   async findByIban(iban: IBAN): Promise<TransactionEntity[]> {
     await this.client.connect();
 
-    const docs = await TransactionModel.find({ iban: iban.value }).lean();
+    const docs = await TransactionModel.find({
+      $or: [{ fromAccountId: iban.value }, { toAccountId: iban.value }],
+    })
+      .sort({ date: -1 })
+      .lean();
 
-    return docs.map((doc: any) => {
-      const amount = Money.create(doc.amount);
-      if (amount instanceof Error) throw amount;
-
-      return TransactionEntity.from({
-        id: doc._id.toString(),
-        label: doc.label,
-        icon: doc.icon,
-        fromAccountId: doc.fromAccountId,
-        toAccountId: doc.toAccountId,
-        amount,
-        date: doc.date,
-        type: doc.type,
-      });
-    });
+    return docs.map((doc) => this.mapDocToTransaction(doc));
   }
 
+  /** Sauvegarder une transaction */
   async save(transaction: TransactionEntity): Promise<void> {
     await this.client.connect();
 
@@ -69,9 +74,10 @@ export class TransactionRepositoryMongo implements TransactionRepository {
       },
       date: transaction.date,
       type: transaction.type,
-    } as any);
+    });
   }
 
+  /** Supprimer une transaction */
   async delete(transactionId: TransactionEntity["id"]): Promise<void> {
     await this.client.connect();
 

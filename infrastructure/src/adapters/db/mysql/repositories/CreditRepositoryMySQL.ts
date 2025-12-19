@@ -9,104 +9,76 @@ import { Percentage } from "@domain/values/Percentage";
 export class CreditRepositoryMySQL implements CreditRepository {
   constructor(private readonly client: MySQLClient) {}
 
+  private mapRowToCredit(row: RowDataPacket): CreditEntity {
+    const initialAmount = Money.from({
+      amount: row.initial_amount,
+      currency: row.initial_currency,
+    });
+    const monthlyPayment = Money.from({
+      amount: row.monthly_amount,
+      currency: row.monthly_currency,
+    });
+    const remainingBalance = Money.from({
+      amount: row.remaining_amount,
+      currency: row.remaining_currency,
+    });
+    const interestRate = Percentage.from(row.interest_rate);
+    const insuranceRate = Percentage.from(row.insurance_rate);
+
+    return CreditEntity.from({
+      id: row.id,
+      userId: row.user_id,
+      initialAmount,
+      interestRate,
+      insuranceRate,
+      durationMonths: row.duration_months,
+      startDate: row.start_date,
+      monthlyPayment,
+      remainingBalance,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    });
+  }
+
+  /** Trouver un crédit par ID */
   async findById(id: CreditEntity["id"]): Promise<CreditEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM credits WHERE id = ?",
       [id]
     );
-    if (rows.length === 0) return null;
-    const row = rows[0];
 
-    return CreditEntity.from({
-      id: row.id,
-      userId: row.userId,
-      initialAmount: Money.from({
-        amount: row.initialAmount,
-        currency: row.initialCurrency,
-      }),
-      interestRate: Percentage.from({ value: row.interestRate }),
-      insuranceRate: Percentage.from({ value: row.insuranceRate }),
-      durationMonths: row.durationMonths,
-      startDate: row.startDate,
-      monthlyPayment: Money.from({
-        amount: row.monthlyAmount,
-        currency: row.monthlyCurrency,
-      }),
-      remainingBalance: Money.from({
-        amount: row.remainingAmount,
-        currency: row.remainingCurrency,
-      }),
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt ?? null,
-    });
+    if (rows.length === 0) return null;
+
+    return this.mapRowToCredit(rows[0]);
   }
 
+  /** Tous les crédits d'un utilisateur */
   async findAllByUserId(userId: UserEntity["id"]): Promise<CreditEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM credits WHERE user_id = ?",
+      "SELECT * FROM credits WHERE user_id = ? ORDER BY start_date DESC",
       [userId]
     );
-    return rows.map((row) =>
-      CreditEntity.from({
-        id: row.id,
-        userId: row.userId,
-        initialAmount: Money.from({
-          amount: row.initialAmount,
-          currency: row.initialCurrency,
-        }),
-        interestRate: Percentage.from({ value: row.interestRate }),
-        insuranceRate: Percentage.from({ value: row.insuranceRate }),
-        durationMonths: row.durationMonths,
-        startDate: row.startDate,
-        monthlyPayment: Money.from({
-          amount: row.monthlyAmount,
-          currency: row.monthlyCurrency,
-        }),
-        remainingBalance: Money.from({
-          amount: row.remainingAmount,
-          currency: row.remainingCurrency,
-        }),
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt ?? null,
-      })
-    );
+
+    return rows.map((row) => this.mapRowToCredit(row));
   }
 
+  /** Crédits actifs */
   async findActiveCredits(): Promise<CreditEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM credits WHERE remaining_amount > 0"
+      "SELECT * FROM credits WHERE remaining_amount > 0 ORDER BY start_date DESC"
     );
-    return rows.map((row) =>
-      CreditEntity.from({
-        id: row.id,
-        userId: row.userId,
-        initialAmount: Money.from({
-          amount: row.initialAmount,
-          currency: row.initialCurrency,
-        }),
-        interestRate: Percentage.from({ value: row.interestRate }),
-        insuranceRate: Percentage.from({ value: row.insuranceRate }),
-        durationMonths: row.durationMonths,
-        startDate: row.startDate,
-        monthlyPayment: Money.from({
-          amount: row.monthlyAmount,
-          currency: row.monthlyCurrency,
-        }),
-        remainingBalance: Money.from({
-          amount: row.remainingAmount,
-          currency: row.remainingCurrency,
-        }),
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt ?? null,
-      })
-    );
+
+    return rows.map((row) => this.mapRowToCredit(row));
   }
 
+  /** Sauvegarder un crédit */
   async save(credit: CreditEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO credits 
-        (id, user_id, initial_amount, initial_currency, interest_rate, insurance_rate, duration_months, start_date, monthly_amount, monthly_currency, remaining_amount, remaining_currency, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (id, user_id, initial_amount, initial_currency, interest_rate, insurance_rate, 
+         duration_months, start_date, monthly_amount, monthly_currency, 
+         remaining_amount, remaining_currency, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         credit.id,
         credit.userId,
@@ -121,15 +93,18 @@ export class CreditRepositoryMySQL implements CreditRepository {
         credit.remainingBalance.amount,
         credit.remainingBalance.currency,
         credit.createdAt,
-        credit.updatedAt ?? null,
       ]
     );
   }
 
+  /** Mettre à jour un crédit */
   async update(credit: CreditEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE credits
-       SET user_id = ?, initial_amount = ?, initial_currency = ?, interest_rate = ?, insurance_rate = ?, duration_months = ?, start_date = ?, monthly_amount = ?, monthly_currency = ?, remaining_amount = ?, remaining_currency = ?, created_at = ?, updated_at = ? 
+       SET user_id = ?, initial_amount = ?, initial_currency = ?, 
+           interest_rate = ?, insurance_rate = ?, duration_months = ?, 
+           start_date = ?, monthly_amount = ?, monthly_currency = ?, 
+           remaining_amount = ?, remaining_currency = ?, updated_at = ? 
        WHERE id = ?`,
       [
         credit.userId,
@@ -143,13 +118,13 @@ export class CreditRepositoryMySQL implements CreditRepository {
         credit.monthlyPayment.currency,
         credit.remainingBalance.amount,
         credit.remainingBalance.currency,
-        credit.createdAt,
         credit.updatedAt,
         credit.id,
       ]
     );
   }
 
+  /** Supprimer un crédit */
   async delete(id: CreditEntity["id"]): Promise<void> {
     await this.client.query<ResultSetHeader>(
       "DELETE FROM credits WHERE id = ?",
