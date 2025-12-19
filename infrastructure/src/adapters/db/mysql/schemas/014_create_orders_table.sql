@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS orders (
     fee_currency CHAR(3) DEFAULT 'EUR',
     order_date DATETIME NOT NULL,
     status ENUM('pending','executed','cancelled') NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_action FOREIGN KEY (action_id) REFERENCES actions(ISIN) ON DELETE CASCADE

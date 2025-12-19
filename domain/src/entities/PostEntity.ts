@@ -14,7 +14,7 @@ export class PostEntity {
     public tagsId: TagEntity["id"][],
     public createdAt: Date,
     public readBy: UserEntity["id"][] = [],
-    public updatedAt?: Date,
+    public updatedAt: Date,
     public publishedAt?: Date,
     public clientId?: UserEntity["id"]
   ) {}

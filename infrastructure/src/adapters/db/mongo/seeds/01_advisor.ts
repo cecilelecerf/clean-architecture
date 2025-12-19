@@ -36,6 +36,7 @@ export async function seedMongoAdministrator(
         createdAt: clockService.now(),
         isActiveField: true,
         confirmedAt: clockService.now(),
+        updatedAt: clockService.now(),
       });
 
       advisors.push(user);

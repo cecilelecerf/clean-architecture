@@ -1,7 +1,13 @@
 import { Money } from "@domain/values/Money";
 import { ActionEntity } from "./ActionEntity";
-import { UserEntity } from "./UserEntity"; 
-import { FactorNegativeError, MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import { UserEntity } from "./UserEntity";
+import {
+  FactorNegativeError,
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMismatchError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
 import { InvalidOrderStatusTransitionError } from "@domain/errors/order";
 
 export class OrderEntity {
@@ -16,7 +22,7 @@ export class OrderEntity {
     public date: Date,
     public status: "pending" | "executed" | "cancelled",
     public createdAt: Date,
-    public updatedAt?: Date
+    public updatedAt: Date
   ) {}
 
   public static create({
@@ -29,7 +35,7 @@ export class OrderEntity {
     date,
     status,
     createdAt,
-    updatedAt
+    updatedAt,
   }: Pick<
     OrderEntity,
     | "id"
@@ -74,7 +80,7 @@ export class OrderEntity {
     date,
     status,
     createdAt,
-    updatedAt
+    updatedAt,
   }: Pick<
     OrderEntity,
     | "id"
@@ -151,7 +157,6 @@ export class OrderEntity {
   }
 
   public static defaultFee(): Money {
-    return Money.create({ amount: 1, currency: 'EUR' }) as Money;
+    return Money.create({ amount: 1, currency: "EUR" }) as Money;
   }
-
 }

@@ -11,6 +11,7 @@ import { generateSavingsRate } from "./09_savingsrate";
 import { generateOrders } from "./10_orders";
 import { generateNotifications } from "./11_notification";
 import { generateCredits } from "./12_credits";
+import { generateBankAccounts } from "./13_bank_accounts";
 
 const all = async () => {
   const mysqlClient = new MySQLClient();
@@ -26,6 +27,7 @@ const all = async () => {
   await generateOrders(mysqlClient, clients, actions);
   await generateNotifications(mysqlClient, advisors, clients);
   await generateCredits(mysqlClient, clients);
+  await generateBankAccounts(mysqlClient);
 };
 all()
   .then(() => {

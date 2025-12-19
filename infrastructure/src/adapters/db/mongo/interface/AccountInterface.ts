@@ -1,8 +1,12 @@
-import { Document } from "mongoose";
+import { Types } from "mongoose";
 
-export interface AccountInterface extends Document {
+export interface AccountInterface {
+  _id: Types.UUID;
   iban: string;
-  userId: string;
+  owner: {
+    role: "bank" | "client";
+    userId: string;
+  };
   name: string;
   type: "courant" | "epargne";
   color: string;

@@ -4,6 +4,7 @@ import { AccountRepository } from "@application/ports/repositories/AccountReposi
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EmailService } from "@application/ports/services/EmailService";
 import { findActiveUser } from "@application/utils/userValidators";
+import { IBANInvalidCheckDigitsError, IBANInvalidFormatError, IBANTooLongError, IBANTooShortError } from "@domain/errors/IBAN";
  import { IBAN } from "@domain/values/IBAN";
 
 export class DeleteAccountUsecase {
@@ -13,27 +14,36 @@ export class DeleteAccountUsecase {
     private readonly userRepository: UserRepository
   ) {}
 
-  public async execute(accountIBAN: IBAN, requestUserId: string): Promise<
+  public async execute(accountIban: string, requestUserId: string): Promise<
     | MissingIBANError
     | UnauthorizedAccessAccountError
     | AccountNotFoundError
     | UserNotFoundError
     | UserNotActiveError
+    | IBANTooShortError 
+    | IBANTooLongError 
+    | IBANInvalidFormatError 
+    | IBANInvalidCheckDigitsError
     | void> {
-    if (!accountIBAN) return new MissingIBANError();
+    if (!accountIban || accountIban.trim().length === 0) {
+      return new MissingIBANError();
+    }
     if (!requestUserId) return new AccountNotFoundError();
 
-    const existingAccount = await this.accountRepository.findByIBAN(accountIBAN);
+    const iban = IBAN.create(accountIban);
+    if (iban instanceof Error) return iban;
+
+    const existingAccount = await this.accountRepository.findByIBAN(iban);
     if (!existingAccount) return new AccountNotFoundError();
 
     const user = await findActiveUser(this.userRepository, requestUserId);
     if (user instanceof Error) return user;
 
-    if (existingAccount.userId !== requestUserId) {
+    if (!existingAccount.owner.belongsTo(user.id)) {
       return new UnauthorizedAccessAccountError();
     }
 
-    await this.accountRepository.delete(accountIBAN);
+    await this.accountRepository.delete(iban);
 
     await this.emailService.sendEmail({
       to: user.email,

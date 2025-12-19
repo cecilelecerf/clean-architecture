@@ -32,17 +32,14 @@ export async function generateSavingsRateMongo(
         rate,
         effectiveDate: raw.effectiveDate,
         createdAt: clockService.now(),
+        updatedAt: clockService.now(),
       });
 
       savingsRates.push(savingsRate);
       await savingsRateRepository.save(savingsRate);
       console.log(savingsRate.id);
     } catch (err) {
-      console.error(
-        "Error creating savings rate from raw",
-        raw,
-        err
-      );
+      console.error("Error creating savings rate from raw", raw, err);
     }
   }
 

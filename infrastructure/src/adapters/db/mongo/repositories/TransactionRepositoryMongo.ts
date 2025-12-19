@@ -6,76 +6,77 @@ import { TransactionModel } from "../models/TransactionModel";
 import { Money } from "@domain/values/Money";
 
 export class TransactionRepositoryMongo implements TransactionRepository {
-    constructor(private readonly client: MongoClient) {}
+  constructor(private readonly client: MongoClient) {}
 
-    async findByDateRange(
-        startDate: Date,
-        endDate: Date
-    ): Promise<TransactionEntity[]> {
-        await this.client.connect();
-        const docs = await TransactionModel.find({
-            date: { $gte: startDate, $lte: endDate },
-        })
-            .sort({ date: 1 }) 
-            .lean();
-        
-        return docs.map((doc) =>
-            TransactionEntity.from({
-                id: doc._id.toString(),
-                fromAccountId: doc.fromAccountId as IBAN,
-                toAccountId: doc.toAccountId as IBAN,
-                amount: Money.from({ amount: doc.amount, currency: doc.currency }),
-                label: doc.label,
-                icon: doc.icon,
-                date: doc.date,
-                type: doc.type,
-            })
-        );
-    }
+  private mapDocToTransaction(doc: any): TransactionEntity {
+    const amount = Money.from(doc.amount);
+    const fromAccountId = IBAN.from(doc.fromAccountId);
+    const toAccountId = IBAN.from(doc.toAccountId);
 
-    async findByIban(iban: IBAN): Promise<TransactionEntity[]> {
-        await this.client.connect();
-        
-        const docs = await TransactionModel.find({ iban: iban.value }).lean();
-        
-        return docs.map((doc: any) => {
-            const amount = Money.create(doc.amount);
-            if (amount instanceof Error) throw amount;
+    return TransactionEntity.from({
+      id: doc._id.toString(),
+      fromAccountId,
+      toAccountId,
+      amount,
+      label: doc.label,
+      icon: doc.icon,
+      date: doc.date,
+      type: doc.type,
+    });
+  }
 
-            return TransactionEntity.from({
-                id: doc._id.toString(),
-                label: doc.label,
-                icon: doc.icon,
-                fromAccountId: doc.fromAccountId,
-                toAccountId: doc.toAccountId,
-                amount,
-                date: doc.date,
-                type: doc.type,
-            });
-        })
-        
-    }
+  /** Transactions par période */
+  async findByDateRange(
+    startDate: Date,
+    endDate: Date
+  ): Promise<TransactionEntity[]> {
+    await this.client.connect();
 
-    async save(transaction: TransactionEntity): Promise<void> {
-        await this.client.connect();
-                                                              
-        await TransactionModel.create({
-            label: transaction.label,
-            icon: transaction.icon,
-            fromAccountId: transaction.fromAccountId.value,
-            toAccountId: transaction.toAccountId.value,
-            amount: {
-                amount: transaction.amount.amount,
-                currency: transaction.amount.currency,
-            },
-            date: transaction.date,
-            type: transaction.type
-        } as any);
-    }
+    const docs = await TransactionModel.find({
+      date: { $gte: startDate, $lte: endDate },
+    })
+      .sort({ date: -1 })
+      .lean();
 
-    async delete(transactionId: TransactionEntity["id"]): Promise<void> {
-        await this.client.connect();
-                
-        await TransactionModel.deleteOne({ _id: transactionId });
-    }
+    return docs.map((doc) => this.mapDocToTransaction(doc));
+  }
+
+  /** Transactions par IBAN */
+  async findByIban(iban: IBAN): Promise<TransactionEntity[]> {
+    await this.client.connect();
+
+    const docs = await TransactionModel.find({
+      $or: [{ fromAccountId: iban.value }, { toAccountId: iban.value }],
+    })
+      .sort({ date: -1 })
+      .lean();
+
+    return docs.map((doc) => this.mapDocToTransaction(doc));
+  }
+
+  /** Sauvegarder une transaction */
+  async save(transaction: TransactionEntity): Promise<void> {
+    await this.client.connect();
+
+    await TransactionModel.create({
+      _id: transaction.id,
+      label: transaction.label,
+      icon: transaction.icon,
+      fromAccountId: transaction.fromAccountId.value,
+      toAccountId: transaction.toAccountId.value,
+      amount: {
+        amount: transaction.amount.amount,
+        currency: transaction.amount.currency,
+      },
+      date: transaction.date,
+      type: transaction.type,
+    });
+  }
+
+  /** Supprimer une transaction */
+  async delete(transactionId: TransactionEntity["id"]): Promise<void> {
+    await this.client.connect();
+
+    await TransactionModel.deleteOne({ _id: transactionId });
+  }
 }

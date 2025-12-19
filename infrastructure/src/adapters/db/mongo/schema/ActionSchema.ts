@@ -1,9 +1,9 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 import { ActionInterface } from "../interface/ActionInterface";
 
 export const ActionSchema = new Schema<ActionInterface>(
   {
-    ISIN: { type: String, required: true },
+    ISIN: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     totalNb: { type: Number, required: true },
     symbol: { type: String, required: true },
@@ -14,16 +14,14 @@ export const ActionSchema = new Schema<ActionInterface>(
         amount: { type: Number, required: true },
         currency: { type: String, required: true },
       },
-      required: true
+      required: true,
     },
     isAvailable: { type: Boolean, required: true },
+    createdAt: { type: Date, required: true },
+    updatedAt: { type: Date, required: true },
   },
   {
-    timestamps: {
-      createdAt: "createdAt",
-      updatedAt: "updatedAt",
-    },
-    collection: "action",
+    collection: "actions",
     versionKey: false,
   }
 );

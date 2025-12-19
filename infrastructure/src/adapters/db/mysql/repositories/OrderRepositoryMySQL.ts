@@ -27,7 +27,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
         order.date,
         order.status,
         order.createdAt,
-        order.updatedAt ?? null
+        order.updatedAt,
       ]
     );
   }
@@ -53,7 +53,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
       date: row.date,
       status: row.status,
       createdAt: row.createdAt,
-      updatedAt: row.updatedAt ?? null
+      updatedAt: row.updatedAt,
     });
   }
 
@@ -77,7 +77,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
         date: row.date,
         status: row.status,
         createdAt: row.createdAt,
-        updatedAt: row.updatedAt ?? null
+        updatedAt: row.updatedAt,
       })
     );
   }
@@ -104,7 +104,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
         date: row.date,
         status: row.status,
         createdAt: row.createdAt,
-        updatedAt: row.updatedAt ?? null
+        updatedAt: row.updatedAt,
       })
     );
   }
@@ -128,7 +128,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
         date: row.date,
         status: row.status,
         createdAt: row.createdAt,
-        updatedAt: row.updatedAt ?? null
+        updatedAt: row.updatedAt,
       })
     );
   }
@@ -151,7 +151,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
         order.status,
         order.id,
         order.createdAt,
-        order.updatedAt || new Date()
+        order.updatedAt,
       ]
     );
   }

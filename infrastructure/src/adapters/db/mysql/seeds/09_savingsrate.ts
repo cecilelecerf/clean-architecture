@@ -9,34 +9,33 @@ import { SystemClockService } from "@infrastructure/adapters/services/SystemCloc
 export async function generateSavingsRate(
   mysqlClient: MySQLClient
 ): Promise<SavingsRateEntity[]> {
-    console.log("-- Création des Taux d'Épargnes  --");
+  console.log("-- Création des Taux d'Épargnes  --");
 
-    const savingsRateRepository = new SavingsRateRepositoryMySQL(mysqlClient);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
+  const savingsRateRepository = new SavingsRateRepositoryMySQL(mysqlClient);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
 
-    const savingsrate = [];
-    for (const raw of rawSavingsRate) {
-        try {
-            const rate = Percentage.create(raw.rate);
-            if (rate instanceof Error) {
-                console.warn(rate);
-                continue;
-            }
-        
-            const savingrate = SavingsRateEntity.from({
-                id: uuidService.generate(),
-                rate: rate,
-                effectiveDate: raw.effectiveDate,
-                createdAt: clockService.now()
-            });
-                
-            savingsrate.push(savingrate);
-            await savingsRateRepository.save(savingrate);
-            console.log(savingrate.id);
-        } catch (err) {
-            console.error("Error creating saving rate from raw", raw, err);
-        }
+  const savingsrate = [];
+  for (const raw of rawSavingsRate) {
+    try {
+      const rate = Percentage.create(raw.rate);
+      if (rate instanceof Error) {
+        console.warn(rate);
+        continue;
+      }
+      const savingrate = SavingsRateEntity.from({
+        id: uuidService.generate(),
+        rate,
+        effectiveDate: raw.effectiveDate,
+        createdAt: clockService.now(),
+        updatedAt: clockService.now(),
+      });
+      savingsrate.push(savingrate);
+      await savingsRateRepository.save(savingrate);
+      console.log(savingrate.id);
+    } catch (err) {
+      console.error("Error creating saving rate from raw", raw, err);
     }
-    return savingsrate;
+  }
+  return savingsrate;
 }

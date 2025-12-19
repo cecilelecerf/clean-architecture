@@ -15,10 +15,10 @@ import { TransactionRepositoryMySQL } from "@infrastructure/adapters/db/mysql/re
 import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
 import { Color } from "@domain/values/Color";
 import { rand } from "./utils";
+import { AccountOwner } from "@domain/values/AccountOwner";
 
 export async function seedSQLClient(
-  mysqlClient: MySQLClient,
-  advisors: UserEntity[]
+  mysqlClient: MySQLClient
 ): Promise<UserEntity[]> {
   console.log("-- Création des comptes Client --");
 
@@ -65,10 +65,12 @@ export async function seedSQLClient(
         id: uuidService.generate(),
         role: "client",
         createdAt,
-        isActiveField: true, 
-                                   confirmedAt : confirmedAt ?? new Date(createdAt),   
-        updatedAt:   Math.random() < 0.3? clockService.addDays(createdAt, rand(1, 10))
-                                                        :  clockService.nowMinusDays(rand(0, 60))
+        isActiveField: true,
+        confirmedAt: confirmedAt ?? new Date(createdAt),
+        updatedAt:
+          Math.random() < 0.3
+            ? clockService.addDays(createdAt, rand(1, 10))
+            : clockService.nowMinusDays(rand(0, 60)),
       });
       users.push(user);
       await userRepository.save(user);
@@ -85,18 +87,22 @@ export async function seedSQLClient(
         }
 
         const color = Color.from(rawAccount.color);
-          if (color instanceof Error) continue;
+        if (color instanceof Error) continue;
 
         const account = AccountEntity.from({
           ...rawAccount,
           iban,
           createdAt: clockService.now(),
           color,
-          userId: user.id,
+          owner: AccountOwner.from({
+            role: "client",
+            userId: user.id,
+          }),
           balance: Money.from({
             amount: rawAccount.balance,
             currency: rawAccount.currency,
           }),
+          updatedAt: clockService.now(),
         });
         accounts.push(account);
         await accountRepository.save(account);

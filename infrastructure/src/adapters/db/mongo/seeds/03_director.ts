@@ -39,6 +39,7 @@ export async function seedMongoDirector(
         role: "directeur",
         createdAt: clockService.now(),
         isActiveField: true,
+        updatedAt: clockService.now(),
       });
 
       await userRepository.save(user);

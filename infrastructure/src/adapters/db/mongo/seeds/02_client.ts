@@ -14,10 +14,10 @@ import { Money } from "@domain/values/Money";
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
 import { Color } from "@domain/values/Color";
+import { AccountOwner } from "@domain/values/AccountOwner";
 
 export async function seedMongoClient(
-  mongoClient: MongoClient,
-  advisors: UserEntity[]
+  mongoClient: MongoClient
 ): Promise<UserEntity[]> {
   console.log("-- Création des comptes Client (Mongo) --");
 
@@ -62,6 +62,7 @@ export async function seedMongoClient(
         createdAt,
         isActiveField: true,
         confirmedAt,
+        updatedAt: clockService.now(),
       });
 
       await userRepository.save(user);
@@ -81,13 +82,17 @@ export async function seedMongoClient(
         const account = AccountEntity.from({
           ...rawAccount,
           iban,
-          userId: user.id,
+          owner: AccountOwner.from({
+            role: "client",
+            userId: user.id,
+          }),
           createdAt: clockService.now(),
           color,
           balance: Money.from({
             amount: rawAccount.balance,
             currency: rawAccount.currency,
-          })
+          }),
+          updatedAt: clockService.now(),
         });
 
         await accountRepository.save(account);

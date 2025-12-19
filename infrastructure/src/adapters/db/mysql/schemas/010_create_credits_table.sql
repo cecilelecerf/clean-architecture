@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS credits (
     remaining_amount DECIMAL(15,2) NOT NULL,
     remaining_currency CHAR(3) NOT NULL,
     created_at DATETIME NOT NULL,
-    updated_at DATETIME,
+    updated_at DATETIME NOT NULL,
 
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

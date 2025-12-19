@@ -1,5 +1,8 @@
-
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import {
   ThreadEntityWithUsers,
   ThreadRepository,
@@ -8,7 +11,11 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-type Props = {  userId: UserEntity["id"] ,type ?: ThreadEntity["type"], advisorId?: UserEntity["id"]};
+type Props = {
+  userId: UserEntity["id"];
+  type?: ThreadEntity["type"];
+  advisorId?: UserEntity["id"];
+};
 
 export class GetThreadsByUserAndTypeUsecase {
   constructor(
@@ -18,7 +25,7 @@ export class GetThreadsByUserAndTypeUsecase {
   async execute({
     userId,
     type,
-    advisorId
+    advisorId,
   }: Props): Promise<
     | ThreadEntityWithUsers[]
     | UserNotFoundError
@@ -26,38 +33,36 @@ export class GetThreadsByUserAndTypeUsecase {
     | UserRoleMismatchError
   > {
     const user = await findActiveUser(this.userRepository, userId);
-    if (user instanceof Error) return user; 
-    console.log("usecase")
-console.log(type)
-    if(type === "external"){
-      if(advisorId){
+    if (user instanceof Error) return user;
+    if (type === "external") {
+      if (advisorId) {
         const advisor = await findActiveUser(this.userRepository, advisorId);
         if (advisor instanceof Error) return advisor;
-    
+
         if (!advisor.hasRole({ role: "conseiller" }))
           return new UserRoleMismatchError(["conseiller"], advisor.role);
       }
-          if (user.hasRole({ role: "directeur" }))
-      return new UserRoleMismatchError(["conseiller", "client"], user.role);
-
-    }else if(type==="internal") {
-          if (user.hasRole({ role: "client" }))
-      return new UserRoleMismatchError(["conseiller", "directeur"], user.role);
+      if (user.hasRole({ role: "directeur" }))
+        return new UserRoleMismatchError(["conseiller", "client"], user.role);
+    } else if (type === "internal") {
+      if (user.hasRole({ role: "client" }))
+        return new UserRoleMismatchError(
+          ["conseiller", "directeur"],
+          user.role
+        );
     }
 
     const threadsAdmin =
       await this.threadRepository.findAllWithUserByAdministratorIdAndType(
-        userId, type
+        userId,
+        type
       );
-      console.log(threadsAdmin)
-           const threadsParticipant =
+    const threadsParticipant =
       await this.threadRepository.findAllWithUserByParticipantIdAndType(
-        userId, type
+        userId,
+        type
       );
-      const threads  = [
-      ...threadsAdmin,
-      ...threadsParticipant,
-    ];
+    const threads = [...threadsAdmin, ...threadsParticipant];
     return threads;
   }
 }

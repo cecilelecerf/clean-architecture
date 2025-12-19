@@ -3,5 +3,5 @@ import { SavingsRateSchema } from "../schema/SavingsRateSchema";
 import { SavingsRateInterface } from "../interface/SavingsRateInterface";
 
 export const SavingsRateModel =
-  mongoose.models.savingsrate ||
-  mongoose.model<SavingsRateInterface>("savingsrate", SavingsRateSchema);
+  mongoose.models.SavingsRate ||
+  mongoose.model<SavingsRateInterface>("SavingsRate", SavingsRateSchema);

@@ -10,7 +10,7 @@ import { pick } from "./utils";
 export async function generateNotificationsMongo(
   mongoClient: MongoClient,
   advisors: UserEntity[],
-  clients: UserEntity[],
+  clients: UserEntity[]
 ): Promise<NotificationEntity[]> {
   console.log("-- Création des Notifications (Mongo) --");
 
@@ -41,6 +41,7 @@ export async function generateNotificationsMongo(
         isRead: false,
         type: raw.type as "info" | "alert" | "reminder",
         createdAt: clockService.now(),
+        updatedAt: clockService.now(),
       });
 
       notifications.push(notification);

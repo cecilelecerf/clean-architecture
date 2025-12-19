@@ -1,7 +1,12 @@
 import { Money } from "@domain/values/Money";
-import { UserEntity } from "./UserEntity"; 
-import { Percentage } from "@domain/values/Percentage"; 
-import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import { UserEntity } from "./UserEntity";
+import { Percentage } from "@domain/values/Percentage";
+import {
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMismatchError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
 import { CreditAlreadyPaidError } from "@domain/errors/credit";
 export type MonthlySchedule = {
   capitalPaid: Money;
@@ -23,7 +28,7 @@ export class CreditEntity {
     public monthlyPayment: Money,
     public remainingBalance: Money,
     public createdAt: Date,
-    public updatedAt?: Date
+    public updatedAt: Date
   ) {}
   public static from({
     id,
@@ -36,7 +41,7 @@ export class CreditEntity {
     durationMonths,
     remainingBalance,
     createdAt,
-    updatedAt
+    updatedAt,
   }: Pick<
     CreditEntity,
     | "id"
