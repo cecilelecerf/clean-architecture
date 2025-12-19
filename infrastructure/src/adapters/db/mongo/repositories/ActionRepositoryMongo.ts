@@ -8,8 +8,7 @@ export class ActionRepositoryMongo implements ActionRepository {
   constructor(private readonly client: MongoClient) {}
 
   private mapDocToAction(doc: any): ActionEntity {
-    const currentPrice = Money.create(doc.currentPrice);
-    if (currentPrice instanceof Error) throw currentPrice;
+    const currentPrice = Money.from(doc.currentPrice);
 
     return ActionEntity.from({
       ISIN: doc.ISIN,

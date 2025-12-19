@@ -124,7 +124,7 @@ export class PostRepositoryMySQL implements PostRepository {
         post.title,
         post.content,
         post.createdAt,
-        post.updatedAt || null,
+        post.updatedAt,
         post.publishedAt || null,
         post.clientId || null,
       ]

@@ -1,3 +1,5 @@
+import { Color } from "@domain/values/Color";
+
 export const rawClients = [
   {
     firstname: "client",
@@ -91,7 +93,7 @@ export const rawClients = [
       {
         name: "Compte courant",
         type: "courant" as const,
-        color: "purple" as const,
+        color: "purple" as string,
         balance: 900,
         currency: "EUR",
         transactions: [
@@ -190,7 +192,7 @@ export const rawClients = [
       {
         name: "Compte courant",
         type: "courant" as const,
-        color: "teal" as const,
+        color: "green" as const,
         balance: 1000,
         currency: "EUR",
         transactions: [
@@ -223,7 +225,7 @@ export const rawClients = [
       {
         name: "Compte courant",
         type: "courant" as const,
-        color: "yellow" as const,
+        color: "red" as const,
         balance: 950,
         currency: "EUR",
         transactions: [
@@ -256,7 +258,7 @@ export const rawClients = [
       {
         name: "Compte courant",
         type: "courant" as const,
-        color: "brown" as const,
+        color: "orange" as const,
         balance: 1400,
         currency: "EUR",
         transactions: [
@@ -289,7 +291,7 @@ export const rawClients = [
       {
         name: "Compte courant",
         type: "courant" as const,
-        color: "cyan" as const,
+        color: "green" as const,
         balance: 1150,
         currency: "EUR",
         transactions: [
@@ -322,7 +324,7 @@ export const rawClients = [
       {
         name: "Compte courant",
         type: "courant" as const,
-        color: "grey" as const,
+        color: "gray" as const,
         balance: 1300,
         currency: "EUR",
         transactions: [

@@ -9,7 +9,6 @@ export class TagRepositoryMySQL implements TagRepository {
 
   private mapRowToTag(row: RowDataPacket): TagEntity {
     const color = Color.from(row.color);
-    if (color instanceof Error) throw color;
 
     return TagEntity.from({
       id: row.id,
@@ -23,8 +22,8 @@ export class TagRepositoryMySQL implements TagRepository {
   /** Sauvegarder un tag */
   async save(tag: TagEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO tags (id, label, color, created_at) VALUES (?, ?, ?, ?)`,
-      [tag.id, tag.label, tag.color.getValue(), tag.createdAt]
+      `INSERT INTO tags (id, label, color, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`,
+      [tag.id, tag.label, tag.color.getValue(), tag.createdAt, tag.updatedAt]
     );
   }
 

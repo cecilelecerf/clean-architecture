@@ -90,7 +90,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
         thread.administratorId ?? null,
         thread.title,
         thread.createdAt,
-        thread.updatedAt ?? thread.createdAt,
+        thread.updatedAt,
         thread.isClose ? 1 : 0,
         thread.type,
       ]

@@ -174,8 +174,6 @@ export class PostRepositoryMongo implements PostRepository {
       .lean();
 
     if (!doc) return null;
-    if (!doc.advisorId) throw new Error(`Advisor not found for post: ${id}`);
-
     const advisor = this.mapDocToAdvisor(doc.advisorId);
 
     const tags: TagEntity[] = (doc.tagsId || [])

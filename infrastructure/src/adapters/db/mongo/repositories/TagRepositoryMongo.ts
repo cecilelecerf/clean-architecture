@@ -9,7 +9,6 @@ export class TagRepositoryMongo implements TagRepository {
 
   private mapDocToTag(doc: any): TagEntity {
     const color = Color.from(doc.color);
-    if (color instanceof Error) throw color;
 
     return TagEntity.from({
       id: doc._id.toString(),

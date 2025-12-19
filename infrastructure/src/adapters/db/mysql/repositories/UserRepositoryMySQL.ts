@@ -82,8 +82,8 @@ export class UserRepositoryMySQL implements UserRepository {
   async save(user: UserEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO users 
-      (id, firstname, lastname, email, password_hash, role, is_active, created_at, confirmed_at) 
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, firstname, lastname, email, password_hash, role, is_active, created_at, confirmed_at, updated_at) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         user.id,
         user.firstname,
@@ -94,6 +94,7 @@ export class UserRepositoryMySQL implements UserRepository {
         user.isActiveField,
         user.createdAt,
         user.confirmedAt ?? null,
+        user.updatedAt,
       ]
     );
   }

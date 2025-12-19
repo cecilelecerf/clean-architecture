@@ -12,7 +12,7 @@ export const UserSchema = new Schema<UserInterface>(
       enum: ["client", "conseiller", "directeur"],
       required: true,
     },
-    isActiveField: { type: Boolean, required: true },
+    isActive: { type: Boolean, required: true },
     confirmedAt: { type: Date, required: false },
   },
   {

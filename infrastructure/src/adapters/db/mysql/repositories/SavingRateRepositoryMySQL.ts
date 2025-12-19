@@ -8,8 +8,7 @@ export class SavingsRateRepositoryMySQL implements SavingRateRepository {
   constructor(private readonly client: MySQLClient) {}
 
   private mapRowToSavingsRate(row: RowDataPacket): SavingsRateEntity {
-    const rate = Percentage.create(row.rate);
-    if (rate instanceof Error) throw rate;
+    const rate = Percentage.from(row.rate);
 
     return SavingsRateEntity.from({
       id: row.id,
@@ -57,12 +56,13 @@ export class SavingsRateRepositoryMySQL implements SavingRateRepository {
   /** Sauvegarder un taux d'épargne */
   async save(savingsRate: SavingsRateEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO savings_rates (id, rate, effective_date, created_at) VALUES (?, ?, ?, ?)`,
+      `INSERT INTO savings_rates (id, rate, effective_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`,
       [
         savingsRate.id,
         savingsRate.rate.value,
         savingsRate.effectiveDate,
         savingsRate.createdAt,
+        savingsRate.updatedAt,
       ]
     );
   }

@@ -24,8 +24,8 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
   async save(notification: NotificationEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO notifications 
-       (id, advisor_id, client_id, title, content, is_read, type, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, advisor_id, client_id, title, content, is_read, type, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         notification.id,
         notification.advisorId,
@@ -35,6 +35,7 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
         notification.isRead ? 1 : 0,
         notification.type,
         notification.createdAt,
+        notification.updatedAt,
       ]
     );
   }

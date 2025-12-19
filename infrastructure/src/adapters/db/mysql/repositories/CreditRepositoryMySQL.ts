@@ -77,8 +77,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
       `INSERT INTO credits 
         (id, user_id, initial_amount, initial_currency, interest_rate, insurance_rate, 
          duration_months, start_date, monthly_amount, monthly_currency, 
-         remaining_amount, remaining_currency, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         remaining_amount, remaining_currency, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         credit.id,
         credit.userId,
@@ -93,6 +93,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
         credit.remainingBalance.amount,
         credit.remainingBalance.currency,
         credit.createdAt,
+        credit.updatedAt,
       ]
     );
   }

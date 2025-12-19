@@ -9,14 +9,9 @@ export class TransactionRepositoryMongo implements TransactionRepository {
   constructor(private readonly client: MongoClient) {}
 
   private mapDocToTransaction(doc: any): TransactionEntity {
-    const amount = Money.create(doc.amount);
-    if (amount instanceof Error) throw amount;
-
-    const fromAccountId = IBAN.create(doc.fromAccountId);
-    if (fromAccountId instanceof Error) throw fromAccountId;
-
-    const toAccountId = IBAN.create(doc.toAccountId);
-    if (toAccountId instanceof Error) throw toAccountId;
+    const amount = Money.from(doc.amount);
+    const fromAccountId = IBAN.from(doc.fromAccountId);
+    const toAccountId = IBAN.from(doc.toAccountId);
 
     return TransactionEntity.from({
       id: doc._id.toString(),

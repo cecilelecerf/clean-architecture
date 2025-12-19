@@ -11,78 +11,80 @@ import { Percentage } from "@domain/values/Percentage";
 
 export async function generateCredits(
   mysqlClient: MySQLClient,
-  clients: UserEntity[],
+  clients: UserEntity[]
 ): Promise<CreditEntity[]> {
-    console.log("-- Création des Crédits --");
+  console.log("-- Création des Crédits --");
 
-    const creditRepository = new CreditRepositoryMySQL(mysqlClient);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
-    
-    const credits = [];
-    for (const raw of rawCredits) {
-        try {
-            const client = pick(clients);
+  const creditRepository = new CreditRepositoryMySQL(mysqlClient);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
 
-            const initialAmount = Money.create({
-                amount: raw.initialAmount,
-                currency: raw.currency,
-            });
-            if (initialAmount instanceof Error) {
-                console.warn(initialAmount);
-                continue;
-            }
+  const credits = [];
+  for (const raw of rawCredits) {
+    try {
+      const client = pick(clients);
 
-            const interestRate = Percentage.create(raw.interestRate);
-            if (interestRate instanceof Error) {
-                console.warn(interestRate);
-                continue;
-            }
+      const initialAmount = Money.create({
+        amount: raw.initialAmount,
+        currency: raw.currency,
+      });
+      if (initialAmount instanceof Error) {
+        console.warn(initialAmount);
+        continue;
+      }
 
-            const insuranceRate = Percentage.create(raw.insuranceRate);
-            if (insuranceRate instanceof Error) {
-                console.warn(insuranceRate);
-                continue;
-            }
+      const interestRate = Percentage.create(raw.interestRate);
+      if (interestRate instanceof Error) {
+        console.warn(interestRate);
+        continue;
+      }
 
-            const tempCredit = CreditEntity.from({
-                id: "temp",
-                userId: client.id,
-                initialAmount,
-                interestRate,
-                insuranceRate,
-                durationMonths: raw.durationMonths,
-                startDate: raw.startDate,
-                monthlyPayment: initialAmount,
-                remainingBalance: initialAmount,
-                createdAt: clockService.now(),
-            });
+      const insuranceRate = Percentage.create(raw.insuranceRate);
+      if (insuranceRate instanceof Error) {
+        console.warn(insuranceRate);
+        continue;
+      }
 
-            const monthlyPayment = tempCredit.calculateMonthlyPayment();
-            if (monthlyPayment instanceof Error) {
-                console.warn(monthlyPayment);
-                continue;
-            }
+      const tempCredit = CreditEntity.from({
+        id: "temp",
+        userId: client.id,
+        initialAmount,
+        interestRate,
+        insuranceRate,
+        durationMonths: raw.durationMonths,
+        startDate: raw.startDate,
+        monthlyPayment: initialAmount,
+        remainingBalance: initialAmount,
+        createdAt: clockService.now(),
+        updatedAt: clockService.now(),
+      });
 
-            const credit = CreditEntity.from({
-                id: uuidService.generate(),
-                userId: client.id,
-                initialAmount: initialAmount,
-                interestRate: interestRate,
-                insuranceRate: insuranceRate,
-                durationMonths: raw.durationMonths,
-                startDate: raw.startDate,
-                monthlyPayment: monthlyPayment,
-                remainingBalance: initialAmount,
-                createdAt: clockService.now()
-            });
+      const monthlyPayment = tempCredit.calculateMonthlyPayment();
+      if (monthlyPayment instanceof Error) {
+        console.warn(monthlyPayment);
+        continue;
+      }
 
-            credits.push(credit);
-            await creditRepository.save(credit);
-            console.log(credit.id);
-        } catch (err) {
-            console.error("Error creating credit from raw", raw, err);
-        }
+      const credit = CreditEntity.from({
+        id: uuidService.generate(),
+        userId: client.id,
+        initialAmount: initialAmount,
+        interestRate: interestRate,
+        insuranceRate: insuranceRate,
+        durationMonths: raw.durationMonths,
+        startDate: raw.startDate,
+        monthlyPayment: monthlyPayment,
+        remainingBalance: initialAmount,
+        createdAt: clockService.now(),
+        updatedAt: clockService.now(),
+      });
+
+      credits.push(credit);
+      await creditRepository.save(credit);
+      console.log(credit.id);
+    } catch (err) {
+      console.error("Error creating credit from raw", raw, err);
     }
-    return credits;
+  }
+  return credits;
 }

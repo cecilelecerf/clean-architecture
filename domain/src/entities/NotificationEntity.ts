@@ -10,7 +10,7 @@ export class NotificationEntity {
     public isRead: boolean = false,
     public type: "info" | "alert" | "reminder",
     public createdAt: Date,
-    public updatedAt?: Date
+    public updatedAt: Date
   ) {}
 
   public static from({
@@ -22,7 +22,7 @@ export class NotificationEntity {
     isRead,
     type,
     createdAt,
-    updatedAt
+    updatedAt,
   }: Pick<
     NotificationEntity,
     | "id"

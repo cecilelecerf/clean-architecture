@@ -10,11 +10,8 @@ export class OrderRepositoryMongo implements OrderRepository {
   constructor(private readonly client: MongoClient) {}
 
   private mapDocToOrder(doc: any): OrderEntity {
-    const price = Money.create(doc.price);
-    if (price instanceof Error) throw price;
-
-    const fee = Money.create(doc.fee);
-    if (fee instanceof Error) throw fee;
+    const price = Money.from(doc.price);
+    const fee = Money.from(doc.fee);
 
     return OrderEntity.from({
       id: doc._id.toString(),

@@ -10,7 +10,7 @@ export const MessageSchema = new Schema<MessageInterface>(
     readBy: { type: [String], required: true, default: [] },
   },
   {
-    timestamps: true,
+    timestamps: false,
     collection: "messages",
     versionKey: false,
   }

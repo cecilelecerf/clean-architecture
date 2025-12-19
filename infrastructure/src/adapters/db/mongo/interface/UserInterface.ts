@@ -4,7 +4,7 @@ export interface UserInterface {
   email: string;
   passwordHash: string;
   role: "client" | "conseiller" | "directeur";
-  isActiveField: boolean;
+  isActive: boolean;
   createdAt: Date;
   confirmedAt: Date;
   updatedAt: Date;

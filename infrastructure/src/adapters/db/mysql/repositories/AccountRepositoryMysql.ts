@@ -81,8 +81,8 @@ export class AccountRepositoryMySQL implements AccountRepository {
   async save(account: AccountEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO accounts 
-        (iban, role, user_id, name, type, color, balance, currency, created_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (iban, role, user_id, name, type, color, balance, currency, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         account.iban.value,
         account.owner.role,
@@ -93,6 +93,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
         account.balance.amount,
         account.balance.currency,
         account.createdAt,
+        account.updatedAt,
       ]
     );
   }

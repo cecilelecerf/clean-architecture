@@ -31,8 +31,8 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async save(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO actions 
-        (isin, name, total_nb, symbol, market, activity_sector, current_price, currency, is_available, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (isin, name, total_nb, symbol, market, activity_sector, current_price, currency, is_available, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         action.ISIN,
         action.name,
@@ -44,6 +44,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
         action.currentPrice.currency,
         action.isAvailable ? 1 : 0,
         action.createdAt,
+        action.updatedAt,
       ]
     );
   }

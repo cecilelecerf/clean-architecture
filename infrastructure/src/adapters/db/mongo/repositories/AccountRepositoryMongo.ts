@@ -13,17 +13,10 @@ export class AccountRepositoryMongo implements AccountRepository {
 
   // 🔧 Méthode helper pour mapper un document MongoDB vers AccountEntity
   private mapDocToAccount(doc: any): AccountEntity {
-    const iban = IBAN.create(doc.iban);
-    if (iban instanceof Error) throw iban;
-
-    const owner = AccountOwner.create(doc.owner);
-    if (owner instanceof Error) throw owner;
-
-    const balance = Money.create(doc.balance);
-    if (balance instanceof Error) throw balance;
-
+    const iban = IBAN.from(doc.iban);
+    const owner = AccountOwner.from(doc.owner);
+    const balance = Money.from(doc.balance);
     const color = Color.from(doc.color);
-    if (color instanceof Error) throw color;
 
     return AccountEntity.from({
       iban,

@@ -82,7 +82,6 @@ export class MessageRepositoryMongo implements MessageRepository {
   /** ❌ Supprimer un message */
   async delete(messageId: MessageEntity["id"]): Promise<void> {
     await this.client.connect();
-
     await MessageModel.deleteOne({ _id: messageId });
   }
 
@@ -99,13 +98,7 @@ export class MessageRepositoryMongo implements MessageRepository {
 
     return docs.map((doc) => {
       const message = this.mapDocToMessage(doc);
-
-      if (!doc.senderId) {
-        throw new Error(`Sender not found for message ${doc._id}`);
-      }
-
       const sender = this.mapDocToSender(doc.senderId);
-
       return Object.assign(message, { sender });
     });
   }
