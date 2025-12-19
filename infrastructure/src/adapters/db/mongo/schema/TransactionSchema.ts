@@ -12,12 +12,12 @@ export const TransactionSchema = new Schema<TransactionInterface>(
     label: { type: String, required: true },
     icon: { type: String, required: true },
     fromAccountId: {
-      type: Schema.Types.UUID,
+      type: String,
       ref: "Account",
       required: true,
     },
     toAccountId: {
-      type: Schema.Types.UUID,
+      type: String,
       ref: "Account",
       required: true,
     },

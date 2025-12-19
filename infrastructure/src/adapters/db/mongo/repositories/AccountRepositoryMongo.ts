@@ -79,7 +79,6 @@ export class AccountRepositoryMongo implements AccountRepository {
   /** 📬 Sauvegarder un compte */
   async save(account: AccountEntity): Promise<void> {
     await this.client.connect();
-
     await AccountModel.create({
       iban: account.iban.value,
       owner: {
@@ -94,6 +93,7 @@ export class AccountRepositoryMongo implements AccountRepository {
         currency: account.balance.currency,
       },
       createdAt: account.createdAt,
+      updatedAt: account.updatedAt,
     });
   }
 

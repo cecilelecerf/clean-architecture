@@ -10,7 +10,7 @@ export const OrderSchema = new Schema<OrderInterface>(
       index: true,
     },
     userId: { type: Schema.Types.UUID, ref: "User", required: true },
-    actionId: { type: Schema.Types.UUID, ref: "Action", required: true },
+    actionId: { type: String, ref: "Action", required: true },
     type: { type: String, enum: ["buy", "sell"], required: true },
     quantity: { type: Number, required: true },
     price: {

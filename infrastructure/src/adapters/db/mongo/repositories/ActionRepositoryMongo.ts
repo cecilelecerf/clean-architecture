@@ -41,6 +41,7 @@ export class ActionRepositoryMongo implements ActionRepository {
       },
       isAvailable: action.isAvailable,
       createdAt: action.createdAt,
+      updatedAt: action.updatedAt,
     });
   }
 

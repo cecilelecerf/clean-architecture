@@ -89,6 +89,7 @@ export class CreditRepositoryMongo implements CreditRepository {
         currency: credit.remainingBalance.currency,
       },
       createdAt: credit.createdAt,
+      updatedAt: credit.updatedAt,
     });
   }
 

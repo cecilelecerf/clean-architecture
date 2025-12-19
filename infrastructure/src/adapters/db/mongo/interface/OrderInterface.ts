@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 export interface OrderInterface {
   _id: Types.UUID;
   userId: Types.UUID;
-  actionId: Types.UUID;
+  actionId: string;
   type: "buy" | "sell";
   quantity: number;
   price: {

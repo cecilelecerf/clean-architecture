@@ -33,6 +33,7 @@ export class NotificationRepositoryMongo implements NotificationRepository {
       isRead: notification.isRead,
       type: notification.type,
       createdAt: notification.createdAt,
+      updatedAt: notification.updatedAt,
     });
   }
 

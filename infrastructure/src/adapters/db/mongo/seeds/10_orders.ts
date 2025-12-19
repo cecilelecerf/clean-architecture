@@ -63,6 +63,7 @@ export async function generateOrdersMongo(
         date: raw.date,
         status: raw.status as "pending" | "executed" | "cancelled",
         createdAt: clockService.now(),
+        updatedAt: clockService.now(),
       });
 
       orders.push(order);

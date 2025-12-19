@@ -62,6 +62,7 @@ export class SavingsRateRepositoryMongo implements SavingRateRepository {
       rate: savingsRate.rate.value,
       effectiveDate: savingsRate.effectiveDate,
       createdAt: savingsRate.createdAt,
+      updatedAt: savingsRate.updatedAt,
     });
   }
 

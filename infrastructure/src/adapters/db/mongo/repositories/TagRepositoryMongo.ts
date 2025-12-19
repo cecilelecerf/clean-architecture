@@ -22,13 +22,12 @@ export class TagRepositoryMongo implements TagRepository {
   /** Sauvegarder un tag */
   async save(tag: TagEntity): Promise<void> {
     await this.client.connect();
-
     await TagModel.create({
       _id: tag.id,
       label: tag.label,
       color: tag.color.getValue(),
       createdAt: tag.createdAt,
-      updateAt: tag.updatedAt,
+      updatedAt: tag.updatedAt,
     });
   }
 

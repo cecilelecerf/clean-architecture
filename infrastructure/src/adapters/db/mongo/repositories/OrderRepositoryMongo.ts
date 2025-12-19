@@ -49,6 +49,7 @@ export class OrderRepositoryMongo implements OrderRepository {
       date: order.date,
       status: order.status,
       createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
     });
   }
 
