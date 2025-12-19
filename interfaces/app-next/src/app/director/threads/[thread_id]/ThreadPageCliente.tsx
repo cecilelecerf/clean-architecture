@@ -7,11 +7,13 @@ import { match } from 'ts-pattern';
 import { useEffect, useRef, useState } from 'react';
 import { socket } from '@/lib/socket';
 import { UserDto } from '@infrastructure/types/user';
-import { Message, MessageWithUser } from '@infrastructure/types/message';
+import { MessageWithUser } from '@infrastructure/types/message';
+import { MessageComponent } from '@/components/threads/Message';
+import { Flex } from '@radix-ui/themes';
+import { PostMessage } from '@/components/threads/PostMessage';
+import { Settings } from './Settings';
 import { endpoints } from '@/utils/endpoint';
 import { ThreadWithUser } from '@/utils/endpoint/threadEndpoints';
-import { MessageComponent } from '@/components/threads/Message';
-import { PostMessage } from '@/components/threads/PostMessage';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
@@ -21,6 +23,7 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
             endpoints.threads.messages.getAll({ threadId })
         ]
     })
+
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
     return match(queries)
@@ -39,14 +42,15 @@ const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWit
     useEffect(() => {
         if (!socket) return;
         socket.emit("thread:join", { threadId: thread.id });
-
         const eventName = `thread:${thread.id}:new_message`;
 
+        // Quand un message arrive du serveur
         socket.on(eventName, (msg) => {
             console.log("💬 Nouveau message reçu:", msg);
             setMessages((prev) => [...prev, msg]);
         });
 
+        // Nettoyage
         return () => {
             socket.off(eventName);
         };
@@ -56,32 +60,24 @@ const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWit
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    return <div className="flex flex-col h-full ">
+    return <div className="flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center border-b pb-2 mb-4">
+        <Flex justify="between" align="center" className="border-b pb-2 mb-4">
             <h2 className="font-bold text-lg">{thread.title}</h2>
-            <span className="text-sm text-gray-500">
-                {thread.administrator && (
-                    <>
-                        Administrateur: {thread.administrator.firstname}
-                        {thread.administrator.lastname}
-                    </>
-                )}
-            </span>
-        </div>
+            <Settings {...thread} />
+        </Flex>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-scroll space-y-3 min-h-[60vh] sm:min-h-[70vh] xl:min-h-[70vh] max-h-[60vh] sm:max-h-[75vh] xl:max-h-[72vh]">
             {messages.map((msg) => (<MessageComponent key={msg.id} {...msg} isCurrentUser={msg.senderId === userId} />))}
             <div ref={bottomRef} />
         </div>
-
         {/* Input */}
-        {match({ haveAdministrator: !!thread.administratorId, isClose: thread.isClose })
+        {match({ isClose: thread.isClose })
             .with({ isClose: true }, () =>
                 <p className='w-full bg-red-200 text-red-900 rounded-sm text-center p-2 font-bold'>Discussion fermée</p>)
-            .otherwise(() => <PostMessage threadId={thread.id} />
-            )
+            .otherwise(() => <PostMessage threadId={thread.id} />)
         }
+
     </div>
 }

@@ -1,6 +1,6 @@
 "use client"
 import { ReactNode } from "react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 
 export const ButtonLink = ({ children, path, }: { children: ReactNode, path: string }) => {

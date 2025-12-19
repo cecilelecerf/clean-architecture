@@ -1,5 +1,6 @@
 "use client"
 import { ButtonLoading } from "@/components/buttons/ButtonLoading"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -15,23 +16,31 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { match } from "ts-pattern"
 type Props = {} & ThreadWithUser
-export const Settings = ({ id, isClose }: Props) => {
+export const Settings = ({ administrator, participants }: Props) => {
 
     return (
         <Dialog>
-            <DialogTrigger><Button size="icon" variant="ghost"><SettingsIcon /></Button></DialogTrigger>
+            <DialogTrigger asChild><Button size="icon" variant="ghost"><SettingsIcon /></Button></DialogTrigger>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Paramètre de discution</DialogTitle>
                     <DialogDescription>
+                        Administrateur : {administrator.firstname}{" "}{administrator.lastname}
                     </DialogDescription>
                 </DialogHeader>
-                {!isClose && (
-                    <Flex justify="between"><p>Fermer la conversation ?</p> <ButtonLoading loading={false} variant="destructive" size="icon"><X /></ButtonLoading></Flex>
-                )}
-                <Flex justify="between">
-                    <p>Transférer la conversation</p>
-                    <AdvisorsList threadId={id} />
+
+                <p>Participants</p>
+                <Flex direction="column" gap="2">
+                    {participants.map((participant) =>
+                        <Flex align='center' gap="2" key={participant.id}>
+                            <Avatar>
+                                <AvatarFallback>{participant.firstname[0]}{participant.lastname[0]}</AvatarFallback>
+                            </Avatar>
+                            <p>
+                                {participant.firstname} {participant.lastname}
+                            </p>
+                        </Flex>
+                    )}
                 </Flex>
             </DialogContent>
         </Dialog>

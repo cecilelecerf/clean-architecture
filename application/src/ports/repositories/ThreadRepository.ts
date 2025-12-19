@@ -1,9 +1,9 @@
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
-import { UserDTO, UserEntity } from "@domain/entities/UserEntity";
+import { UserToFront, UserEntity } from "@domain/entities/UserEntity";
 
 export type ThreadEntityWithUsers = ThreadEntity & {
-  administrator: UserDTO | null;
-  participants: UserDTO[];
+  administrator: UserToFront | null;
+  participants: UserToFront[];
 };
 
 export interface ThreadRepository {
@@ -22,11 +22,11 @@ export interface ThreadRepository {
   ): Promise<ThreadEntityWithUsers | null>;
   findAllWithUserByAdministratorIdAndType(
     administratorId: UserEntity["id"],
-    type ?: ThreadEntity["type"]
+    type?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]>;
   findAllWithUserByAdministratorNullable(): Promise<ThreadEntityWithUsers[]>;
   findAllWithUserByParticipantIdAndType(
-    participantId: UserEntity["id"],    type ?: ThreadEntity["type"]
-
+    participantId: UserEntity["id"],
+    type?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]>;
 }

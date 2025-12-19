@@ -1,11 +1,12 @@
 "use client"
- import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Tag } from "@/components/Tag";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { useSession } from "next-auth/react";
 import { Check } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";import { endpoints } from "@/utils/endpoint";
-import { ButtonLoading } from "@/components/ButtonLoading";
+import { ButtonLoading } from "@/components/buttons/ButtonLoading";
+import { endpoints } from "@/utils/endpoint";
+import { useMutation } from "@tanstack/react-query";
 import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint";
 
 type PostCardProps = {

@@ -6,9 +6,9 @@ import { toStringTypeAccount } from '@/utils/toStringTypeAccount';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { match } from 'ts-pattern';
-import { ButtonLink } from '@/components/ButtonLink';
 import { endpoints } from '@/utils/endpoint';
- 
+import { ButtonLink } from '@/components/buttons/ButtonLink';
+
 export default function AccountsPage() {
   const router = useRouter();
   const query = useQuery(endpoints.accounts.getAll())

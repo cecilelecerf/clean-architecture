@@ -41,6 +41,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
               createdAt: new Date(row.admin_created_at),
               isActiveField: row.admin_is_active === 1,
               passwordHash: row.admin_password_hash,
+              updatedAt: row.admin_updated_at,
             })
           : null;
 
@@ -66,6 +67,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
               createdAt: new Date(row.participant_created_at),
               isActiveField: row.participant_is_active === 1,
               passwordHash: row.participant_password_hash,
+              updatedAt: row.updated_at,
             })
           );
 

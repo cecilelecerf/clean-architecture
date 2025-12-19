@@ -1,4 +1,4 @@
-import { ButtonLoading } from "@/components/ButtonLoading"
+import { ButtonLoading } from "@/components/buttons/ButtonLoading"
 import { endpoints } from "@/utils/endpoint"
 import { ThreadId } from "@infrastructure/types/thread"
 import { useMutation } from "@tanstack/react-query"

@@ -11,17 +11,6 @@ import { UserEntity } from "@domain/entities/UserEntity";
 export class MessageRepositoryMySQL implements MessageRepository {
   constructor(private readonly client: MySQLClient) {}
 
-  private mapRowToMessage(row: RowDataPacket): MessageEntity {
-    return MessageEntity.from({
-      id: row.id || row.message_id,
-      threadId: row.thread_id,
-      senderId: row.sender_id,
-      content: row.content,
-      sentAt: new Date(row.sent_at),
-      readBy: JSON.parse(row.read_by || "[]"),
-    });
-  }
-
   private mapRowToSender(row: RowDataPacket): UserEntity {
     return UserEntity.from({
       id: row.user_id,
@@ -78,6 +67,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
       ]
     );
 
+    // Marquer le message comme lu par l'expéditeur
     await this.client.query<ResultSetHeader>(
       `INSERT INTO message_user_read (message_id, user_id, read_at)
        VALUES (?, ?, ?)`,
@@ -90,11 +80,28 @@ export class MessageRepositoryMySQL implements MessageRepository {
     threadId: ThreadEntity["id"]
   ): Promise<MessageEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM messages WHERE thread_id = ? ORDER BY sent_at ASC`,
+      `SELECT 
+        m.*,
+        GROUP_CONCAT(mur.user_id) as reader_ids
+       FROM messages m
+       LEFT JOIN message_user_read mur ON m.id = mur.message_id
+       WHERE m.thread_id = ?
+       GROUP BY m.id
+       ORDER BY m.sent_at ASC`,
       [threadId]
     );
 
-    return rows.map((row) => this.mapRowToMessage(row));
+    return rows.map((row) => {
+      const readerIds = row.reader_ids ? row.reader_ids.split(",") : [];
+      return MessageEntity.from({
+        id: row.id,
+        threadId: row.thread_id,
+        senderId: row.sender_id,
+        content: row.content,
+        sentAt: new Date(row.sent_at),
+        readBy: readerIds,
+      });
+    });
   }
 
   /** Mettre à jour un message */
@@ -126,7 +133,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
         m.sender_id,
         m.content,
         m.sent_at,
-        m.read_by,
+        GROUP_CONCAT(mur.user_id) as reader_ids,
         u.id AS user_id,
         u.firstname,
         u.lastname,
@@ -139,13 +146,23 @@ export class MessageRepositoryMySQL implements MessageRepository {
         u.updated_at AS user_updated_at
        FROM messages m
        JOIN users u ON m.sender_id = u.id
+       LEFT JOIN message_user_read mur ON m.id = mur.message_id
        WHERE m.thread_id = ?
+       GROUP BY m.id, u.id
        ORDER BY m.sent_at ASC`,
       [threadId]
     );
 
     return rows.map((row) => {
-      const message = this.mapRowToMessage(row);
+      const readerIds = row.reader_ids ? row.reader_ids.split(",") : [];
+      const message = MessageEntity.from({
+        id: row.message_id,
+        threadId: row.thread_id,
+        senderId: row.sender_id,
+        content: row.content,
+        sentAt: new Date(row.sent_at),
+        readBy: readerIds,
+      });
       const sender = this.mapRowToSender(row);
       return Object.assign(message, { sender });
     });

@@ -1,4 +1,4 @@
-import { ButtonLoading } from "@/components/ButtonLoading";
+import { ButtonLoading } from "@/components/buttons/ButtonLoading";
 import { Input } from "@/components/ui/input";
 import { socket } from "@/lib/socket";
 import { endpoints } from "@/utils/endpoint";
@@ -27,7 +27,9 @@ export const PostMessage = ({ threadId }: { threadId: ThreadId }) => {
                 onChange={(e) => setInput(e.target.value)}
                 data-form-type="other"
             />
-            <ButtonLoading loading={sendMessageMutate.isPending} onClick={handlePress}   >  <ArrowRight /></ButtonLoading>
+            <ButtonLoading loading={sendMessageMutate.isPending} onClick={handlePress}>
+                <ArrowRight />
+            </ButtonLoading>
         </div>
     )
 }
