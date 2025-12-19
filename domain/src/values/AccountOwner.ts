@@ -4,9 +4,9 @@ export type AccountOwnerRole = "bank" | "client";
 
 export class AccountOwner {
   public readonly role: AccountOwnerRole;
-  public readonly userId?: string;
+  public readonly userId?: string | null;
 
-  private constructor(role: AccountOwnerRole, userId?: string) {
+  private constructor(role: AccountOwnerRole, userId?: string | null) {
     this.role = role;
     this.userId = userId;
   }

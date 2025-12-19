@@ -11,7 +11,6 @@ export class AccountEntity {
   private constructor(
     public iban: IBAN,
     public owner: AccountOwner,
-    // public userId: UserEntity["id"],
     public name: string,
     public type: "courant" | "epargne",
     public color:Color,
