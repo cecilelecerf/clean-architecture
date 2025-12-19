@@ -67,9 +67,19 @@ export class UserEntity {
   public hasRole({ role }: Pick<UserEntity, "role">): boolean {
     return role === this.role;
   }
+
+  public toFront(): UserToFront {
+    return {
+      id: this.id,
+      email: this.email.value,
+      firstname: this.firstname,
+      lastname: this.lastname,
+      role: this.role,
+    };
+  }
 }
 
-export type UserDTO = Pick<
+export type UserToFront = { email: string } & Pick<
   UserEntity,
-  "id" | "email" | "firstname" | "lastname" | "role"
+  "id" | "firstname" | "lastname" | "role"
 >;

@@ -55,24 +55,24 @@ export const threadsEndpoint = createEndpointsNodes({
         get(`/threads/${threadId}`).then((data) => safeParseWithLog(threadWithUserSchema, data)),
     }),
 
-  // GET /api/threads/user/:userId
+  // GET /api/threads/users/:userId
   // Threads d'un user spécifique
   getByUser: ({ userId }: { userId: UserId }) =>
     queryOptions({
-      queryKey: ['threads', 'client', userId],
+      queryKey: ['threads', userId],
       queryFn: () =>
-        get(`/threads/user/${userId}`).then((data) =>
+        get(`/threads/users/${userId}`).then((data) =>
           safeParseWithLog(threadWithAdminOnlySchema.array(), data),
         ),
     }),
 
-  // GET /api/threads/user/:userI/client
+  // GET /api/threads/users/:userI/client
   // Threads d'un user spécifique (conseiller/directeur)
   getByClient: ({ clientId }: { clientId: UserId }) =>
     queryOptions({
-      queryKey: ['threads', 'client', clientId],
+      queryKey: ['threads', clientId, 'client'],
       queryFn: () =>
-        get(`/threads/client/${clientId}/client`).then((data) =>
+        get(`/threads/users/${clientId}/client`).then((data) =>
           safeParseWithLog(threadWithAdminOnlySchema.array(), data),
         ),
     }),

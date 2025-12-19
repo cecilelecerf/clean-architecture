@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { get } from '@/lib/apiClient';
-import { User, UserId, userSchema } from '@infrastructure/types/user';
+import { User, userDtoSchema, UserId, userSchema } from '@infrastructure/types/user';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 
@@ -11,13 +11,13 @@ export const usersEndpoint = createEndpointsNodes({
       queryFn: () => {
         const roleParams = !!role ? `?role=${role}` : '';
         return get(`/users${roleParams}`).then((data) => {
-          return safeParseWithLog(userSchema.array(), data);
+          return safeParseWithLog(userDtoSchema.array(), data);
         });
       },
     }),
   get: ({ id }: { id: UserId }) =>
     queryOptions({
       queryKey: ['users', id],
-      queryFn: () => get(`/users/${id}`).then((data) => userSchema.parse(data)),
+      queryFn: () => get(`/users/${id}`).then((data) => userDtoSchema.parse(data)),
     }),
 });
