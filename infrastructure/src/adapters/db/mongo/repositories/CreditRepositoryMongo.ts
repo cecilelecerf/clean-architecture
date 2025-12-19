@@ -70,6 +70,7 @@ export class CreditRepositoryMongo implements CreditRepository {
     await this.client.connect();
 
     await CreditModel.create({
+      _id: credit.id,
       userId: credit.userId,
       initialAmount: {
         amount: credit.initialAmount.amount,

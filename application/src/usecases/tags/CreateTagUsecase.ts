@@ -1,5 +1,8 @@
-
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
@@ -49,6 +52,7 @@ export class AddTagUseCase {
       label: label,
       color: colorVo,
       createdAt: this.clockService.now(),
+      updatedAt: this.clockService.now(),
     });
 
     await this.tagRepository.save(tag);

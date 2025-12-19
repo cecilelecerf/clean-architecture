@@ -24,9 +24,11 @@ export class TagRepositoryMongo implements TagRepository {
     await this.client.connect();
 
     await TagModel.create({
+      _id: tag.id,
       label: tag.label,
       color: tag.color.getValue(),
       createdAt: tag.createdAt,
+      updateAt: tag.updatedAt,
     });
   }
 

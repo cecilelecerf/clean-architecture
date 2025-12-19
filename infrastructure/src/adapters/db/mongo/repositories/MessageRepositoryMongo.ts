@@ -42,6 +42,7 @@ export class MessageRepositoryMongo implements MessageRepository {
     await this.client.connect();
 
     await MessageModel.create({
+      _id: message.id,
       threadId: message.threadId,
       senderId: message.senderId,
       content: message.content,

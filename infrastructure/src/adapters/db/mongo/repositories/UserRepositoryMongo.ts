@@ -81,6 +81,7 @@ export class UserRepositoryMongo implements UserRepository {
     await this.client.connect();
 
     await UserModel.create({
+      _id: user.id,
       firstname: user.firstname,
       lastname: user.lastname,
       email: user.email.value,

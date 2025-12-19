@@ -6,7 +6,7 @@ export class TagEntity {
     public label: string,
     public color: Color,
     public createdAt: Date,
-    public updatedAt?: Date
+    public updatedAt: Date
   ) {}
 
   public static from({

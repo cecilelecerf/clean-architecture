@@ -15,7 +15,7 @@ export class PostRepositoryMongo implements PostRepository {
 
   private mapDocToPost(doc: any): PostEntity {
     return PostEntity.from({
-      id: doc._id.toString(),
+      id: doc._id,
       advisorId: doc.advisorId?.toString() || doc.advisorId,
       title: doc.title,
       content: doc.content,
@@ -72,6 +72,7 @@ export class PostRepositoryMongo implements PostRepository {
     await this.client.connect();
 
     await PostModel.create({
+      _id: post.id,
       advisorId: post.advisorId,
       title: post.title,
       content: post.content,

@@ -1,9 +1,10 @@
 import { Types } from "mongoose";
 
 export interface MessageInterface {
-  threadId: Types.ObjectId;
-  senderId: Types.ObjectId;
+  _id: Types.UUID;
+  threadId: Types.UUID;
+  senderId: Types.UUID;
   content: string;
   sentAt: Date;
-  readBy: Types.ObjectId[];
+  readBy: Types.UUID[];
 }

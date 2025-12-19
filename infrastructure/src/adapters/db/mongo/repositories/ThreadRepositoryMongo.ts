@@ -75,12 +75,14 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     await this.client.connect();
 
     await ThreadModel.create({
+      _id: thread.id,
       participantsId: thread.participantsId,
       title: thread.title,
       createdAt: thread.createdAt,
       isClose: thread.isClose,
       type: thread.type,
       administratorId: thread.administratorId,
+      updatedAt: thread.updatedAt,
     });
   }
 

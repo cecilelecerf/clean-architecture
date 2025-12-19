@@ -58,6 +58,7 @@ export class SavingsRateRepositoryMongo implements SavingRateRepository {
     await this.client.connect();
 
     await SavingsRateModel.create({
+      _id: savingsRate.id,
       rate: savingsRate.rate.value,
       effectiveDate: savingsRate.effectiveDate,
       createdAt: savingsRate.createdAt,

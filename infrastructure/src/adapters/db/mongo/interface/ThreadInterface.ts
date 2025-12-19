@@ -1,11 +1,12 @@
 import { Types } from "mongoose";
 
 export interface ThreadInterface {
-  participantsId: Types.ObjectId[];
+  _id: Types.UUID;
+  participantsId: Types.UUID[];
   title: string;
   createdAt: Date;
   isClose: boolean;
   type: "external" | "internal";
-  administratorId: Types.ObjectId;
+  administratorId: Types.UUID;
   updatedAt: Date;
 }

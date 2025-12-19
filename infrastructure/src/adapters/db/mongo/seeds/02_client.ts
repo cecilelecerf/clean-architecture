@@ -62,6 +62,7 @@ export async function seedMongoClient(
         createdAt,
         isActiveField: true,
         confirmedAt,
+        updatedAt: clockService.now(),
       });
 
       await userRepository.save(user);
@@ -91,6 +92,7 @@ export async function seedMongoClient(
             amount: rawAccount.balance,
             currency: rawAccount.currency,
           }),
+          updatedAt: clockService.now(),
         });
 
         await accountRepository.save(account);

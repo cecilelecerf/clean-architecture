@@ -25,6 +25,7 @@ export class NotificationRepositoryMongo implements NotificationRepository {
     await this.client.connect();
 
     await NotificationModel.create({
+      _id: notification.id,
       advisorId: notification.advisorId,
       clientId: notification.clientId,
       title: notification.title,

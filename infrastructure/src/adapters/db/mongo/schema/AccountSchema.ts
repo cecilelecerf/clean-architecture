@@ -1,9 +1,9 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 import { AccountInterface } from "../interface/AccountInterface";
 
 export const AccountSchema = new Schema<AccountInterface>(
   {
-    iban: { type: String, required: true },
+    iban: { type: String, required: true, unique: true },
     owner: {
       type: {
         role: { type: String, enum: ["bank", "client"], required: true },
@@ -21,9 +21,10 @@ export const AccountSchema = new Schema<AccountInterface>(
       },
       required: true,
     },
+    createdAt: { type: Date, required: true },
+    updatedAt: { type: Date, required: true },
   },
   {
-    timestamps: true,
     collection: "accounts",
     versionKey: false,
   }

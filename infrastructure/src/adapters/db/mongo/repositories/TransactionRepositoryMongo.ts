@@ -59,6 +59,7 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     await this.client.connect();
 
     await TransactionModel.create({
+      _id: transaction.id,
       label: transaction.label,
       icon: transaction.icon,
       fromAccountId: transaction.fromAccountId.value,

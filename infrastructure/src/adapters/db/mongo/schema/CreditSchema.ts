@@ -1,9 +1,15 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 import { CreditInterface } from "../interface/CreditInterface";
 
 export const CreditSchema = new Schema<CreditInterface>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    _id: {
+      type: Types.UUID,
+      required: true,
+      unique: true,
+      index: true,
+    },
+    userId: { type: Schema.Types.UUID, ref: "User", required: true },
     initialAmount: {
       type: {
         amount: { type: Number, required: true },
@@ -29,9 +35,10 @@ export const CreditSchema = new Schema<CreditInterface>(
       },
       required: true,
     },
+    createdAt: { type: Date, required: true },
+    updatedAt: { type: Date, required: true },
   },
   {
-    timestamps: true,
     collection: "credits",
     versionKey: false,
   }

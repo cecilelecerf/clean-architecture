@@ -1,13 +1,14 @@
 import { Types } from "mongoose";
 
 export interface PostInterface {
-  advisorId: Types.ObjectId;
+  _id: Types.UUID;
+  advisorId: Types.UUID;
   title: string;
   content: string;
-  tagsId: Types.ObjectId[];
+  tagsId: Types.UUID[];
   createdAt: Date;
-  readBy: Types.ObjectId[];
+  readBy: Types.UUID[];
   updatedAt: Date;
   publishedAt: Date;
-  clientId: Types.ObjectId[];
+  clientId: Types.UUID[];
 }

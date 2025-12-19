@@ -33,6 +33,7 @@ export class OrderRepositoryMongo implements OrderRepository {
     await this.client.connect();
 
     await OrderModel.create({
+      _id: order.id,
       userId: order.userId,
       actionId: order.actionId,
       type: order.type,

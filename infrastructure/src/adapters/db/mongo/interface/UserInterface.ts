@@ -1,4 +1,7 @@
+import { Types } from "mongoose";
+
 export interface UserInterface {
+  _id: Types.UUID;
   firstname: string;
   lastname: string;
   email: string;

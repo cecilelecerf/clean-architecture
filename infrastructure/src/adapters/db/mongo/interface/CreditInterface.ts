@@ -1,7 +1,8 @@
 import { Types } from "mongoose";
 
 export interface CreditInterface {
-  userId: Types.ObjectId;
+  _id: Types.UUID;
+  userId: Types.UUID;
   initialAmount: {
     amount: number;
     currency: string;

@@ -1,8 +1,9 @@
 import { Types } from "mongoose";
 
 export interface NotificationInterface {
-  advisorId: Types.ObjectId;
-  clientId: Types.ObjectId;
+  _id: Types.UUID;
+  advisorId: Types.UUID;
+  clientId: Types.UUID;
   title: string;
   content: string;
   isRead: boolean;

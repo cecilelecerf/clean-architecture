@@ -1,8 +1,9 @@
 import { Types } from "mongoose";
 
 export interface OrderInterface {
-  userId: Types.ObjectId;
-  actionId: Types.ObjectId;
+  _id: Types.UUID;
+  userId: Types.UUID;
+  actionId: Types.UUID;
   type: "buy" | "sell";
   quantity: number;
   price: {

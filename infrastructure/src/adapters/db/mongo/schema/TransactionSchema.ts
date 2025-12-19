@@ -1,17 +1,23 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 import { TransactionInterface } from "../interface/TransactionInterface";
 
 export const TransactionSchema = new Schema<TransactionInterface>(
   {
+    _id: {
+      type: Types.UUID,
+      required: true,
+      unique: true,
+      index: true,
+    },
     label: { type: String, required: true },
     icon: { type: String, required: true },
     fromAccountId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.UUID,
       ref: "Account",
       required: true,
     },
     toAccountId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.UUID,
       ref: "Account",
       required: true,
     },
@@ -26,7 +32,6 @@ export const TransactionSchema = new Schema<TransactionInterface>(
     date: { type: Date, required: true },
   },
   {
-    timestamps: false,
     collection: "transactions",
     versionKey: false,
   }
