@@ -1,19 +1,27 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 import { ThreadInterface } from "../interface/ThreadInterface";
 
 export const ThreadSchema = new Schema<ThreadInterface>(
   {
-    participantsId: { type: [String], required: true, default: [] },
+    _id: {
+      type: Types.UUID,
+      required: true,
+      unique: true,
+      index: true,
+    },
+    participantsId: [{ type: Schema.Types.UUID, ref: "User", required: true }],
     title: { type: String, required: true },
-    isClose: {type: Boolean, required: true},
-    type: {type: String, enum: ["external", "internal"], required: true},
-    administratorId: { type: String, required: true }
+    isClose: { type: Boolean, required: true },
+    type: { type: String, enum: ["external", "internal"], required: true },
+    administratorId: {
+      type: Schema.Types.UUID,
+      ref: "User",
+      required: true,
+    },
+    createdAt: { type: Date, required: true },
+    updatedAt: { type: Date, required: true },
   },
   {
-    timestamps: {
-      createdAt: "createdAt",
-      updatedAt: "updatedAt",
-    },
     collection: "threads",
     versionKey: false,
   }

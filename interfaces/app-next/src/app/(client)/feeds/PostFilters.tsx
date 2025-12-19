@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarFilter } from "../../../components/CalendarFilter";
 import { Slider } from "@/components/ui/slider";
 import { FiltersProps } from "@/utils/endpoint/feedsEndpoint";
- 
+
 type PostFiltersProps = {
     filters: FiltersProps;
     onChange: (filters: FiltersProps) => void;
@@ -17,7 +17,6 @@ export const PostFilters = ({ filters, onChange }: PostFiltersProps) => {
     const [localFilters, setLocalFilters] = useState<FiltersProps>(filters);
 
     useEffect(() => {
-        console.log(localFilters)
         onChange(localFilters);
     }, [localFilters]);
 

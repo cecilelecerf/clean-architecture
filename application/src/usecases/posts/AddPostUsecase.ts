@@ -1,5 +1,9 @@
- import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
@@ -8,7 +12,10 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
-import { InvalidPostContentError, InvalidPostTitleError } from "@domain/errors/posts"; 
+import {
+  InvalidPostContentError,
+  InvalidPostTitleError,
+} from "@domain/errors/posts";
 type Props = { tagsId: TagEntity["id"][]; published?: boolean } & Pick<
   PostEntity,
   "content" | "title" | "advisorId"

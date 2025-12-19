@@ -3,5 +3,5 @@ import { ThreadSchema } from "../schema/ThreadSchema";
 import { ThreadInterface } from "../interface/ThreadInterface";
 
 export const ThreadModel =
-  mongoose.models.threads ||
-  mongoose.model<ThreadInterface>("threads", ThreadSchema);
+  mongoose.models.Thread ||
+  mongoose.model<ThreadInterface>("Thread", ThreadSchema);

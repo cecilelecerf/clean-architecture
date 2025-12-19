@@ -1,5 +1,5 @@
 "use client"
-import { ButtonLoading } from "@/components/ButtonLoading";
+import { ButtonLoading } from "@/components/buttons/ButtonLoading";
 import { SwitchComponent } from "@/components/SwitchComponent";
 import { Tag } from "@/components/Tag";
 import { Badge } from "@/components/ui/badge";
@@ -59,7 +59,6 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
     };
 
     const handleSave = () => {
-        console.log(editValues)
         editMutation.mutate(editValues, { onSuccess: () => socket.emit("post:update", { post: { ...post, ...editValues } }) });
     };
 

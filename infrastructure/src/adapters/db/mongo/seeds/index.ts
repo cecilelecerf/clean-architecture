@@ -14,21 +14,21 @@ import { generateCreditsMongo } from "./12_credits";
 import { generateBankAccountsMongo } from "./13_bank_accounts";
 
 const all = async () => {
-    const mongoClient = new MongoClient();
-    const advisors = await seedMongoAdministrator(mongoClient);
-    const clients = await seedMongoClient(mongoClient, advisors);
-    const directors = await seedMongoDirector(mongoClient);
-    await generateExternalThreadsMongo(clients, advisors, mongoClient);
-    await generateInternalThreadsMongo(directors, advisors, mongoClient);
-    const tags = await generateTagsMongo(mongoClient);
-    await generatePostsMongo(advisors, directors, clients, tags, mongoClient);
-    const actions = await generateActions(mongoClient);
-    await generateSavingsRateMongo(mongoClient);
-    await generateOrdersMongo(mongoClient, clients, actions);
-    await generateNotificationsMongo(mongoClient, advisors, clients);
-    await generateCreditsMongo(mongoClient, clients);
-    await generateBankAccountsMongo(mongoClient)
-}
+  const mongoClient = new MongoClient();
+  const advisors = await seedMongoAdministrator(mongoClient);
+  const clients = await seedMongoClient(mongoClient);
+  const directors = await seedMongoDirector(mongoClient);
+  await generateExternalThreadsMongo(clients, advisors, mongoClient);
+  await generateInternalThreadsMongo(directors, advisors, mongoClient);
+  const tags = await generateTagsMongo(mongoClient);
+  await generatePostsMongo(advisors, directors, clients, tags, mongoClient);
+  const actions = await generateActions(mongoClient);
+  await generateSavingsRateMongo(mongoClient);
+  await generateOrdersMongo(mongoClient, clients, actions);
+  await generateNotificationsMongo(mongoClient, advisors, clients);
+  await generateCreditsMongo(mongoClient, clients);
+  await generateBankAccountsMongo(mongoClient);
+};
 
 all()
   .then(() => {

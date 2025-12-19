@@ -1,5 +1,9 @@
 import { PostNotFoundError } from "@application/errors/posts";
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import {
   PostRepository,
   PostWithTagsAndUser,

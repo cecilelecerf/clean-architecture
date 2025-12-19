@@ -1,5 +1,12 @@
-import { PostNotFoundError,InvalidPostAccessError } from "@application/errors/posts";
- import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  PostNotFoundError,
+  InvalidPostAccessError,
+} from "@application/errors/posts";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";

@@ -11,7 +11,7 @@ import { Percentage } from "@domain/values/Percentage";
 
 export async function generateCreditsMongo(
   mongoClient: MongoClient,
-  clients: UserEntity[],
+  clients: UserEntity[]
 ): Promise<CreditEntity[]> {
   console.log("-- Création des Crédits (Mongo) --");
 
@@ -64,6 +64,7 @@ export async function generateCreditsMongo(
         monthlyPayment: initialAmount,
         remainingBalance: initialAmount,
         createdAt: clockService.now(),
+        updatedAt: clockService.now(),
       });
 
       const monthlyPayment = tempCredit.calculateMonthlyPayment();
@@ -83,6 +84,7 @@ export async function generateCreditsMongo(
         monthlyPayment,
         remainingBalance: initialAmount,
         createdAt: clockService.now(),
+        updatedAt: clockService.now(),
       });
 
       credits.push(credit);

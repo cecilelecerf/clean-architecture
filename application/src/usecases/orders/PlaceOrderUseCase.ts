@@ -4,7 +4,12 @@ import { OrderRepository } from "@application/ports/repositories/OrderRepository
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { OrderEntity } from "@domain/entities/OrderEntity";
-import { FactorNegativeError, MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import {
+  FactorNegativeError,
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
 
 export class PlaceOrderUsecase {
   public constructor(
@@ -20,15 +25,15 @@ export class PlaceOrderUsecase {
     type: "buy" | "sell",
     quantity: number
   ): Promise<
-        | ActionNotFoundError
-        | FactorNegativeError 
-        | MoneyCurrencyMissingError 
-        | MoneyAmountInvalidError 
-        | MoneyAmountNegativeError
-        | void
-      > {
+    | ActionNotFoundError
+    | FactorNegativeError
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
+    | void
+  > {
     const action = await this.actionRepository.findByISIN(actionId);
-    if (!action) return new ActionNotFoundError;
+    if (!action) return new ActionNotFoundError();
 
     const totalPriceResult = action.currentPrice.multiply(quantity);
     if (totalPriceResult instanceof Error) return totalPriceResult;
@@ -45,7 +50,8 @@ export class PlaceOrderUsecase {
       price: totalPrice,
       date: today,
       status: "pending",
-      createdAt: today
+      createdAt: today,
+      updatedAt: today,
     });
 
     if (order instanceof Error) {

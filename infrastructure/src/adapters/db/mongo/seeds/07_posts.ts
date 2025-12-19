@@ -118,7 +118,7 @@ export const generatePostsMongo = async (
       content: pick(contents),
       tagsId: tagsForPost,
       createdAt,
-      updatedAt,
+      updatedAt: updatedAt ?? createdAt,
       publishedAt,
       readBy,
       clientId: client?.id,

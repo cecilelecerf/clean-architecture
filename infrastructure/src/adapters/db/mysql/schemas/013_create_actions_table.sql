@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS actions (
   currency CHAR(3) NOT NULL,
   is_available TINYINT(1) NOT NULL DEFAULT 1,
   created_at DATETIME NOT NULL,
-  updated_at DATETIME NULL
+  updated_at DATETIME NOT NULL
 ) 

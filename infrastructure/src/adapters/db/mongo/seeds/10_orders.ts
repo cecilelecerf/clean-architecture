@@ -12,7 +12,7 @@ import { UserEntity } from "@domain/entities/UserEntity";
 export async function generateOrdersMongo(
   mongoClient: MongoClient,
   clients: UserEntity[],
-  actions: ActionEntity[],
+  actions: ActionEntity[]
 ): Promise<OrderEntity[]> {
   console.log("-- Création des Ordres d'actions (Mongo) --");
 
@@ -63,6 +63,7 @@ export async function generateOrdersMongo(
         date: raw.date,
         status: raw.status as "pending" | "executed" | "cancelled",
         createdAt: clockService.now(),
+        updatedAt: clockService.now(),
       });
 
       orders.push(order);

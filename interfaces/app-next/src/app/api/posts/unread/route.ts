@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts';
 
 export async function GET(req: NextRequest) {
   try {

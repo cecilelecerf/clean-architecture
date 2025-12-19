@@ -56,7 +56,7 @@ export class MongoClient {
     if (!db) {
       throw new Error("Mongo database connection is not initialized");
     }
-    
+
     const collections = await db.collections();
     for (const collection of collections) {
       await collection.drop();

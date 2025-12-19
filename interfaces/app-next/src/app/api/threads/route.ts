@@ -7,9 +7,7 @@ import { messageSchema } from '@infrastructure/types/message';
 import z from 'zod';
 import { userIdSchema } from '@infrastructure/types/user';
 
-export async function GET(
-  req: NextRequest,
- ) {
+export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -17,8 +15,10 @@ export async function GET(
     }
     const { searchParams } = new URL(req.url);
     const type = searchParams.get('type') as 'external' | 'internal' | null;
-console.log(type)
-    const thread = await threadsFactory().getThreadsByUserAndTypeUsecase.execute({userId:session.user.id, type : type ??undefined});
+    const thread = await threadsFactory().getThreadsByUserAndTypeUsecase.execute({
+      userId: session.user.id,
+      type: type ?? undefined,
+    });
     if (thread instanceof Error) {
       return NextResponse.json(
         { name: thread.name, message: thread.message },
@@ -34,10 +34,13 @@ console.log(type)
 }
 
 const newThreadSchmea = threadSchema
-  .pick({ title: true,  })
-  .extend({ messageContent: messageSchema.shape.content, type : threadSchema.shape.type.optional(), participantsId : userIdSchema.array().optional() });
+  .pick({ title: true })
+  .extend({
+    messageContent: messageSchema.shape.content,
+    type: threadSchema.shape.type.optional(),
+    participantsId: userIdSchema.array().optional(),
+  });
 export type NewThread = z.infer<typeof newThreadSchmea>;
-
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,47 +52,40 @@ export async function POST(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get('type') as 'external' | 'internal' | null;
     const json = await req.json();
-    const data = newThreadSchmea.parse(json); 
-    if (type === 'external') {  
-    const  result = await threadsFactory().startExternalThread.execute({
-        clientId: session.user.id, ...data
-      });
-            if (result instanceof Error) {
-      return NextResponse.json(
-        { name: result.name, message: result.message },
-        { status: result.statusCode ??404 }
-      );
-      
-    }
-    return NextResponse.json(result, { status: 201 });
-    } else if (data.type === 'internal') { 
-    const  result = await threadsFactory().startInternalThread.execute({
-        administratorId: session.user.id,
-        ...data, participantsId: data.participantsId ?? []
+    const data = newThreadSchmea.parse(json);
+    if (type === 'external') {
+      const result = await threadsFactory().startExternalThread.execute({
+        clientId: session.user.id,
+        ...data,
       });
       if (result instanceof Error) {
-      return NextResponse.json(
-        { name: result.name, message: result.message },
-        { status: result.statusCode ??404 }
-      );
-      
-    }
-    return NextResponse.json(result, { status: 201 });
+        return NextResponse.json(
+          { name: result.name, message: result.message },
+          { status: result.statusCode ?? 404 },
+        );
+      }
+      return NextResponse.json(result, { status: 201 });
+    } else if (data.type === 'internal') {
+      const result = await threadsFactory().startInternalThread.execute({
+        administratorId: session.user.id,
+        ...data,
+        participantsId: data.participantsId ?? [],
+      });
+      if (result instanceof Error) {
+        return NextResponse.json(
+          { name: result.name, message: result.message },
+          { status: result.statusCode ?? 404 },
+        );
+      }
+      return NextResponse.json(result, { status: 201 });
     } else {
-      return NextResponse.json(
-        { message: 'Invalid thread type' },
-        { status: 400 }
-      );
-    } 
-
-
-
+      return NextResponse.json({ message: 'Invalid thread type' }, { status: 400 });
+    }
   } catch (err) {
     console.error('Error in POST /api/threads:', err);
     return NextResponse.json(
       { message: err instanceof Error ? err.message : 'Erreur serveur' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

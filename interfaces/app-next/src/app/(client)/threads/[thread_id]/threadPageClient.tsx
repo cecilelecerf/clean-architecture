@@ -2,28 +2,23 @@
 
 import { useSession } from 'next-auth/react';
 import { ThreadId } from '@infrastructure/types/thread';
-import { useMutation, useQueries } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 import { match } from 'ts-pattern';
 import { useEffect, useRef, useState } from 'react';
 import { socket } from '@/lib/socket';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { UserDto } from '@infrastructure/types/user';
 import { Message, MessageWithUser } from '@infrastructure/types/message';
-import { post } from '@/lib/apiClient';
- import { Spinner } from '@/components/ui/spinner';
-import { ArrowRight } from 'lucide-react'; 
-import { MessageComponent } from '@/components/Message';
 import { endpoints } from '@/utils/endpoint';
 import { ThreadWithUser } from '@/utils/endpoint/threadEndpoints';
-import { NewMessage } from '@/app/api/threads/[threadId]/messages/route';
+import { MessageComponent } from '@/components/threads/Message';
+import { PostMessage } from '@/components/threads/PostMessage';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
     const queries = useQueries({
         queries: [
             endpoints.threads.get({ threadId }),
-            endpoints.threads.messages.getAll({  threadId })
+            endpoints.threads.messages.getAll({ threadId })
         ]
     })
     const { data: session } = useSession();
@@ -39,16 +34,8 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
 
 const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWithUser, messages: MessageWithUser[], userId: UserDto["id"] }) => {
     const [messages, setMessages] = useState<MessageWithUser[]>(messagesData);
-    const [input, setInput] = useState("");
     const bottomRef = useRef<HTMLDivElement | null>(null);
 
-    const sendMessageMutate = useMutation({
-        mutationFn: (content: string) => post<Message, NewMessage>(`/threads/${thread.id}/messages/new`, { content }),
-        onSuccess: (data) => {
-            socket.emit("thread:new_message", { message: data });
-            setInput("")
-        }
-    })
     useEffect(() => {
         if (!socket) return;
         socket.emit("thread:join", { threadId: thread.id });
@@ -93,18 +80,8 @@ const Display = ({ thread, userId, messages: messagesData }: { thread: ThreadWit
         {match({ haveAdministrator: !!thread.administratorId, isClose: thread.isClose })
             .with({ isClose: true }, () =>
                 <p className='w-full bg-red-200 text-red-900 rounded-sm text-center p-2 font-bold'>Discussion fermée</p>)
-            .otherwise(() =>
-                <div className="flex gap-3 mt-4">
-                    <Input
-                        type="text"
-                        value={input}
-                        placeholder="Écrire un message..."
-                        onChange={(e) => setInput(e.target.value)}
-                    />
-                    <Button onClick={() => input.length && sendMessageMutate.mutate(input)} disabled={sendMessageMutate.isPending} >{sendMessageMutate.isPending && <Spinner />} <ArrowRight /></Button>
-                </div>
+            .otherwise(() => <PostMessage threadId={thread.id} />
             )
-
         }
     </div>
 }

@@ -3,5 +3,5 @@ import { TransactionSchema } from "../schema/TransactionSchema";
 import { TransactionInterface } from "../interface/TransactionInterface";
 
 export const TransactionModel =
-  mongoose.models.transactions ||
-  mongoose.model<TransactionInterface>("transactions", TransactionSchema);
+  mongoose.models.Transaction ||
+  mongoose.model<TransactionInterface>("Transaction", TransactionSchema);

@@ -1,5 +1,5 @@
 "use client"
-import { ButtonLoading } from "@/components/ButtonLoading"
+import { ButtonLoading } from "@/components/buttons/ButtonLoading"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"

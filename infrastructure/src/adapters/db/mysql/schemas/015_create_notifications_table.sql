@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     is_read TINYINT(1) NOT NULL DEFAULT 0,
     type ENUM('info', 'alert', 'reminder') NOT NULL,
     created_at DATETIME NOT NULL,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL,
     
     CONSTRAINT fk_notifications_advisor FOREIGN KEY (advisor_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_notifications_client FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE CASCADE

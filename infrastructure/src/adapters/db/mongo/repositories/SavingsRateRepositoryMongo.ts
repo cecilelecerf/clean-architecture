@@ -5,82 +5,80 @@ import { SavingsRateModel } from "../models/SavingsRateModel";
 import { Percentage } from "@domain/values/Percentage";
 
 export class SavingsRateRepositoryMongo implements SavingRateRepository {
-    constructor(private readonly client: MongoClient) {}
+  constructor(private readonly client: MongoClient) {}
 
-    async findCurrent(): Promise<SavingsRateEntity | null> {
-        await this.client.connect();
+  private mapDocToSavingsRate(doc: any): SavingsRateEntity {
+    return SavingsRateEntity.from({
+      id: doc._id.toString(),
+      rate: Percentage.from({ value: doc.rate }),
+      effectiveDate: doc.effectiveDate,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    });
+  }
 
-        const doc = await SavingsRateModel
-            .findOne()
-            .sort({ effectiveDate: -1 })
-            .lean();
-        
-        if (!doc) return null;
+  /** Taux d'épargne actuel */
+  async findCurrent(): Promise<SavingsRateEntity | null> {
+    await this.client.connect();
 
-        return SavingsRateEntity.from({
-            id: doc._id.toString(),
-            rate: Percentage.from({ value: doc.rate }),
-            effectiveDate: doc.effectiveDate,
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt ?? null,
-        });
-    }
+    const doc = await SavingsRateModel.findOne()
+      .sort({ effectiveDate: -1 })
+      .lean();
 
-    async findAll(): Promise<SavingsRateEntity[]> {
-        await this.client.connect();
+    if (!doc) return null;
 
-        const docs = await SavingsRateModel.find().lean();
+    return this.mapDocToSavingsRate(doc);
+  }
 
-        return docs.map((doc) => {
-            return SavingsRateEntity.from({
-                id: doc._id.toString(),
-                rate: Percentage.from({ value: doc.rate }),
-                effectiveDate: doc.effectiveDate,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt ?? null,
-            });
-        })
-    }
+  /** Tous les taux d'épargne */
+  async findAll(): Promise<SavingsRateEntity[]> {
+    await this.client.connect();
 
-    async findById(
-        id: SavingsRateEntity["id"]
-    ): Promise<SavingsRateEntity | null> {
-        await this.client.connect();
-        
-        const doc = await SavingsRateModel.findOne({ _id: id }).lean();
-        if (!doc) return null;
+    const docs = await SavingsRateModel.find()
+      .sort({ effectiveDate: -1 })
+      .lean();
 
-        return SavingsRateEntity.from({
-            id: doc._id.toString(),
-            rate: Percentage.from({ value: doc.rate }),
-            effectiveDate: doc.effectiveDate,
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt ?? null,
-        });
-    }
+    return docs.map((doc) => this.mapDocToSavingsRate(doc));
+  }
 
-    async save(savingsRate: SavingsRateEntity): Promise<void> {
-        await this.client.connect();
-                                      
-        await SavingsRateModel.create({
-                rate: savingsRate.rate.value,
-                effectiveDate: savingsRate.effectiveDate,
-                createdAt: savingsRate.createdAt
-        } as any);
-    }
+  /** Trouver un taux par ID */
+  async findById(
+    id: SavingsRateEntity["id"]
+  ): Promise<SavingsRateEntity | null> {
+    await this.client.connect();
 
-    async update(savingsRate: SavingsRateEntity): Promise<void> {
-        await this.client.connect();
-                                        
-        await SavingsRateModel.updateOne(
-            { _id: savingsRate.id },
-            {
-                $set: {
-                    rate: savingsRate.rate,
-                    effectiveDate: savingsRate.effectiveDate,
-                    updatedAt: savingsRate.updatedAt || new Date(),
-                },
-            }
-        );
-    }
+    const doc = await SavingsRateModel.findById(id).lean();
+    if (!doc) return null;
+
+    return this.mapDocToSavingsRate(doc);
+  }
+
+  /** Sauvegarder un taux d'épargne */
+  async save(savingsRate: SavingsRateEntity): Promise<void> {
+    await this.client.connect();
+
+    await SavingsRateModel.create({
+      _id: savingsRate.id,
+      rate: savingsRate.rate.value,
+      effectiveDate: savingsRate.effectiveDate,
+      createdAt: savingsRate.createdAt,
+      updatedAt: savingsRate.updatedAt,
+    });
+  }
+
+  /** Mettre à jour un taux d'épargne */
+  async update(savingsRate: SavingsRateEntity): Promise<void> {
+    await this.client.connect();
+
+    await SavingsRateModel.updateOne(
+      { _id: savingsRate.id },
+      {
+        $set: {
+          rate: savingsRate.rate.value,
+          effectiveDate: savingsRate.effectiveDate,
+          updatedAt: savingsRate.updatedAt,
+        },
+      }
+    );
+  }
 }

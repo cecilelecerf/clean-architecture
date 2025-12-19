@@ -24,10 +24,13 @@ export class Color {
     "green",
   ] as const;
 
-  static from(value: string): Color | ColorInvalidFormatError {
+  static create(value: string): Color | ColorInvalidFormatError {
     if (!this.validColors.includes(value as any)) {
       return new ColorInvalidFormatError(value);
     }
+    return new Color(value as any);
+  }
+  static from(value: string): Color {
     return new Color(value as any);
   }
 

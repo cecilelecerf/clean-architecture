@@ -1,8 +1,11 @@
-
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { UserEntity } from "@domain/entities/UserEntity";
+import { UserEntity, UserToFront } from "@domain/entities/UserEntity";
 
 type Props = { userId: UserEntity["id"]; role?: UserEntity["role"] };
 
@@ -13,7 +16,7 @@ export class GetUsersByRoleUseCase {
     userId,
     role,
   }: Props): Promise<
-    | UserEntity[]
+    | UserToFront[]
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -25,6 +28,7 @@ export class GetUsersByRoleUseCase {
         ["conseiller", "directeur"],
         advisor.role
       );
-    return await this.userRepository.findAllByRoleAndIsActif(role);
+    const users = await this.userRepository.findAllByRoleAndIsActif(role);
+    return users.map((user) => user.toFront());
   }
 }
