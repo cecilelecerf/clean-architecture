@@ -1,5 +1,6 @@
 import { Color } from "@domain/values/Color";
 
+export type TagToFront = Pick<TagEntity, "id" | "label" | "color">;
 export class TagEntity {
   private constructor(
     public id: string,
@@ -27,5 +28,8 @@ export class TagEntity {
   public changeColor(newColor: TagEntity["color"]): void {
     this.color = newColor;
     this.updatedAt = new Date();
+  }
+  public toFront(): TagToFront {
+    return { id: this.id, label: this.label, color: this.color };
   }
 }

@@ -11,6 +11,10 @@ import {
   PostWithTagsAndUser,
 } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
+import {
+  PostToFrontMapper,
+  PostWithTagsAndUsersToFront,
+} from "@application/toFronts/PostToFrontMapper";
 import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 type Props = {
@@ -26,7 +30,7 @@ export class FindPostByIdWithTagsUsecase {
     userId,
     id: postId,
   }: Props): Promise<
-    | PostWithTagsAndUser
+    | PostWithTagsAndUsersToFront
     | UserNotFoundError
     | UserNotActiveError
     | PostNotFoundError
@@ -41,6 +45,6 @@ export class FindPostByIdWithTagsUsecase {
     if (user.hasRole({ role: "client" }) && !post.publishedAt)
       return new InvalidPostAccessError(user.id, post.id);
 
-    return post;
+    return PostToFrontMapper.map(post);
   }
 }
