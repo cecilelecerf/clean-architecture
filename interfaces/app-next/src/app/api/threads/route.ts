@@ -33,13 +33,11 @@ export async function GET(req: NextRequest) {
   }
 }
 
-const newThreadSchmea = threadSchema
-  .pick({ title: true })
-  .extend({
-    messageContent: messageSchema.shape.content,
-    type: threadSchema.shape.type.optional(),
-    participantsId: userIdSchema.array().optional(),
-  });
+const newThreadSchmea = threadSchema.pick({ title: true }).extend({
+  messageContent: messageSchema.shape.content,
+  type: threadSchema.shape.type.optional(),
+  participantsId: userIdSchema.array().optional(),
+});
 export type NewThread = z.infer<typeof newThreadSchmea>;
 
 export async function POST(req: NextRequest) {

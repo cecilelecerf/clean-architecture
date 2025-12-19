@@ -1,13 +1,12 @@
 import mysql, { Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import { dirname, resolve } from "path";
+import { join, resolve } from "path";
 import path from "path";
 import fs from "fs";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-dotenv.config({ path: resolve(__dirname, "../../../../.env") });
+const envPath = join(process.cwd(), ".env");
+
+dotenv.config({ path: envPath });
 let pool: Pool;
 
 function getPool(): Pool {
