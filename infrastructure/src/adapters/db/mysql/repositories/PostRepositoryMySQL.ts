@@ -11,53 +11,12 @@ import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 export class PostRepositoryMySQL implements PostRepository {
   constructor(private readonly client: MySQLClient) {}
 
-  async save(post: PostEntity): Promise<void> {
-    await this.client.query<ResultSetHeader>(
-      `INSERT INTO posts (id, advisor_id, title, content, created_at, updated_at, published_at, client_id) 
-       VALUES (?, ?, ?, ?, ?, ?, ?,?)`,
-      [
-        post.id,
-        post.advisorId,
-        post.title,
-        post.content,
-        post.createdAt,
-        post.updatedAt || null,
-        post.publishedAt || null,
-        post.clientId || null,
-      ]
-    );
-    for (const readId of post.readBy) {
-      await this.client.query<ResultSetHeader>(
-        `INSERT INTO post_user_read (post_id, user_id) VALUES (?, ?)`,
-        [post.id, readId]
-      );
-    }
-    for (const tagId of post.tagsId) {
-      await this.client.query<ResultSetHeader>(
-        `INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)`,
-        [post.id, tagId]
-      );
-    }
-  }
-
-  async findById(id: PostEntity["id"]): Promise<PostEntity | null> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM posts WHERE id = ?`,
-      [id]
-    );
-    if (rows.length === 0) return null;
-    const row = rows[0];
-
-    const tagRows = await this.client.query<RowDataPacket[]>(
-      `SELECT tag_id FROM post_tag WHERE post_id = ?`,
-      [id]
-    );
-    const readRows = await this.client.query<RowDataPacket[]>(
-      `SELECT user_id FROM post_user_read WHERE post_id = ?`,
-      [id]
-    );
-    const readsId = readRows.map((r) => r.user_id);
-    const tagsId = tagRows.map((r) => r.tag_id);
+  // 🔧 Méthode helper pour mapper un row SQL vers PostEntity simple
+  private mapRowToPost(
+    row: RowDataPacket,
+    tagsId: string[],
+    readsId: string[]
+  ): PostEntity {
     return PostEntity.from({
       id: row.id,
       advisorId: row.advisor_id,
@@ -72,41 +31,151 @@ export class PostRepositoryMySQL implements PostRepository {
     });
   }
 
+  // 🔧 Méthode helper pour mapper un row vers UserEntity (advisor)
+  private mapRowToAdvisor(row: RowDataPacket): UserEntity {
+    return UserEntity.from({
+      id: row.advisor_id,
+      firstname: row.advisor_firstname,
+      lastname: row.advisor_lastname,
+      email: row.advisor_email,
+      passwordHash: row.advisor_password_hash,
+      role: row.advisor_role,
+      isActiveField: row.advisor_is_active,
+      createdAt: row.advisor_created_at,
+      confirmedAt: row.advisor_confirmed_at,
+      updatedAt: row.advisor_updated_at,
+    });
+  }
+
+  // 🔧 Méthode helper pour récupérer les tags d'un post
+  private async getPostTags(
+    postId: string
+  ): Promise<{ tags: TagEntity[]; tagsId: string[] }> {
+    const tagRows = await this.client.query<RowDataPacket[]>(
+      `SELECT t.* FROM post_tag pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = ?`,
+      [postId]
+    );
+
+    const tags = tagRows.map((tagRow) =>
+      TagEntity.from({
+        id: tagRow.id,
+        label: tagRow.label,
+        color: tagRow.color,
+        createdAt: tagRow.created_at,
+        updatedAt: tagRow.updated_at,
+      })
+    );
+
+    const tagsId = tagRows.map((r) => r.id);
+
+    return { tags, tagsId };
+  }
+
+  // 🔧 Méthode helper pour récupérer les user IDs qui ont lu un post
+  private async getPostReaders(postId: string): Promise<string[]> {
+    const readRows = await this.client.query<RowDataPacket[]>(
+      `SELECT user_id FROM post_user_read WHERE post_id = ?`,
+      [postId]
+    );
+    return readRows.map((r) => r.user_id);
+  }
+
+  // 🔧 Méthode helper pour mettre à jour les relations many-to-many
+  private async updateManyToMany(
+    postId: string,
+    newIds: string[],
+    tableName: string,
+    columnName: string
+  ): Promise<void> {
+    // Récupérer les IDs existants
+    const existingRows = await this.client.query<RowDataPacket[]>(
+      `SELECT ${columnName} FROM ${tableName} WHERE post_id = ?`,
+      [postId]
+    );
+    const existingIds = existingRows.map((r) => r[columnName]);
+
+    // Ajouter les nouveaux
+    const idsToAdd = newIds.filter((id) => !existingIds.includes(id));
+    for (const id of idsToAdd) {
+      await this.client.query<ResultSetHeader>(
+        `INSERT INTO ${tableName} (post_id, ${columnName}) VALUES (?, ?)`,
+        [postId, id]
+      );
+    }
+
+    // Supprimer les anciens
+    const idsToRemove = existingIds.filter((id) => !newIds.includes(id));
+    for (const id of idsToRemove) {
+      await this.client.query<ResultSetHeader>(
+        `DELETE FROM ${tableName} WHERE post_id = ? AND ${columnName} = ?`,
+        [postId, id]
+      );
+    }
+  }
+
+  /** 📬 Sauvegarder un post */
+  async save(post: PostEntity): Promise<void> {
+    await this.client.query<ResultSetHeader>(
+      `INSERT INTO posts (id, advisor_id, title, content, created_at, updated_at, published_at, client_id) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        post.id,
+        post.advisorId,
+        post.title,
+        post.content,
+        post.createdAt,
+        post.updatedAt || null,
+        post.publishedAt || null,
+        post.clientId || null,
+      ]
+    );
+
+    // Sauvegarder les relations
+    for (const readId of post.readBy) {
+      await this.client.query<ResultSetHeader>(
+        `INSERT INTO post_user_read (post_id, user_id) VALUES (?, ?)`,
+        [post.id, readId]
+      );
+    }
+    for (const tagId of post.tagsId) {
+      await this.client.query<ResultSetHeader>(
+        `INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)`,
+        [post.id, tagId]
+      );
+    }
+  }
+
+  /** 🔍 Trouver un post par ID */
+  async findById(id: PostEntity["id"]): Promise<PostEntity | null> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT * FROM posts WHERE id = ?`,
+      [id]
+    );
+    if (rows.length === 0) return null;
+
+    const { tagsId } = await this.getPostTags(id);
+    const readsId = await this.getPostReaders(id);
+
+    return this.mapRowToPost(rows[0], tagsId, readsId);
+  }
+
+  /** 🔍 Tous les posts d'un advisor */
   async findAllByAdvisorId(advisorId: UserEntity["id"]): Promise<PostEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM posts WHERE advisor_id = ?`,
+      `SELECT * FROM posts WHERE advisor_id = ? ORDER BY created_at DESC`,
       [advisorId]
     );
 
     return Promise.all(
       rows.map(async (row) => {
-        const tagRows = await this.client.query<RowDataPacket[]>(
-          `SELECT tag_id FROM post_tag WHERE post_id = ?`,
-          [row.id]
-        );
-        const tagsId = tagRows.map((r) => r.tagId);
-
-        const readRows = await this.client.query<RowDataPacket[]>(
-          `SELECT user_id FROM post_user_read WHERE post_id = ?`,
-          [row.id]
-        );
-        const readsId = readRows.map((r) => r.user_id);
-        return PostEntity.from({
-          id: row.id,
-          advisorId: row.advisor_id,
-          title: row.title,
-          content: row.content,
-          tagsId,
-          createdAt: row.created_at,
-          updatedAt: row.updated_at ?? undefined,
-          publishedAt: row.published_at ?? undefined,
-          readBy: readsId,
-          clientId: row.client_id ?? undefined,
-        });
+        const { tagsId } = await this.getPostTags(row.id);
+        const readsId = await this.getPostReaders(row.id);
+        return this.mapRowToPost(row, tagsId, readsId);
       })
     );
   }
 
+  /** 🔍 Posts récents */
   async findAllRecent(limit = 10): Promise<PostEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM posts ORDER BY created_at DESC LIMIT ?`,
@@ -115,33 +184,14 @@ export class PostRepositoryMySQL implements PostRepository {
 
     return Promise.all(
       rows.map(async (row) => {
-        const tagRows = await this.client.query<RowDataPacket[]>(
-          `SELECT tag_id FROM post_tag WHERE post_id = ?`,
-          [row.id]
-        );
-        const tagsId = tagRows.map((r) => r.tagId);
-
-        const readRows = await this.client.query<RowDataPacket[]>(
-          `SELECT user_id FROM post_user_read WHERE post_id = ?`,
-          [row.id]
-        );
-        const readsId = readRows.map((r) => r.user_id);
-        return PostEntity.from({
-          id: row.id,
-          advisorId: row.advisor_id,
-          title: row.title,
-          content: row.content,
-          tagsId,
-          createdAt: row.created_at,
-          updatedAt: row.updated_at ?? undefined,
-          publishedAt: row.published_at ?? undefined,
-          readBy: readsId,
-          clientId: row.client_id ?? undefined,
-        });
+        const { tagsId } = await this.getPostTags(row.id);
+        const readsId = await this.getPostReaders(row.id);
+        return this.mapRowToPost(row, tagsId, readsId);
       })
     );
   }
 
+  /** 🔄 Mettre à jour un post */
   async update(post: PostEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE posts
@@ -156,77 +206,74 @@ export class PostRepositoryMySQL implements PostRepository {
       ]
     );
 
-    const existingTagRows = await this.client.query<RowDataPacket[]>(
-      `SELECT tag_id FROM post_tag WHERE post_id = ?`,
-      [post.id]
-    );
-    const existingTagIds = existingTagRows.map((r) => r.tag_id);
+    // Mettre à jour les tags
+    await this.updateManyToMany(post.id, post.tagsId, "post_tag", "tag_id");
 
-    const tagsToAdd = post.tagsId.filter((id) => !existingTagIds.includes(id));
-    for (const tagId of tagsToAdd) {
-      await this.client.query<ResultSetHeader>(
-        `INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)`,
-        [post.id, tagId]
-      );
-    }
-
-    const tagsToRemove = existingTagIds.filter(
-      (id) => !post.tagsId.includes(id)
+    // Mettre à jour les lecteurs
+    await this.updateManyToMany(
+      post.id,
+      post.readBy,
+      "post_user_read",
+      "user_id"
     );
-    for (const tagId of tagsToRemove) {
-      await this.client.query<ResultSetHeader>(
-        `DELETE FROM post_tag WHERE post_id = ? AND tag_id = ?`,
-        [post.id, tagId]
-      );
-    }
-
-    const existingUserReadRows = await this.client.query<RowDataPacket[]>(
-      `SELECT user_id FROM post_user_read WHERE post_id = ?`,
-      [post.id]
-    );
-    const existingUserIds = existingUserReadRows.map((r) => r.user_id);
-
-    const UsersToAdd = post.readBy.filter(
-      (id) => !existingUserIds.includes(id)
-    );
-    for (const userId of UsersToAdd) {
-      await this.client.query<ResultSetHeader>(
-        `INSERT INTO post_user_read (post_id, user_id) VALUES (?, ?)`,
-        [post.id, userId]
-      );
-    }
-
-    const usersToRemove = existingUserIds.filter(
-      (id) => !post.readBy.includes(id)
-    );
-    for (const userId of usersToRemove) {
-      await this.client.query<ResultSetHeader>(
-        `DELETE FROM post_user_read WHERE post_id = ? AND user_id = ?`,
-        [post.id, userId]
-      );
-    }
   }
 
+  /** ❌ Supprimer un post */
   async delete(id: PostEntity["id"]): Promise<void> {
     await this.client.query<ResultSetHeader>(`DELETE FROM posts WHERE id = ?`, [
       id,
     ]);
   }
 
+  /** 🔍 Posts par tag */
   async findAllByTags(tagId: TagEntity["id"]): Promise<PostEntity[]> {
     const tagRows = await this.client.query<RowDataPacket[]>(
       `SELECT post_id FROM post_tag WHERE tag_id = ?`,
       [tagId]
     );
 
-    const posts: PostEntity[] = [];
-    for (const row of tagRows) {
-      const post = await this.findById(row.postId);
-      if (post) posts.push(post);
-    }
-    return posts;
+    const posts = await Promise.all(
+      tagRows.map((row) => this.findById(row.post_id))
+    );
+
+    return posts.filter((post): post is PostEntity => post !== null);
   }
 
+  /** 🔍 Post avec tags et user par ID */
+  async findWithTagsAndUserById(
+    id: PostEntity["id"]
+  ): Promise<PostWithTagsAndUser | null> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+        p.*,
+        u.id AS advisor_id,
+        u.firstname AS advisor_firstname,
+        u.lastname AS advisor_lastname,
+        u.email AS advisor_email,
+        u.password_hash AS advisor_password_hash,
+        u.role AS advisor_role,
+        u.is_active AS advisor_is_active,
+        u.created_at AS advisor_created_at,
+        u.confirmed_at AS advisor_confirmed_at,
+        u.updated_at AS advisor_updated_at
+       FROM posts p 
+       JOIN users u ON u.id = p.advisor_id 
+       WHERE p.id = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) return null;
+
+    const row = rows[0];
+    const { tags, tagsId } = await this.getPostTags(id);
+    const readsId = await this.getPostReaders(id);
+    const advisor = this.mapRowToAdvisor(row);
+    const post = this.mapRowToPost(row, tagsId, readsId);
+
+    return Object.assign(post, { tags, advisor });
+  }
+
+  /** 🔍 Posts paginés avec filtres */
   async findAllPaginatedWithTagsAndUserByFilters(
     filters: {
       dateFrom?: Date;
@@ -239,6 +286,7 @@ export class PostRepositoryMySQL implements PostRepository {
   ): Promise<{ posts: PostWithTagsAndUser[]; total: number }> {
     const whereClauses: string[] = [];
     const params: any[] = [];
+
     if (filters.dateFrom) {
       whereClauses.push("p.created_at >= ?");
       params.push(filters.dateFrom);
@@ -261,6 +309,7 @@ export class PostRepositoryMySQL implements PostRepository {
       whereClauses.push("p.title LIKE ?");
       params.push(`%${filters.title}%`);
     }
+
     if (typeof filters.status === "boolean") {
       if (filters.status) {
         whereClauses.push("p.published_at IS NOT NULL");
@@ -273,9 +322,10 @@ export class PostRepositoryMySQL implements PostRepository {
       ? "WHERE " + whereClauses.join(" AND ")
       : "";
     const offset = (pagination.page - 1) * pagination.limit;
+
+    // Query pour les posts
     const rows = await this.client.query<RowDataPacket[]>(
-      `
-      SELECT DISTINCT p.*, 
+      `SELECT DISTINCT p.*, 
         u.id AS advisor_id,
         u.firstname AS advisor_firstname,
         u.lastname AS advisor_lastname,
@@ -286,82 +336,57 @@ export class PostRepositoryMySQL implements PostRepository {
         u.created_at AS advisor_created_at,
         u.confirmed_at AS advisor_confirmed_at,
         u.updated_at AS advisor_updated_at
-      FROM posts p JOIN users u ON u.id = p.advisor_id
+      FROM posts p 
+      JOIN users u ON u.id = p.advisor_id
       ${tagJoin}
       ${whereSQL}
       ORDER BY p.created_at DESC
-        LIMIT ${pagination.limit} OFFSET ${offset}
-      `,
-      [...params]
-    );
-
-    const totalRows = await this.client.query<RowDataPacket[]>(
-      `
-      SELECT COUNT(DISTINCT p.id) as total
-      FROM posts p
-      ${tagJoin}
-      ${whereSQL}
-      `,
+      LIMIT ${pagination.limit} OFFSET ${offset}`,
       params
     );
+
+    // Query pour le total
+    const totalRows = await this.client.query<RowDataPacket[]>(
+      `SELECT COUNT(DISTINCT p.id) as total
+      FROM posts p
+      ${tagJoin}
+      ${whereSQL}`,
+      params
+    );
+
+    // Mapper les posts avec tags et advisor
     const posts = await Promise.all(
       rows.map(async (row) => {
-        const tagRows = await this.client.query<RowDataPacket[]>(
-          `SELECT t.* FROM post_tag pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = ? `,
-          [row.id]
-        );
+        const { tags, tagsId } = await this.getPostTags(row.id);
+        const readsId = await this.getPostReaders(row.id);
+        const advisor = this.mapRowToAdvisor(row);
+        const post = this.mapRowToPost(row, tagsId, readsId);
 
-        const readRows = await this.client.query<RowDataPacket[]>(
-          `SELECT user_id FROM post_user_read WHERE post_id = ?`,
-          [row.id]
-        );
-        const readsId = readRows.map((r) => r.user_id);
-        const tagsId = tagRows.map((r) => r.id);
-        const tags = tagRows.map((tagRow) =>
-          TagEntity.from({
-            id: tagRow.id,
-            label: tagRow.label,
-            color: tagRow.color,
-            createdAt: tagRow.created_at,
-            updatedAt: tagRow.updated_at,
-          })
-        );
-        const advisor = UserEntity.from({
-          id: row.advisor_id,
-          firstname: row.advisor_firstname,
-          lastname: row.advisor_lastname,
-          email: row.advisor_email,
-          passwordHash: row.advisor_password_hash,
-          role: row.advisor_role,
-          isActiveField: row.advisor_is_active,
-          createdAt: row.advisor_created_at,
-          confirmedAt: row.advisor_confirmed_at,
-          updatedAt: row.advisor_updated_at,
-        });
-        const post = PostEntity.from({
-          id: row.id,
-          advisorId: row.advisor_id,
-          title: row.title,
-          content: row.content,
-          tagsId,
-          createdAt: row.created_at,
-          updatedAt: row.updated_at ?? undefined,
-          publishedAt: row.published_at ?? undefined,
-          readBy: readsId,
-          clientId: row.client_id ?? undefined,
-        });
         return Object.assign(post, { tags, advisor });
       })
     );
-    return { posts, total: Math.ceil(totalRows[0].total / pagination.limit) };
+
+    return {
+      posts,
+      total: Math.ceil(totalRows[0].total / pagination.limit),
+    };
   }
 
-  async findWithTagsAndUserById(
-    id: PostEntity["id"]
-  ): Promise<PostWithTagsAndUser | null> {
+  /** 🔍 Posts non lus avec tags */
+  async findAllUnreadWithTags(
+    userId: UserEntity["id"]
+  ): Promise<PostWithTagsAndUser[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
-        p.*,
+        p.id AS post_id,
+        p.advisor_id,
+        p.title,
+        p.content,
+        p.created_at AS post_created_at,
+        p.updated_at AS post_updated_at,
+        p.published_at,
+        p.client_id,
+        
         u.id AS advisor_id,
         u.firstname AS advisor_firstname,
         u.lastname AS advisor_lastname,
@@ -371,153 +396,50 @@ export class PostRepositoryMySQL implements PostRepository {
         u.is_active AS advisor_is_active,
         u.created_at AS advisor_created_at,
         u.confirmed_at AS advisor_confirmed_at,
-        u.updated_at AS advisor_updated_at
-       FROM posts p JOIN users u ON u.id = p.advisor_id WHERE p.id = ?`,
-      [id]
-    );
-    if (rows.length === 0) return null;
-    const row = rows[0];
-
-    const tagRows = await this.client.query<RowDataPacket[]>(
-      `SELECT t.* FROM post_tag pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = ? `,
-      [row.id]
-    );
-    const readRows = await this.client.query<RowDataPacket[]>(
-      `SELECT user_id FROM post_user_read WHERE post_id = ?`,
-      [id]
-    );
-    const readsId = readRows.map((r) => r.user_id);
-    const tagsId = tagRows.map((r) => r.id);
-    const tags = tagRows.map((tagRow) =>
-      TagEntity.from({
-        id: tagRow.id,
-        label: tagRow.label,
-        color: tagRow.color,
-        createdAt: tagRow.created_at,
-        updatedAt: tagRow.updated_at,
-      })
-    );
-    const advisor = UserEntity.from({
-      id: row.advisor_id,
-      firstname: row.advisor_firstname,
-      lastname: row.advisor_lastname,
-      email: row.advisor_email,
-      passwordHash: row.advisor_password_hash,
-      role: row.advisor_role,
-      isActiveField: row.advisor_is_active,
-      createdAt: row.advisor_created_at,
-      confirmedAt: row.advisor_confirmed_at,
-      updatedAt: row.advisor_updated_at,
-    });
-    const post = PostEntity.from({
-      id: row.id,
-      advisorId: row.advisor_id,
-      title: row.title,
-      content: row.content,
-      tagsId,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at ?? undefined,
-      publishedAt: row.published_at ?? undefined,
-      readBy: readsId,
-      clientId: row.client_id ?? undefined,
-    });
-    return Object.assign(post, { tags, advisor });
-  }
-
-  async findAllUnreadWithTags(
-    userId: UserEntity["id"]
-  ): Promise<PostWithTagsAndUser[]> {
-    // ✅ UNE SEULE requête avec tous les JOINs
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT 
-      p.id AS post_id,
-      p.advisor_id,
-      p.title,
-      p.content,
-      p.created_at AS post_created_at,
-      p.updated_at AS post_updated_at,
-      p.published_at,
-      p.client_id,
+        u.updated_at AS advisor_updated_at,
+        
+        t.id AS tag_id,
+        t.label AS tag_label,
+        t.color AS tag_color,
+        t.created_at AS tag_created_at,
+        t.updated_at AS tag_updated_at,
+        
+        GROUP_CONCAT(DISTINCT pr_all.user_id) AS read_by_ids
+        
+      FROM posts p
+      INNER JOIN users u ON u.id = p.advisor_id
+      LEFT JOIN post_user_read pr ON pr.post_id = p.id AND pr.user_id = ?
+      LEFT JOIN post_user_read pr_all ON pr_all.post_id = p.id
+      LEFT JOIN post_tag pt ON pt.post_id = p.id
+      LEFT JOIN tags t ON t.id = pt.tag_id
       
-      -- Advisor
-      u.id AS advisor_id,
-      u.firstname AS advisor_firstname,
-      u.lastname AS advisor_lastname,
-      u.email AS advisor_email,
-      u.password_hash AS advisor_password_hash,
-      u.role AS advisor_role,
-      u.is_active AS advisor_is_active,
-      u.created_at AS advisor_created_at,
-      u.confirmed_at AS advisor_confirmed_at,
-      u.updated_at AS advisor_updated_at,
-      
-      -- Tags (peut être NULL si pas de tags)
-      t.id AS tag_id,
-      t.label AS tag_label,
-      t.color AS tag_color,
-      t.created_at AS tag_created_at,
-      t.updated_at AS tag_updated_at,
-      
-      -- ReadBy (agrégé en JSON)
-      GROUP_CONCAT(DISTINCT pr_all.user_id) AS read_by_ids
-      
-    FROM posts p
-    
-    -- Join avec l'advisor (obligatoire)
-    INNER JOIN users u ON u.id = p.advisor_id
-    
-    -- Join pour filtrer les posts NON LUS par cet utilisateur
-    LEFT JOIN post_user_read pr ON pr.post_id = p.id AND pr.user_id = ?
-    
-    -- Join pour récupérer TOUS les utilisateurs qui ont lu (pour le champ readBy)
-    LEFT JOIN post_user_read pr_all ON pr_all.post_id = p.id
-    
-    -- Join avec les tags (optionnel)
-    LEFT JOIN post_tag pt ON pt.post_id = p.id
-    LEFT JOIN tags t ON t.id = pt.tag_id
-    
-    WHERE pr.user_id IS NULL 
-      AND p.published_at IS NOT NULL
-      AND (p.client_id IS NULL OR p.client_id = ?)
-      
-    GROUP BY p.id, t.id
-    ORDER BY p.published_at DESC`,
+      WHERE pr.user_id IS NULL 
+        AND p.published_at IS NOT NULL
+        AND (p.client_id IS NULL OR p.client_id = ?)
+        
+      GROUP BY p.id, t.id
+      ORDER BY p.published_at DESC`,
       [userId, userId]
     );
 
-    // ✅ Grouper les résultats par post (car un post peut avoir plusieurs tags)
+    // Grouper par post
     const postsMap = new Map<string, PostWithTagsAndUser>();
 
     for (const row of rows) {
       const postId = row.post_id;
 
       if (!postsMap.has(postId)) {
-        // Créer l'advisor (une seule fois par post)
-        const advisor = UserEntity.from({
-          id: row.advisor_id,
-          firstname: row.advisor_firstname,
-          lastname: row.advisor_lastname,
-          email: row.advisor_email,
-          passwordHash: row.advisor_password_hash,
-          role: row.advisor_role,
-          isActiveField: row.advisor_is_active,
-          createdAt: row.advisor_created_at,
-          confirmedAt: row.advisor_confirmed_at,
-          updatedAt: row.advisor_updated_at,
-        });
-
-        // Parser les IDs des utilisateurs qui ont lu
+        const advisor = this.mapRowToAdvisor(row);
         const readByIds = row.read_by_ids
           ? row.read_by_ids.split(",").filter(Boolean)
           : [];
 
-        // Créer le post
         const post = PostEntity.from({
           id: postId,
           advisorId: row.advisor_id,
           title: row.title,
           content: row.content,
-          tagsId: [], // On va remplir ça après
+          tagsId: [],
           createdAt: row.post_created_at,
           updatedAt: row.post_updated_at ?? undefined,
           publishedAt: row.published_at ?? undefined,
@@ -525,7 +447,6 @@ export class PostRepositoryMySQL implements PostRepository {
           clientId: row.client_id ?? undefined,
         });
 
-        // Combiner post + advisor + tags vides pour l'instant
         postsMap.set(
           postId,
           Object.assign(post, {
@@ -535,7 +456,6 @@ export class PostRepositoryMySQL implements PostRepository {
         );
       }
 
-      // Ajouter le tag s'il existe
       if (row.tag_id) {
         const tag = TagEntity.from({
           id: row.tag_id,
