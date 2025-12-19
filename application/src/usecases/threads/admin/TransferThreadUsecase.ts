@@ -1,11 +1,19 @@
-import { InvalidThreadAccessError,ThreadNotFoundError } from "@application/errors/threads";
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  InvalidThreadAccessError,
+  ThreadNotFoundError,
+} from "@application/errors/threads";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { ThreadClosedError } from "@domain/errors/thread";
 
 type Props = {
   newAdministratorId: UserEntity["id"];
@@ -29,6 +37,7 @@ export class TransferThreadUsecase {
     | ThreadNotFoundError
     | InvalidThreadAccessError
     | UserNotActiveError
+    | ThreadClosedError
   > {
     const administrator = await findActiveUser(
       this.userRepository,
@@ -41,7 +50,7 @@ export class TransferThreadUsecase {
 
     const newAdministrator = await findActiveUser(
       this.userRepository,
-      administratorId
+      newAdministratorId
     );
     if (newAdministrator instanceof Error) return newAdministrator;
     if (!thread.isAdministrator(administrator.id))
@@ -53,10 +62,14 @@ export class TransferThreadUsecase {
       return new UserRoleMismatchError([expectedRole], administrator.role);
     if (!newAdministrator.hasRole({ role: expectedRole }))
       return new UserRoleMismatchError([expectedRole], newAdministrator.role);
-
-    thread.transferTo(newAdministratorId, this.clockService.now());
-    this.threadRepository.update(thread);
-    return thread;
+    console.log(thread);
+    const updateThread = thread.transferTo(
+      newAdministratorId,
+      this.clockService.now()
+    );
+    if (updateThread instanceof Error) return updateThread;
+    this.threadRepository.update(updateThread);
+    return updateThread;
   }
 }
 /*

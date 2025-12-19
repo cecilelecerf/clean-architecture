@@ -7,6 +7,7 @@ import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { Email } from "@domain/values/Email";
 
 export class PostRepositoryMySQL implements PostRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -24,7 +25,7 @@ export class PostRepositoryMySQL implements PostRepository {
       content: row.content,
       tagsId,
       createdAt: row.created_at,
-      updatedAt: row.updated_at ?? undefined,
+      updatedAt: row.updated_at,
       publishedAt: row.published_at ?? undefined,
       readBy: readsId,
       clientId: row.client_id ?? undefined,
@@ -37,7 +38,7 @@ export class PostRepositoryMySQL implements PostRepository {
       id: row.advisor_id,
       firstname: row.advisor_firstname,
       lastname: row.advisor_lastname,
-      email: row.advisor_email,
+      email: Email.from(row.advisor_email),
       passwordHash: row.advisor_password_hash,
       role: row.advisor_role,
       isActiveField: row.advisor_is_active,

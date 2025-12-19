@@ -1,13 +1,19 @@
 import { InvalidThreadAccessError } from "@application/errors/threads/InvalidThreadAccessError";
 import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
-import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { ThreadClosedError ,ThreadParticipantAlreadyExistError} from "@domain/errors/thread";
+import {
+  ThreadClosedError,
+  ThreadParticipantAlreadyExistError,
+} from "@domain/errors/thread";
 
 type Props = {
   userId: UserEntity["id"];
@@ -47,14 +53,13 @@ export class AddParticipantUsecase {
 
     if (!thread.isAdministrator(administrator.id))
       return new InvalidThreadAccessError(administrator.id, thread.id);
-
     const updateThread = thread.addParticipant(
       user.id,
       this.clockService.now()
     );
     if (updateThread instanceof Error) return updateThread;
 
-    this.threadRepository.save(updateThread);
+    this.threadRepository.update(updateThread);
     return updateThread;
   }
 }

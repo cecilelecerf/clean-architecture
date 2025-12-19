@@ -11,8 +11,7 @@ export class UserEntity {
     public isActiveField: boolean,
     public createdAt: Date,
     public updatedAt: Date,
-    public confirmedAt?: Date,
-    public advisorId?: UserEntity["id"]
+    public confirmedAt?: Date
   ) {}
 
   public static from({
@@ -26,7 +25,6 @@ export class UserEntity {
     confirmedAt,
     createdAt,
     updatedAt,
-    advisorId,
   }: Pick<
     UserEntity,
     | "id"
@@ -39,7 +37,6 @@ export class UserEntity {
     | "createdAt"
     | "isActiveField"
     | "updatedAt"
-    | "advisorId"
   >) {
     return new UserEntity(
       id,
@@ -51,8 +48,7 @@ export class UserEntity {
       isActiveField,
       createdAt,
       updatedAt,
-      confirmedAt,
-      advisorId
+      confirmedAt
     );
   }
 

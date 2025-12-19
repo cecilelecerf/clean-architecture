@@ -11,7 +11,7 @@ import { MessageWithUser } from '@infrastructure/types/message';
 import { MessageComponent } from '@/components/threads/Message';
 import { Flex } from '@radix-ui/themes';
 import { PostMessage } from '@/components/threads/PostMessage';
-import { Settings } from './Settings';
+import { Settings } from '../../../../components/threads/Settings';
 import { endpoints } from '@/utils/endpoint';
 import { ThreadWithUser } from '@/utils/endpoint/threadEndpoints';
 

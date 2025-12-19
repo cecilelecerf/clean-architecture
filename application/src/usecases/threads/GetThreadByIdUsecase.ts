@@ -1,11 +1,18 @@
-
-import { InvalidThreadAccessError, ThreadNotFoundError } from "@application/errors/threads";
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
 import {
-  ThreadEntityWithUsers,
-  ThreadRepository,
-} from "@application/ports/repositories/ThreadRepository";
+  InvalidThreadAccessError,
+  ThreadNotFoundError,
+} from "@application/errors/threads";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
+import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
+import {
+  ThreadEntityWithUsersToFront,
+  ThreadToFrontMapper,
+} from "@application/toFronts/ThreadToFrontMapper";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
@@ -20,21 +27,21 @@ export class GetThreadByIdUsecase {
     threadId,
     userId,
   }: Props): Promise<
-    | ThreadEntityWithUsers
+    | ThreadEntityWithUsersToFront
     | UserNotFoundError
     | UserNotActiveError
-    | UserRoleMismatchError|InvalidThreadAccessError|ThreadNotFoundError
+    | UserRoleMismatchError
+    | InvalidThreadAccessError
+    | ThreadNotFoundError
   > {
     const user = await findActiveUser(this.userRepository, userId);
-    if (user instanceof Error) return user; 
+    if (user instanceof Error) return user;
 
-    const thread =
-      await this.threadRepository.findWithUserById(
-        threadId
-      );
-      if(!thread) return new ThreadNotFoundError();
-  if(!thread.hasAccess(user.id)) return new InvalidThreadAccessError(user.id, thread.id)
+    const thread = await this.threadRepository.findWithUserById(threadId);
+    if (!thread) return new ThreadNotFoundError();
+    if (!thread.hasAccess(user.id))
+      return new InvalidThreadAccessError(user.id, thread.id);
 
-    return thread;
+    return ThreadToFrontMapper.map(thread);
   }
 }

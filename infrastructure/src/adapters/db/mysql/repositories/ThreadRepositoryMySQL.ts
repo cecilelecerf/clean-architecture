@@ -4,6 +4,7 @@ import {
 } from "@application/ports/repositories/ThreadRepository";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { Email } from "@domain/values/Email";
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
@@ -36,7 +37,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
               id: row.admin_id,
               firstname: row.admin_firstname,
               lastname: row.admin_lastname,
-              email: row.admin_email,
+              email: Email.from(row.admin_email),
               role: row.admin_role,
               createdAt: new Date(row.admin_created_at),
               isActiveField: row.admin_is_active === 1,
@@ -62,7 +63,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
               id: row.participant_id,
               firstname: row.participant_firstname,
               lastname: row.participant_lastname,
-              email: row.participant_email,
+              email: Email.from(row.participant_email),
               role: row.participant_role,
               createdAt: new Date(row.participant_created_at),
               isActiveField: row.participant_is_active === 1,

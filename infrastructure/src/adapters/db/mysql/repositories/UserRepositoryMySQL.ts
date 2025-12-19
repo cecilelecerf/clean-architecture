@@ -8,8 +8,7 @@ export class UserRepositoryMySQL implements UserRepository {
   constructor(private readonly client: MySQLClient) {}
 
   private mapRowToUser(row: RowDataPacket): UserEntity {
-    const email = Email.create(row.email);
-    if (email instanceof Error) throw email;
+    const email = Email.from(row.email);
 
     return UserEntity.from({
       id: row.id,

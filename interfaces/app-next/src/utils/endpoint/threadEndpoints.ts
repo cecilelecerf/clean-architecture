@@ -8,6 +8,7 @@ import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { NewThread } from '@/app/api/threads/route';
+import { AddParticipant } from '@/app/api/threads/[threadId]/transfer/route';
 
 // ============================================================================
 // SCHEMAS
@@ -131,7 +132,7 @@ export const threadsEndpoint = createEndpointsNodes({
   // Transférer un thread à un autre conseiller
   transfer: ({ threadId }: { threadId: ThreadId }) =>
     mutationOptions({
-      mutationFn: ({ newAdministratorId }: { newAdministratorId: UserId }) =>
+      mutationFn: ({ newAdministratorId }: AddParticipant) =>
         post(`/threads/${threadId}/transfer`, { newAdministratorId }),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['threads', threadId] });

@@ -11,12 +11,12 @@ import { UserDto } from '@infrastructure/types/user';
 import { MessageWithUser } from '@infrastructure/types/message';
 import { useRouter } from 'next/navigation';
 import { ThreadWithUser } from '@/utils/endpoint/threadEndpoints';
-import { Settings } from './Settings';
 import { Flex } from '@radix-ui/themes';
 import { JoinThread } from './Join';
 import { endpoints } from '@/utils/endpoint';
 import { MessageComponent } from '@/components/threads/Message';
 import { PostMessage } from '@/components/threads/PostMessage';
+import { Settings } from '@/components/threads/Settings';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
