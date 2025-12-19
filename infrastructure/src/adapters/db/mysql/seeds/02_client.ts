@@ -15,6 +15,7 @@ import { TransactionRepositoryMySQL } from "@infrastructure/adapters/db/mysql/re
 import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
 import { Color } from "@domain/values/Color";
 import { rand } from "./utils";
+import { AccountOwner } from "@domain/values/AccountOwner";
 
 export async function seedSQLClient(
   mysqlClient: MySQLClient,
@@ -92,7 +93,10 @@ export async function seedSQLClient(
           iban,
           createdAt: clockService.now(),
           color,
-          userId: user.id,
+          owner: AccountOwner.from({
+            role: 'client',
+            userId: user.id
+          }),
           balance: Money.from({
             amount: rawAccount.balance,
             currency: rawAccount.currency,

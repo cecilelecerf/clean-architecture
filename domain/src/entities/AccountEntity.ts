@@ -2,13 +2,15 @@ import { IBAN } from "@domain/values/IBAN";
 import { UserEntity } from "./UserEntity";
 import { Money } from "@domain/values/Money"; 
 import { Color } from "@domain/values/Color";
-import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import { FactorNegativeError, MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
 import { InvalidAccountNameError } from "@domain/errors/account";
+import { AccountOwner } from "@domain/values/AccountOwner";
+import { InvalidAccountTypeError } from "@domain/errors/account/InvalidAccountType";
 
 export class AccountEntity {
   private constructor(
     public iban: IBAN,
-    public userId: UserEntity["id"],
+    public owner: AccountOwner,
     public name: string,
     public type: "courant" | "epargne",
     public color:Color,
@@ -19,7 +21,7 @@ export class AccountEntity {
 
   public static create({
     iban,
-    userId,
+    owner,
     name,
     type,
     balance,
@@ -29,7 +31,7 @@ export class AccountEntity {
   }: Pick<
     AccountEntity,
     | "iban"
-    | "userId"
+    | "owner"
     | "name"
     | "type"
     | "color"
@@ -42,7 +44,7 @@ export class AccountEntity {
 
     return new AccountEntity(
       iban,
-      userId,
+      owner,
       name,
       type,
       color,
@@ -54,7 +56,7 @@ export class AccountEntity {
 
   public static from({
     iban,
-    userId,
+    owner,
     name,
     type,
     balance,
@@ -64,7 +66,7 @@ export class AccountEntity {
   }: Pick<
     AccountEntity,
     | "iban"
-    | "userId"
+    | "owner"
     | "name"
     | "type"
     | "color"
@@ -74,7 +76,7 @@ export class AccountEntity {
   >) {
     return new AccountEntity(
       iban,
-      userId,
+      owner,
       name,
       type,
       color,
@@ -120,9 +122,72 @@ export class AccountEntity {
     return trimedName;
   }
 
-  public permissionToModify(user: UserEntity): boolean {
+  public canBeModifiedBy(user: UserEntity): boolean {
+    return this.owner.belongsTo(user.id);
+  }
+
+  public isBankAccount(): boolean {
+    return this.owner.role === "bank";
+  }
+
+  public isClientAccount(): boolean {
+    return this.owner.role === "client";
+  }
+
+  public canBeRenamedBy(user: UserEntity): boolean {
     return (
-      user.hasRole({ role: "client" }) && user.id === this.userId
+      user.hasRole({ role: "client" }) &&
+      this.owner.belongsTo(user.id)
     );
   }
+
+  public rename(
+    newName: string,
+    user: UserEntity,
+    updatedAt: Date
+  ): InvalidAccountNameError | InvalidAccountNameError | void {
+    if (!user.hasRole({ role: "client" })) {
+      return new InvalidAccountNameError();
+    }
+
+    if (!this.owner.belongsTo(user.id)) {
+      return new InvalidAccountNameError();
+    }
+
+    const verifiedName = AccountEntity.verifyName(newName);
+    if (verifiedName instanceof Error) return verifiedName;
+
+    this.name = verifiedName;
+    this.updatedAt = updatedAt;
+  }
+
+  public applyDailyInterest(
+    bankAccount: AccountEntity,
+    dailyRate: number
+  ):
+    | FactorNegativeError
+    | InvalidAccountTypeError
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
+    | MoneyCurrencyMismatchError
+    | Money {
+
+    if (this.type !== "epargne") return new InvalidAccountTypeError;
+
+    const interest = this.balance.multiply(dailyRate);
+    if (interest instanceof Error) return interest;
+
+    const depositResult = this.deposit(interest);
+    if (depositResult instanceof Error) return depositResult;
+
+    const withdrawResult = bankAccount.withdraw(interest);
+    if (withdrawResult instanceof Error) {
+      this.withdraw(interest);
+      return withdrawResult;
+    }
+
+    return this.getBalance();
+  }
+
 }

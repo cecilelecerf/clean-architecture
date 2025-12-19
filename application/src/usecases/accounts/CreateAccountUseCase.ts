@@ -7,17 +7,21 @@ import { EmailService } from "@application/ports/services/EmailService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 import { InvalidAccountNameError } from "@domain/errors/account";
+import { AccountOwner } from "@domain/values/AccountOwner";
+import { Color } from "@domain/values/Color";
 import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
-// TODO tu dois pas récupérer un type IBAN | color | Money directement mais des types string par exemple et tu dois les mettre au format IBAN et autre dans le use case
+
 interface Props {
-  iban: IBAN;
+  iban: string;
   userId: string;
   name: string;
   type: "courant" | "epargne";
-  color: AccountEntity["color"];
-  balance: Money;
+  color: string;
+  initialBalance: number;
+  currency: string;
 }
+
 
 export class CreateAccountUsecase {
   public constructor(
@@ -33,7 +37,8 @@ export class CreateAccountUsecase {
     name,
     type,
     color,
-    balance
+    initialBalance,
+    currency,
   }: Props): Promise<
   | UserNotFoundError
   | UserNotActiveError
@@ -42,19 +47,39 @@ export class CreateAccountUsecase {
   | void> {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
+    
+    const ibanVO = IBAN.create(iban);
+    if (ibanVO instanceof Error) return ibanVO;
 
+    const colorVO = Color.from(color);
+    if (colorVO instanceof Error) return colorVO;
+
+    const balanceVO = Money.create({
+      amount: initialBalance,
+      currency,
+    });
+    if (balanceVO instanceof Error) return balanceVO;
+
+    const owner = AccountOwner.create({
+      type: "client",
+      userId: user.id,
+    });
+    if (owner instanceof Error) return owner;
+    
     const today = this.clockService.now();
+
     const account = AccountEntity.create({
-      iban,
-      userId,
+      iban: ibanVO,
+      owner,
       name,
-      type,
-      color,
-      balance,
-      createdAt: today,
-      updatedAt: today,
-    })
+      type: type,
+      color: colorVO,
+      balance: balanceVO,
+      createdAt: today
+    });
+
     if (account instanceof Error) return account;
+
     await this.accountRepository.save(account);
 
     await this.emailService.sendEmail({

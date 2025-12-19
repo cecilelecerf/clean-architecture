@@ -17,7 +17,7 @@ export class RenameAccountUsecase {
     private readonly clockService: ClockService,
     private readonly userRepository: UserRepository
   ) {}
-  public async execute(iban: IBAN, newName: string): Promise<
+  public async execute(iban: string, requestUserId: string, newName: string): Promise<
   | MissingIBANError
   | MissingOrInvalidNameError
   | AccountNotFoundError
@@ -27,37 +27,33 @@ export class RenameAccountUsecase {
   | UserNotActiveError
   | InvalidAccountAccessError
   | void> {
-    if (!iban) return new MissingIBANError();
+    if (!iban || iban.trim().length === 0) {
+      return new MissingIBANError();
+    }
 
-    const existingAccount = await this.accountRepository.findByIBAN(iban);
-    if (!existingAccount) return new AccountNotFoundError();
+    if (!newName || newName.trim().length === 0) {
+      return new MissingOrInvalidNameError();
+    }
 
-    const user = await findActiveUser(this.userRepository, existingAccount.userId);
+    const user = await findActiveUser(this.userRepository, requestUserId);
     if (user instanceof Error) return user;
 
-    const today = this.clockService.now();
+    const ibanVO = IBAN.create(iban);
+    if (ibanVO instanceof Error) return ibanVO;
 
-    const updatedAccount = AccountEntity.create({
-      iban: existingAccount.iban,
-      userId: existingAccount.userId,
-      name: newName,
-      type: existingAccount.type,
-      color: existingAccount.color,
-      balance: existingAccount.balance,
-      createdAt: existingAccount.createdAt, 
-      updatedAt: today
-    })
-    if (updatedAccount instanceof Error) return updatedAccount;
+    const account = await this.accountRepository.findByIBAN(ibanVO);
+    if (!account) return new AccountNotFoundError();
 
-    const access = updatedAccount.permissionToModify(user);
-    if (!access) return new InvalidAccountAccessError(user.id, updatedAccount.iban);
+    const now = this.clockService.now();
+    const renameResult = account.rename(newName, user, now);
+    if (renameResult instanceof Error) return renameResult;
 
-    await this.accountRepository.update(updatedAccount);
+    await this.accountRepository.update(account);
 
     await this.emailService.sendEmail({
       to: user.email,
       subject: "Compte modifié",
-      text: `Votre compte a été modifié avec un nouveau nom ${updatedAccount.name}.`,
+      text: `Le nom de votre compte a été modifié en "${account.name}".`,
     });
   }
 }

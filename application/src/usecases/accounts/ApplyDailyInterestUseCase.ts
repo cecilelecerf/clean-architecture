@@ -5,7 +5,7 @@ import { TransactionRepository } from "@application/ports/repositories/Transacti
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
-import { FactorNegativeError, MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import { FactorNegativeError, MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
 
 
 export class ApplyDailyInterestUseCase {
@@ -22,38 +22,48 @@ export class ApplyDailyInterestUseCase {
     | FactorNegativeError 
     | MoneyCurrencyMissingError 
     | MoneyAmountInvalidError 
-    | MoneyAmountNegativeError> {
-    const rate = await this.configRepository.findCurrent();
+    | MoneyAmountNegativeError
+    | FactorNegativeError  
+    | MoneyCurrencyMismatchError> {
+    const rateConfig = await this.configRepository.findCurrent();
+    if (!rateConfig) return new RateNotFoundError();
 
-    if (!rate) return new RateNotFoundError();
+    const dailyRate = rateConfig.rate.toDecimal() / 365;
 
-    const savingsAccounts = await this.accountRepository.findAllSavingsAccounts();
+    const bankAccount = await this.accountRepository.findBankInterestAccount();
+    if (!bankAccount) {
+      throw new Error("Bank interest account not configured");
+    }
+
+    const savingAccounts =
+      await this.accountRepository.findAllSavingsAccounts();
 
     const today = this.clockService.now();
 
-    if (savingsAccounts) {
-      for (const account of savingsAccounts) { 
-        const dailyRateDecimal = rate.rate.toDecimal() / 365;
-        const interestResult = account.balance.multiply(dailyRateDecimal);
+    for (const savingAccount of savingAccounts) {
+      const interestResult = savingAccount.applyDailyInterest(
+        bankAccount,
+        dailyRate
+      );
 
-        if (interestResult instanceof Error) return interestResult;
-        const interestMoney = interestResult;
+      if (interestResult instanceof Error) return interestResult;
 
-        account.deposit(interestMoney);
+      const transaction = TransactionEntity.from({
+        id: this.uuidService.generate(),
+        fromAccountId: bankAccount.iban,
+        toAccountId: savingAccount.iban,
+        amount: interestResult, 
+        label: "Intérêts journaliers",
+        icon: "interest",
+        type: "credit",
+        date: today,
+      });
 
-        const transaction = TransactionEntity.from({
-          id: this.uuidService.generate(),
-          // TODO : il faut passer l'id d'un account
-          fromAccountId: "BANK",
-          toAccountId: account.iban,
-          amount: interestMoney,
-          type: "credit",
-          date: today,
-        });
+      await this.transactionRepository.save(transaction);
 
-        await this.transactionRepository.save(transaction);
-        await this.accountRepository.save(account);
-      }
+      await this.accountRepository.save(savingAccount);
     }
+
+    await this.accountRepository.save(bankAccount);
   }
 }

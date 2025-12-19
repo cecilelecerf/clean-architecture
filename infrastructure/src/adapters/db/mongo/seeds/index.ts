@@ -11,6 +11,7 @@ import { generateSavingsRateMongo } from "./09_savingsrate";
 import { generateOrdersMongo } from "./10_orders";
 import { generateNotificationsMongo } from "./11_notification";
 import { generateCreditsMongo } from "./12_credits";
+import { generateBankAccountsMongo } from "./13_bank_accounts";
 
 const all = async () => {
     const mongoClient = new MongoClient();
@@ -26,6 +27,7 @@ const all = async () => {
     await generateOrdersMongo(mongoClient, clients, actions);
     await generateNotificationsMongo(mongoClient, advisors, clients);
     await generateCreditsMongo(mongoClient, clients);
+    await generateBankAccountsMongo(mongoClient)
 }
 
 all()

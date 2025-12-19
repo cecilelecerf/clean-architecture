@@ -6,6 +6,7 @@ import { MongoClient } from "../../MongoClient";
 import { AccountModel } from "../models/AccountModel";
 import { Money } from "@domain/values/Money";
 import { Color } from "@domain/values/Color";
+import { AccountOwner } from "@domain/values/AccountOwner";
 
 export class AccountRepositoryMongo implements AccountRepository {
     constructor(private readonly client: MongoClient) {}
@@ -19,6 +20,9 @@ export class AccountRepositoryMongo implements AccountRepository {
             const iban = IBAN.create(doc.iban);
             if (iban instanceof Error) throw iban;
 
+            const owner = AccountOwner.create(doc.owner);
+            if (owner instanceof Error) throw owner;
+
             const balance = Money.create(doc.balance);
             if (balance instanceof Error) throw balance;
 
@@ -27,7 +31,7 @@ export class AccountRepositoryMongo implements AccountRepository {
 
             return AccountEntity.from({
                 iban,
-                userId: doc.userId,
+                owner,
                 name: doc.name,
                 type: doc.type,
                 color,
@@ -44,6 +48,9 @@ export class AccountRepositoryMongo implements AccountRepository {
         const doc = await AccountModel.findOne({ iban: iban.value }).lean();
         if (!doc) return null;
 
+        const owner = AccountOwner.create(doc.owner);
+        if (owner instanceof Error) throw owner;
+
         const balance = Money.create(doc.balance);
         if (balance instanceof Error) throw balance;
 
@@ -52,7 +59,7 @@ export class AccountRepositoryMongo implements AccountRepository {
 
         return AccountEntity.from({
             iban,
-            userId: doc.userId,
+            owner,
             name: doc.name,
             type: doc.type,
             color,
@@ -71,6 +78,9 @@ export class AccountRepositoryMongo implements AccountRepository {
             const iban = IBAN.create(doc.iban);
             if (iban instanceof Error) throw iban;
 
+            const owner = AccountOwner.create(doc.owner);
+            if (owner instanceof Error) throw owner;
+
             const balance = Money.create(doc.balance);
             if (balance instanceof Error) throw balance;
 
@@ -79,7 +89,7 @@ export class AccountRepositoryMongo implements AccountRepository {
 
             return AccountEntity.from({
             iban,
-            userId: doc.userId,
+            owner,
             name: doc.name,
             type: doc.type,
             color,
@@ -90,12 +100,49 @@ export class AccountRepositoryMongo implements AccountRepository {
         });
     }
 
+    async findBankInterestAccount(): Promise<AccountEntity | null> {
+        await this.client.connect();
+
+        const doc = await AccountModel.findOne({
+            type: "epargne",
+            owner_type: "bank",
+        }).lean();
+        if (!doc) return null;
+
+        const iban = IBAN.create(doc.iban);
+        if (iban instanceof Error) throw iban;
+
+        const owner = AccountOwner.create(doc.owner);
+        if (owner instanceof Error) throw owner;
+
+        const balance = Money.create(doc.balance);
+        if (balance instanceof Error) throw balance;
+
+        const color = Color.from(doc.color);
+        if (color instanceof Error) throw color;
+
+        return AccountEntity.from({
+            iban,
+            owner,
+            name: doc.name,
+            type: doc.type,
+            color,
+            balance,
+            createdAt: doc.createdAt,
+            updatedAt: doc.updatedAt,
+        });
+
+    }
+
     async save(account: AccountEntity): Promise<void> {
         await this.client.connect();
 
         await AccountModel.create({
             iban: account.iban.value,
-            userId: account.userId,
+            owner: {
+                role: account.owner.role,
+                userId: account.owner.userId ?? null,
+            },
             name: account.name,
             type: account.type,
             color: account.color.getValue(),
@@ -114,7 +161,10 @@ export class AccountRepositoryMongo implements AccountRepository {
             { iban: account.iban.value },
             {
                 $set: {
-                    userId: account.userId,
+                    owner: {
+                        role: account.owner.role,
+                        userId: account.owner.userId ?? null,
+                    },
                     name: account.name,
                     type: account.type,
                     color: account.color.getValue(),
