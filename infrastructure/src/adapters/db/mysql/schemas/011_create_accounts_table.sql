@@ -8,6 +8,6 @@ CREATE TABLE IF NOT EXISTS accounts (
     color ENUM('blue','red','pink','yellow') NOT NULL,
     currency CHAR(3) NOT NULL,
     created_at DATETIME NOT NULL,
-    updated_at DATETIME,
+    updated_at DATETIME NOT NULL,
     CONSTRAINT fk_accounts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

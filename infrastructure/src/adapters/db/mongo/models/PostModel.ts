@@ -3,5 +3,4 @@ import { PostSchema } from "../schema/PostSchema";
 import { PostInterface } from "../interface/PostInterface";
 
 export const PostModel =
-  mongoose.models.posts ||
-  mongoose.model<PostInterface>("posts", PostSchema);
+  mongoose.models.Post || mongoose.model<PostInterface>("Post", PostSchema);

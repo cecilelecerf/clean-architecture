@@ -14,16 +14,13 @@ export const ActionSchema = new Schema<ActionInterface>(
         amount: { type: Number, required: true },
         currency: { type: String, required: true },
       },
-      required: true
+      required: true,
     },
     isAvailable: { type: Boolean, required: true },
   },
   {
-    timestamps: {
-      createdAt: "createdAt",
-      updatedAt: "updatedAt",
-    },
-    collection: "action",
+    timestamps: true,
+    collection: "actions",
     versionKey: false,
   }
 );

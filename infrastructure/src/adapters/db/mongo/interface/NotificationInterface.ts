@@ -1,10 +1,12 @@
-export interface NotificationInterface{
-    advisorId: string,
-    clientId: string,
-    title: string,
-    content: string,
-    isRead: boolean,
-    type: "info" | "alert" | "reminder",
-    createdAt: Date,
-    updatedAt: Date 
+import { Types } from "mongoose";
+
+export interface NotificationInterface {
+  advisorId: Types.ObjectId;
+  clientId: Types.ObjectId;
+  title: string;
+  content: string;
+  isRead: boolean;
+  type: "info" | "alert" | "reminder";
+  createdAt: Date;
+  updatedAt: Date;
 }

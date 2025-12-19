@@ -3,4 +3,5 @@ import { CreditSchema } from "../schema/CreditSchema";
 import { CreditInterface } from "../interface/CreditInterface";
 
 export const CreditModel =
-  mongoose.models.credits || mongoose.model<CreditInterface>("credits", CreditSchema);
+  mongoose.models.Credit ||
+  mongoose.model<CreditInterface>("Credit", CreditSchema);

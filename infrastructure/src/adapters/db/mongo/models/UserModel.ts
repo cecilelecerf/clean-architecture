@@ -3,5 +3,4 @@ import { UserSchema } from "../schema/UserSchema";
 import { UserInterface } from "../interface/UserInterface";
 
 export const UserModel =
-  mongoose.models.users ||
-  mongoose.model<UserInterface>("users", UserSchema);
+  mongoose.models.User || mongoose.model<UserInterface>("User", UserSchema);

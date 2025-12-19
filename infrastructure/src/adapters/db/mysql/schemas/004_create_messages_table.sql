@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS messages (
     sender_id VARCHAR(36) NOT NULL,
     content TEXT NOT NULL,
     sent_at DATETIME NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     FOREIGN KEY (thread_id) REFERENCES threads(id) ON DELETE CASCADE,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
 );

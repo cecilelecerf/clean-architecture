@@ -9,7 +9,7 @@ export const AccountSchema = new Schema<AccountInterface>(
         role: { type: String, enum: ["bank", "client"], required: true },
         userId: { type: String, required: false },
       },
-      required: true
+      required: true,
     },
     name: { type: String, required: true },
     type: { type: String, enum: ["courant", "epargne"], required: true },
@@ -19,15 +19,12 @@ export const AccountSchema = new Schema<AccountInterface>(
         amount: { type: Number, required: true },
         currency: { type: String, required: true },
       },
-      required: true
+      required: true,
     },
   },
   {
-    timestamps: {
-      createdAt: "createdAt",
-      updatedAt: "updatedAt",
-    },
-    collection: "account",
+    timestamps: true,
+    collection: "accounts",
     versionKey: false,
   }
 );

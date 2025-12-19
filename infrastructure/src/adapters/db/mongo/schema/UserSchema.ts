@@ -7,17 +7,17 @@ export const UserSchema = new Schema<UserInterface>(
     lastname: { type: String, required: true },
     email: { type: String, required: true },
     passwordHash: { type: String, required: true },
-    role: { type: String, enum: ["client", "conseiller", "directeur"], required: true },
-    isActiveField: {type: Boolean, required: true},
+    role: {
+      type: String,
+      enum: ["client", "conseiller", "directeur"],
+      required: true,
+    },
+    isActiveField: { type: Boolean, required: true },
     confirmedAt: { type: Date, required: false },
-    advisorId: { type: String, required: false }
   },
   {
-    timestamps: {
-      createdAt: "createdAt",
-      updatedAt: "updatedAt",
-    },
-    collection: "user",
+    timestamps: true,
+    collection: "users",
     versionKey: false,
   }
 );

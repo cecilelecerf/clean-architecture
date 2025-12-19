@@ -1,7 +1,9 @@
-export interface MessageInterface{
-    threadId: string,
-    senderId: string,
-    content: string,
-    sentAt: Date,
-    readBy: string[]
+import { Types } from "mongoose";
+
+export interface MessageInterface {
+  threadId: Types.ObjectId;
+  senderId: Types.ObjectId;
+  content: string;
+  sentAt: Date;
+  readBy: Types.ObjectId[];
 }
