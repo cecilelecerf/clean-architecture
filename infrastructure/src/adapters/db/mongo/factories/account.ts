@@ -11,6 +11,8 @@ import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccou
 import { DeleteAccountUsecase } from "@application/usecases/accounts/DeleteAccountUsecase";
 import { RenameAccountUsecase } from "@application/usecases/accounts/RenameAccountUsecase";
 import { TransfertBetweenAccountUsecase } from "@application/usecases/accounts/TransfertBetweenAccountUsecase";
+import { GetAccountByIBANUsercase } from "@application/usecases/accounts/GetAccountByIBANUseCase";
+import { GetAccountsUsercase } from "@application/usecases/accounts/GetAccountsUseCase";
 
 export const accountFactory = () => {
     const client = new MongoClient();
@@ -40,6 +42,14 @@ export const accountFactory = () => {
         emailService,
         userRepository
     );
+    const getAccountByIBAN = new GetAccountByIBANUsercase(
+        accountRepository,
+        userRepository
+    );
+    const getAccounts = new GetAccountsUsercase(
+        accountRepository,
+        userRepository
+    );
     const renameAccount = new RenameAccountUsecase(
         accountRepository,
         emailService,
@@ -61,6 +71,8 @@ export const accountFactory = () => {
         client: {
             createAccount,
             deleteAccount,
+            getAccountByIBAN,
+            getAccounts,
             renameAccount,
             transfertBetweenAccount
         },

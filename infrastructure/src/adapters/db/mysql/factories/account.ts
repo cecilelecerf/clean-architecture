@@ -12,6 +12,8 @@ import { DeleteAccountUsecase } from "@application/usecases/accounts/DeleteAccou
 import { TransfertBetweenAccountUsecase } from "@application/usecases/accounts/TransfertBetweenAccountUsecase";
 import { ApplyDailyInterestUseCase } from "@application/usecases/accounts/ApplyDailyInterestUseCase";
 import { SavingsRateRepositoryMySQL } from "../repositories/SavingRateRepositoryMySQL";
+import { GetAccountByIBANUsercase } from "@application/usecases/accounts/GetAccountByIBANUseCase";
+import { GetAccountsUsercase } from "@application/usecases/accounts/GetAccountsUseCase";
 
 export const accountFactory = () => {
     const client = new MySQLClient();
@@ -41,6 +43,14 @@ export const accountFactory = () => {
         emailService,
         userRepository
     );
+    const getAccountByIBAN = new GetAccountByIBANUsercase(
+        accountRepository,
+        userRepository
+    );
+    const getAccounts = new GetAccountsUsercase(
+        accountRepository,
+        userRepository
+    );
     const renameAccount = new RenameAccountUsecase(
         accountRepository,
         emailService,
@@ -62,6 +72,8 @@ export const accountFactory = () => {
         client: {
             createAccount,
             deleteAccount,
+            getAccountByIBAN,
+            getAccounts,
             renameAccount,
             transfertBetweenAccount
         },

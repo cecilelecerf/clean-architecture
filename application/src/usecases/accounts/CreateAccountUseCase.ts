@@ -22,7 +22,6 @@ interface Props {
   currency: string;
 }
 
-
 export class CreateAccountUsecase {
   public constructor(
     private readonly accountRepository: AccountRepository,
@@ -61,7 +60,7 @@ export class CreateAccountUsecase {
     if (balanceVO instanceof Error) return balanceVO;
 
     const owner = AccountOwner.create({
-      type: "client",
+      role: "client",
       userId: user.id,
     });
     if (owner instanceof Error) return owner;
