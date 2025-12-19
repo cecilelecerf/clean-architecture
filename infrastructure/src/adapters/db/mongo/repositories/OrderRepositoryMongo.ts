@@ -7,171 +7,125 @@ import { OrderModel } from "../models/OrderModel";
 import { Money } from "@domain/values/Money";
 
 export class OrderRepositoryMongo implements OrderRepository {
-    constructor(private readonly client: MongoClient) {}
-    
-    async save(order: OrderEntity): Promise<void> {
-        await this.client.connect();
-                                
-        await OrderModel.create({
-            userId: order.userId,
-            actionId: order.actionId,
-            type: order.type,
-            quantity: order.quantity,
-            price: {
-                amount: order.price.amount,
-                currency: order.price.currency,
-            },
-            fee: {
-                amount: order.fee.amount,
-                currency: order.fee.currency,
-            },
-            date: order.date,
-            status: order.status,
-            createdAt: order.createdAt
-        } as any);
-    }
+  constructor(private readonly client: MongoClient) {}
 
-    async findById(id: OrderEntity["id"]): Promise<OrderEntity | null> {
-        await this.client.connect();
-                
-        const doc = await OrderModel.findOne({ _id: id }).lean();
-        if (!doc) return null;
+  private mapDocToOrder(doc: any): OrderEntity {
+    const price = Money.from(doc.price);
+    const fee = Money.from(doc.fee);
 
-        const price = Money.create(doc.price);
-        if (price instanceof Error) throw price;
+    return OrderEntity.from({
+      id: doc._id.toString(),
+      userId: doc.userId,
+      actionId: doc.actionId,
+      type: doc.type,
+      quantity: doc.quantity,
+      price,
+      fee,
+      date: doc.date,
+      status: doc.status,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    });
+  }
 
-        const fee = Money.create(doc.fee);
-        if (fee instanceof Error) throw fee;
-        
-        return OrderEntity.from({
-            id,
-            userId: doc.userId,
-            actionId: doc.actionId,
-            type: doc.type,
-            quantity: doc.quantity,
-            price,
-            fee,
-            date: doc.date,
-            status: doc.status,
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt,
-        });
-    }
+  /** Sauvegarder un ordre */
+  async save(order: OrderEntity): Promise<void> {
+    await this.client.connect();
 
-    async findAllByUserId(userId: UserEntity["id"]): Promise<OrderEntity[]> {
-        await this.client.connect();
-                
-        const docs = await OrderModel.find({ userId }).lean();
+    await OrderModel.create({
+      _id: order.id,
+      userId: order.userId,
+      actionId: order.actionId,
+      type: order.type,
+      quantity: order.quantity,
+      price: {
+        amount: order.price.amount,
+        currency: order.price.currency,
+      },
+      fee: {
+        amount: order.fee.amount,
+        currency: order.fee.currency,
+      },
+      date: order.date,
+      status: order.status,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+    });
+  }
 
-        return docs.map((doc) => {
-            const price = Money.create(doc.price);
-            if (price instanceof Error) throw price;
+  /** Trouver un ordre par ID */
+  async findById(id: OrderEntity["id"]): Promise<OrderEntity | null> {
+    await this.client.connect();
 
-            const fee = Money.create(doc.fee);
-            if (fee instanceof Error) throw fee;
+    const doc = await OrderModel.findById(id).lean();
+    if (!doc) return null;
 
-            return OrderEntity.from({
-                id: doc._id.toString(),
-                userId: doc.userId,
-                actionId: doc.actionId,
-                type: doc.type,
-                quantity: doc.quantity,
-                price,
-                fee,
-                date: doc.date,
-                status: doc.status,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt ?? null,
-            });
-        })
-    }
+    return this.mapDocToOrder(doc);
+  }
 
-    async findAllByActionId(actionId: ActionEntity["ISIN"]): Promise<OrderEntity[]> {
-        await this.client.connect();
-                
-        const docs = await OrderModel.find({ actionId }).lean();
+  /** Tous les ordres d'un utilisateur */
+  async findAllByUserId(userId: UserEntity["id"]): Promise<OrderEntity[]> {
+    await this.client.connect();
 
-        return docs.map((doc) => {
-            const price = Money.create(doc.price);
-            if (price instanceof Error) throw price;
+    const docs = await OrderModel.find({ userId }).sort({ date: -1 }).lean();
 
-            const fee = Money.create(doc.fee);
-            if (fee instanceof Error) throw fee;
+    return docs.map((doc) => this.mapDocToOrder(doc));
+  }
 
-            return OrderEntity.from({
-                id: doc._id.toString(),
-                userId: doc.userId,
-                actionId: doc.actionId,
-                type: doc.type,
-                quantity: doc.quantity,
-                price,
-                fee,
-                date: doc.date,
-                status: doc.status,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt ?? null,
-            });
-        })
-    }
+  /** Tous les ordres d'une action */
+  async findAllByActionId(
+    actionId: ActionEntity["ISIN"]
+  ): Promise<OrderEntity[]> {
+    await this.client.connect();
 
-    async findAllOpen(): Promise<OrderEntity[]> {
-        await this.client.connect();
+    const docs = await OrderModel.find({ actionId }).sort({ date: -1 }).lean();
 
-        const docs = await OrderModel.find({ status: "pending" }).lean();
+    return docs.map((doc) => this.mapDocToOrder(doc));
+  }
 
-        return docs.map((doc) => {
-            const price = Money.create(doc.price);
-            if (price instanceof Error) throw price;
+  /** Ordres en attente */
+  async findAllOpen(): Promise<OrderEntity[]> {
+    await this.client.connect();
 
-            const fee = Money.create(doc.fee);
-            if (fee instanceof Error) throw fee;
+    const docs = await OrderModel.find({ status: "pending" })
+      .sort({ date: -1 })
+      .lean();
 
-            return OrderEntity.from({
-                id: doc._id.toString(),
-                userId: doc.userId,
-                actionId: doc.actionId,
-                type: doc.type,
-                quantity: doc.quantity,
-                price,
-                fee,
-                date: doc.date,
-                status: doc.status,
-                createdAt: doc.createdAt,
-                updatedAt: doc.updatedAt ?? null,
-            });
-        })
-    }
+    return docs.map((doc) => this.mapDocToOrder(doc));
+  }
 
-    async update(order: OrderEntity): Promise<void> {
-        await this.client.connect();
-                                
-        await OrderModel.updateOne(
-            { _id: order.id },
-            {
-                $set: {
-                    userId: order.userId,
-                    actionId: order.actionId,
-                    type: order.type,
-                    quantity: order.quantity,
-                    price: {
-                        amount: order.price.amount,
-                        currency: order.price.currency,
-                    },
-                    fee: {
-                        amount: order.fee.amount,
-                        currency: order.fee.currency,
-                    },
-                    date: order.date,
-                    status: order.status,
-                    updatedAt: order.updatedAt || new Date(),
-                },
-            }
-        );
-    }
+  /** Mettre à jour un ordre */
+  async update(order: OrderEntity): Promise<void> {
+    await this.client.connect();
 
-    async delete(id: OrderEntity["id"]): Promise<void> {
-        await this.client.connect();
-                                
-        await OrderModel.deleteOne({ _id: id });
-    }
+    await OrderModel.updateOne(
+      { _id: order.id },
+      {
+        $set: {
+          userId: order.userId,
+          actionId: order.actionId,
+          type: order.type,
+          quantity: order.quantity,
+          price: {
+            amount: order.price.amount,
+            currency: order.price.currency,
+          },
+          fee: {
+            amount: order.fee.amount,
+            currency: order.fee.currency,
+          },
+          date: order.date,
+          status: order.status,
+          updatedAt: order.updatedAt,
+        },
+      }
+    );
+  }
+
+  /** Supprimer un ordre */
+  async delete(id: OrderEntity["id"]): Promise<void> {
+    await this.client.connect();
+
+    await OrderModel.deleteOne({ _id: id });
+  }
 }

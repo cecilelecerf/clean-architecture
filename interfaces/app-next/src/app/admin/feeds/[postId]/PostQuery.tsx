@@ -59,7 +59,6 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
     };
 
     const handleSave = () => {
-        console.log(editValues)
         editMutation.mutate(editValues, { onSuccess: () => socket.emit("post:update", { post: { ...post, ...editValues } }) });
     };
 

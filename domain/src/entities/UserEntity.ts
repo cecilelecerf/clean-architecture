@@ -10,8 +10,8 @@ export class UserEntity {
     public role: "client" | "conseiller" | "directeur",
     public isActiveField: boolean,
     public createdAt: Date,
+    public updatedAt: Date,
     public confirmedAt?: Date,
-    public updatedAt?: Date,
     public advisorId?: UserEntity["id"]
   ) {}
 
@@ -50,8 +50,8 @@ export class UserEntity {
       role,
       isActiveField,
       createdAt,
-      confirmedAt,
       updatedAt,
+      confirmedAt,
       advisorId
     );
   }

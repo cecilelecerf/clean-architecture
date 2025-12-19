@@ -21,7 +21,6 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/threads/[thr
       userId: session.user.id,
       id: threadId,
     });
-    console.log(messages);
     if (messages instanceof Error) {
       return NextResponse.json(
         { name: messages.name, message: messages.message },

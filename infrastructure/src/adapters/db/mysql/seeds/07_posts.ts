@@ -74,7 +74,7 @@ export const generatePosts = async (
     const updatedAt =
       Math.random() < 0.3
         ? clockService.addDays(createdAt, rand(1, 10))
-        :  clockService.nowMinusDays(rand(0, 60));
+        : clockService.nowMinusDays(rand(0, 60));
     const publishedAt =
       Math.random() < 0.9
         ? clockService.addDays(createdAt, rand(0, 3))

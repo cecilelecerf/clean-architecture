@@ -1,8 +1,14 @@
 import { IBAN } from "@domain/values/IBAN";
 import { UserEntity } from "./UserEntity";
-import { Money } from "@domain/values/Money"; 
+import { Money } from "@domain/values/Money";
 import { Color } from "@domain/values/Color";
-import { FactorNegativeError, MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import {
+  FactorNegativeError,
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMismatchError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
 import { InvalidAccountNameError } from "@domain/errors/account";
 import { AccountOwner } from "@domain/values/AccountOwner";
 import { InvalidAccountTypeError } from "@domain/errors/account/InvalidAccountType";
@@ -13,10 +19,10 @@ export class AccountEntity {
     public owner: AccountOwner,
     public name: string,
     public type: "courant" | "epargne",
-    public color:Color,
+    public color: Color,
     public balance: Money,
     public createdAt: Date,
-    public updatedAt?: Date
+    public updatedAt: Date
   ) {}
 
   public static create({
@@ -38,7 +44,7 @@ export class AccountEntity {
     | "balance"
     | "createdAt"
     | "updatedAt"
-  >): AccountEntity | InvalidAccountNameError{
+  >): AccountEntity | InvalidAccountNameError {
     const verifiedName = this.verifyName(name);
     if (verifiedName instanceof Error) return verifiedName;
 
@@ -114,8 +120,9 @@ export class AccountEntity {
     return this.balance;
   }
 
-  public static verifyName(name: AccountEntity["name"]): InvalidAccountNameError | AccountEntity["name"]
-  {
+  public static verifyName(
+    name: AccountEntity["name"]
+  ): InvalidAccountNameError | AccountEntity["name"] {
     const trimedName = name.trim();
     if (trimedName.length < 10 || trimedName.length > 100)
       return new InvalidAccountNameError();
@@ -135,10 +142,7 @@ export class AccountEntity {
   }
 
   public canBeRenamedBy(user: UserEntity): boolean {
-    return (
-      user.hasRole({ role: "client" }) &&
-      this.owner.belongsTo(user.id)
-    );
+    return user.hasRole({ role: "client" }) && this.owner.belongsTo(user.id);
   }
 
   public rename(
@@ -172,8 +176,7 @@ export class AccountEntity {
     | MoneyAmountNegativeError
     | MoneyCurrencyMismatchError
     | Money {
-
-    if (this.type !== "epargne") return new InvalidAccountTypeError;
+    if (this.type !== "epargne") return new InvalidAccountTypeError();
 
     const interest = this.balance.multiply(dailyRate);
     if (interest instanceof Error) return interest;
@@ -189,5 +192,4 @@ export class AccountEntity {
 
     return this.getBalance();
   }
-
 }

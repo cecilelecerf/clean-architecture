@@ -1,9 +1,15 @@
-import { IBANInvalidCheckDigitsError, IBANInvalidFormatError, IBANTooLongError, IBANTooShortError } from "@domain/errors/IBAN";
-
+import {
+  IBANInvalidCheckDigitsError,
+  IBANInvalidFormatError,
+  IBANTooLongError,
+  IBANTooShortError,
+} from "@domain/errors/IBAN";
 
 export class IBAN {
   private constructor(public readonly value: string) {}
-
+  public static from(iban: string) {
+    return new IBAN(iban);
+  }
   public static create(
     iban: string
   ):

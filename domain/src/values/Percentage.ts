@@ -14,7 +14,6 @@ export class Percentage {
     if (isNaN(value) || value < 0 || value > 100) {
       return new InvalidPercentageError(value);
     }
-
     return new Percentage(Number(value.toFixed(4))); // 4 décimales max
   }
 
