@@ -3,7 +3,7 @@ import { SignOutButton } from "@/components/SignOutButton";
 import { Button } from "@/components/ui/button";
 import { Flex } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 

@@ -2,7 +2,6 @@ import { Flex } from "@radix-ui/themes";
 import { Settings } from "./Settings";
 import { MessageComponent } from "./Message";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { MessageWithUser } from "@infrastructure/types/message";
 import { socket } from "@/lib/socket";
 import { ThreadWithUser } from "@/utils/endpoint/threadEndpoints";
 import { UserDto } from "@infrastructure/types/user";
@@ -11,13 +10,14 @@ import { PostMessage } from "./PostMessage";
 import { JoinThread } from "@/app/admin/client-threads/[thread_id]/Join";
 import { ButtonBack } from "../buttons/ButtonBack";
 import { useSession } from "next-auth/react";
+import { MessageWithUserDTO } from "@infrastructure/types/message";
 
-type Props = { thread: ThreadWithUser, defaultMessages: MessageWithUser[], userId: UserDto["id"], withSetting?: boolean, addElementInTop?: ReactNode }
+type Props = { thread: ThreadWithUser, defaultMessages: MessageWithUserDTO[], userId: UserDto["id"], withSetting?: boolean, addElementInTop?: ReactNode }
 
 export const WrapperThread = ({ thread, defaultMessages, userId, withSetting, addElementInTop }: Props) => {
     const { data: session } = useSession();
 
-    const [messages, setMessages] = useState<MessageWithUser[]>(defaultMessages);
+    const [messages, setMessages] = useState<MessageWithUserDTO[]>(defaultMessages);
     const bottomRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
         if (!socket) return;
