@@ -6,7 +6,6 @@ import { rawBankAccounts } from "../../seeds/bank_account";
 import { IBAN } from "@domain/values/IBAN";
 import { generateFrenchIBAN } from "../../seeds/utils";
 import { Color } from "@domain/values/Color";
-import { AccountOwner } from "@domain/values/AccountOwner";
 import { Money } from "@domain/values/Money";
 
 export async function generateBankAccountsMongo(
@@ -32,10 +31,7 @@ export async function generateBankAccountsMongo(
       const account = AccountEntity.from({
         ...raw,
         iban,
-        owner: AccountOwner.from({
-          role: "bank",
-          userId: null,
-        }),
+        userId: null,
         createdAt: clockService.now(),
         color,
         balance: Money.from({

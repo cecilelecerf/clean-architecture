@@ -1,4 +1,4 @@
-import { AccountNotFoundError,MissingIBANError,MissingOrInvalidNameError } from "@application/errors/accounts";
+import { AccountNotFoundError,MissingIBANError,MissingOrInvalidNameError, UnauthorizedAccessAccountError } from "@application/errors/accounts";
 import { InvalidAccountAccessError } from "@application/errors/accounts/InvalidAccountAccessError";
 import { UserNotActiveError, UserNotFoundError } from "@application/errors/users";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
@@ -26,6 +26,7 @@ export class RenameAccountUsecase {
   | UserNotFoundError 
   | UserNotActiveError
   | InvalidAccountAccessError
+  | UnauthorizedAccessAccountError
   | void> {
     if (!iban || iban.trim().length === 0) {
       return new MissingIBANError();
@@ -43,6 +44,10 @@ export class RenameAccountUsecase {
 
     const account = await this.accountRepository.findByIBAN(ibanVO);
     if (!account) return new AccountNotFoundError();
+
+    if (account.userId !== requestUserId) {
+      return new UnauthorizedAccessAccountError();
+    }
 
     const now = this.clockService.now();
     const renameResult = account.rename(newName, user, now);

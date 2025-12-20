@@ -39,7 +39,7 @@ export class DeleteAccountUsecase {
     const user = await findActiveUser(this.userRepository, requestUserId);
     if (user instanceof Error) return user;
 
-    if (!existingAccount.owner.belongsTo(user.id)) {
+    if (existingAccount.userId !== requestUserId) {
       return new UnauthorizedAccessAccountError();
     }
 

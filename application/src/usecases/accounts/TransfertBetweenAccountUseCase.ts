@@ -79,7 +79,7 @@ export class TransfertBetweenAccountUsecase {
     const user = await findActiveUser(this.userRepository, requestUserId);
     if (user instanceof Error) return user;
 
-    if (fromAccount.owner.userId !== requestUserId) {
+    if (fromAccount.userId !== requestUserId) {
       return new UnauthorizedAccessAccountError();
     }
 

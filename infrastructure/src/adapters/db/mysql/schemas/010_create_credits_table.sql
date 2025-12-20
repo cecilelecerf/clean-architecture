@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS credits (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
-    user_id VARCHAR(36) NOT NULL,
+    user_id VARCHAR(36) NULL,
     initial_amount DECIMAL(15,2) NOT NULL,
     initial_currency CHAR(3) NOT NULL,
     interest_rate DECIMAL(5,2) NOT NULL,

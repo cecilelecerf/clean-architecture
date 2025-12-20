@@ -7,7 +7,6 @@ import { EmailService } from "@application/ports/services/EmailService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 import { InvalidAccountNameError } from "@domain/errors/account";
-import { AccountOwner } from "@domain/values/AccountOwner";
 import { Color } from "@domain/values/Color";
 import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
@@ -50,7 +49,7 @@ export class CreateAccountUsecase {
     const ibanVO = IBAN.create(iban);
     if (ibanVO instanceof Error) return ibanVO;
 
-    const colorVO = Color.from(color);
+    const colorVO = Color.create(color);
     if (colorVO instanceof Error) return colorVO;
 
     const balanceVO = Money.create({
@@ -58,18 +57,12 @@ export class CreateAccountUsecase {
       currency,
     });
     if (balanceVO instanceof Error) return balanceVO;
-
-    const owner = AccountOwner.create({
-      role: "client",
-      userId: user.id,
-    });
-    if (owner instanceof Error) return owner;
     
     const today = this.clockService.now();
 
     const account = AccountEntity.create({
       iban: ibanVO,
-      owner,
+      userId: user.id,
       name,
       type: type,
       color: colorVO,

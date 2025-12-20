@@ -1,7 +1,6 @@
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { AccountOwner } from "@domain/values/AccountOwner";
 import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 import { Color } from "@domain/values/Color";
@@ -14,8 +13,6 @@ export class AccountRepositoryMySQL implements AccountRepository {
   private mapRowToAccount(row: RowDataPacket): AccountEntity {
     const iban = IBAN.from(row.iban);
 
-    const owner = AccountOwner.from({ role: row.role, userId: row.user_id });
-
     const balance = Money.from({
       amount: row.balance,
       currency: row.currency,
@@ -25,7 +22,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
 
     return AccountEntity.from({
       iban,
-      owner,
+      userId: row.user_id,
       name: row.name,
       type: row.type,
       color,
@@ -81,12 +78,11 @@ export class AccountRepositoryMySQL implements AccountRepository {
   async save(account: AccountEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO accounts 
-        (iban, role, user_id, name, type, color, balance, currency, created_at, updated_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (iban, user_id, name, type, color, balance, currency, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         account.iban.value,
-        account.owner.role,
-        account.owner.userId,
+        account.userId,,
         account.name,
         account.type,
         account.color.getValue(),
@@ -102,11 +98,10 @@ export class AccountRepositoryMySQL implements AccountRepository {
   async update(account: AccountEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE accounts 
-       SET user_id = ?, role = ?, name = ?, type = ?, color = ?, balance = ?, currency = ?, updated_at = ? 
+       SET user_id = ?, name = ?, type = ?, color = ?, balance = ?, currency = ?, updated_at = ? 
        WHERE iban = ?`,
       [
-        account.owner.userId,
-        account.owner.role,
+        account.userId,
         account.name,
         account.type,
         account.color.getValue(),

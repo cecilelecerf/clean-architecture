@@ -5,7 +5,6 @@ import { rawBankAccounts } from "../../seeds/bank_account";
 import { IBAN } from "@domain/values/IBAN";
 import { generateFrenchIBAN } from "../../seeds/utils";
 import { Color } from "@domain/values/Color";
-import { AccountOwner } from "@domain/values/AccountOwner";
 import { Money } from "@domain/values/Money";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 
@@ -37,10 +36,7 @@ export async function generateBankAccounts(
         iban,
         createdAt: clockService.now(),
         color,
-        owner: AccountOwner.from({
-          role: "bank",
-          userId: null,
-        }),
+        userId: null,
         balance: Money.from({
           amount: raw.balance,
           currency: raw.currency,

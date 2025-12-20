@@ -6,7 +6,6 @@ import { MongoClient } from "../../MongoClient";
 import { AccountModel } from "../models/AccountModel";
 import { Money } from "@domain/values/Money";
 import { Color } from "@domain/values/Color";
-import { AccountOwner } from "@domain/values/AccountOwner";
 
 export class AccountRepositoryMongo implements AccountRepository {
   constructor(private readonly client: MongoClient) {}
@@ -14,13 +13,12 @@ export class AccountRepositoryMongo implements AccountRepository {
   // 🔧 Méthode helper pour mapper un document MongoDB vers AccountEntity
   private mapDocToAccount(doc: any): AccountEntity {
     const iban = IBAN.from(doc.iban);
-    const owner = AccountOwner.from(doc.owner);
     const balance = Money.from(doc.balance);
     const color = Color.from(doc.color);
 
     return AccountEntity.from({
       iban,
-      owner,
+      userId: doc.userId,
       name: doc.name,
       type: doc.type,
       color,
@@ -81,10 +79,7 @@ export class AccountRepositoryMongo implements AccountRepository {
     await this.client.connect();
     await AccountModel.create({
       iban: account.iban.value,
-      owner: {
-        role: account.owner.role,
-        userId: account.owner.userId ?? null,
-      },
+      userId: account.userId,
       name: account.name,
       type: account.type,
       color: account.color.getValue(),
@@ -105,10 +100,7 @@ export class AccountRepositoryMongo implements AccountRepository {
       { iban: account.iban.value },
       {
         $set: {
-          owner: {
-            role: account.owner.role,
-            userId: account.owner.userId ?? null,
-          },
+          userId: account.userId,
           name: account.name,
           type: account.type,
           color: account.color.getValue(),
