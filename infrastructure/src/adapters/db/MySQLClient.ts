@@ -24,8 +24,6 @@ if (result.error) {
 }
 
 function getPool(): Pool {
-  console.log(process.env.MYSQL_HOST);
-  console.log(pool);
   if (!pool) {
     const config = {
       host: process.env.MYSQL_HOST,

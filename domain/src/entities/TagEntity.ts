@@ -38,7 +38,6 @@ export class TagEntity {
     return { id: this.id, label: this.label, color: this.color.getValue() };
   }
   public toDTO(): TagDTO {
-    console.log(this);
     return {
       id: this.id,
       label: this.label,
