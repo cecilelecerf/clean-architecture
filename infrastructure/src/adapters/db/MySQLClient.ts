@@ -1,30 +1,54 @@
 import mysql, { Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import { dirname, join, resolve } from "path";
+import { dirname, resolve } from "path";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+
+let pool: Pool;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// const envPath = join(process.cwd(), ".env");
-// dotenv.config({ path: envPath });
-dotenv.config({ path: resolve(__dirname, "../../../../.env") });
-let pool: Pool;
+const envPath = resolve(__dirname, "../../../../.env");
+const result = dotenv.config({ path: envPath });
+
+if (result.error) {
+  console.warn(`⚠️  Could not load .env file from ${envPath}`);
+  console.warn("Using environment variables from system");
+} else {
+  console.log(
+    `✅ Loaded ${
+      Object.keys(result.parsed || {}).length
+    } environment variables from ${envPath}`
+  );
+}
 
 function getPool(): Pool {
+  console.log(process.env.MYSQL_HOST);
+  console.log(pool);
   if (!pool) {
-    pool = mysql.createPool({
+    const config = {
       host: process.env.MYSQL_HOST,
       port: Number(process.env.MYSQL_PORT),
       user: process.env.MYSQL_USER,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DATABASE,
       waitForConnections: true,
-      connectionLimit: 10, // à ajuster selon ton serveur
+      connectionLimit: 10,
       queueLimit: 0,
       multipleStatements: true,
+    };
+
+    // Log de debug pour vérifier la configuration
+    console.log("🔌 Creating MySQL pool with config:", {
+      host: config.host,
+      port: config.port,
+      user: config.user,
+      database: config.database,
+      password: config.password,
     });
+
+    pool = mysql.createPool(config);
   }
   return pool;
 }
