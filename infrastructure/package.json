@@ -19,9 +19,9 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "domain": "workspace:*",
     "application": "workspace:*",
     "bcryptjs": "^3.0.2",
-    "domain": "workspace:*",
     "dotenv": "^17.2.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.0.1",

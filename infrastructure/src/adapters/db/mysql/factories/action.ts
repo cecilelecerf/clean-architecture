@@ -7,24 +7,24 @@ import { ManageActionAvailabilityUsecase } from "@application/usecases/actions/M
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 
 export const actionFactory = () => {
-    const client = new MySQLClient();
-    const actionRepository = new ActionRepositoryMySQL(client);
-    const userRepository = new UserRepositoryMySQL(client);
-    const clockService = new SystemClockService();
+  const client = new MySQLClient();
+  const actionRepository = new ActionRepositoryMySQL(client);
+  const userRepository = new UserRepositoryMySQL(client);
+  const clockService = new SystemClockService();
 
-    const createAction = new CreateActionUsecase(
-        actionRepository,
-        userRepository,
-        clockService
-    );
-    const manageActionAvailability = new ManageActionAvailabilityUsecase(
-        actionRepository
-    );
+  const createAction = new CreateActionUsecase(
+    actionRepository,
+    userRepository,
+    clockService
+  );
+  const manageActionAvailability = new ManageActionAvailabilityUsecase(
+    actionRepository
+  );
 
-    return {
-        admin: {
-            manageActionAvailability,
-            createAction
-        }
-    };
-}
+  return {
+    admin: {
+      manageActionAvailability,
+      createAction,
+    },
+  };
+};

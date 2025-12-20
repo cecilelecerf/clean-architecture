@@ -3,14 +3,18 @@ import { SavingsRateEntity } from "@domain/entities/SavingsRateEntity";
 import { Percentage } from "@domain/values/Percentage";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
- import { UuidService } from "@application/ports/services/UuidService";
-import { UserNotFoundError,UserNotActiveError,UserRoleMismatchError } from "@application/errors/users";
- import { InvalidPercentageError } from "@domain/errors/percentage";
+import { UuidService } from "@application/ports/services/UuidService";
+import {
+  UserNotFoundError,
+  UserNotActiveError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
+import { InvalidPercentageError } from "@domain/errors/percentage";
 import { ClockService } from "@application/ports/services/ClockService";
 
 interface Props {
-  rate : number;
-  effectiveDate : string;
+  rate: number;
+  effectiveDate: string;
   userId: string;
 }
 
@@ -26,18 +30,20 @@ export class SetSavingsRateUsecase {
   public async execute({
     rate,
     effectiveDate,
-    userId
+    userId,
   }: Props): Promise<
-      | UserRoleMismatchError
-      | UserNotFoundError
-      | UserNotActiveError
-      | InvalidPercentageError
-      | void
-    > {
+    | UserRoleMismatchError
+    | UserNotFoundError
+    | UserNotActiveError
+    | InvalidPercentageError
+    | void
+  > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-    if (user.hasRole({ role: "client" }) ||
-      (user.hasRole({ role: "conseiller" })))
+    if (
+      user.hasRole({ role: "client" }) ||
+      user.hasRole({ role: "conseiller" })
+    )
       return new UserRoleMismatchError(["directeur"], user.role);
 
     const percentage = Percentage.create(rate);
@@ -53,7 +59,8 @@ export class SetSavingsRateUsecase {
       id: this.uuidService.generate(),
       rate: percentage,
       effectiveDate: effectiveDateResult,
-      createdAt: today
+      createdAt: today,
+      updatedAt: today,
     });
 
     await this.configRepository.save(savingsRate);

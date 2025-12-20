@@ -1,13 +1,21 @@
 import { InvalidCreditDurationError } from "@application/errors/credits";
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { CreditEntity } from "@domain/entities/CreditEntity";
-import { UserEntity } from "@domain/entities/UserEntity"; 
-import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import { UserEntity } from "@domain/entities/UserEntity";
+import {
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
 import { InvalidPercentageError } from "@domain/errors/percentage";
 import { Money } from "@domain/values/Money";
 import { Percentage } from "@domain/values/Percentage";
@@ -92,7 +100,8 @@ export class GrantCreditUsecase {
       startDate,
       monthlyPayment: initialAmountVO, // placeholder
       remainingBalance: initialAmountVO,
-      createdAt: startDate
+      createdAt: startDate,
+      updatedAt: startDate,
     });
 
     const monthlyPayment = tempCredit.calculateMonthlyPayment();

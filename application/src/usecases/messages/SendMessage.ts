@@ -1,5 +1,11 @@
-import { InvalidThreadAccessError,ThreadNotFoundError } from "@application/errors/threads";
- import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
+import {
+  InvalidThreadAccessError,
+  ThreadNotFoundError,
+} from "@application/errors/threads";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import {
   MessageRepository,
   MessageWithUser,
@@ -61,6 +67,6 @@ export class SendMessage {
     if (validateContent instanceof Error) return validateContent;
     await this.messageRepository.save(message);
 
-    return Object.assign(message, { sender: user });
+    return Object.assign(message, { sender: user.toFront() });
   }
 }
