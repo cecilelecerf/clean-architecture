@@ -10,13 +10,15 @@ import { match } from "ts-pattern";
 import { PostMessage } from "./PostMessage";
 import { JoinThread } from "@/app/admin/client-threads/[thread_id]/Join";
 import { ButtonBack } from "../buttons/ButtonBack";
+import { useSession } from "next-auth/react";
 
 type Props = { thread: ThreadWithUser, defaultMessages: MessageWithUser[], userId: UserDto["id"], withSetting?: boolean, addElementInTop?: ReactNode }
 
 export const WrapperThread = ({ thread, defaultMessages, userId, withSetting, addElementInTop }: Props) => {
+    const { data: session } = useSession();
+
     const [messages, setMessages] = useState<MessageWithUser[]>(defaultMessages);
     const bottomRef = useRef<HTMLDivElement | null>(null);
-
     useEffect(() => {
         if (!socket) return;
         socket.emit("thread:join", { threadId: thread.id });
@@ -52,24 +54,22 @@ export const WrapperThread = ({ thread, defaultMessages, userId, withSetting, ad
                 </Flex>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-scroll space-y-3   max-h-[60vh] sm:max-h-[70vh] md:max-h-[72vh] min-h-[60vh] sm:min-h-[70vh] md:min-h-[72vh]">
+                <div className="flex-1 overflow-y-scroll space-y-3 max-h-[60vh] sm:max-h-[67vh] md:max-h-[65vh] min-h-[60vh] sm:min-h-[67vh] md:min-h-[65vh] ">
                     {messages.map((msg) => (<MessageComponent key={msg.id} {...msg} isCurrentUser={msg.senderId === userId} />))}
                     <div ref={bottomRef} />
                 </div>
                 {match({
                     haveAdministrator: !!thread.administratorId,
-                    isClose: thread.isClose
+                    isClose: thread.isClose,
+                    role: session.user.role
                 })
                     .with({ isClose: true }, () =>
                         <p className='w-full bg-red-200 text-red-900 rounded-sm text-center p-2 font-bold'>Discussion fermée</p>
                     )
-                    .with({ haveAdministrator: true }, () =>
-                        <PostMessage threadId={thread.id} />
-                    )
-                    .with({ haveAdministrator: false }, () =>
+                    .with({ haveAdministrator: false, role: "conseiller" }, () =>
                         <JoinThread threadId={thread.id} />
                     )
-                    .exhaustive()
+                    .otherwise(() => <PostMessage threadId={thread.id} />)
                 }
             </div>
         </div>

@@ -1,6 +1,11 @@
 import { Color } from "@domain/values/Color";
 
-export type TagToFront = Pick<TagEntity, "id" | "label" | "color">;
+export type TagDTO = { color: string } & Pick<
+  TagEntity,
+  "id" | "label" | "updatedAt" | "createdAt"
+>;
+
+export type TagClientDTO = Pick<TagDTO, "id" | "color" | "label">;
 export class TagEntity {
   private constructor(
     public id: string,
@@ -29,7 +34,17 @@ export class TagEntity {
     this.color = newColor;
     this.updatedAt = new Date();
   }
-  public toFront(): TagToFront {
-    return { id: this.id, label: this.label, color: this.color };
+  public toClientDTO(): TagClientDTO {
+    return { id: this.id, label: this.label, color: this.color.getValue() };
+  }
+  public toDTO(): TagDTO {
+    console.log(this);
+    return {
+      id: this.id,
+      label: this.label,
+      color: this.color.getValue(),
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
   }
 }

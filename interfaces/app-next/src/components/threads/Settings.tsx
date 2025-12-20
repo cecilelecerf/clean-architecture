@@ -18,12 +18,12 @@ import { match } from "ts-pattern"
 
 type Props = {} & ThreadWithUser
 
-export const Settings = ({ administrator, participants, participantsId, isClose, id }: Props) => {
+export const Settings = ({ administrator, participants, participantsId, isClose, id, type }: Props) => {
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
     const transfer = useMutation(endpoints.threads.transfer({ threadId: id }))
     const removeParticipant = useMutation(endpoints.threads.participants.remove({ threadId: id }))
-    const isAdmin = session.user.id === administrator.id
+    const isAdmin = administrator ? session.user.id === administrator.id : false
     return (
         <Dialog>
             <DialogTrigger asChild><Button size="icon" variant="ghost"><SettingsIcon /></Button></DialogTrigger>
@@ -31,7 +31,11 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                 <DialogHeader>
                     <DialogTitle>Paramètre de discution</DialogTitle>
                     <DialogDescription>
-                        Administrateur : {administrator.firstname}{" "}{administrator.lastname}
+                        {administrator && (
+                            <>
+                                Administrateur : {administrator.firstname}{" "}{administrator.lastname}
+                            </>
+                        )}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -78,7 +82,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                         </Flex>
                     )}
                 </Flex>
-                {isAdmin && (
+                {isAdmin && type === "internal" && (
                     <AddParticipant administratorId={administrator.id} participantsId={participantsId} id={id} />
                 )}
                 <DialogFooter >

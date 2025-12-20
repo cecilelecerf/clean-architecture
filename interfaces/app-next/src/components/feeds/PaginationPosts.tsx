@@ -2,7 +2,6 @@
 import { FiltersProps } from "@/utils/endpoint/feedsEndpoint"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 
-
 type Props = { filters: FiltersProps, totalPage: number, onPaginationChange: (page: number) => void }
 
 export const PaginationPosts = ({ filters, totalPage, onPaginationChange }: Props) => {

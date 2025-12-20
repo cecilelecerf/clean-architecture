@@ -8,7 +8,7 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { TagEntity } from "@domain/entities/TagEntity";
+import { TagDTO, TagEntity } from "@domain/entities/TagEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { ColorInvalidFormatError } from "@domain/errors/color";
 import { Color } from "@domain/values/Color";
@@ -32,7 +32,7 @@ export class AddTagUseCase {
     color,
     advisorId,
   }: CreateTagInput): Promise<
-    | TagEntity
+    | TagDTO
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -56,6 +56,6 @@ export class AddTagUseCase {
     });
 
     await this.tagRepository.save(tag);
-    return tag;
+    return tag.toDTO();
   }
 }

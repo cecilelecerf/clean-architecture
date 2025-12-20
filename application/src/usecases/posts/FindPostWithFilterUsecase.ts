@@ -7,9 +7,12 @@ import {
   UserNotFoundError,
   UserRoleMismatchError,
 } from "@application/errors/users";
-import { PostEntity } from "@domain/entities/PostEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { InvalidPaginationLimitError } from "@application/errors/posts/InvalidPaginationLimitError";
+import {
+  PostDTOMapper,
+  PostWithTagsAndUsersDTO,
+} from "@application/dto/PostDTOMapper";
 
 type Props = {
   fromDate?: Date;
@@ -39,7 +42,7 @@ export class FindPostWithFilterUsecase {
     status,
   }: Props): Promise<
     | {
-        posts: PostEntity[];
+        posts: PostWithTagsAndUsersDTO[];
         total: number;
       }
     | UserNotFoundError
@@ -68,6 +71,6 @@ export class FindPostWithFilterUsecase {
         { page, limit }
       );
 
-    return posts;
+    return { posts: PostDTOMapper.maps(posts.posts), total: posts.total };
   }
 }

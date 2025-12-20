@@ -62,7 +62,6 @@ export class TransferThreadUsecase {
       return new UserRoleMismatchError([expectedRole], administrator.role);
     if (!newAdministrator.hasRole({ role: expectedRole }))
       return new UserRoleMismatchError([expectedRole], newAdministrator.role);
-    console.log(thread);
     const updateThread = thread.transferTo(
       newAdministratorId,
       this.clockService.now()

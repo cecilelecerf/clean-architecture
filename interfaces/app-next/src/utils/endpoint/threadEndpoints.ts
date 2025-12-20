@@ -78,6 +78,17 @@ export const threadsEndpoint = createEndpointsNodes({
         ),
     }),
 
+  // GET /api/threads/advisor
+  // Liste des threads d'un advisor et des sans admin
+  advisorGetAll: () =>
+    queryOptions({
+      queryKey: ['threads', 'list', 'advisor'],
+      queryFn: () => {
+        return get(`/threads/advisor`).then((data) =>
+          safeParseWithLog(threadWithUserSchema.array(), data),
+        );
+      },
+    }),
   // POST /api/threads
   // Créer un nouveau thread (externe ou interne)
   create: ({ type }: { type: Thread['type'] }) =>

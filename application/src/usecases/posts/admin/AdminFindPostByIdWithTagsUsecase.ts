@@ -7,9 +7,9 @@ import {
 import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import {
-  PostToFrontMapper,
-  PostWithTagsAndUsersToFront,
-} from "@application/toFronts/PostToFrontMapper";
+  PostDTOMapper,
+  PostWithTagsAndUsersDTO,
+} from "@application/dto/PostDTOMapper";
 import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 type Props = {
@@ -25,7 +25,7 @@ export class AdminFindPostByIdWithTagsUsecase {
     userId,
     id: postId,
   }: Props): Promise<
-    | PostWithTagsAndUsersToFront
+    | PostWithTagsAndUsersDTO
     | UserNotFoundError
     | UserNotActiveError
     | PostNotFoundError
@@ -40,6 +40,6 @@ export class AdminFindPostByIdWithTagsUsecase {
     const post = await this.feedRepository.findWithTagsAndUserById(postId);
     if (!post) return new PostNotFoundError();
 
-    return PostToFrontMapper.map(post);
+    return PostDTOMapper.map(post);
   }
 }

@@ -8,9 +8,9 @@ import {
 } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import {
-  ThreadEntityWithUsersToFront,
-  ThreadToFrontMapper,
-} from "@application/toFronts/ThreadToFrontMapper";
+  ThreadEntityWithUsersDTO,
+  ThreadDTOMapper,
+} from "@application/dto/ThreadDTOMapper";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 type Props = { administratorId: UserEntity["id"] };
@@ -23,10 +23,11 @@ export class GetAdvisorThreadsUsecase {
   async execute({
     administratorId,
   }: Props): Promise<
-    ThreadEntityWithUsersToFront[] | UserNotFoundError | UserNotActiveError
+    ThreadEntityWithUsersDTO[] | UserNotFoundError | UserNotActiveError
   > {
     const user = await findActiveUser(this.userRepository, administratorId);
     if (user instanceof Error) return user;
+
     const administratorThread =
       await this.threadRepository.findAllWithUserByAdministratorIdAndType(
         user.id,
@@ -38,6 +39,6 @@ export class GetAdvisorThreadsUsecase {
       ...administratorThread,
       ...nullableAdministratorThread,
     ];
-    return ThreadToFrontMapper.maps(threads);
+    return ThreadDTOMapper.maps(threads);
   }
 }

@@ -8,9 +8,9 @@ import {
   UserRoleMismatchError,
 } from "@application/errors/users";
 import {
-  PostToFrontMapper,
-  PostWithTagsAndUsersToFront,
-} from "@application/toFronts/PostToFrontMapper";
+  PostDTOMapper,
+  PostWithTagsAndUsersDTO,
+} from "@application/dto/PostDTOMapper";
 
 type Props = {
   clientId: UserEntity["id"];
@@ -25,7 +25,7 @@ export class GetUnreadPostWithTagUsecase {
   public async execute({
     clientId,
   }: Props): Promise<
-    | PostWithTagsAndUsersToFront[]
+    | PostWithTagsAndUsersDTO[]
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -36,6 +36,6 @@ export class GetUnreadPostWithTagUsecase {
       return new UserRoleMismatchError(["client"], user.role);
 
     const posts = await this.postRepository.findAllUnreadWithTags(clientId);
-    return PostToFrontMapper.maps(posts);
+    return PostDTOMapper.maps(posts);
   }
 }

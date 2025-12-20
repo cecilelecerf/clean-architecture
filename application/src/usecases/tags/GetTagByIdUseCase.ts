@@ -1,9 +1,13 @@
 import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { TagEntity } from "@domain/entities/TagEntity";
+import { TagDTO, TagEntity } from "@domain/entities/TagEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 type Props = { id: TagEntity["id"]; administratorId: UserEntity["id"] };
 export class GetTagByIdUseCase {
@@ -16,7 +20,7 @@ export class GetTagByIdUseCase {
     id,
     administratorId,
   }: Props): Promise<
-    | TagEntity
+    | TagDTO
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -29,6 +33,6 @@ export class GetTagByIdUseCase {
 
     const tag = await this.tagRepository.findById(id);
     if (!tag) return new TagNotFoundError();
-    return tag;
+    return tag.toDTO();
   }
 }

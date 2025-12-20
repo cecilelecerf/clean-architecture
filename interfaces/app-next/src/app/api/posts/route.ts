@@ -14,10 +14,11 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const paramsObj: Record<string, string | boolean | number> = {};
+    const paramsObj: Record<string, string | boolean | number | string[]> = {};
     searchParams.forEach((val, key) => {
       if (key === 'limit' || key === 'page') return (paramsObj[key] = Number(val));
       if (key === 'status') return (paramsObj[key] = val === 'true');
+      if (key === 'tagsId') return (paramsObj[key] = val.split(','));
       paramsObj[key] = val;
     });
     const parsed = querySchema.parse(paramsObj);

@@ -2,13 +2,13 @@ import { ThreadEntityWithUsers } from "@application/ports/repositories/ThreadRep
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserToFront } from "@domain/entities/UserEntity";
 
-export type ThreadEntityWithUsersToFront = ThreadEntity & {
+export type ThreadEntityWithUsersDTO = ThreadEntity & {
   administrator: UserToFront | null;
   participants: UserToFront[];
 };
 
-export class ThreadToFrontMapper {
-  static map(thread: ThreadEntityWithUsers): ThreadEntityWithUsersToFront {
+export class ThreadDTOMapper {
+  static map(thread: ThreadEntityWithUsers): ThreadEntityWithUsersDTO {
     return Object.assign(thread, {
       administrator: thread.administrator
         ? thread.administrator.toFront()
@@ -16,9 +16,7 @@ export class ThreadToFrontMapper {
       participants: thread.participants.map((p) => p.toFront()),
     });
   }
-  static maps(
-    threads: ThreadEntityWithUsers[]
-  ): ThreadEntityWithUsersToFront[] {
+  static maps(threads: ThreadEntityWithUsers[]): ThreadEntityWithUsersDTO[] {
     return threads.map((thread) => this.map(thread));
   }
 }

@@ -9,9 +9,9 @@ import {
 } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import {
-  ThreadEntityWithUsersToFront,
-  ThreadToFrontMapper,
-} from "@application/toFronts/ThreadToFrontMapper";
+  ThreadEntityWithUsersDTO,
+  ThreadDTOMapper,
+} from "@application/dto/ThreadDTOMapper";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 type Props = { advisorId: UserEntity["id"] };
@@ -24,7 +24,7 @@ export class DirectorFindAllThreadUsecase {
   async execute({
     advisorId,
   }: Props): Promise<
-    | ThreadEntityWithUsersToFront[]
+    | ThreadEntityWithUsersDTO[]
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -45,6 +45,6 @@ export class DirectorFindAllThreadUsecase {
         advisor.id,
         "internal"
       );
-    return ThreadToFrontMapper.maps(threadsAdmin.concat(threadsParticipant));
+    return ThreadDTOMapper.maps(threadsAdmin.concat(threadsParticipant));
   }
 }

@@ -9,9 +9,9 @@ import {
 } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import {
-  ThreadEntityWithUsersToFront,
-  ThreadToFrontMapper,
-} from "@application/toFronts/ThreadToFrontMapper";
+  ThreadEntityWithUsersDTO,
+  ThreadDTOMapper,
+} from "@application/dto/ThreadDTOMapper";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
@@ -31,7 +31,7 @@ export class GetThreadsByUserAndTypeUsecase {
     type,
     advisorId,
   }: Props): Promise<
-    | ThreadEntityWithUsersToFront[]
+    | ThreadEntityWithUsersDTO[]
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -66,7 +66,8 @@ export class GetThreadsByUserAndTypeUsecase {
         userId,
         type
       );
+
     const threads = [...threadsAdmin, ...threadsParticipant];
-    return ThreadToFrontMapper.maps(threads);
+    return ThreadDTOMapper.maps(threads);
   }
 }
