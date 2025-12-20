@@ -128,12 +128,6 @@ export class AccountEntity {
     return trimedName;
   }
 
-  // public canBeModifiedBy(user: UserEntity): boolean {
-  //   return (
-  //     user.hasRole({ role: "client" }) && user.id === this.userId
-  //   );
-  // }
-
   public isBankAccount(): boolean {
     return this.userId === null;
   }
@@ -158,11 +152,7 @@ export class AccountEntity {
     if (!user.hasRole({ role: "client" })) {
       return new InvalidAccountNameError();
     }
-
-    if (!this.canBeRenamedBy(user)) {
-      return new InvalidAccountNameError();
-    }
-
+    
     const verifiedName = AccountEntity.verifyName(newName);
     if (verifiedName instanceof Error) return verifiedName;
 

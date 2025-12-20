@@ -60,9 +60,14 @@ export class CreateAccountUsecase {
     
     const today = this.clockService.now();
 
+    var requestUser = null;
+    if(user.hasRole({ role: "client" }) && user.id === userId){
+      requestUser = userId;
+    }
+
     const account = AccountEntity.create({
       iban: ibanVO,
-      userId: user.id,
+      userId: requestUser,
       name,
       type: type,
       color: colorVO,
