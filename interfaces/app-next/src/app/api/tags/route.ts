@@ -16,8 +16,7 @@ export async function GET() {
     if (result instanceof Error) {
       return NextResponse.json({ name: result.name, message: result.message }, { status: 404 });
     }
-
-    return NextResponse.json(tagSchema.array().parse(result));
+    return NextResponse.json(result);
   } catch (err) {
     console.error(err);
     return NextResponse.json(

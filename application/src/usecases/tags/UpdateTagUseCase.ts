@@ -1,9 +1,13 @@
 import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { TagEntity } from "@domain/entities/TagEntity";
+import { TagDTO, TagEntity } from "@domain/entities/TagEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { ColorInvalidFormatError } from "@domain/errors/color";
 import { Color } from "@domain/values/Color";
@@ -27,7 +31,7 @@ export class UpdateTagUseCase {
     administratorId,
     id,
   }: Props): Promise<
-    | TagEntity
+    | TagDTO
     | UserRoleMismatchError
     | UserNotFoundError
     | UserNotActiveError
@@ -54,6 +58,6 @@ export class UpdateTagUseCase {
     if (colorVo) tag.changeColor(colorVo);
 
     await this.tagRepository.update(tag);
-    return tag;
+    return tag.toDTO();
   }
 }

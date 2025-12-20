@@ -8,6 +8,7 @@ import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { NewThread } from '@/app/api/threads/route';
+import { AddParticipant } from '@/app/api/threads/[threadId]/transfer/route';
 
 // ============================================================================
 // SCHEMAS
@@ -77,6 +78,17 @@ export const threadsEndpoint = createEndpointsNodes({
         ),
     }),
 
+  // GET /api/threads/advisor
+  // Liste des threads d'un advisor et des sans admin
+  advisorGetAll: () =>
+    queryOptions({
+      queryKey: ['threads', 'list', 'advisor'],
+      queryFn: () => {
+        return get(`/threads/advisor`).then((data) =>
+          safeParseWithLog(threadWithUserSchema.array(), data),
+        );
+      },
+    }),
   // POST /api/threads
   // Créer un nouveau thread (externe ou interne)
   create: ({ type }: { type: Thread['type'] }) =>
@@ -131,7 +143,7 @@ export const threadsEndpoint = createEndpointsNodes({
   // Transférer un thread à un autre conseiller
   transfer: ({ threadId }: { threadId: ThreadId }) =>
     mutationOptions({
-      mutationFn: ({ newAdministratorId }: { newAdministratorId: UserId }) =>
+      mutationFn: ({ newAdministratorId }: AddParticipant) =>
         post(`/threads/${threadId}/transfer`, { newAdministratorId }),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['threads', threadId] });

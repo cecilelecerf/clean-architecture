@@ -1,12 +1,18 @@
-import { InvalidThreadAccessError,ThreadNotFoundError } from "@application/errors/threads";
-import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
+import {
+  InvalidThreadAccessError,
+  ThreadNotFoundError,
+} from "@application/errors/threads";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { InvalidTitleError,ThreadClosedError } from "@domain/errors/thread"; 
+import { InvalidTitleError, ThreadClosedError } from "@domain/errors/thread";
 
 type Props = {
   userId: UserEntity["id"];

@@ -3,10 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
 
- export async function GET(
-  req: NextRequest,
-  ctx: RouteContext<'/api/threads/[threadId]'>,
-) {
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/threads/[threadId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -14,7 +11,10 @@ import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/thre
     }
     const { threadId } = await ctx.params;
 
-    const thread = await threadsFactory().getThreadById.execute({threadId, userId: session.user.id});
+    const thread = await threadsFactory().getThreadById.execute({
+      threadId,
+      userId: session.user.id,
+    });
     if (thread instanceof Error) {
       return NextResponse.json(
         { name: thread.name, message: thread.message },
@@ -29,8 +29,7 @@ import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/thre
   }
 }
 
-export async function PATCH(req: NextRequest,  ctx: RouteContext<'/api/threads/[threadId]'>,
-) {
+export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/threads/[threadId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -39,26 +38,26 @@ export async function PATCH(req: NextRequest,  ctx: RouteContext<'/api/threads/[
     const { threadId } = await ctx.params;
 
     const body = await req.json();
-    const {  title} = body;
-     
-    const thread = await threadsFactory().updateThreadTitle.execute({userId:session.user.id, threadId :threadId, title });
+    const { title } = body;
+
+    const thread = await threadsFactory().updateThreadTitle.execute({
+      userId: session.user.id,
+      threadId: threadId,
+      title,
+    });
     if (thread instanceof Error) {
       return NextResponse.json(
         { name: thread.name, message: thread.message },
         { status: thread.statusCode ?? 404 },
       );
     }
-    
+
     return NextResponse.json(thread);
-    
-
-
-
   } catch (err) {
     console.error('Error in POST /api/threads:', err);
     return NextResponse.json(
       { message: err instanceof Error ? err.message : 'Erreur serveur' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

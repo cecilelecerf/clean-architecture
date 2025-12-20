@@ -1,8 +1,5 @@
 import { findActiveUser } from "@application/utils/userValidators";
-import {
-  PostRepository,
-  PostWithTagsAndUser,
-} from "../../ports/repositories/PostRepository";
+import { PostRepository } from "../../ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { UserEntity } from "@domain/entities/UserEntity";
 import {
@@ -10,6 +7,10 @@ import {
   UserNotFoundError,
   UserRoleMismatchError,
 } from "@application/errors/users";
+import {
+  PostDTOMapper,
+  PostWithTagsAndUsersDTO,
+} from "@application/dto/PostDTOMapper";
 
 type Props = {
   clientId: UserEntity["id"];
@@ -24,7 +25,7 @@ export class GetUnreadPostWithTagUsecase {
   public async execute({
     clientId,
   }: Props): Promise<
-    | PostWithTagsAndUser[]
+    | PostWithTagsAndUsersDTO[]
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -35,6 +36,6 @@ export class GetUnreadPostWithTagUsecase {
       return new UserRoleMismatchError(["client"], user.role);
 
     const posts = await this.postRepository.findAllUnreadWithTags(clientId);
-    return posts;
+    return PostDTOMapper.maps(posts);
   }
 }

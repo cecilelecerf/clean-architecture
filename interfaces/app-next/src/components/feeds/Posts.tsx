@@ -10,7 +10,9 @@ import { socket } from "@/lib/socket"
 import { queryClient } from "@/lib/queryClient"
 import { FiltersProps } from "@/utils/endpoint/feedsEndpoint"
 
-export const Posts = ({ filters, onPaginationChange }: { filters: FiltersProps, onPaginationChange: (pageNumber: number) => void }) => {
+type Props = { filters: FiltersProps, onPaginationChange: (pageNumber: number) => void, isAdmin?: boolean }
+
+export const Posts = ({ filters, onPaginationChange, isAdmin }: Props) => {
     const query = useQuery(endpoints.feeds.posts.getAll({ filters }))
     useEffect(() => {
         if (!socket) return;
@@ -31,7 +33,7 @@ export const Posts = ({ filters, onPaginationChange }: { filters: FiltersProps, 
                     <div className="text-gray-500">Aucun post trouvé</div>
                 ) : (
                     data.posts.map((post) => (
-                        <DisplayPost dataPost={post} key={post.id} />
+                        <DisplayPost dataPost={post} key={post.id} isAdmin={isAdmin} />
                     ))
                 )}
                 <PaginationPosts onPaginationChange={onPaginationChange} totalPage={data.total} filters={filters} />
@@ -42,7 +44,7 @@ export const Posts = ({ filters, onPaginationChange }: { filters: FiltersProps, 
         .exhaustive()
 }
 
-const DisplayPost = ({ dataPost }: { dataPost: PostWithTagsAndUser }) => {
+const DisplayPost = ({ dataPost, isAdmin }: { dataPost: PostWithTagsAndUser, isAdmin?: boolean }) => {
     const [post, setPost] = useState<PostWithTagsAndUser>(dataPost)
 
     useEffect(() => {
@@ -56,6 +58,9 @@ const DisplayPost = ({ dataPost }: { dataPost: PostWithTagsAndUser }) => {
             socket.off(eventName);
         };
     }, []);
+    useEffect(() => {
+        setPost(dataPost)
+    }, [dataPost])
 
-    return <PostCard post={post} key={post.id} />
+    return <PostCard post={post} key={post.id} isAdmin={isAdmin} />
 }

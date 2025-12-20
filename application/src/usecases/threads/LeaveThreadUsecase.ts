@@ -1,5 +1,11 @@
-import { InvalidThreadAccessError,ThreadNotFoundError } from "@application/errors/threads/";
-import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
+import {
+  InvalidThreadAccessError,
+  ThreadNotFoundError,
+} from "@application/errors/threads/";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
@@ -39,7 +45,7 @@ export class LeaveThreadUsecase {
     );
     if (updateThread instanceof Error) return updateThread;
 
-    this.threadRepository.save(updateThread);
+    this.threadRepository.update(updateThread);
     return updateThread;
   }
 }

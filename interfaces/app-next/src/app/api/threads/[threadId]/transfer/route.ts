@@ -4,7 +4,11 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
 import z from 'zod';
 import { userIdSchema } from '@infrastructure/types/user';
-export async function PATCH(
+import { safeParseWithLog } from '@/lib/zodUtils';
+
+const addParticipantSchema = z.object({ newAdministratorId: userIdSchema });
+export type AddParticipant = z.infer<typeof addParticipantSchema>;
+export async function POST(
   req: NextRequest,
   ctx: RouteContext<'/api/threads/[threadId]/transfer'>,
 ) {
@@ -15,12 +19,12 @@ export async function PATCH(
     }
     const { threadId } = await ctx.params;
     const body = await req.json();
-    const payload = z.object({ advisor: userIdSchema }).parse(body);
+    const payload = safeParseWithLog(addParticipantSchema, body);
 
     const thread = await threadsFactory().transferThread.execute({
       id: threadId,
       administratorId: session.user.id,
-      newAdministratorId: payload.advisor,
+      newAdministratorId: payload.newAdministratorId,
     });
     if (thread instanceof Error) {
       return NextResponse.json(

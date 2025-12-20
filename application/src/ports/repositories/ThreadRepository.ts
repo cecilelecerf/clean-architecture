@@ -2,8 +2,8 @@ import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserToFront, UserEntity } from "@domain/entities/UserEntity";
 
 export type ThreadEntityWithUsers = ThreadEntity & {
-  administrator: UserToFront | null;
-  participants: UserToFront[];
+  administrator: UserEntity | null;
+  participants: UserEntity[];
 };
 
 export interface ThreadRepository {

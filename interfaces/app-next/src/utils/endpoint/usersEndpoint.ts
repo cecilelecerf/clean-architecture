@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { get } from '@/lib/apiClient';
-import { User, userDtoSchema, UserId, userSchema } from '@infrastructure/types/user';
+import { User, userDtoSchema, UserId } from '@infrastructure/types/user';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 

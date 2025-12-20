@@ -9,10 +9,7 @@ let pool: Pool;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// Reset et seeds db
 const envPath = resolve(__dirname, "../../../../.env");
-// Next
-// const envPath = resolve(__dirname, "../../../../../.env");
 const result = dotenv.config({ path: envPath });
 
 if (result.error) {
@@ -27,8 +24,6 @@ if (result.error) {
 }
 
 function getPool(): Pool {
-  console.log(process.env.MYSQL_HOST);
-  console.log(pool);
   if (!pool) {
     const config = {
       host: process.env.MYSQL_HOST,

@@ -7,9 +7,10 @@ import { Badge } from "@/components/ui/badge";
 
 type PostCardProps = {
     post: PostWithTagsAndUser;
+    isAdmin?: boolean
 };
 
-export const PostCard = ({ post }: PostCardProps) => {
+export const PostCard = ({ post, isAdmin }: PostCardProps) => {
     const router = useRouter();
 
     const { data: session } = useSession();
@@ -25,9 +26,13 @@ export const PostCard = ({ post }: PostCardProps) => {
             <div>
 
                 <div className="flex flex-col sm:flex-row justify-between gap-1 mb-3">
-                    <h2 className="text-xl font-bold">{post.title}<Badge variant={post.publishedAt ? "secondary" : "outline"} className="h-fit ml-2">
-                        {post.publishedAt ? "Publié" : "Brouillon"}
-                    </Badge></h2>
+                    <h2 className="text-xl font-bold">{post.title}
+                        {isAdmin && (
+                            <Badge variant={post.publishedAt ? "secondary" : "outline"} className="h-fit ml-2">
+                                {post.publishedAt ? "Publié" : "Brouillon"}
+                            </Badge>
+                        )}
+                    </h2>
                 </div>
 
                 <p className="text-gray-700 mb-4 line-clamp-3">{post.content}</p>
