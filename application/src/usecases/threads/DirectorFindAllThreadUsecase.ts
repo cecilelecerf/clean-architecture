@@ -8,6 +8,10 @@ import {
   ThreadRepository,
 } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
+import {
+  ThreadEntityWithUsersDTO,
+  ThreadDTOMapper,
+} from "@application/dto/ThreadDTOMapper";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 type Props = { advisorId: UserEntity["id"] };
@@ -20,7 +24,7 @@ export class DirectorFindAllThreadUsecase {
   async execute({
     advisorId,
   }: Props): Promise<
-    | ThreadEntityWithUsers[]
+    | ThreadEntityWithUsersDTO[]
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -32,9 +36,15 @@ export class DirectorFindAllThreadUsecase {
       return new UserRoleMismatchError(["directeur"], advisor.role);
 
     const threadsParticipant =
-      await this.threadRepository.findAllWithUserByParticipantId(advisor.id);
+      await this.threadRepository.findAllWithUserByParticipantIdAndType(
+        advisor.id,
+        "internal"
+      );
     const threadsAdmin =
-      await this.threadRepository.findAllWithUserByAdministratorId(advisor.id);
-    return threadsAdmin.concat(threadsParticipant);
+      await this.threadRepository.findAllWithUserByAdministratorIdAndType(
+        advisor.id,
+        "internal"
+      );
+    return ThreadDTOMapper.maps(threadsAdmin.concat(threadsParticipant));
   }
 }

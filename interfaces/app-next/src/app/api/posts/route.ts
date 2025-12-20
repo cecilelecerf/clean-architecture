@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
- import { postSchema } from '@infrastructure/types/feed';
+import { postSchema } from '@infrastructure/types/feed';
 import z from 'zod';
 import { newPostSchema, querySchema } from '@/utils/endpoint/feedsEndpoint';
 
@@ -14,13 +14,14 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const paramsObj: Record<string, string | boolean | number> = {};
+    const paramsObj: Record<string, string | boolean | number | string[]> = {};
     searchParams.forEach((val, key) => {
       if (key === 'limit' || key === 'page') return (paramsObj[key] = Number(val));
-      if (key === 'status' ) return (paramsObj[key] =val ==="true");
+      if (key === 'status') return (paramsObj[key] = val === 'true');
+      if (key === 'tagsId') return (paramsObj[key] = val.split(','));
       paramsObj[key] = val;
     });
-     const parsed = querySchema.parse(paramsObj);
+    const parsed = querySchema.parse(paramsObj);
     const result = await postsFactory().getPostWithFilter.execute({
       page: parsed.page,
       limit: parsed.limit,
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest) {
       userId: session.user.id,
       fromDate: parsed.fromDate && new Date(parsed.fromDate),
       toDate: parsed.toDate && new Date(parsed.toDate),
-      status: parsed.status
+      status: parsed.status,
     });
 
     if (result instanceof Error) {

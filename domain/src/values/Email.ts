@@ -18,6 +18,10 @@ export class Email {
     return new Email(sanitized);
   }
 
+  public static from(email: string) {
+    return new Email(email);
+  }
+
   public is(other: Email): boolean {
     return this.value === other.value;
   }

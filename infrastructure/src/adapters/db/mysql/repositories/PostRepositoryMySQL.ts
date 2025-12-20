@@ -7,6 +7,8 @@ import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { Email } from "@domain/values/Email";
+import { Color } from "@domain/values/Color";
 
 export class PostRepositoryMySQL implements PostRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -24,7 +26,7 @@ export class PostRepositoryMySQL implements PostRepository {
       content: row.content,
       tagsId,
       createdAt: row.created_at,
-      updatedAt: row.updated_at ?? undefined,
+      updatedAt: row.updated_at,
       publishedAt: row.published_at ?? undefined,
       readBy: readsId,
       clientId: row.client_id ?? undefined,
@@ -37,7 +39,7 @@ export class PostRepositoryMySQL implements PostRepository {
       id: row.advisor_id,
       firstname: row.advisor_firstname,
       lastname: row.advisor_lastname,
-      email: row.advisor_email,
+      email: Email.from(row.advisor_email),
       passwordHash: row.advisor_password_hash,
       role: row.advisor_role,
       isActiveField: row.advisor_is_active,
@@ -60,7 +62,7 @@ export class PostRepositoryMySQL implements PostRepository {
       TagEntity.from({
         id: tagRow.id,
         label: tagRow.label,
-        color: tagRow.color,
+        color: Color.from(tagRow.color),
         createdAt: tagRow.created_at,
         updatedAt: tagRow.updated_at,
       })
@@ -460,7 +462,7 @@ export class PostRepositoryMySQL implements PostRepository {
         const tag = TagEntity.from({
           id: row.tag_id,
           label: row.tag_label,
-          color: row.tag_color,
+          color: Color.from(row.tag_color),
           createdAt: row.tag_created_at,
           updatedAt: row.tag_updated_at,
         });

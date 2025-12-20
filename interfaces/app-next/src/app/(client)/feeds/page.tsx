@@ -1,8 +1,8 @@
 "use client"
- import { useState } from "react";
-import { Posts } from "./Posts";
-import { PostFilters } from "./PostFilters";
+import { useState } from "react";
 import { FiltersProps } from "@/utils/endpoint/feedsEndpoint";
+import { PostFilters } from "@/components/feeds/PostFilters";
+import { Posts } from "@/components/feeds/Posts";
 
 export default function PostsPage() {
     const [filters, setFilters] = useState<FiltersProps>({
@@ -10,7 +10,8 @@ export default function PostsPage() {
         fromDate: undefined,
         toDate: undefined,
         limit: 20,
-        page: 1
+        page: 1,
+        status: true
     })
     return (
         <>

@@ -1,10 +1,11 @@
 import { TagRepository } from "@application/ports/repositories/TagRepository";
-import { TagEntity } from "@domain/entities/TagEntity";
+import { TagDTO, TagEntity } from "@domain/entities/TagEntity";
 
 export class GetAllTagsUseCase {
   constructor(private readonly tagRepository: TagRepository) {}
 
-  async execute(): Promise<TagEntity[]> {
-    return this.tagRepository.findAll();
+  async execute(): Promise<TagDTO[]> {
+    const tags = await this.tagRepository.findAll();
+    return tags.map((tag) => tag.toDTO());
   }
 }

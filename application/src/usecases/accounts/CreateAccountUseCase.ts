@@ -1,5 +1,8 @@
 import { MissingOrInvalidNameError } from "@application/errors/accounts";
-import { UserNotActiveError, UserNotFoundError } from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
@@ -22,7 +25,6 @@ interface Props {
   currency: string;
 }
 
-
 export class CreateAccountUsecase {
   public constructor(
     private readonly accountRepository: AccountRepository,
@@ -40,14 +42,15 @@ export class CreateAccountUsecase {
     initialBalance,
     currency,
   }: Props): Promise<
-  | UserNotFoundError
-  | UserNotActiveError
-  | MissingOrInvalidNameError
-  | InvalidAccountNameError
-  | void> {
+    | UserNotFoundError
+    | UserNotActiveError
+    | MissingOrInvalidNameError
+    | InvalidAccountNameError
+    | void
+  > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-    
+
     const ibanVO = IBAN.create(iban);
     if (ibanVO instanceof Error) return ibanVO;
 
@@ -65,7 +68,7 @@ export class CreateAccountUsecase {
       userId: user.id,
     });
     if (owner instanceof Error) return owner;
-    
+
     const today = this.clockService.now();
 
     const account = AccountEntity.create({
@@ -75,7 +78,7 @@ export class CreateAccountUsecase {
       type: type,
       color: colorVO,
       balance: balanceVO,
-      createdAt: today
+      createdAt: today,
     });
 
     if (account instanceof Error) return account;

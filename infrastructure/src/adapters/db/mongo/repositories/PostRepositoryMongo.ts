@@ -165,12 +165,9 @@ export class PostRepositoryMongo implements PostRepository {
     const doc = await PostModel.findById(id)
       .populate({
         path: "advisorId",
-        select:
-          "firstname lastname email passwordHash role isActive createdAt confirmedAt updatedAt",
       })
       .populate({
         path: "tagsId",
-        select: "label color createdAt updatedAt",
       })
       .lean();
 

@@ -27,7 +27,6 @@ export default function PostsPage() {
     ];
 
     const mutate = useMutation<Post, Error, NewPost>(endpoints.feeds.posts.add())
-
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         mutate.mutate(field, {
@@ -36,7 +35,6 @@ export default function PostsPage() {
                 if (post.publishedAt)
                     socket.emit("post:status", { post })
             }
-
         })
     }
 
