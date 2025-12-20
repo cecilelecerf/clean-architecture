@@ -5,7 +5,7 @@ import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/acco
 import { accountSchema } from "@infrastructure/types/account";
 import z from "zod";
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/accounts/[accountIban]/transfer'>) {
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/accounts/[accountIban]'>) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) {

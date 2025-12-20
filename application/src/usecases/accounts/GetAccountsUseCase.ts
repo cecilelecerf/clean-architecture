@@ -10,21 +10,22 @@ export class GetAccountsUsercase {
         private readonly userRepository: UserRepository
     ) {}
 
-    public async execute(userId: string | null): Promise<
+    public async execute(userId: string): Promise<
     | AccountEntity[]
     | null
     | UserNotFoundError 
     | UserNotActiveError
     > {
-        if (userId === null) {
-            return this.accountRepository.findByUserId(null);
-        }
-
         const user = await findActiveUser(this.userRepository, userId);
         if (user instanceof Error) {
             return user;
         }
 
-        return this.accountRepository.findByUserId(userId);
+        var requestUser = null;
+        if (user.hasRole({ role: "client" }) && user.id === userId) {
+            requestUser = userId;
+        }    
+
+        return this.accountRepository.findByUserId(requestUser);
     }
 }
