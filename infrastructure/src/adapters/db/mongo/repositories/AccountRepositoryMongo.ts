@@ -29,7 +29,7 @@ export class AccountRepositoryMongo implements AccountRepository {
   }
 
   /** 🔍 Trouver tous les comptes d'un user */
-  async findByUserId(userId: UserEntity["id"]): Promise<AccountEntity[]> {
+  async findByUserId(userId: UserEntity["id"] | null): Promise<AccountEntity[]> {
     await this.client.connect();
 
     const docs = await AccountModel.find({ userId })

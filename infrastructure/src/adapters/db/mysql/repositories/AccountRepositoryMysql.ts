@@ -33,7 +33,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
   }
 
   /** Tous les comptes d'un utilisateur */
-  async findByUserId(userId: UserEntity["id"]): Promise<AccountEntity[]> {
+  async findByUserId(userId: UserEntity["id"] | null): Promise<AccountEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM accounts WHERE user_id = ? ORDER BY created_at DESC",
       [userId]

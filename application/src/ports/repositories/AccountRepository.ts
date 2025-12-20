@@ -3,7 +3,7 @@ import { UserEntity } from "@domain/entities/UserEntity";
 import { IBAN } from "@domain/values/IBAN";
 
 export interface AccountRepository {
-  findByUserId(userId: UserEntity["id"]): Promise<AccountEntity[]>;
+  findByUserId(userId: UserEntity["id"] | null): Promise<AccountEntity[]>;
   findByIBAN(iban: IBAN): Promise<AccountEntity | null>;
   findAllSavingsAccounts(): Promise<AccountEntity[]>;
   findBankInterestAccount(): Promise<AccountEntity | null>;

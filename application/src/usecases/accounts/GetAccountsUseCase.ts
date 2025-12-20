@@ -10,17 +10,21 @@ export class GetAccountsUsercase {
         private readonly userRepository: UserRepository
     ) {}
 
-    public async execute(userId: string): Promise<
+    public async execute(userId: string | null): Promise<
     | AccountEntity[]
     | null
     | UserNotFoundError 
     | UserNotActiveError
     > {
+        if (userId === null) {
+            return this.accountRepository.findByUserId(null);
+        }
+
         const user = await findActiveUser(this.userRepository, userId);
-        if (user instanceof Error) return user;
+        if (user instanceof Error) {
+            return user;
+        }
 
-        const accounts = await this.accountRepository.findByUserId(userId);
-
-        return accounts;
+        return this.accountRepository.findByUserId(userId);
     }
 }
