@@ -16,7 +16,7 @@ import { generateBankAccounts } from "./13_bank_accounts";
 const all = async () => {
   const mysqlClient = new MySQLClient();
   const advisors = await seedSQLAdministrator(mysqlClient);
-  const clients = await seedSQLClient(mysqlClient, advisors);
+  const clients = await seedSQLClient(mysqlClient);
   const directors = await seedSQLDirector(mysqlClient);
   await generateExternalThreads(clients, advisors, mysqlClient);
   await generateInternalThreads(directors, advisors, mysqlClient);

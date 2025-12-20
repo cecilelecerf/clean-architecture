@@ -3,11 +3,7 @@ import { MongoClient } from "../../MongoClient";
 import { MessageRepositoryMongo } from "../repositories/MessageRepositoryMongo";
 import { ThreadRepositoryMongo } from "../repositories/ThreadRepositoryMongo";
 import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
-import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
-import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/UserRepositoryMySQL";
-import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/ThreadRepositoryMySQL";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { MessageRepositoryMySQL } from "../repositories/MessageRepositoryMySQL";
 import { LeaveThreadUsecase } from "@application/usecases/threads/LeaveThreadUsecase";
 import { StartExternalThreadUsecase } from "@application/usecases/threads/StartExternalThreadUsecase";
 import { AddParticipantUsecase } from "@application/usecases/threads/admin/AddParticipantUsecase";
@@ -36,20 +32,27 @@ export const threadsFactory = () => {
     uuidService,
     clockService
   );
+
+  const startInternalThread = new StartInternalThreadUsecase(
+    threadRepository,
+    userRepository,
+    uuidService,
+    clockService
+  );
   const addParticipant = new AddParticipantUsecase(
     userRepository,
     threadRepository,
     clockService
   );
-  const advisorGetAllThread = new AdvisorGetAllThreadUsecase(
+  const advisorGetAllThread = new GetAdvisorThreadsUsecase(
     threadRepository,
     userRepository
   );
-  const advisorGetAllByClientThread = new AdvisorGetAllThreadByClientUsecase(
+  const getThreadsByUserAndTypeUsecase = new GetThreadsByUserAndTypeUsecase(
     threadRepository,
     userRepository
   );
-  const clientGetAllThread = new ClientGetAllThreadUsecase(
+  const getThreadById = new GetThreadByIdUsecase(
     threadRepository,
     userRepository
   );
@@ -58,10 +61,7 @@ export const threadsFactory = () => {
     threadRepository,
     clockService
   );
-  const findThreadWithUser = new FindThreadWithUserUsecase(
-    threadRepository,
-    userRepository
-  );
+
   const leaveThread = new LeaveThreadUsecase(
     userRepository,
     threadRepository,
@@ -70,12 +70,6 @@ export const threadsFactory = () => {
   const removeParticipant = new RemoveParticipantUsecase(
     userRepository,
     threadRepository,
-    clockService
-  );
-  const startInternalThread = new StartInternalThreadUsecase(
-    threadRepository,
-    userRepository,
-    uuidService,
     clockService
   );
   const transferThread = new TransferThreadUsecase(
@@ -88,7 +82,7 @@ export const threadsFactory = () => {
     threadRepository,
     clockService
   );
-  const advisorJoinExternalThread = new AdvisorJoinExternalThread(
+  const adminJoinThread = new AdminJoinThreadUsecase(
     threadRepository,
     userRepository
   );
@@ -97,15 +91,14 @@ export const threadsFactory = () => {
     startExternalThread,
     addParticipant,
     advisorGetAllThread,
-    clientGetAllThread,
     closeThread,
-    findThreadWithUser,
+    getThreadsByUserAndTypeUsecase,
     leaveThread,
     removeParticipant,
     startInternalThread,
     transferThread,
     updateThreadTitle,
-    advisorJoinExternalThread,
-    advisorGetAllByClientThread,
+    adminJoinThread,
+    getThreadById,
   };
 };

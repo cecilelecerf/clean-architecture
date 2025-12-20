@@ -5,15 +5,15 @@ import { JwtTokenService } from "@infrastructure/adapters/services/JwtTokenServi
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { RegisterUsecase } from "@application/usecases/users/RegisterUsecase";
 import { LogoutUsecase } from "@application/usecases/users/LogoutUsecase";
 import { LoginUsecase } from "@application/usecases/users/LoginUsecase";
-import { GetMeUsecase } from "@application/usecases/users/GetUserUsecase";
+import { GetMeUsecase } from "@application/usecases/users/GetMeUsecase";
 import { ForgotPasswordUsecase } from "@application/usecases/users/ForgotPasswordUsecase";
 import { ConfirmRegistrationUsecase } from "@application/usecases/users/ConfirmRegistrationUsecase";
 import { BanClientUsecase } from "@application/usecases/users/BanClientUsecase";
-import { GetUsersByRoleUseCase } from "@application/usecases/users/advisors/GetUsersByRoleUseCase";
-import { GetUserUsercase } from "@application/usecases/users/advisors/AdvisorGetClientUsercase";
+import { GetUsersByRoleUseCase } from "@application/usecases/users/GetUsersByRoleUseCase";
+import { GetUserUsercase } from "@application/usecases/users/GetUserUsercase";
+import { RegisterUsecase } from "@application/usecases/users/RegisterUsecase";
 
 export const usersFactory = () => {
   const client = new MongoClient();
@@ -38,7 +38,7 @@ export const usersFactory = () => {
     encryptionService,
     tokenService
   );
-  const getUser = new GetMeUsecase(userRepository);
+  const getMe = new GetMeUsecase(userRepository);
   const forgotPassword = new ForgotPasswordUsecase(
     userRepository,
     emailService,
@@ -51,17 +51,17 @@ export const usersFactory = () => {
   );
   const banClient = new BanClientUsecase(userRepository, clockService);
   const getUsersByRole = new GetUsersByRoleUseCase(userRepository);
-  const advisorGetClient = new GetUserUsercase(userRepository);
+  const getUser = new GetUserUsercase(userRepository);
 
   return {
     register,
     logout,
     login,
     getUser,
+    getMe,
     forgotPassword,
     confirmRegistration,
     banClient,
     getUsersByRole,
-    advisorGetClient,
   };
 };

@@ -7,6 +7,7 @@ import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { Email } from "@domain/values/Email";
 
 export class MessageRepositoryMySQL implements MessageRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -16,7 +17,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
       id: row.user_id,
       firstname: row.firstname,
       lastname: row.lastname,
-      email: row.email,
+      email: Email.from(row.email),
       passwordHash: row.password_hash,
       role: row.role,
       isActiveField: row.is_active,
@@ -152,8 +153,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
        ORDER BY m.sent_at ASC`,
       [threadId]
     );
-
-    return rows.map((row) => {
+    const result: MessageWithUser[] = rows.map((row): MessageWithUser => {
       const readerIds = row.reader_ids ? row.reader_ids.split(",") : [];
       const message = MessageEntity.from({
         id: row.message_id,
@@ -163,8 +163,10 @@ export class MessageRepositoryMySQL implements MessageRepository {
         sentAt: new Date(row.sent_at),
         readBy: readerIds,
       });
-      const sender = this.mapRowToSender(row);
+      const sender: UserEntity = this.mapRowToSender(row);
       return Object.assign(message, { sender });
     });
+    console.log(result);
+    return result;
   }
 }

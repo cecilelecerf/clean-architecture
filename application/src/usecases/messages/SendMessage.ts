@@ -1,3 +1,4 @@
+import { MessageEntityWithUsersDTO } from "@application/dto/MessageDTOMapper";
 import {
   InvalidThreadAccessError,
   ThreadNotFoundError,
@@ -34,7 +35,7 @@ export class SendMessage {
     senderId,
     threadId,
   }: Props): Promise<
-    | MessageWithUser
+    | MessageEntityWithUsersDTO
     | UserNotFoundError
     | ThreadNotFoundError
     | InvalidThreadAccessError
