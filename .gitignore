@@ -2,3 +2,4 @@ node_modules
 dist
 docker/mysql/data
 env
+tsconfig.tsbuildinfo
