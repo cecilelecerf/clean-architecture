@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { accountSchema } from '@infrastructure/types/account';
 import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
+import z from 'zod';
 
 export async function PATCH(
   req: NextRequest,
@@ -27,7 +28,15 @@ export async function PATCH(
       );
     }
 
-    return NextResponse.json(account);
+    return NextResponse.json(
+      accountSchema
+        .omit({ createdAt: true, updatedAt: true })
+        .extend({
+          createdAt: z.date(),
+          updatedAt: z.date().optional(),
+        })
+        .parse(account),
+    );
   } catch (err) {
     console.error(err);
     return NextResponse.json(

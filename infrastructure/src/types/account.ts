@@ -10,7 +10,9 @@ export const accountSchema = z.object({
   balance: z.number().nonnegative(),
   type: z.enum(["courant", "epargne"]),
   color: colorSchema,
-  currency: z.string().min(1)
+  currency: z.string().min(1),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export type Account = z.infer<typeof accountSchema>;
