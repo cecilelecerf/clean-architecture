@@ -23,6 +23,7 @@ export class AccountRepositoryMongo implements AccountRepository {
       type: doc.type,
       color,
       balance,
+      currency: doc.currency,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     });
@@ -87,6 +88,7 @@ export class AccountRepositoryMongo implements AccountRepository {
         amount: account.balance.amount,
         currency: account.balance.currency,
       },
+      currency: account.currency,
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,
     });
@@ -108,6 +110,7 @@ export class AccountRepositoryMongo implements AccountRepository {
             amount: account.balance.amount,
             currency: account.balance.currency,
           },
+          currency: account.currency,
           updatedAt: account.updatedAt,
         },
       }

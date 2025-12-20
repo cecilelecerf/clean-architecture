@@ -19,6 +19,7 @@ export class AccountEntity {
     public type: "courant" | "epargne",
     public color: Color,
     public balance: Money,
+    public currency: string,
     public createdAt: Date,
     public userId?: UserEntity["id"] | null,
     public updatedAt?: Date
@@ -29,6 +30,7 @@ export class AccountEntity {
     name,
     type,
     balance,
+    currency,
     color,
     createdAt,
     userId,
@@ -40,6 +42,7 @@ export class AccountEntity {
     | "type"
     | "color"
     | "balance"
+    | "currency"
     | "createdAt"
     | "userId"
     | "updatedAt"
@@ -53,6 +56,7 @@ export class AccountEntity {
       type,
       color,
       balance,
+      currency,
       createdAt,
       userId,
       updatedAt
@@ -64,6 +68,7 @@ export class AccountEntity {
     name,
     type,
     balance,
+    currency,
     color,
     createdAt,
     userId,
@@ -75,6 +80,7 @@ export class AccountEntity {
     | "type"
     | "color"
     | "balance"
+    | "currency"
     | "createdAt"
     | "userId"
     | "updatedAt"
@@ -85,6 +91,7 @@ export class AccountEntity {
       type,
       color,
       balance,
+      currency,
       createdAt,
       userId,
       updatedAt
@@ -152,7 +159,7 @@ export class AccountEntity {
     if (!user.hasRole({ role: "client" })) {
       return new InvalidAccountNameError();
     }
-    
+
     const verifiedName = AccountEntity.verifyName(newName);
     if (verifiedName instanceof Error) return verifiedName;
 

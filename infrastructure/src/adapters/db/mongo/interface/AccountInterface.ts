@@ -11,6 +11,7 @@ export interface AccountInterface {
     amount: number;
     currency: string;
   };
+  currency: string,
   createdAt: Date;
   updatedAt: Date;
 }

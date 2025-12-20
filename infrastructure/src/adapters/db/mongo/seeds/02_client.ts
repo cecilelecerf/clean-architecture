@@ -88,6 +88,7 @@ export async function seedMongoClient(
             amount: rawAccount.balance,
             currency: rawAccount.currency,
           }),
+          currency: rawAccount.currency,
           updatedAt: clockService.now(),
         });
 

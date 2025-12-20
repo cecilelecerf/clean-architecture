@@ -15,6 +15,7 @@ export const AccountSchema = new Schema<AccountInterface>(
       },
       required: true,
     },
+    currency: { type: String, required: true },
     createdAt: { type: Date, required: true },
     updatedAt: { type: Date, required: true },
   },

@@ -10,6 +10,7 @@ export const transactionSchema = z.object({
   fromAccountId: accountIdSchema,
   toAccountId: accountIdSchema,
   amount: z.any(),
+  currency: z.string().min(1),
   date: z.date(),
   type: z.enum(["credit", "debit"]),
   icon: z.string(),

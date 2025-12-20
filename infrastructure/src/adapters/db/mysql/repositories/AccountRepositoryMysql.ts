@@ -27,6 +27,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
       type: row.type,
       color,
       balance,
+      currency: row.currency,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     });

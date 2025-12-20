@@ -38,6 +38,7 @@ export async function generateBankAccountsMongo(
           amount: raw.balance,
           currency: raw.currency,
         }),
+        currency: raw.currency,
         updatedAt: clockService.now(),
       });
 

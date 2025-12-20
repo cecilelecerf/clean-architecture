@@ -98,6 +98,7 @@ export async function seedSQLClient(
             amount: rawAccount.balance,
             currency: rawAccount.currency,
           }),
+          currency: rawAccount.currency,
           updatedAt: clockService.now(),
         });
         accounts.push(account);

@@ -72,6 +72,7 @@ export class CreateAccountUsecase {
       type: type,
       color: colorVO,
       balance: balanceVO,
+      currency: currency,
       createdAt: today
     });
 

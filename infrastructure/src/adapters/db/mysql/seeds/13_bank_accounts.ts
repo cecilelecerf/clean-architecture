@@ -41,6 +41,7 @@ export async function generateBankAccounts(
           amount: raw.balance,
           currency: raw.currency,
         }),
+        currency: raw.currency,
         updatedAt: clockService.now(),
       });
       accounts.push(account);
