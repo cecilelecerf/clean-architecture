@@ -16,7 +16,7 @@ export async function PATCH(
     const { accountIban } = await ctx.params;
 
     const body = await req.json();
-    const payload = accountSchema.parse(body);
+    const payload = accountSchema.pick({ name: true }).partial().parse(body);
 
     const account = await accountFactory().client.renameAccount.execute(accountIban,session.user.id, payload.name);
 
