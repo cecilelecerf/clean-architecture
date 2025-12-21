@@ -3,7 +3,9 @@ import { useState } from 'react';
 import FormWrapper from '../../../components/FromWrapper';
 import { useMutation } from '@tanstack/react-query';
 import { post } from '@/lib/apiClient';
-import { RegisterPayload, RegisterResponse } from '@/app/api/auth/register/route';
+import { RegisterPayload } from '@/app/api/auth/register/route';
+import { toast } from 'sonner';
+import { endpoints } from '@/utils/endpoint';
 
 
 export default function RegisterPage() {
@@ -13,12 +15,9 @@ export default function RegisterPage() {
         lastname: '',
         plainedPassword: '',
     });
-    const mutate = useMutation<RegisterResponse, Error, RegisterPayload>({
-        mutationFn: (data: RegisterPayload) =>
-            post<RegisterResponse, RegisterPayload>("/auth/register", data)
-    })
+    const mutate = useMutation(endpoints.auth.register())
     return (
-        <form onSubmit={(e) => { e.preventDefault(); mutate.mutate(register) }}>
+        <form onSubmit={(e) => { e.preventDefault(); mutate.mutate(register, { onSuccess: () => toast.success("Email envoyé") }) }}>
             <FormWrapper
                 title="S'inscrire"
                 fields={[

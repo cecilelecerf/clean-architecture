@@ -8,7 +8,7 @@ import { EmailService } from "@application/ports/services/EmailService";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
 import { UuidService } from "@application/ports/services/UuidService";
-import { UserEntity } from "@domain/entities/UserEntity";
+import { UserEntity, UserToFront } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import { Email } from "@domain/values/Email";
 
@@ -35,7 +35,7 @@ export class RegisterUsecase {
     plainedPassword,
     confirmationUrl,
   }: Props): Promise<
-    | UserEntity
+    | UserToFront
     | EmailInvalidFormatError
     | EmailAlreadyExistsError
     | UserNotFoundError
@@ -68,13 +68,11 @@ export class RegisterUsecase {
     const token = await this.tokenService.generateConfirmationToken({
       userId: user.id,
     });
-    const confirmationLink = `${confirmationUrl}?token=${token}`;
-
-    this.emailService.sendEmail({
-      to: user.email,
-      subject: "Bienvenue sur notre plateform",
-      text: `Clique ici pour valider ton inscription : ${confirmationLink}`,
+    const confirmationLink = `${confirmationUrl}/confirm-email?token=${token}`;
+    await this.emailService.sendConfirmationEmail(user.email, {
+      firstname: user.firstname,
+      confirmationLink,
     });
-    return user;
+    return user.toFront();
   }
 }
