@@ -7,22 +7,22 @@ import { SetSavingsRateUsecase } from "@application/usecases/savingRates/SetSavi
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 
 export const savingsrateFactory = () => {
-    const client = new MySQLClient();
-    const userRepository = new UserRepositoryMySQL(client);
-    const configRepository = new SavingsRateRepositoryMySQL(client);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
+  const client = new MySQLClient();
+  const userRepository = new UserRepositoryMySQL(client);
+  const configRepository = new SavingsRateRepositoryMySQL(client);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
 
-    const setSavingsRate = new SetSavingsRateUsecase(
-        configRepository,
-        userRepository,
-        uuidService,
-        clockService
-    );
+  const setSavingsRate = new SetSavingsRateUsecase(
+    configRepository,
+    userRepository,
+    uuidService,
+    clockService
+  );
 
-    return {
-        admin: {
-            setSavingsRate
-        }
-    };
-}
+  return {
+    admin: {
+      setSavingsRate,
+    },
+  };
+};

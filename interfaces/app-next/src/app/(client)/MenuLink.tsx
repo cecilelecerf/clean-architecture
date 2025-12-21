@@ -17,6 +17,6 @@ export const MenuLink = ({
 
     const isActive = pathname === href
     return <Button variant="link" asChild className={clsx('active:translate-y-0.5  w-full justify-start rounded-none transition-all', isActive && "bg-gray-100")}>
-        <Link href={href}>{label}</Link>
+        <Link href={href}>{icon}{label}</Link>
     </Button>
 }

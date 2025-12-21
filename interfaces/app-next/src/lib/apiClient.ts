@@ -35,7 +35,7 @@ async function request<T>(
   }
 }
 
- export function post<T, B = unknown>(path: string, body: B) {
+export function post<T, B = unknown>(path: string, body: B) {
   return request<T>(path, { method: 'POST', body });
 }
 
@@ -46,6 +46,6 @@ export function get<T>(path: string) {
 export function patch<T, B = unknown>(path: string, body: B) {
   return request<T>(path, { method: 'PATCH', body });
 }
-export function deleteEntity<T, B = unknown>(path: string) {
+export function deleteEntity<T>(path: string) {
   return request<T>(path, { method: 'DELETE' });
 }

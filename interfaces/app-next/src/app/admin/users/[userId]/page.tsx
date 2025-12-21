@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserEntity } from "@domain/entities/UserEntity";
@@ -35,8 +34,7 @@ interface Account {
 
 export default function ClientPage() {
     const { userId } = useParams<{ userId: UserEntity["id"] }>();
-    const [accounts, setAccounts] = useState<Account[]>([]);
-
+    const accounts: Account[] = []
     return (
         <>
             <UserInfo userId={userId as UserId} />

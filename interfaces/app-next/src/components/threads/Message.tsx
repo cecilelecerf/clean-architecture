@@ -1,7 +1,7 @@
 import { formatDateFrench } from "@/utils/date/formatDateFrench"
-import { MessageWithUser } from "@infrastructure/types/message"
+import { MessageWithUserDTO } from "@infrastructure/types/message"
 
-type Props = { isCurrentUser: boolean } & MessageWithUser
+type Props = { isCurrentUser: boolean } & MessageWithUserDTO
 export const MessageComponent = ({ sender, sentAt, content, isCurrentUser }: Props) => (
     <div
         className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}

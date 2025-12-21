@@ -1,5 +1,8 @@
-import { EmailAlreadyExistsError,UserNotFoundError } from "@application/errors/users";
- import { UserRepository } from "@application/ports/repositories/UserRepository";
+import {
+  EmailAlreadyExistsError,
+  UserNotFoundError,
+} from "@application/errors/users";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { EmailService } from "@application/ports/services/EmailService";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
@@ -57,6 +60,7 @@ export class RegisterUsecase {
       createdAt,
       role: "client",
       isActiveField: false,
+      updatedAt: createdAt,
     });
 
     this.userRepository.save(user);

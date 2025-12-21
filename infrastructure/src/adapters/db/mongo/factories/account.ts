@@ -13,56 +13,56 @@ import { RenameAccountUsecase } from "@application/usecases/accounts/RenameAccou
 import { TransfertBetweenAccountUsecase } from "@application/usecases/accounts/TransfertBetweenAccountUsecase";
 
 export const accountFactory = () => {
-    const client = new MongoClient();
-    const userRepository = new UserRepositoryMongo(client);
-    const accountRepository = new AccountRepositoryMongo(client);
-    const transactionRepository = new TransactionRepositoryMongo(client);
-    const configRepository = new SavingsRateRepositoryMongo(client);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
-    const emailService = new NodeEmailService();
+  const client = new MongoClient();
+  const userRepository = new UserRepositoryMongo(client);
+  const accountRepository = new AccountRepositoryMongo(client);
+  const transactionRepository = new TransactionRepositoryMongo(client);
+  const configRepository = new SavingsRateRepositoryMongo(client);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
+  const emailService = new NodeEmailService();
 
-    const applyDailyInterest = new ApplyDailyInterestUseCase(
-        accountRepository,
-        configRepository,
-        transactionRepository,
-        clockService,
-        uuidService
-    );
-    const createAccount = new CreateAccountUsecase(
-        accountRepository,
-        emailService,
-        userRepository,
-        clockService,
-    );
-    const deleteAccount = new DeleteAccountUsecase(
-        accountRepository,
-        emailService,
-        userRepository
-    );
-    const renameAccount = new RenameAccountUsecase(
-        accountRepository,
-        emailService,
-        clockService,
-        userRepository
-    );
-    const transfertBetweenAccount = new TransfertBetweenAccountUsecase(
-        accountRepository,
-        transactionRepository,
-        clockService,
-        uuidService,
-        userRepository
-    );
+  const applyDailyInterest = new ApplyDailyInterestUseCase(
+    accountRepository,
+    configRepository,
+    transactionRepository,
+    clockService,
+    uuidService
+  );
+  const createAccount = new CreateAccountUsecase(
+    accountRepository,
+    emailService,
+    userRepository,
+    clockService
+  );
+  const deleteAccount = new DeleteAccountUsecase(
+    accountRepository,
+    emailService,
+    userRepository
+  );
+  const renameAccount = new RenameAccountUsecase(
+    accountRepository,
+    emailService,
+    clockService,
+    userRepository
+  );
+  const transfertBetweenAccount = new TransfertBetweenAccountUsecase(
+    accountRepository,
+    transactionRepository,
+    clockService,
+    uuidService,
+    userRepository
+  );
 
-    return {
-        admin: {
-            applyDailyInterest
-        },
-        client: {
-            createAccount,
-            deleteAccount,
-            renameAccount,
-            transfertBetweenAccount
-        },
-    };
-}
+  return {
+    admin: {
+      applyDailyInterest,
+    },
+    client: {
+      createAccount,
+      deleteAccount,
+      renameAccount,
+      transfertBetweenAccount,
+    },
+  };
+};

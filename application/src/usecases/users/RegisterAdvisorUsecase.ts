@@ -1,4 +1,9 @@
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError,EmailAlreadyExistsError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+  EmailAlreadyExistsError,
+} from "@application/errors/users";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { EmailService } from "@application/ports/services/EmailService";
@@ -69,6 +74,7 @@ export class RegisterAdvisorStatus {
       createdAt,
       role: "conseiller",
       isActiveField: false,
+      updatedAt: createdAt,
     });
 
     await this.userRepository.save(user);

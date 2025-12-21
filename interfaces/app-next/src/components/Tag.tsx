@@ -1,4 +1,4 @@
-import { TagToFront, Tag as TagType } from "@infrastructure/types/feed"
+import { TagToFront, } from "@infrastructure/types/feed"
 import { Badge } from "./ui/badge"
 import { bgColorClasses, textColorClasses } from "@/utils/color"
 

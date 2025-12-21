@@ -54,7 +54,7 @@ export class CreateAccountUsecase {
     const ibanVO = IBAN.create(iban);
     if (ibanVO instanceof Error) return ibanVO;
 
-    const colorVO = Color.from(color);
+    const colorVO = Color.create(color);
     if (colorVO instanceof Error) return colorVO;
 
     const balanceVO = Money.create({
@@ -64,7 +64,7 @@ export class CreateAccountUsecase {
     if (balanceVO instanceof Error) return balanceVO;
 
     const owner = AccountOwner.create({
-      type: "client",
+      role: "client",
       userId: user.id,
     });
     if (owner instanceof Error) return owner;
@@ -79,6 +79,7 @@ export class CreateAccountUsecase {
       color: colorVO,
       balance: balanceVO,
       createdAt: today,
+      updatedAt: today,
     });
 
     if (account instanceof Error) return account;

@@ -22,14 +22,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/posts/[pos
     const body = await req.json();
     const { status } = publishActionSchema.parse(body);
 
-    let result:
-      | PostEntity
-      | UserNotFoundError
-      | UserNotActiveError
-      | PostNotFoundError
-      | UserRoleMismatchError
-      | InvalidPostAccessError;
-    result = await postsFactory().updatePostStatusPost.execute({
+    const result = await postsFactory().updatePostStatusPost.execute({
       userId: session.user.id,
       postId: postId,
       status: status === 'publish',
