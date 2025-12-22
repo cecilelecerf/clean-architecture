@@ -6,7 +6,7 @@ import {
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { AccountEntity, AccountToFront } from "@domain/entities/AccountEntity";
+import { AccountDTO } from "@domain/entities/AccountEntity";
 
 type Props = { clientId: string; requesterId?: string };
 export class GetAccountsUsercase {
@@ -19,7 +19,7 @@ export class GetAccountsUsercase {
     clientId,
     requesterId,
   }: Props): Promise<
-    | AccountToFront[]
+    | AccountDTO[]
     | UserRoleMismatchError
     | UserNotFoundError
     | UserNotActiveError

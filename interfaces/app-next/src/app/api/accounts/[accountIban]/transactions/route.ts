@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { newTransactionSchema } from '@infrastructure/types/transaction';
 import { safeParseWithLog } from '@/lib/zodUtils';
+import { transactionFactory } from '@infrastructure/adapters/db/mysql/factories/transaction';
 import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
 
 export async function GET(
@@ -15,14 +16,17 @@ export async function GET(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     const { accountIban } = await ctx.params;
-    const transactions = [];
-    if (transactions instanceof Error) {
+    const result = await transactionFactory().getAllByAccount.execute({
+      iban: accountIban,
+      clientId: session.user.id,
+    });
+    if (result instanceof Error) {
       return NextResponse.json(
-        { name: transactions.name, message: transactions.message },
-        { status: transactions.statusCode ?? 404 },
+        { name: result.name, message: result.message },
+        { status: result.statusCode ?? 404 },
       );
     }
-    return NextResponse.json(transactions);
+    return NextResponse.json({ transactions: result, total: result.length });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: err.message || 'Erreur serveur' }, { status: 500 });

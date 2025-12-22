@@ -85,4 +85,24 @@ export class TransactionEntity {
       type
     );
   }
+  toDTO(): TransactionDTO {
+    return {
+      id: this.id,
+      label: this.label,
+      icon: this.icon,
+      type: this.type,
+      date: this.date,
+      amount: this.amount.amount,
+      currency: this.amount.currency,
+      fromAccountIban: this.fromAccountId.value,
+      toAccountIban: this.toAccountId.value,
+    };
+  }
 }
+
+export type TransactionDTO = {
+  amount: number;
+  currency: string;
+  fromAccountIban: string;
+  toAccountIban: string;
+} & Pick<TransactionEntity, "id" | "date" | "icon" | "label" | "type">;
