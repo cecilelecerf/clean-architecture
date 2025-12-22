@@ -1,31 +1,50 @@
-import { UserNotActiveError, UserNotFoundError } from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { AccountEntity } from "@domain/entities/AccountEntity";
+import { AccountEntity, AccountToFront } from "@domain/entities/AccountEntity";
 
+type Props = { clientId: string; requesterId?: string };
 export class GetAccountsUsercase {
-    public constructor(
-        private readonly accountRepository: AccountRepository,
-        private readonly userRepository: UserRepository
-    ) {}
+  public constructor(
+    private readonly accountRepository: AccountRepository,
+    private readonly userRepository: UserRepository
+  ) {}
 
-    public async execute(userId: string): Promise<
-    | AccountEntity[]
-    | null
-    | UserNotFoundError 
+  public async execute({
+    clientId,
+    requesterId,
+  }: Props): Promise<
+    | AccountToFront[]
+    | UserRoleMismatchError
+    | UserNotFoundError
     | UserNotActiveError
-    > {
-        const user = await findActiveUser(this.userRepository, userId);
-        if (user instanceof Error) {
-            return user;
-        }
-
-        var requestUser = null;
-        if (user.hasRole({ role: "client" }) && user.id === userId) {
-            requestUser = userId;
-        }    
-
-        return this.accountRepository.findByUserId(requestUser);
+  > {
+    const client = await findActiveUser(this.userRepository, clientId);
+    if (client instanceof Error) {
+      return client;
     }
+
+    if (!client.hasRole({ role: "client" }))
+      return new UserRoleMismatchError(["client"], client.role);
+    if (requesterId) {
+      const requester = await findActiveUser(this.userRepository, requesterId);
+      if (requester instanceof Error) {
+        return requester;
+      }
+      if (requester.hasRole({ role: "client" }))
+        return new UserRoleMismatchError(
+          ["conseiller", "directeur"],
+          requester.role
+        );
+    }
+
+    const accounts = await this.accountRepository.findByUserId(client.id);
+    console.log(accounts);
+    return accounts.map((account) => account.toDTO());
+  }
 }

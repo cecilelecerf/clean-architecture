@@ -4,7 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Copy, MoreVertical } from 'lucide-react';
-import { toStringTypeAccount } from '@/utils/toStringTypeAccount';
 import { fromColorClasses, textColorClasses, toColorClasses } from '@/utils/color';
 import { useRouter } from 'next/navigation';
 import { AccountId } from '@infrastructure/types/account';
@@ -12,13 +11,21 @@ import { useQuery } from '@tanstack/react-query';
 import { endpoints } from '@/utils/endpoint';
 import { match } from 'ts-pattern';
 import { GetAllTransactions } from './GetAllTransactions';
+import { use } from 'react';
 
 
-export default async function AccountIdPage({ params }: { params: Promise<{ accountId: AccountId }> }) {
-  const { accountId } = await params
+export default function AccountIdPage({
+  params
+}: {
+  params: Promise<{ accountId: AccountId }>
+}) {
+  const { accountId } = use(params)
+
+  console.log("tesstt")
+  console.log(accountId)
+  const router = useRouter();
   const query = useQuery(endpoints.accounts.get({ accountIban: accountId }));
 
-  const router = useRouter();
   return (
     <>
       <div className="flex items-center gap-2 mb-6">
@@ -50,9 +57,9 @@ export default async function AccountIdPage({ params }: { params: Promise<{ acco
                   <p> {account.IBAN}</p>
                 </div>
                 <div>
-                  <p className="text-xs opacity-75 mb-1">{toStringTypeAccount(account)}</p>
+                  <p className="text-xs opacity-75 mb-1">{account.type}</p>
                   <p className="text-3xl font-bold">
-                    {account.balance.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                    {account.amount.toLocaleString('fr-FR', { style: 'currency', currency: account.currency })}
                   </p>
                 </div>
               </CardContent>

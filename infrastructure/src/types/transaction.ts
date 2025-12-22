@@ -14,7 +14,7 @@ export const transactionSchema = z.object({
   currency: z.string().min(1),
   date: z.date(),
   type: z.enum(["credit", "debit"]),
-  icon: z.string(),
+  icon: z.string().length(1),
 });
 
 export type Transaction = z.infer<typeof transactionSchema>;

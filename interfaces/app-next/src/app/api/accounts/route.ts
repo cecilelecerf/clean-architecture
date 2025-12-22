@@ -10,8 +10,7 @@ export async function GET(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    const result = await accountFactory().getAccounts.execute(session.user.id);
-    // const result = {};
+    const result = await accountFactory().getAccounts.execute({ clientId: session.user.id });
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },
@@ -34,17 +33,15 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const payload = accountSchema.parse(body);
-    console.log(payload);
-    // const result = await accountFactory().createAccount.execute({
-    //   iban: payload.IBAN,
-    //   userId: session.user.id,
-    //   name: payload.name,
-    //   type: payload.type,
-    //   color: payload.color,
-    //   initialBalance: payload.balance,
-    //   currency: payload.currency,
-    // });
-    const result = {};
+    const result = await accountFactory().createAccount.execute({
+      iban: payload.IBAN,
+      userId: session.user.id,
+      name: payload.name,
+      type: payload.type,
+      color: payload.color,
+      initialBalance: payload.balance,
+      currency: payload.currency,
+    });
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },

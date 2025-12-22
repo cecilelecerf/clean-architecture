@@ -1,6 +1,11 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
-import { AccountId, accountSchema, NewAccount } from '@infrastructure/types/account';
+import {
+  accountDTOSchema,
+  AccountId,
+  accountSchema,
+  NewAccount,
+} from '@infrastructure/types/account';
 import { threadSchema } from '@infrastructure/types/thread';
 import z from 'zod';
 import { safeParseWithLog } from '@/lib/zodUtils';
@@ -29,7 +34,7 @@ export const accountsEndpoint = createEndpointsNodes({
       queryKey: ['accounts', 'list'],
       queryFn: () =>
         get('/accounts').then((data) => {
-          return safeParseWithLog(accountSchema.array(), data);
+          return safeParseWithLog(accountDTOSchema.array(), data);
         }),
     }),
 
@@ -38,7 +43,7 @@ export const accountsEndpoint = createEndpointsNodes({
   get: ({ accountIban }: { accountIban: AccountId }) =>
     queryOptions({
       queryKey: ['accounts', accountIban],
-      queryFn: () => get(`/accounts/${accountIban}`).then((data) => accountSchema.parse(data)),
+      queryFn: () => get(`/accounts/${accountIban}`).then((data) => accountDTOSchema.parse(data)),
     }),
 
   // POST /api/accounts
