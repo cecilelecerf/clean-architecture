@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
 import { accountSchema } from '@infrastructure/types/account';
+import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    const result = await accountFactory().getAccounts.execute(session.user.id);
+    const result = await accountFactory().getAccounts.execute({ clientId: session.user.id });
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },
@@ -33,17 +33,15 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const payload = accountSchema.parse(body);
-    console.log(payload);
-    // const result = await accountFactory().createAccount.execute({
-    //   iban: payload.IBAN,
-    //   userId: session.user.id,
-    //   name: payload.name,
-    //   type: payload.type,
-    //   color: payload.color,
-    //   initialBalance: payload.balance,
-    //   currency: payload.currency,
-    // });
-    const result = {};
+    const result = await accountFactory().createAccount.execute({
+      iban: payload.IBAN,
+      userId: session.user.id,
+      name: payload.name,
+      type: payload.type,
+      color: payload.color,
+      initialBalance: payload.balance,
+      currency: payload.currency,
+    });
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },
@@ -68,8 +66,8 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const result = await accountFactory().admin.applyDailyInterest.execute();
-
+    // const result = await accountFactory().admin.applyDailyInterest.execute();
+    const result = {};
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },

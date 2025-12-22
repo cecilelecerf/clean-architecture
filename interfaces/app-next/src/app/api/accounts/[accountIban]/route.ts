@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
-import { accountSchema } from '@infrastructure/types/account';
+import { accountDTOSchema, accountSchema } from '@infrastructure/types/account';
 import z from 'zod';
 
 export async function GET(req: NextRequest, ctx: RouteContext<'/api/accounts/[accountIban]'>) {
@@ -22,15 +22,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/accounts/[ac
         { status: account.statusCode ?? 404 },
       );
     }
-    return NextResponse.json(
-      accountSchema
-        .omit({ createdAt: true, updatedAt: true })
-        .extend({
-          createdAt: z.date(),
-          updatedAt: z.date().optional(),
-        })
-        .parse(account),
-    );
+    return NextResponse.json(accountDTOSchema.parse(account));
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: err.message || 'Erreur serveur' }, { status: 500 });

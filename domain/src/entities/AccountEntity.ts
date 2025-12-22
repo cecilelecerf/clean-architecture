@@ -140,15 +140,11 @@ export class AccountEntity {
   }
 
   public isClientAccount(user: UserEntity): boolean {
-    return (
-      user.hasRole({ role: "client" }) && user.id === this.userId
-    );
+    return user.hasRole({ role: "client" }) && user.id === this.userId;
   }
 
   public canBeRenamedBy(user: UserEntity): boolean {
-    return (
-      user.hasRole({ role: "client" }) && user.id === this.userId
-    );
+    return user.hasRole({ role: "client" }) && user.id === this.userId;
   }
 
   public rename(
@@ -194,4 +190,21 @@ export class AccountEntity {
 
     return this.getBalance();
   }
+
+  public toDTO(): AccountDTO {
+    return {
+      IBAN: this.iban.value,
+      name: this.name,
+      type: this.type,
+      currency: this.currency,
+      color: this.color.getValue(),
+      amount: this.balance.amount,
+    };
+  }
 }
+
+export type AccountDTO = {
+  IBAN: string;
+  color: string;
+  amount: number;
+} & Pick<AccountEntity, "name" | "type" | "currency">;

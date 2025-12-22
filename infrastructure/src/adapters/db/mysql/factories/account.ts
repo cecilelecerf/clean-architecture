@@ -6,14 +6,14 @@ import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
 import { TransactionRepositoryMySQL } from "../repositories/TransactionRepositoryMySQL";
 import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailService";
 
-import { RenameAccountUsecase } from "@application/usecases/accounts/RenameAccountUsecase";
-import { DeleteAccountUsecase } from "@application/usecases/accounts/DeleteAccountUsecase";
+import { RenameAccountUsecase } from "@application/usecases/accounts/RenameAccountUseCase";
+import { DeleteAccountUsecase } from "@application/usecases/accounts/DeleteAccountUseCase";
 import { ApplyDailyInterestUseCase } from "@application/usecases/accounts/ApplyDailyInterestUseCase";
 import { SavingsRateRepositoryMySQL } from "../repositories/SavingRateRepositoryMySQL";
 import { GetAccountByIBANUsercase } from "@application/usecases/accounts/GetAccountByIBANUseCase";
 import { GetAccountsUsercase } from "@application/usecases/accounts/GetAccountsUseCase";
-import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccountUsecase";
-import { TransfertBetweenAccountUsecase } from "@application/usecases/accounts/TransfertBetweenAccountUsecase";
+import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccountUseCase";
+import { TransfertBetweenAccountUsecase } from "@application/usecases/accounts/TransfertBetweenAccountUseCase";
 
 export const accountFactory = () => {
   const client = new MySQLClient();

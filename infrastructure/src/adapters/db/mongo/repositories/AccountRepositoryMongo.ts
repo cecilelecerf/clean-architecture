@@ -13,7 +13,10 @@ export class AccountRepositoryMongo implements AccountRepository {
   // 🔧 Méthode helper pour mapper un document MongoDB vers AccountEntity
   private mapDocToAccount(doc: any): AccountEntity {
     const iban = IBAN.from(doc.iban);
-    const balance = Money.from(doc.balance);
+    const balance = Money.from({
+      amount: Number(doc.balance),
+      currency: doc.currency,
+    });
     const color = Color.from(doc.color);
 
     return AccountEntity.from({
@@ -30,7 +33,9 @@ export class AccountRepositoryMongo implements AccountRepository {
   }
 
   /** 🔍 Trouver tous les comptes d'un user */
-  async findByUserId(userId: UserEntity["id"] | null): Promise<AccountEntity[]> {
+  async findByUserId(
+    userId: UserEntity["id"] | null
+  ): Promise<AccountEntity[]> {
     await this.client.connect();
 
     const docs = await AccountModel.find({ userId })

@@ -10,10 +10,11 @@ import { TransactionId } from '@infrastructure/types/transaction';
 import { useQuery } from '@tanstack/react-query';
 import { endpoints } from '@/utils/endpoint';
 import { match } from 'ts-pattern';
+import { use } from 'react';
 
 
-export default async function TransactionIdPage({ params }: { params: Promise<{ accountId: AccountId, transactionId: TransactionId }> }) {
-  const { accountId, transactionId } = await params
+export default function TransactionIdPage({ params }: { params: Promise<{ accountId: AccountId, transactionId: TransactionId }> }) {
+  const { accountId, transactionId } = use(params)
   const router = useRouter();
   const query = useQuery(endpoints.accounts.transactions.get({ transactionId, accountIban: accountId }))
 

@@ -4,7 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Copy, MoreVertical } from 'lucide-react';
-import { toStringTypeAccount } from '@/utils/toStringTypeAccount';
 import { fromColorClasses, textColorClasses, toColorClasses } from '@/utils/color';
 import { useRouter } from 'next/navigation';
 import { AccountId } from '@infrastructure/types/account';
@@ -12,13 +11,20 @@ import { useQuery } from '@tanstack/react-query';
 import { endpoints } from '@/utils/endpoint';
 import { match } from 'ts-pattern';
 import { GetAllTransactions } from './GetAllTransactions';
+import { use } from 'react';
+import { Skeleton } from '@radix-ui/themes';
 
 
-export default async function AccountIdPage({ params }: { params: Promise<{ accountId: AccountId }> }) {
-  const { accountId } = await params
-  const query = useQuery(endpoints.accounts.get({ accountIban: accountId }));
+export default function AccountIdPage({
+  params
+}: {
+  params: Promise<{ accountId: AccountId }>
+}) {
+  const { accountId } = use(params)
 
   const router = useRouter();
+  const query = useQuery(endpoints.accounts.get({ accountIban: accountId }));
+
   return (
     <>
       <div className="flex items-center gap-2 mb-6">
@@ -28,7 +34,26 @@ export default async function AccountIdPage({ params }: { params: Promise<{ acco
         <h1 className="text-2xl font-bold">Retour</h1>
       </div>
       {match(query)
-        .with({ status: "pending" }, () => "pendign")
+        .with({ status: "pending" }, () => <>
+          <Card className="rounded-2xl shadow-lg border-0">
+            <CardContent className="flex flex-col justify-between p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-8 w-8 rounded-full" />
+              </div>
+              <div className="flex gap-2 my-4">
+                <Skeleton className="h-5 w-5" />
+                <Skeleton className="h-5 w-64" />
+              </div>
+              <div>
+                <Skeleton className="h-3 w-24 mb-2" />
+                <Skeleton className="h-9 w-40" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Action button skeleton */}
+          <Skeleton className="h-20 w-full mx-1 mt-10" /></>)
         .with({ status: "error" }, () => "error")
         .with({ status: "success" }, ({ data: account }) =>
           <div className="flex flex-col gap-6">
@@ -50,9 +75,9 @@ export default async function AccountIdPage({ params }: { params: Promise<{ acco
                   <p> {account.IBAN}</p>
                 </div>
                 <div>
-                  <p className="text-xs opacity-75 mb-1">{toStringTypeAccount(account)}</p>
+                  <p className="text-xs opacity-75 mb-1">{account.type}</p>
                   <p className="text-3xl font-bold">
-                    {account.balance.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                    {account.amount.toLocaleString('fr-FR', { style: 'currency', currency: account.currency })}
                   </p>
                 </div>
               </CardContent>
@@ -69,7 +94,7 @@ export default async function AccountIdPage({ params }: { params: Promise<{ acco
             {/* Transactions */}
             <div className="flex flex-col gap-4">
               <h2 className="font-semibold text-lg">Dernières transactions</h2>
-              <GetAllTransactions accountIban={accountId} filters={{ limit: 7, page: 1 }} onPaginationChange={() => { }} />
+              <GetAllTransactions accountIban={accountId} filters={{ limit: 7, page: 1 }} onPaginationChange={() => { }} hiddePagination />
             </div>
           </div >
         )
