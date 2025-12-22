@@ -1,10 +1,16 @@
 "use client"
-import { FiltersProps } from "@/utils/endpoint/feedsEndpoint"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import z from "zod"
 
-type Props = { filters: FiltersProps, totalPage: number, onPaginationChange: (page: number) => void }
+export const paginationSchema = z.object({
+    page: z.number().optional(),
+    limit: z.number().optional(),
+})
+export type PaginationType = z.infer<typeof paginationSchema>
 
-export const PaginationPosts = ({ filters, totalPage, onPaginationChange }: Props) => {
+type Props = { filters: PaginationType, totalPage: number, onPaginationChange: (page: number) => void }
+
+export const PaginationComponent = ({ filters, totalPage, onPaginationChange }: Props) => {
 
     const displayedPages = getDisplayedPages(filters, totalPage)
     const goToPage = (page: number) => {
@@ -57,7 +63,7 @@ export const PaginationPosts = ({ filters, totalPage, onPaginationChange }: Prop
     )
 }
 
-const getDisplayedPages = (filters: FiltersProps, totalPages: number) => {
+const getDisplayedPages = (filters: PaginationType, totalPages: number) => {
     const { page } = filters
     const pages: (number | string)[] = []
     if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1)

@@ -1,5 +1,5 @@
 import z from "zod";
-import { accountIdSchema } from "./account";
+import { accountDTOWithUserSchema, accountIdSchema } from "./account";
 import { userDtoSchema } from "./user";
 
 const transactionIdSchema = z.uuid().brand("transaction");
@@ -19,17 +19,20 @@ export const transactionSchema = z.object({
 
 export type Transaction = z.infer<typeof transactionSchema>;
 
-export const transactionDTOSchema = transactionSchema.pick({
-  id: true,
-  label: true,
-  amount: true,
-  currency: true,
-  date: true,
-  icon: true,
-  type: true,
-  fromAccount: userDtoSchema,
-  toAccount: userDtoSchema,
-});
+export const transactionDTOSchema = transactionSchema
+  .pick({
+    id: true,
+    label: true,
+    amount: true,
+    currency: true,
+    date: true,
+    icon: true,
+    type: true,
+  })
+  .extend({
+    fromAccount: accountDTOWithUserSchema,
+    toAccount: accountDTOWithUserSchema,
+  });
 export type TransactionDTO = z.infer<typeof transactionDTOSchema>;
 
 export const newTransactionSchema = transactionSchema.pick({

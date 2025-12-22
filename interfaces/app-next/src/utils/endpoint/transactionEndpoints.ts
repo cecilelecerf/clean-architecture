@@ -11,6 +11,36 @@ import {
   TransactionId,
   transactionSchema,
 } from '@infrastructure/types/transaction';
+import { safeParseWithLog } from '@/lib/zodUtils';
+
+export const querySchema = z.object({
+  page: z.number().optional(),
+  limit: z.number().optional(),
+  type: transactionSchema.shape.type.optional(),
+  fromDate: z.string().datetime().optional(),
+  toDate: z.string().datetime().optional(),
+  label: transactionSchema.shape.label.optional(),
+});
+export type FiltersProps = z.infer<typeof querySchema>;
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function buildTransactionsQueryParams(filters?: FiltersProps): URLSearchParams {
+  const params = new URLSearchParams();
+
+  if (!filters) return params;
+
+  if (filters.label) params.set('label', filters.label);
+  if (filters.page) params.set('page', String(filters.page));
+  if (filters.limit) params.set('limit', String(filters.limit));
+  if (filters.fromDate) params.set('fromDate', filters.fromDate);
+  if (filters.toDate) params.set('toDate', filters.toDate);
+  if (filters.type) params.set('type', filters.type);
+
+  return params;
+}
 
 // ============================================================================
 // TRANSACTIONS ENDPOINTS
@@ -19,13 +49,17 @@ import {
 export const transactionEndpoint = createEndpointsNodes({
   // GET /api/accounts/:accountIban/transactions
   // Transactions d'un account
-  getAll: ({ accountIban }: { accountIban: AccountId }) =>
+  getAll: ({ accountIban, filters }: { accountIban: AccountId; filters?: FiltersProps }) =>
     queryOptions({
       queryKey: ['accounts', accountIban, 'transactions', 'list'],
-      queryFn: () =>
-        get(`/accounts/${accountIban}/transactions`).then((data) =>
-          transactionSchema.array().parse(data),
-        ),
+      queryFn: async () => {
+        const params = buildTransactionsQueryParams(filters);
+        const data = await get(`/accounts/${accountIban}/transactions?${params.toString()}`);
+        return safeParseWithLog(
+          z.object({ transactions: transactionSchema.array(), total: z.number() }),
+          data,
+        );
+      },
     }),
 
   // GET /api/accounts/:accountIban/transactions/:transactionId

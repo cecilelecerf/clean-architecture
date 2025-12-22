@@ -13,6 +13,7 @@ import {
 import z from 'zod';
 import { queryClient } from '@/lib/queryClient';
 import { userDtoSchema } from '@infrastructure/types/user';
+import { paginationSchema } from '@/components/PaginationComponent';
 
 // ============================================================================
 // SCHEMAS
@@ -42,9 +43,7 @@ export const publishActionSchema = z.object({
 });
 export type PublishAction = z.infer<typeof publishActionSchema>;
 
-export const querySchema = z.object({
-  page: z.number().optional(),
-  limit: z.number().optional(),
+export const querySchema = paginationSchema.extend({
   tagsId: tagIdSchema.array().optional(),
   status: z.boolean().optional(),
   fromDate: z.string().datetime().optional(),
