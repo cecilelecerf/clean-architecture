@@ -5,7 +5,7 @@ import {
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { TokenService } from "@application/ports/services/TokenService";
-import { UserEntity, UserToFront } from "@domain/entities/UserEntity";
+import { UserToFront } from "@domain/entities/UserEntity";
 
 type Props = {
   token: string;
@@ -21,7 +21,6 @@ export class ConfirmRegistrationUsecase {
   public async execute({
     token,
   }: Props): Promise<UserToFront | InvalidTokenError | UserNotFoundError> {
-    console.log(token);
     const payload = await this.tokenService.validateToken(
       token,
       "confirmation"

@@ -2,10 +2,10 @@
 import { useState } from 'react';
 import FormWrapper from '../../../components/FromWrapper';
 import { useMutation } from '@tanstack/react-query';
-import { post } from '@/lib/apiClient';
 import { RegisterPayload } from '@/app/api/auth/register/route';
 import { toast } from 'sonner';
 import { endpoints } from '@/utils/endpoint';
+import Link from 'next/link';
 
 
 export default function RegisterPage() {
@@ -46,7 +46,17 @@ export default function RegisterPage() {
                 ]}
                 button="Connexion"
                 loading={mutate.isPending}
-            />
+            >
+                <div className="text-center text-sm">
+                    <span className="text-muted-foreground">Déjà un compte ? </span>
+                    <Link
+                        href="/login"
+                        className="text-primary hover:underline font-medium"
+                    >
+                        Se connecter
+                    </Link>
+                </div>
+            </FormWrapper>
         </form>
     );
 }

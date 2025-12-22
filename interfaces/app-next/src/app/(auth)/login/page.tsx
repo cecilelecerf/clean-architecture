@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { match } from 'ts-pattern';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter()
@@ -48,7 +49,26 @@ export default function LoginPage() {
         ]}
         button="Connexion"
         loading={false}
-      />
+      >
+        <div className="space-y-2 text-center text-sm">
+          <Link
+            href="/forgot-password"
+            className="text-primary hover:underline block"
+          >
+            Mot de passe oublié ?
+          </Link>
+          <div>
+            <span className="text-muted-foreground">Pas encore de compte ? </span>
+            <Link
+              href="/register"
+              className="text-primary hover:underline font-medium"
+            >
+              S'inscrire
+            </Link>
+          </div>
+        </div>
+      </FormWrapper>
+
     </form>
   );
 }

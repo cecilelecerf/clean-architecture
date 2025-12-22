@@ -6,7 +6,6 @@ export async function POST(req: NextRequest) {
   try {
     const json = await req.json();
     const data = tokenSchema.parse(json);
-    console.log(data);
     const result = await usersFactory().confirmRegistration.execute(data);
     if (result instanceof Error)
       return NextResponse.json({ message: result.message }, { status: result.statusCode });
