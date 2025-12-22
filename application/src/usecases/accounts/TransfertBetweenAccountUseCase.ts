@@ -5,21 +5,38 @@ import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
-import { AccountNotFoundError,UnauthorizedAccessAccountError,SameAccountTransferError } from "@application/errors/accounts";
-import { IBANInvalidCheckDigitsError, IBANInvalidFormatError, IBANTooLongError, IBANTooShortError } from "@domain/errors/IBAN";
-import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import {
+  AccountNotFoundError,
+  UnauthorizedAccessAccountError,
+  SameAccountTransferError,
+} from "@application/errors/accounts";
+import {
+  IBANInvalidCheckDigitsError,
+  IBANInvalidFormatError,
+  IBANTooLongError,
+  IBANTooShortError,
+} from "@domain/errors/IBAN";
+import {
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMismatchError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
-import { UserNotActiveError, UserNotFoundError } from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 
 interface Props {
-  requestUserId: string,
-  fromIbanString: string,
-  toIbanString: string,
-  amountValue: number,
-  amountCurrency: string,
-  label: string,
-  icon: string
+  requestUserId: string;
+  fromAccountIban: string;
+  toAccountIban: string;
+  amountValue: number;
+  amountCurrency: string;
+  label: string;
+  icon: string;
 }
 export class TransfertBetweenAccountUsecase {
   constructor(
@@ -32,12 +49,12 @@ export class TransfertBetweenAccountUsecase {
 
   public async execute({
     requestUserId,
-    fromIbanString,
-    toIbanString,
+    fromAccountIban: fromIbanString,
+    toAccountIban: toIbanString,
     amountValue,
     amountCurrency,
     label,
-    icon
+    icon,
   }: Props): Promise<
     | AccountNotFoundError
     | UnauthorizedAccessAccountError
@@ -50,9 +67,10 @@ export class TransfertBetweenAccountUsecase {
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
     | MoneyCurrencyMismatchError
-    | UserNotFoundError 
+    | UserNotFoundError
     | UserNotActiveError
-    | void> {
+    | void
+  > {
     const fromIbanResult = IBAN.create(fromIbanString);
     if (fromIbanResult instanceof Error) {
       return fromIbanResult;
@@ -65,7 +83,10 @@ export class TransfertBetweenAccountUsecase {
     }
     const toIBAN = toIbanResult;
 
-    const amount = Money.create({ amount: amountValue, currency: amountCurrency });
+    const amount = Money.create({
+      amount: amountValue,
+      currency: amountCurrency,
+    });
     if (amount instanceof Error) {
       return amount;
     }

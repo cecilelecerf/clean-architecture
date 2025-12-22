@@ -16,3 +16,10 @@ export const accountSchema = z.object({
 });
 
 export type Account = z.infer<typeof accountSchema>;
+
+export const newAccountSchema = accountSchema.pick({
+  name: true,
+  type: true,
+  color: true,
+});
+export type NewAccount = z.infer<typeof newAccountSchema>;

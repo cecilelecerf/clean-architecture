@@ -1,12 +1,19 @@
-import { AccountNotFoundError,MissingIBANError,MissingOrInvalidNameError, UnauthorizedAccessAccountError } from "@application/errors/accounts";
+import {
+  AccountNotFoundError,
+  MissingIBANError,
+  MissingOrInvalidNameError,
+  UnauthorizedAccessAccountError,
+} from "@application/errors/accounts";
 import { InvalidAccountAccessError } from "@application/errors/accounts/InvalidAccountAccessError";
-import { UserNotActiveError, UserNotFoundError } from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { EmailService } from "@application/ports/services/EmailService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { AccountEntity } from "@domain/entities/AccountEntity";
 import { InvalidAccountNameError } from "@domain/errors/account";
 import { IBAN } from "@domain/values/IBAN";
 
@@ -17,17 +24,22 @@ export class RenameAccountUsecase {
     private readonly clockService: ClockService,
     private readonly userRepository: UserRepository
   ) {}
-  public async execute(iban: string, requestUserId: string, newName: string): Promise<
-  | MissingIBANError
-  | MissingOrInvalidNameError
-  | AccountNotFoundError
-  | UserNotFoundError
-  | InvalidAccountNameError
-  | UserNotFoundError 
-  | UserNotActiveError
-  | InvalidAccountAccessError
-  | UnauthorizedAccessAccountError
-  | void> {
+  public async execute(
+    iban: string,
+    requestUserId: string,
+    newName: string
+  ): Promise<
+    | MissingIBANError
+    | MissingOrInvalidNameError
+    | AccountNotFoundError
+    | UserNotFoundError
+    | InvalidAccountNameError
+    | UserNotFoundError
+    | UserNotActiveError
+    | InvalidAccountAccessError
+    | UnauthorizedAccessAccountError
+    | void
+  > {
     if (!iban || iban.trim().length === 0) {
       return new MissingIBANError();
     }
