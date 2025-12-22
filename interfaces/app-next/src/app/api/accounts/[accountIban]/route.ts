@@ -12,7 +12,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/accounts/[ac
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     const { accountIban } = await ctx.params;
-    const account = await accountFactory().client.getAccountByIBAN.execute({
+    const account = await accountFactory().getAccountByIBAN.execute({
       iban: accountIban,
       userId: session.user.id,
     });
@@ -45,10 +45,7 @@ export async function DELETE(req: NextRequest, ctx: RouteContext<'/api/accounts/
     }
     const { accountIban } = await ctx.params;
 
-    const account = await accountFactory().client.deleteAccount.execute(
-      accountIban,
-      session.user.id,
-    );
+    const account = await accountFactory().deleteAccount.execute(accountIban, session.user.id);
 
     if (account instanceof Error) {
       return NextResponse.json(

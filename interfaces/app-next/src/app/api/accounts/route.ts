@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    const result = await accountFactory().client.getAccounts.execute(session.user.id);
+    const result = await accountFactory().getAccounts.execute(session.user.id);
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const payload = accountSchema.parse(body);
 
-    const result = await accountFactory().client.createAccount.execute({
+    const result = await accountFactory().createAccount.execute({
       iban: payload.IBAN,
       userId: session.user.id,
       name: payload.name,
