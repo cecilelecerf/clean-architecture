@@ -4,6 +4,8 @@ export class CreditStatusMismatchError extends Error {
   public readonly name = "CreditStatusMismatchError";
 
   constructor(public readonly creditStatus: CreditEntity["status"]) {
-    super(`Le crédit est avec le status "${creditStatus}" au lieu d'être en attente.`);
+    super(
+      `Le crédit est avec le status "${creditStatus}" au lieu d'être en attente.`
+    );
   }
 }
