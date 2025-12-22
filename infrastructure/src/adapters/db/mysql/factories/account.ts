@@ -13,7 +13,7 @@ import { ApplyDailyInterestUseCase } from "@application/usecases/accounts/ApplyD
 import { SavingsRateRepositoryMySQL } from "../repositories/SavingRateRepositoryMySQL";
 import { GetAccountByIBANUsercase } from "@application/usecases/accounts/GetAccountByIBANUseCase";
 import { GetAccountsUsercase } from "@application/usecases/accounts/GetAccountsUseCase";
-import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccountUsecase";
+import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccountUsecasee";
 
 export const accountFactory = () => {
   const client = new MySQLClient();

@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
 import { accountSchema } from '@infrastructure/types/account';
-import z from 'zod';
 
 export async function GET(req: NextRequest) {
   try {
@@ -35,16 +34,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const payload = accountSchema.parse(body);
 
-    const result = await accountFactory().createAccount.execute({
-      iban: payload.IBAN,
-      userId: session.user.id,
-      name: payload.name,
-      type: payload.type,
-      color: payload.color,
-      initialBalance: payload.balance,
-      currency: payload.currency,
-    });
-
+    // const result = await accountFactory().createAccount.execute({
+    //   iban: payload.IBAN,
+    //   userId: session.user.id,
+    //   name: payload.name,
+    //   type: payload.type,
+    //   color: payload.color,
+    //   initialBalance: payload.balance,
+    //   currency: payload.currency,
+    // });
+    const result = {};
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },
@@ -52,15 +51,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(
-      accountSchema
-        .omit({ createdAt: true, updatedAt: true })
-        .extend({
-          createdAt: z.date(),
-          updatedAt: z.date().optional(),
-        })
-        .parse(result),
-    );
+    return NextResponse.json(result);
   } catch (err) {
     console.error(err);
     return NextResponse.json(
