@@ -1,36 +1,22 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
-import { AccountId, accountSchema } from '@infrastructure/types/account';
+import { AccountId, accountSchema, NewAccount } from '@infrastructure/types/account';
 import { threadSchema } from '@infrastructure/types/thread';
 import z from 'zod';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { transactionSchema } from '@infrastructure/types/transaction';
 import { UserId } from '@infrastructure/types/user';
+import { transactionEndpoint } from './transactionEndpoints';
 
 // ============================================================================
 // SCHEMAS
 // ============================================================================
-export type Account = z.infer<typeof accountSchema>;
 
 export const renameAccountSchema = accountSchema.pick({
-  name: true
+  name: true,
 });
 export type renameAccount = z.infer<typeof renameAccountSchema>;
-
-export const transferAccountSchema = accountSchema.pick({
-  IBAN: true
-});
-export type transferAccount = z.infer<typeof transferAccountSchema>;
-
-export const transferTransactionSchema = transactionSchema.pick({
-  amount: true,
-  currency: true,
-  label: true,
-  icon: true
-});
-export type transferTransaction = z.infer<typeof transferTransactionSchema>;
 
 // ============================================================================
 // ACCOUNTS ENDPOINTS
@@ -49,7 +35,7 @@ export const accountsEndpoint = createEndpointsNodes({
     }),
 
   // GET /api/accounts/:accountIban
-  // Détails d'un compte avec transactions
+  // Détails d'un compte
   get: ({ accountIban }: { accountIban: AccountId }) =>
     queryOptions({
       queryKey: ['accounts', accountIban],
@@ -60,17 +46,17 @@ export const accountsEndpoint = createEndpointsNodes({
   // Créer un nouveau compte
   create: () =>
     mutationOptions({
-      mutationFn: async (payload: Account) => {
-        const data = await post('/posts', payload);
+      mutationFn: async (payload: NewAccount) => {
+        const data = await post('/accounts', payload);
         return accountSchema.parse(data);
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['threads', 'list', ] });
+        queryClient.invalidateQueries({ queryKey: ['accounts', 'list'] });
       },
     }),
 
   // PATCH /api/accounts/:accountIban/rename
-  // Modifier un compte (nom)
+  // Modifier un compte
   update: ({ accountIban }: { accountIban: AccountId }) =>
     mutationOptions({
       mutationFn: (data: { name?: string }) => patch(`/accounts/${accountIban}`, data),
@@ -80,28 +66,18 @@ export const accountsEndpoint = createEndpointsNodes({
       },
     }),
 
-    // POST /api/accounts/:accountIban/transfer
-    // Transférer un thread à un autre conseiller
-    transfer: ({ accountIban }: { accountIban: AccountId }) =>
-      mutationOptions({
-        mutationFn: () =>
-          patch(`/accounts/${accountIban}/transfer`, { }),
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['accountIban', accountIban] });
-          queryClient.invalidateQueries({ queryKey: ['accountIban', 'list'] });
-        },
-    }),
-
-    // DELETE /api/threads/:accountIban/delete
-    // Supprtion d'un participant
-    remove: ({ accountIban }: { accountIban: AccountId }) =>
-      mutationOptions({
-        mutationFn: ({ userId }: { userId: UserId }) =>
-          deleteEntity(`/threads/${accountIban}/delete`).then((data) =>
-            safeParseWithLog(threadSchema, data),
+  // DELETE /api/accounts/:accountIban
+  // Supprtion d'un participant
+  remove: ({ accountIban }: { accountIban: AccountId }) =>
+    mutationOptions({
+      mutationFn: () =>
+        deleteEntity(`/accounts/${accountIban}`).then((data) =>
+          safeParseWithLog(threadSchema, data),
         ),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['threads', accountIban] });
-        },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['accounts', accountIban] });
+        queryClient.invalidateQueries({ queryKey: ['accounts', 'list'] });
+      },
     }),
+  transactions: transactionEndpoint,
 });
