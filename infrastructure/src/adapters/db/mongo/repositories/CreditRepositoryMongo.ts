@@ -26,7 +26,9 @@ export class CreditRepositoryMongo implements CreditRepository {
       startDate: doc.startDate,
       monthlyPayment,
       remainingBalance,
+      status: doc.status,
       createdAt: doc.createdAt,
+      advisorId: doc.advisorId,
       updatedAt: doc.updatedAt,
     });
   }

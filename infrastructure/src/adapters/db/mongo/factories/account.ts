@@ -10,9 +10,7 @@ import { ApplyDailyInterestUseCase } from "@application/usecases/accounts/ApplyD
 import { DeleteAccountUsecase } from "@application/usecases/accounts/DeleteAccountUsecase";
 import { RenameAccountUsecase } from "@application/usecases/accounts/RenameAccountUsecase";
 import { TransfertBetweenAccountUsecase } from "@application/usecases/accounts/TransfertBetweenAccountUsecase";
-import { GetAccountByIBANUsercase } from "@application/usecases/accounts/GetAccountByIBANUseCase";
-import { GetAccountsUsercase } from "@application/usecases/accounts/GetAccountsUseCase";
-import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccountUsecasee";
+import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccountUsecase";
 
 export const accountFactory = () => {
   const client = new MongoClient();
@@ -60,11 +58,10 @@ export const accountFactory = () => {
     admin: {
       applyDailyInterest,
     },
-    client: {
-      createAccount,
-      deleteAccount,
-      renameAccount,
-      transfertBetweenAccount,
-    },
+
+    createAccount,
+    deleteAccount,
+    renameAccount,
+    transfertBetweenAccount,
   };
 };

@@ -15,6 +15,9 @@ import { TransactionRepositoryMySQL } from "@infrastructure/adapters/db/mysql/re
 import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
 import { Color } from "@domain/values/Color";
 import { rand } from "./utils";
+import { CreditRepositoryMySQL } from "../repositories/CreditRepositoryMySQL";
+import { Percentage } from "@domain/values/Percentage";
+import { CreditEntity, CreditStatus } from "@domain/entities/CreditEntity";
 
 export async function seedSQLClient(
   mysqlClient: MySQLClient
@@ -24,6 +27,7 @@ export async function seedSQLClient(
   const userRepository = new UserRepositoryMySQL(mysqlClient);
   const accountRepository = new AccountRepositoryMySQL(mysqlClient);
   const transactionRepository = new TransactionRepositoryMySQL(mysqlClient);
+  const creditRepository = new CreditRepositoryMySQL(mysqlClient);
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
@@ -123,6 +127,52 @@ export async function seedSQLClient(
           await transactionRepository.save(transaction);
           console.log(transaction.id);
         }
+      }
+
+      const credits: CreditEntity[] = [];
+      for(const rawCredit of raw.credits ?? []){
+        const initialAmount = Money.create({
+          amount: rawCredit.initialAmount,
+          currency: rawCredit.currency,
+        });
+        if (initialAmount instanceof Error) {
+          console.warn(initialAmount);
+          continue;
+        }
+
+        const interestRate = Percentage.create(rawCredit.interestRate);
+        if (interestRate instanceof Error) {
+          console.warn(interestRate);
+          continue;
+        }
+
+        const insuranceRate = Percentage.create(rawCredit.insuranceRate);
+        if (insuranceRate instanceof Error) {
+          console.warn(insuranceRate);
+          continue;
+        }
+
+        const credit = CreditEntity.create({
+          id: uuidService.generate(),
+          advisorId: null,
+          userId: user.id,
+          initialAmount: initialAmount,
+          interestRate: interestRate,
+          insuranceRate: insuranceRate,
+          durationMonths:  rawCredit.durationMonths,
+          startDate: rawCredit.startDate,
+          status: CreditStatus.PENDING
+        });
+
+        if (credit instanceof Error) {
+          console.warn(credit);
+          continue;
+        }
+
+        credits.push(credit);
+        await creditRepository.save(credit);
+        console.log(credit.id);
+
       }
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);

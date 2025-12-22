@@ -35,7 +35,9 @@ export class CreditRepositoryMySQL implements CreditRepository {
       startDate: row.start_date,
       monthlyPayment,
       remainingBalance,
+      status: row.status,
       createdAt: row.created_at,
+      advisorId: row.advisor_id,
       updatedAt: row.updated_at,
     });
   }
@@ -77,8 +79,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
       `INSERT INTO credits 
         (id, user_id, initial_amount, initial_currency, interest_rate, insurance_rate, 
          duration_months, start_date, monthly_amount, monthly_currency, 
-         remaining_amount, remaining_currency, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         remaining_amount, remaining_currency, status, created_at, advisor_id, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         credit.id,
         credit.userId,
@@ -92,7 +94,9 @@ export class CreditRepositoryMySQL implements CreditRepository {
         credit.monthlyPayment.currency,
         credit.remainingBalance.amount,
         credit.remainingBalance.currency,
+        credit.status,
         credit.createdAt,
+        credit.advisorId,
         credit.updatedAt,
       ]
     );
@@ -105,7 +109,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
        SET user_id = ?, initial_amount = ?, initial_currency = ?, 
            interest_rate = ?, insurance_rate = ?, duration_months = ?, 
            start_date = ?, monthly_amount = ?, monthly_currency = ?, 
-           remaining_amount = ?, remaining_currency = ?, updated_at = ? 
+           remaining_amount = ?, remaining_currency = ?, status = ?, advisor_id = ?, updated_at = ? 
        WHERE id = ?`,
       [
         credit.userId,
@@ -119,6 +123,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
         credit.monthlyPayment.currency,
         credit.remainingBalance.amount,
         credit.remainingBalance.currency,
+        credit.status,
+        credit.advisorId,
         credit.updatedAt,
         credit.id,
       ]

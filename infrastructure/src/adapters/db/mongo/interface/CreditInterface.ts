@@ -19,6 +19,8 @@ export interface CreditInterface {
     amount: number;
     currency: string;
   };
+  status: string;
   createdAt: Date;
+  advisor: Types.UUID;
   updatedAt: Date;
 }
