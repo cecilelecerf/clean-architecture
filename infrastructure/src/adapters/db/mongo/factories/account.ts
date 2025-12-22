@@ -7,10 +7,10 @@ import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailService";
 import { ApplyDailyInterestUseCase } from "@application/usecases/accounts/ApplyDailyInterestUseCase";
-import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccountUsecase";
 import { DeleteAccountUsecase } from "@application/usecases/accounts/DeleteAccountUsecase";
 import { RenameAccountUsecase } from "@application/usecases/accounts/RenameAccountUsecase";
 import { TransfertBetweenAccountUsecase } from "@application/usecases/accounts/TransfertBetweenAccountUsecase";
+import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccountUsecase";
 
 export const accountFactory = () => {
   const client = new MongoClient();

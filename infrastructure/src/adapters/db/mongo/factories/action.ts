@@ -16,14 +16,23 @@ export const actionFactory = () => {
     clockService
   );
 
-  const manageActionAvailability = new ManageActionAvailabilityUsecase(
-    actionRepository
+  const updateAction = new UpdateActionUsecase(
+    actionRepository,
+    userRepository
+  );
+
+  const getAllActionsByAvailability = new GetAllActionsByAvailabilityUsecase(
+    actionRepository,
+    userRepository
   );
 
   return {
     admin: {
-      manageActionAvailability,
       createAction,
+      updateAction,
+    },
+    client: {
+      getAllActionsByAvailability,
     },
   };
 };

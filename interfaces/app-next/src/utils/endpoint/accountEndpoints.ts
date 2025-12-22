@@ -46,6 +46,7 @@ export const accountsEndpoint = createEndpointsNodes({
   create: () =>
     mutationOptions({
       mutationFn: async (payload: NewAccount) => {
+        console.log(payload);
         const data = await post('/accounts', payload);
         return accountSchema.parse(data);
       },
