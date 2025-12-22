@@ -3,7 +3,8 @@ import { MongoClient } from "../../MongoClient";
 import { ActionRepositoryMongo } from "../repositories/ActionRepositoryMongo";
 import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
 import { CreateActionUsecase } from "@application/usecases/actions/CreateActionUsecase";
-import { ManageActionAvailabilityUsecase } from "@application/usecases/actions/ManageActionAvailabilityUsecase";
+import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/actions/GetAllActionsByAvailabilityUseCase";
+import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
 
 export const actionFactory = () => {
     const client = new MongoClient();
@@ -16,15 +17,24 @@ export const actionFactory = () => {
         userRepository,
         clockService
     );
+
+    const updateAction = new UpdateActionUsecase(
+        actionRepository,
+        userRepository
+    );
     
-    const manageActionAvailability = new ManageActionAvailabilityUsecase(
-        actionRepository
+    const getAllActionsByAvailability  = new GetAllActionsByAvailabilityUsecase(
+        actionRepository,
+        userRepository
     );
 
     return {
         admin: {
-            manageActionAvailability,
-            createAction
+            createAction,
+            updateAction
+        },
+        client: {
+            getAllActionsByAvailability
         }
     };
 }

@@ -3,8 +3,9 @@ import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositor
 import { ActionRepositoryMySQL } from "../repositories/ActionRepositoryMySQL";
 
 import { CreateActionUsecase } from "@application/usecases/actions/CreateActionUsecase";
-import { ManageActionAvailabilityUsecase } from "@application/usecases/actions/ManageActionAvailabilityUsecase";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
+import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/actions/GetAllActionsByAvailabilityUseCase";
+import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
 
 export const actionFactory = () => {
     const client = new MySQLClient();
@@ -17,14 +18,24 @@ export const actionFactory = () => {
         userRepository,
         clockService
     );
-    const manageActionAvailability = new ManageActionAvailabilityUsecase(
-        actionRepository
+
+    const updateAction = new UpdateActionUsecase(
+        actionRepository,
+        userRepository
+    );
+
+    const getAllActionsByAvailability  = new GetAllActionsByAvailabilityUsecase(
+        actionRepository,
+        userRepository
     );
 
     return {
         admin: {
-            manageActionAvailability,
-            createAction
+            createAction,
+            updateAction
+        },
+        client: {
+            getAllActionsByAvailability
         }
     };
 }
