@@ -11,10 +11,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from './ui/label';
 import { AlertCircle, Calendar, CheckCircle2, Mail, User, Lock } from 'lucide-react';
 import { ButtonLoading } from './buttons/ButtonLoading';
+import { Flex } from '@radix-ui/themes';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 
 export type Field = {
   label: string;
-  type?: "text" | "email" | "textarea" | "password" | "date" | "checkbox" | "other";
+  type?: "text" | "email" | "textarea" | "password" | "date" | "checkbox" | "other" | "radio";
   placeholder?: string;
   get: string | string[];
   set: (e: string | string[]) => void;
@@ -123,7 +125,7 @@ export default function FormWrapper({
                     />
                   ))
                   .with("checkbox", () => (
-                    <div className="space-y-3">
+                    <Flex gap="5">
                       {field.options?.map((option, idx) => (
                         <div key={idx} className="flex items-center space-x-2">
                           <Checkbox
@@ -140,7 +142,30 @@ export default function FormWrapper({
                           </Label>
                         </div>
                       ))}
-                    </div>
+                    </Flex>
+                  ))
+                  .with("radio", () => (
+                    <RadioGroup
+                      value={field.get as string}
+                      onValueChange={(value) => field.set(value)}
+                      disabled={loading}
+                      className="flex gap-5"
+                    >
+                      {field.options?.map((option, idx) => (
+                        <div key={idx} className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value={option.value}
+                            id={`${field.label}-${option.value}`}
+                          />
+                          <Label
+                            htmlFor={`${field.label}-${option.value}`}
+                            className="text-sm font-normal cursor-pointer"
+                          >
+                            {option.label}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
                   ))
                   .with("other", () => field.layout)
                   .otherwise(() => (

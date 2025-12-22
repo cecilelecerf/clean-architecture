@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const payload = accountSchema.parse(body);
-
+    console.log(payload);
     // const result = await accountFactory().createAccount.execute({
     //   iban: payload.IBAN,
     //   userId: session.user.id,

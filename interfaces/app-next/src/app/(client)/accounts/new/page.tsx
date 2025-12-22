@@ -24,11 +24,11 @@ export default function NewAccountPage() {
     {
       label: 'Nom du compte',
       get: field.name,
-      set: (e) => setField((prev) => ({ ...prev, name: e })),
+      set: (e) => setField((prev) => ({ ...prev, name: e as string })),
     },
     {
       label: 'Type de compte',
-      type: 'checkbox',
+      type: 'radio',
       get: field.type,
       set: (e) => setField((prev) => ({ ...prev, type: e as Account["type"] })),
       options: [
