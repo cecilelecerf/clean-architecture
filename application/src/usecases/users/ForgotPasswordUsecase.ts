@@ -30,16 +30,11 @@ export class ForgotPasswordUsecase {
       userId: user.id,
     });
 
-    // Préparer le lien de reset (exemple : frontend)
     const resetLink = `${confirmationUrl}/reset-password?token=${token}`;
 
-    // Envoyer l'email
-    await this.emailService.sendEmail({
-      to: user.email,
-      subject: "Réinitialisation de votre mot de passe",
-      text: `<p>Bonjour ${user.firstname} ${user.lastname},</p>
-       <p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p>
-       <a href="${resetLink}">${resetLink}</a>`,
+    await this.emailService.sendPasswordResetEmail(user.email, {
+      firstname: user.firstname,
+      resetLink,
     });
   }
 }

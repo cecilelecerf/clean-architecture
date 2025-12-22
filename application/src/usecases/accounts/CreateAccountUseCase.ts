@@ -62,6 +62,12 @@ export class CreateAccountUsecase {
     });
     if (balanceVO instanceof Error) return balanceVO;
 
+    const owner = AccountOwner.create({
+      role: "client",
+      userId: user.id,
+    });
+    if (owner instanceof Error) return owner;
+
     const today = this.clockService.now();
 
     var requestUser = null;

@@ -45,5 +45,12 @@ services:
     depends_on:
       - db_mongo
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: banking-mailhog
+    ports:
+      - "1025:1025" # Port SMTP
+      - "8025:8025" # Interface web
+
 volumes:
   mongo-data:

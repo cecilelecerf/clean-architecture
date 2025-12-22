@@ -18,4 +18,4 @@ export type Message = z.infer<typeof messageSchema>;
 export const messageWithUserSchema = messageSchema.extend({
   sender: userDtoSchema,
 });
-export type MessageWithUser = z.infer<typeof messageWithUserSchema>;
+export type MessageWithUserDTO = z.infer<typeof messageWithUserSchema>;

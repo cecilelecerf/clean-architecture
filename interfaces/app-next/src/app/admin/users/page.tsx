@@ -32,11 +32,11 @@ export default function AdminUsersPage() {
                             </p>
                             <p className="text-sm text-center text-gray-500">{user.email}</p>
                         </div>
-                        <div className="">
+                        <div >
                             <Button
                                 onClick={() => router.push(`users/${user.id}`)}
                             >
-                                + d'info
+                                + d&apos;info
                             </Button>
                         </div>
                     </Card>

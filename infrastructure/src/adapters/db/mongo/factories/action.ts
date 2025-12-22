@@ -3,38 +3,27 @@ import { MongoClient } from "../../MongoClient";
 import { ActionRepositoryMongo } from "../repositories/ActionRepositoryMongo";
 import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
 import { CreateActionUsecase } from "@application/usecases/actions/CreateActionUsecase";
-import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/actions/GetAllActionsByAvailabilityUseCase";
-import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
 
 export const actionFactory = () => {
-    const client = new MongoClient();
-    const actionRepository = new ActionRepositoryMongo(client);
-    const userRepository = new UserRepositoryMongo(client);
-    const clockService = new SystemClockService();
+  const client = new MongoClient();
+  const actionRepository = new ActionRepositoryMongo(client);
+  const userRepository = new UserRepositoryMongo(client);
+  const clockService = new SystemClockService();
 
-    const createAction = new CreateActionUsecase(
-        actionRepository,
-        userRepository,
-        clockService
-    );
+  const createAction = new CreateActionUsecase(
+    actionRepository,
+    userRepository,
+    clockService
+  );
 
-    const updateAction = new UpdateActionUsecase(
-        actionRepository,
-        userRepository
-    );
-    
-    const getAllActionsByAvailability  = new GetAllActionsByAvailabilityUsecase(
-        actionRepository,
-        userRepository
-    );
+  const manageActionAvailability = new ManageActionAvailabilityUsecase(
+    actionRepository
+  );
 
-    return {
-        admin: {
-            createAction,
-            updateAction
-        },
-        client: {
-            getAllActionsByAvailability
-        }
-    };
-}
+  return {
+    admin: {
+      manageActionAvailability,
+      createAction,
+    },
+  };
+};

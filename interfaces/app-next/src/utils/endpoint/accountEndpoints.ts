@@ -6,7 +6,6 @@ import z from 'zod';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { UserId } from '@infrastructure/types/user';
 import { transactionEndpoint } from './transactionEndpoints';
 
 // ============================================================================

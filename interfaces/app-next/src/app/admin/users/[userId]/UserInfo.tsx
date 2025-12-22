@@ -31,7 +31,6 @@ export const UserInfo = ({ userId }: { userId: UserId }) => {
                         <Mail size={16} /> {client.email}
                     </div>
                     <p>Rôle : {client.role}</p>
-                    <p>Créé le : {new Date(client.createdAt).toLocaleDateString()}</p>
                     {client.confirmedAt && (
                         <p>Confirmé le : {new Date(client.confirmedAt).toLocaleDateString()}</p>
                     )}

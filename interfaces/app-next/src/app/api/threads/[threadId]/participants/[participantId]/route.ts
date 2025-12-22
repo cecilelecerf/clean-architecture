@@ -1,5 +1,3 @@
-// DELETE
-// retirer un participant
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
 import { getServerSession } from 'next-auth';
@@ -39,7 +37,7 @@ export async function DELETE(
 }
 
 export async function POST(
-  req: NextRequest,
+  _req: NextRequest,
   ctx: RouteContext<'/api/threads/[threadId]/participants/[participantId]'>,
 ) {
   try {
@@ -48,8 +46,6 @@ export async function POST(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     const { threadId, participantId } = await ctx.params;
-
-    const body = await req.json();
 
     const thread = await threadsFactory().addParticipant.execute({
       administratorId: session.user.id,
