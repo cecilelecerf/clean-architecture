@@ -45,7 +45,7 @@ export class CreateAccountUsecase {
     | UserNotActiveError
     | MissingOrInvalidNameError
     | InvalidAccountNameError
-    | void
+    | AccountEntity
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -96,5 +96,6 @@ export class CreateAccountUsecase {
       subject: "Compte créé",
       text: `Votre compte a été créé.`,
     });
+    return account;
   }
 }
