@@ -35,8 +35,10 @@ export const CreditSchema = new Schema<CreditInterface>(
       },
       required: true,
     },
+    status: { type: String, enum: ["PENDING", "ACCEPTED", "REFUSED", "COMPLETED"], required: false },
     createdAt: { type: Date, required: true },
-    updatedAt: { type: Date, required: true },
+    advisor: { type: Schema.Types.UUID, ref: "User", required: false },
+    updatedAt: { type: Date, required: false },
   },
   {
     collection: "credits",
