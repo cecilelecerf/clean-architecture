@@ -7,34 +7,34 @@ import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/action
 import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
 
 export const actionFactory = () => {
-    const client = new MongoClient();
-    const actionRepository = new ActionRepositoryMongo(client);
-    const userRepository = new UserRepositoryMongo(client);
-    const clockService = new SystemClockService();
+  const client = new MongoClient();
+  const actionRepository = new ActionRepositoryMongo(client);
+  const userRepository = new UserRepositoryMongo(client);
+  const clockService = new SystemClockService();
 
-    const createAction = new CreateActionUsecase(
-        actionRepository,
-        userRepository,
-        clockService
-    );
+  const createAction = new CreateActionUsecase(
+    actionRepository,
+    userRepository,
+    clockService
+  );
 
-    const updateAction = new UpdateActionUsecase(
-        actionRepository,
-        userRepository
-    );
-    
-    const getAllActionsByAvailability  = new GetAllActionsByAvailabilityUsecase(
-        actionRepository,
-        userRepository
-    );
+  const updateAction = new UpdateActionUsecase(
+    actionRepository,
+    userRepository
+  );
 
-    return {
-        admin: {
-            createAction,
-            updateAction
-        },
-        client: {
-            getAllActionsByAvailability
-        }
-    };
-}
+  const getAllActionsByAvailability = new GetAllActionsByAvailabilityUsecase(
+    actionRepository,
+    userRepository
+  );
+
+  return {
+    admin: {
+      createAction,
+      updateAction,
+    },
+    client: {
+      getAllActionsByAvailability,
+    },
+  };
+};

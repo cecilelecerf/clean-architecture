@@ -5,13 +5,13 @@ import { MessageRepositoryMongo } from "../../repositories/MessageRepositoryMong
 import { GetThreadMessages } from "@application/usecases/messages/GetThreadWithUserMessages";
 
 export const getThreadMessagesFactory = () => {
-    const client = new MongoClient();
-    const userRepository = new UserRepositoryMongo(client);
-    const threadRepository = new ThreadRepositoryMongo(client);
-    const messageRepository = new MessageRepositoryMongo(client);
-    return new GetThreadMessages(
-        userRepository,
-        threadRepository,
-        messageRepository
-    );
-}
+  const client = new MongoClient();
+  const userRepository = new UserRepositoryMongo(client);
+  const threadRepository = new ThreadRepositoryMongo(client);
+  const messageRepository = new MessageRepositoryMongo(client);
+  return new GetThreadMessages(
+    userRepository,
+    threadRepository,
+    messageRepository
+  );
+};

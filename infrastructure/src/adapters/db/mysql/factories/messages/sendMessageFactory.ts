@@ -5,7 +5,6 @@ import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/reposit
 import { MessageRepositoryMySQL } from "../../repositories/MessageRepositoryMySQL";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { Server, Socket } from "socket.io";
 
 export const sendMessageFactory = () => {
   const client = new MySQLClient();

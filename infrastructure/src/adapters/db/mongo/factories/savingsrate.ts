@@ -6,22 +6,22 @@ import { SystemClockService } from "@infrastructure/adapters/services/SystemCloc
 import { SetSavingsRateUsecase } from "@application/usecases/savingRates/SetSavingsRateUsecase";
 
 export const savingsrateFactory = () => {
-    const client = new MongoClient();
-    const userRepository = new UserRepositoryMongo(client);
-    const configRepository = new SavingsRateRepositoryMongo(client);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
+  const client = new MongoClient();
+  const userRepository = new UserRepositoryMongo(client);
+  const configRepository = new SavingsRateRepositoryMongo(client);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
 
-    const setSavingsRate = new SetSavingsRateUsecase(
-        configRepository,
-        userRepository,
-        uuidService,
-        clockService
-    );
+  const setSavingsRate = new SetSavingsRateUsecase(
+    configRepository,
+    userRepository,
+    uuidService,
+    clockService
+  );
 
-    return {
-        admin: {
-            setSavingsRate
-        }
-    };
-}
+  return {
+    admin: {
+      setSavingsRate,
+    },
+  };
+};

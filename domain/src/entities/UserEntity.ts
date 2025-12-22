@@ -71,11 +71,13 @@ export class UserEntity {
       firstname: this.firstname,
       lastname: this.lastname,
       role: this.role,
+      confirmedAt: this.confirmedAt,
+      isActiveField: this.isActiveField,
     };
   }
 }
 
 export type UserToFront = { email: string } & Pick<
   UserEntity,
-  "id" | "firstname" | "lastname" | "role"
+  "id" | "firstname" | "lastname" | "role" | "isActiveField" | "confirmedAt"
 >;

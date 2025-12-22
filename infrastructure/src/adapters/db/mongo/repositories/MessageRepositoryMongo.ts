@@ -7,6 +7,7 @@ import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { MessageModel } from "../models/MessageModel";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { Email } from "@domain/values/Email";
 
 export class MessageRepositoryMongo implements MessageRepository {
   constructor(private readonly client: MongoClient) {}
@@ -27,7 +28,7 @@ export class MessageRepositoryMongo implements MessageRepository {
       id: doc._id.toString(),
       firstname: doc.firstname,
       lastname: doc.lastname,
-      email: doc.email,
+      email: Email.from(doc.email),
       passwordHash: doc.passwordHash,
       role: doc.role,
       isActiveField: doc.isActive,
@@ -97,7 +98,7 @@ export class MessageRepositoryMongo implements MessageRepository {
       .sort({ sentAt: 1 })
       .lean<any[]>();
 
-    return docs.map((doc) => {
+    return docs.map((doc): MessageWithUser => {
       const message = this.mapDocToMessage(doc);
       const sender = this.mapDocToSender(doc.senderId);
       return Object.assign(message, { sender });

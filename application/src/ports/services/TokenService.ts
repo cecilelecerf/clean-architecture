@@ -1,5 +1,7 @@
+import { UserEntity } from "@domain/entities/UserEntity";
+
 export interface GenerateTokenOptions {
-  userId: string;
+  userId: UserEntity["id"];
   extraPayload?: Record<string, any>;
 }
 
@@ -8,7 +10,6 @@ export interface TokenService {
   generateConfirmationToken(options: GenerateTokenOptions): Promise<string>;
   validateToken(
     token: string,
-    expectedType?: "auth" | "confirmation"
-  ): Promise<any>;
-  invalidateToken(token: string): Promise<void>;
+    expectedType?: "auth" | "confirmation" | "passwordReset"
+  ): Promise<{ userId: UserEntity["id"] }>;
 }

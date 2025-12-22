@@ -10,28 +10,28 @@ import { UpdateTagUseCase } from "@application/usecases/tags/UpdateTagUseCase";
 import { DeleteTagUseCase } from "@application/usecases/tags/DeleteTagUseCase";
 
 export const tagsFactory = () => {
-    const client = new MongoClient();
-    const tagRepository = new TagRepositoryMongo(client);
-    const userRepository = new UserRepositoryMongo(client);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
+  const client = new MongoClient();
+  const tagRepository = new TagRepositoryMongo(client);
+  const userRepository = new UserRepositoryMongo(client);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
 
-    const createTag = new AddTagUseCase(
-        tagRepository,
-        userRepository,
-        uuidService,
-        clockService
-    );
-    const getTagById = new GetTagByIdUseCase(tagRepository, userRepository);
-    const getAllTags = new GetAllTagsUseCase(tagRepository);
-    const updateTag = new UpdateTagUseCase(tagRepository, userRepository);
-    const deleteTag = new DeleteTagUseCase(tagRepository, userRepository);
+  const createTag = new AddTagUseCase(
+    tagRepository,
+    userRepository,
+    uuidService,
+    clockService
+  );
+  const getTagById = new GetTagByIdUseCase(tagRepository, userRepository);
+  const getAllTags = new GetAllTagsUseCase(tagRepository);
+  const updateTag = new UpdateTagUseCase(tagRepository, userRepository);
+  const deleteTag = new DeleteTagUseCase(tagRepository, userRepository);
 
-    return {
-        createTag,
-        getTagById,
-        getAllTags,
-        updateTag,
-        deleteTag,
-    };
-}
+  return {
+    createTag,
+    getTagById,
+    getAllTags,
+    updateTag,
+    deleteTag,
+  };
+};

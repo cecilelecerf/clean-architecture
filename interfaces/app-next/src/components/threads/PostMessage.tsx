@@ -11,7 +11,7 @@ export const PostMessage = ({ threadId }: { threadId: ThreadId }) => {
     const [input, setInput] = useState("");
     const sendMessageMutate = useMutation(endpoints.threads.messages.send({ threadId }))
     const handlePress = () => {
-        input.length && sendMessageMutate.mutate({content :input}, {
+        input.length && sendMessageMutate.mutate({ content: input }, {
             onSuccess: (data) => {
                 socket.emit("thread:new_message", { message: data });
                 setInput("")

@@ -8,34 +8,32 @@ import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/action
 import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
 
 export const actionFactory = () => {
-    const client = new MySQLClient();
-    const actionRepository = new ActionRepositoryMySQL(client);
-    const userRepository = new UserRepositoryMySQL(client);
-    const clockService = new SystemClockService();
+  const client = new MySQLClient();
+  const actionRepository = new ActionRepositoryMySQL(client);
+  const userRepository = new UserRepositoryMySQL(client);
+  const clockService = new SystemClockService();
 
-    const createAction = new CreateActionUsecase(
-        actionRepository,
-        userRepository,
-        clockService
-    );
+  const createAction = new CreateActionUsecase(
+    actionRepository,
+    userRepository,
+    clockService
+  );
 
-    const updateAction = new UpdateActionUsecase(
-        actionRepository,
-        userRepository
-    );
+  const updateAction = new UpdateActionUsecase(
+    actionRepository,
+    userRepository
+  );
 
-    const getAllActionsByAvailability  = new GetAllActionsByAvailabilityUsecase(
-        actionRepository,
-        userRepository
-    );
+  const getAllActionsByAvailability = new GetAllActionsByAvailabilityUsecase(
+    actionRepository,
+    userRepository
+  );
 
-    return {
-        admin: {
-            createAction,
-            updateAction
-        },
-        client: {
-            getAllActionsByAvailability
-        }
-    };
-}
+  return {
+    admin: {
+      createAction,
+      updateAction,
+    },
+    getAllActionsByAvailability,
+  };
+};

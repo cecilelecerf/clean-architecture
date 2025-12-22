@@ -1,7 +1,8 @@
 "use client"
 import { Tag } from "@/components/Tag";
 import { socket } from "@/lib/socket";
-import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint";import { endpoints } from "@/utils/endpoint";
+import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint";
+import { endpoints } from "@/utils/endpoint";
 import { PostId } from "@infrastructure/types/feed";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -15,7 +16,8 @@ export const PostQuery = ({ postId }: Props) => {
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: "pending" }, () => "pending")
-        .with({ status: "success" }, ({ data: post }) => <PostDisplay postData={post} />
+        .with({ status: "success" }, ({ data: post }) => (
+            <PostDisplay postData={post} />)
         ).exhaustive()
 
 }
