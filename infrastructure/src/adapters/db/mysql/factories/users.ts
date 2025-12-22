@@ -6,7 +6,6 @@ import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidServi
 import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { RegisterUsecase } from "@application/usecases/users/RegisterUsecase";
-import { LogoutUsecase } from "@application/usecases/users/LogoutUsecase";
 import { LoginUsecase } from "@application/usecases/users/LoginUsecase";
 import { GetMeUsecase } from "@application/usecases/users/GetMeUsecase";
 import { ForgotPasswordUsecase } from "@application/usecases/users/ForgotPasswordUsecase";
@@ -14,6 +13,7 @@ import { ConfirmRegistrationUsecase } from "@application/usecases/users/ConfirmR
 import { BanClientUsecase } from "@application/usecases/users/BanClientUsecase";
 import { GetUsersByRoleUseCase } from "@application/usecases/users/GetUsersByRoleUseCase";
 import { GetUserUsercase } from "@application/usecases/users/GetUserUsercase";
+import { ResetPasswordUsecase } from "@application/usecases/users/ResetPasswordUsecase";
 
 export const usersFactory = () => {
   const client = new MySQLClient();
@@ -33,7 +33,12 @@ export const usersFactory = () => {
     emailService,
     tokenService
   );
-  const logout = new LogoutUsecase(tokenService);
+  const resetPassword = new ResetPasswordUsecase(
+    userRepository,
+    tokenService,
+    encryptionService,
+    clockService
+  );
   const login = new LoginUsecase(
     userRepository,
     encryptionService,
@@ -56,11 +61,11 @@ export const usersFactory = () => {
 
   return {
     register,
-    logout,
     login,
     getUser,
     getMe,
     forgotPassword,
+    resetPassword,
     confirmRegistration,
     banClient,
     getUsersByRole,

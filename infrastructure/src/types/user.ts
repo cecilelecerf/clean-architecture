@@ -11,7 +11,7 @@ export const userSchema = z.object({
   role: z.enum(["client", "conseiller", "directeur"]),
   isActiveField: z.preprocess((val) => val === 1 || val === true, z.boolean()),
   createdAt: z.iso.datetime(),
-  confirmedAt: z.iso.datetime().nullable(),
+  confirmedAt: z.iso.datetime().nullable().optional(),
   updatedAt: z.iso.datetime().nullable(),
 });
 export type User = z.infer<typeof userSchema>;

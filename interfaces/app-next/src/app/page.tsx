@@ -28,13 +28,13 @@ export default function HomePage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg" asChild>
-              <Link href="/auth/register">
+              <Link href="/register">
                 Ouvrir un compte
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="text-lg" asChild>
-              <Link href="/auth/login">
+              <Link href="/login">
                 Se connecter
               </Link>
             </Button>
@@ -143,7 +143,7 @@ export default function HomePage() {
             </CardDescription>
             <div className="pt-4">
               <Button size="lg" variant="secondary" className="text-lg" asChild>
-                <Link href="/auth/register">
+                <Link href="/register">
                   Ouvrir un compte gratuitement
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>

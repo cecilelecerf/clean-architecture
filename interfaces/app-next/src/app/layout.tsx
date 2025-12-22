@@ -34,7 +34,6 @@ export default function RootLayout({
         <SessionProvider>
           <QueryClientProvider client={queryClient}>
             <Theme>
-
               <Toaster />
               {children}
             </Theme>
