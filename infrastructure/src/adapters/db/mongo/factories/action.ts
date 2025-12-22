@@ -3,6 +3,8 @@ import { MongoClient } from "../../MongoClient";
 import { ActionRepositoryMongo } from "../repositories/ActionRepositoryMongo";
 import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
 import { CreateActionUsecase } from "@application/usecases/actions/CreateActionUsecase";
+import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
+import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/actions/GetAllActionsByAvailabilityUseCase";
 
 export const actionFactory = () => {
   const client = new MongoClient();

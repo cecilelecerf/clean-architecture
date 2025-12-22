@@ -1,11 +1,23 @@
-import { AccountNotFoundError,MissingIBANError,UnauthorizedAccessAccountError } from "@application/errors/accounts";
- import { UserNotActiveError, UserNotFoundError } from "@application/errors/users";
+import {
+  AccountNotFoundError,
+  MissingIBANError,
+  UnauthorizedAccessAccountError,
+} from "@application/errors/accounts";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EmailService } from "@application/ports/services/EmailService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { IBANInvalidCheckDigitsError, IBANInvalidFormatError, IBANTooLongError, IBANTooShortError } from "@domain/errors/IBAN";
- import { IBAN } from "@domain/values/IBAN";
+import {
+  IBANInvalidCheckDigitsError,
+  IBANInvalidFormatError,
+  IBANTooLongError,
+  IBANTooShortError,
+} from "@domain/errors/IBAN";
+import { IBAN } from "@domain/values/IBAN";
 
 export class DeleteAccountUsecase {
   public constructor(
@@ -14,17 +26,21 @@ export class DeleteAccountUsecase {
     private readonly userRepository: UserRepository
   ) {}
 
-  public async execute(accountIban: string, requestUserId: string): Promise<
+  public async execute(
+    accountIban: string,
+    requestUserId: string
+  ): Promise<
     | MissingIBANError
     | UnauthorizedAccessAccountError
     | AccountNotFoundError
     | UserNotFoundError
     | UserNotActiveError
-    | IBANTooShortError 
-    | IBANTooLongError 
-    | IBANInvalidFormatError 
+    | IBANTooShortError
+    | IBANTooLongError
+    | IBANInvalidFormatError
     | IBANInvalidCheckDigitsError
-    | void> {
+    | void
+  > {
     if (!accountIban || accountIban.trim().length === 0) {
       return new MissingIBANError();
     }
