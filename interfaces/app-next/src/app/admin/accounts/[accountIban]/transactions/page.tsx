@@ -2,8 +2,8 @@
 import { use, useState } from "react";
 import { TransactionFilters as TTransactionFilters } from "@/utils/endpoint/transactionEndpoints";
 import { AccountId } from "@infrastructure/types/account";
-import { GetAllTransactions } from "@/components/transactions/GetAllTransactions";
-import { TransactionFilters } from "@/components/transactions/TransactionFilters";
+import { GetAllTransactions } from "@/components/accounts/transactions/GetAllTransactions";
+import { TransactionFilters } from "@/components/accounts/transactions/TransactionFilters";
 
 export default function TransactionsPage({ params }: { params: Promise<{ accountId: AccountId }> }) {
     const { accountId } = use(params)

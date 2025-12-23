@@ -32,7 +32,7 @@ export default function AdminLayout({
       </aside>
 
       {/* === Mobile Drawer Menu === */}
-      <div className="md:hidden fixed z-50 bg-gradient-to-b from-gray-50 via-gray-50/90 to-gray-50/10 p-4 w-full">
+      <div className="md:hidden fixed z-50 bg-linear-to-b from-gray-50 via-gray-50/90 to-gray-50/10 p-4 w-full">
         <Sheet>
           <SheetTrigger asChild>
             <div className="flex items-center gap-2">

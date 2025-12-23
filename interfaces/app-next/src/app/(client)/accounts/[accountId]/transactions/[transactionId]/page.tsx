@@ -1,7 +1,7 @@
 import { AccountId } from '@infrastructure/types/account';
 import { TransactionId } from '@infrastructure/types/transaction';
 import { use } from 'react';
-import { TransactionDetail } from '@/components/transactions/TransactionDetail';
+import { TransactionDetail } from '@/components/accounts/transactions/TransactionDetail';
 
 
 export default function TransactionIdPage({ params }: { params: Promise<{ accountId: AccountId, transactionId: TransactionId }> }) {

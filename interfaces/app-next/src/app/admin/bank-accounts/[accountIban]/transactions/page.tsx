@@ -1,9 +1,9 @@
 "use client"
 import { use, useState } from "react";
 import { TransactionFilters as TTransactionFilters } from "@/utils/endpoint/transactionEndpoints";
-import { GetAllTransactions } from "../../../../../components/accounts/transactions/GetAllTransactions";
 import { AccountId } from "@infrastructure/types/account";
-import { TransactionFilters } from "../../../../../components/accounts/transactions/TransactionFilters";
+import { GetAllTransactions } from "@/components/accounts/transactions/GetAllTransactions";
+import { TransactionFilters } from "@/components/accounts/transactions/TransactionFilters";
 
 export default function TransactionsPage({ params }: { params: Promise<{ accountId: AccountId }> }) {
     const { accountId } = use(params)
@@ -18,12 +18,7 @@ export default function TransactionsPage({ params }: { params: Promise<{ account
     return (
         <>
             <TransactionFilters filters={filters} onChange={(f) => setFilters(f)} />
-            <GetAllTransactions
-                accountIban={accountId}
-                filters={filters}
-                onPaginationChange={(pageNumber) => setFilters((prev) => ({ ...prev, page: pageNumber }))}
-                baseHref={`/accounts/${accountId.toLowerCase()}/transactions`}
-            />
+            <GetAllTransactions accountIban={accountId} filters={filters} onPaginationChange={(pageNumber) => setFilters((prev) => ({ ...prev, page: pageNumber }))} baseHref={`/admin/bank-accounts/${accountId}/transactions`} />
         </>
     )
 

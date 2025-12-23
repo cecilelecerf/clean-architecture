@@ -1,6 +1,6 @@
 import z from "zod";
 import { colorSchema } from "./color";
-import { userDtoSchema } from "./user";
+import { userDtoSchema, userIdSchema } from "./user";
 
 export const accountIdSchema = z.string().length(26).brand("account");
 export type AccountId = z.infer<typeof accountIdSchema>;
@@ -15,6 +15,7 @@ export const accountSchema = z.object({
   currency: z.string().min(1),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
+  userId: userIdSchema.nullable(),
 });
 export type Account = z.infer<typeof accountSchema>;
 
@@ -25,7 +26,13 @@ export const accountDTOSchema = accountSchema.pick({
   type: true,
   currency: true,
   amount: true,
+  userId: true,
 });
+
+export const accountWithUserSchemaDTO = accountDTOSchema.extend({
+  user: userDtoSchema.nullable(),
+});
+export type AccountWithUserDTO = z.infer<typeof accountWithUserSchemaDTO>;
 
 export const accountResumeSchema = accountSchema.pick({
   IBAN: true,
@@ -34,7 +41,7 @@ export const accountResumeSchema = accountSchema.pick({
   type: true,
 });
 export const accountResumeWithUserSchema = accountResumeSchema.extend({
-  user: userDtoSchema,
+  user: userDtoSchema.nullable(),
 });
 export type AccountResumeWithUser = z.infer<typeof accountResumeWithUserSchema>;
 

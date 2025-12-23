@@ -21,4 +21,5 @@ export const menuItems = [
   { icon: <Home size={18} />, label: "Accueil", href: "/admin" },
   { icon: <Inbox size={18} />, label: "Messageries", href: "/admin/threads" },
   { icon: <Newspaper size={18} />, label: "Actualités", href: "/admin/feeds" },
+  { icon: <Wallet size={18} />, label: "Compte de la banque", href: "/admin/bank-accounts" },
 ];

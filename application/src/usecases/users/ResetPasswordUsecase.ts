@@ -29,9 +29,6 @@ export class ResetPasswordUsecase {
         token,
         "passwordReset"
       );
-      console.log(payload);
-      console.log(!payload);
-      console.log(!payload.userId);
       if (!payload || !payload.userId) {
         return new Error("Token invalide ou expiré");
       }

@@ -20,7 +20,7 @@ export class AccountMapper {
 
     return AccountEntity.from({
       iban,
-      userId: row[`${prefix}user_id`],
+      userId: row[`${prefix}user_id`] ?? null,
       name: row[`${prefix}name`],
       type: row[`${prefix}type`],
       color,

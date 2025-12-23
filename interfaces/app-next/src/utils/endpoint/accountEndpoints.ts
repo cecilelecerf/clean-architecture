@@ -3,7 +3,9 @@ import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import {
   accountDTOSchema,
   AccountId,
+  accountResumeWithUserSchema,
   accountSchema,
+  accountWithUserSchemaDTO,
   NewAccount,
 } from '@infrastructure/types/account';
 import { threadSchema } from '@infrastructure/types/thread';
@@ -52,7 +54,6 @@ export const accountsEndpoint = createEndpointsNodes({
   create: () =>
     mutationOptions({
       mutationFn: async (payload: NewAccount) => {
-        console.log(payload);
         const data = await post('/accounts', payload);
         return accountSchema.parse(data);
       },
@@ -96,12 +97,12 @@ export const accountsEndpoint = createEndpointsNodes({
 
   // GET /api/accounts
   // Liste des comptes selon l'utilisateur (client ou banque)
-  getAll: () =>
+  getAll: ({ type }: { type: 'client' | 'bank' }) =>
     queryOptions({
-      queryKey: ['accounts', 'list'],
+      queryKey: ['accounts', 'list', type],
       queryFn: () =>
-        get('/accounts/advisors').then((data) => {
-          return safeParseWithLog(accountDTOSchema.array(), data);
+        get(`/accounts?type=${type}`).then((data) => {
+          return safeParseWithLog(accountWithUserSchemaDTO.array(), data);
         }),
     }),
   transactions: transactionEndpoint,

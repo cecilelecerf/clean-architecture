@@ -8,12 +8,12 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { TransactionId } from '@infrastructure/types/transaction';
-import { Button } from '../ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { endpoints } from '@/utils/endpoint';
 import { AccountId, AccountResumeWithUser } from '@infrastructure/types/account';
 import { match } from 'ts-pattern';
-import { Skeleton } from '../ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 interface TransactionDetailProps {

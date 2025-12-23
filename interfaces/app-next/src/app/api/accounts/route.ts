@@ -10,7 +10,16 @@ export async function GET(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    const result = await accountFactory().getAccounts.execute({ clientId: session.user.id });
+
+    const { searchParams } = new URL(req.url);
+    const type = searchParams.get('type') as 'bank' | 'client' | null;
+    const result = type
+      ? await accountFactory().getAccountsByType.execute({
+          userId: session.user.id,
+          type,
+        })
+      : await accountFactory().getAccounts.execute({ clientId: session.user.id });
+
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },
@@ -59,28 +68,28 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PATCH(req: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
+// export async function PATCH(req: NextRequest) {
+//   try {
+//     const session = await getServerSession(authOptions);
+//     if (!session?.user?.id) {
+//       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+//     }
 
-    // const result = await accountFactory().admin.applyDailyInterest.execute();
-    const result = {};
-    if (result instanceof Error) {
-      return NextResponse.json(
-        { name: result.name, message: result.message },
-        { status: result.statusCode ?? 400 },
-      );
-    }
+//     // const result = await accountFactory().admin.applyDailyInterest.execute();
+//     const result = {};
+//     if (result instanceof Error) {
+//       return NextResponse.json(
+//         { name: result.name, message: result.message },
+//         { status: result.statusCode ?? 400 },
+//       );
+//     }
 
-    return NextResponse.json(result);
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json(
-      { message: err instanceof Error ? err.message : 'Erreur serveur' },
-      { status: 500 },
-    );
-  }
-}
+//     return NextResponse.json(result);
+//   } catch (err) {
+//     console.error(err);
+//     return NextResponse.json(
+//       { message: err instanceof Error ? err.message : 'Erreur serveur' },
+//       { status: 500 },
+//     );
+//   }
+// }

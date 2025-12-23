@@ -1,4 +1,5 @@
 "use client"
+import { TitleAdminPage } from "@/components/TitleAdminPage";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,42 +12,47 @@ import { match } from "ts-pattern";
 export default function AdminUsersPage() {
     const query = useQuery(endpoints.users.getAll({ role: "client" }))
     const router = useRouter()
-    return match(query)
-        .with({ status: "error" }, () => "error")
-        .with({ status: "pending" }, () => <UsersSkeleton />)
-        .with({ status: "success" }, ({ data: users }) => {
-            if (users.length === 0) return <div className="text-gray-500 text-center border p-6 rounded-lg">
-                Aucun utilisateur associé pour le moment.
-            </div>
-            return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {users.map((user) => (
-                    <Card key={user.id} className="flex items-center gap-4 p-4">
-                        <Avatar>
-                            <AvatarFallback>
-                                {user.firstname?.[0]}
-                                {user.lastname?.[0]}
-                            </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                            <p className="font-semibold text-center">
-                                {user.firstname} {user.lastname}
-                            </p>
-                            <p className="text-sm text-center text-gray-500">{user.email}</p>
-                        </div>
-                        <div >
-                            <Button
-                                onClick={() => router.push(`users/${user.id}`)}
-                            >
-                                + d&apos;info
-                            </Button>
-                        </div>
-                    </Card>
-                ))}
-            </div>
+    return (
+        <>
+            <TitleAdminPage title="Clients" />
+            {match(query)
+                .with({ status: "error" }, () => "error")
+                .with({ status: "pending" }, () => <UsersSkeleton />)
+                .with({ status: "success" }, ({ data: users }) => {
+                    if (users.length === 0) return <div className="text-gray-500 text-center border p-6 rounded-lg">
+                        Aucun utilisateur associé pour le moment.
+                    </div>
+                    return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {users.map((user) => (
+                            <Card key={user.id} className="flex items-center gap-4 p-4">
+                                <Avatar>
+                                    <AvatarFallback>
+                                        {user.firstname?.[0]}
+                                        {user.lastname?.[0]}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                    <p className="font-semibold text-center">
+                                        {user.firstname} {user.lastname}
+                                    </p>
+                                    <p className="text-sm text-center text-gray-500">{user.email}</p>
+                                </div>
+                                <div >
+                                    <Button
+                                        onClick={() => router.push(`users/${user.id}`)}
+                                    >
+                                        + d&apos;info
+                                    </Button>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
 
-        }
-        ).exhaustive()
-
+                }
+                ).exhaustive()
+            }
+        </>
+    )
 }
 
 

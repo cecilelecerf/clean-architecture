@@ -12,7 +12,7 @@ import { User } from "lucide-react";
 import { TitleAdminPage } from "@/components/TitleAdminPage";
 
 export default function AccountsPage() {
-    const query = useQuery(endpoints.accounts.getAll({ type: "client" }));
+    const query = useQuery(endpoints.accounts.getAll({ type: "bank" }));
     const router = useRouter();
 
     return (
@@ -36,7 +36,7 @@ export default function AccountsPage() {
                                 <Card
                                     key={acc.IBAN}
                                     className={`shadow hover:shadow-lg transition-all py-1`}
-                                    onClick={() => router.push(`/admin/accounts/${acc.IBAN}`)}
+                                    onClick={() => router.push(`/admin/bank-accounts/${acc.IBAN}`)}
                                 >
                                     <CardContent className="p-4 space-y-3">
                                         {/* Nom du compte */}
@@ -58,37 +58,12 @@ export default function AccountsPage() {
                                             </p>
                                         </div>
 
-                                        {/* Informations client */}
-                                        <div className="flex items-center gap-3 pt-2 border-t">
-                                            <Avatar className="h-8 w-8">
-                                                <AvatarFallback className="bg-gray-100 text-xs">
-                                                    {acc.user?.firstname?.[0]}
-                                                    {acc.user?.lastname?.[0]}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium truncate">
-                                                    {acc.user?.firstname} {acc.user?.lastname}
-                                                </p>
-                                                <p className="text-xs text-gray-500 truncate">
-                                                    {acc.user?.email}
-                                                </p>
-                                            </div>
-                                        </div>
 
                                         {/* Actions */}
                                         <div className="flex flex-col gap-2">
                                             <Button
-                                                variant="outline"
                                                 size="sm"
-                                                onClick={(e) => { e.stopPropagation(); router.push(`/admin/users/${acc.user?.id}`) }}
-                                            >
-                                                <User className="w-4 h-4 mr-2" />
-                                                Voir client
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                onClick={() => router.push(`/admin/accounts/${acc.IBAN}`)}
+                                                onClick={() => router.push(`/admin/bank-accounts/${acc.IBAN}`)}
                                             >
                                                 Voir compte
                                             </Button>

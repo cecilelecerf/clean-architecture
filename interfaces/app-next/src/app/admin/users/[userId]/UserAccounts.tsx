@@ -4,12 +4,10 @@ import { fromColorClasses, textColorClasses, toColorClasses } from "@/utils/colo
 import { endpoints } from "@/utils/endpoint"
 import { UserId } from "@infrastructure/types/user"
 import { useQuery } from "@tanstack/react-query"
-import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { match } from "ts-pattern"
 
 export const UserAccounts = ({ userId }: { userId: UserId }) => {
-    const { data: session } = useSession()
     const router = useRouter()
     const query = useQuery(endpoints.accounts.getAllByClient({ userId }))
 
@@ -54,7 +52,6 @@ export const UserAccounts = ({ userId }: { userId: UserId }) => {
                                                 })}
                                             </span>
                                         </p>
-                                        {/* <p>Ouvert le : {new Date(acc.).toLocaleDateString()}</p> */}
                                     </CardContent>
                                 </Card>
                             ))}
