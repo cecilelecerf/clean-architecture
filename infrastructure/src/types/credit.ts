@@ -20,3 +20,19 @@ export const creditSchema = z.object({
     advisorId: userIdSchema.optional(),
     updatedAt: z.iso.datetime().optional()
 })
+
+export const creditResponseSchema = z.object({
+    accept: z.boolean()
+})
+
+export const creditDTOSchema = creditSchema.pick({
+  id: true,
+  initialAmount: true,
+  interestRate: true,
+  insuranceRate: true,
+  durationMonths: true,
+  startDate: true,
+  monthlyPayment: true,
+  remainingBalance: true,
+  status: true
+});

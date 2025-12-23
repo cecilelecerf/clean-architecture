@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credit';
-import { creditSchema } from '@infrastructure/types/credit';
+import { creditResponseSchema, creditSchema } from '@infrastructure/types/credit';
 import z from 'zod';
 
 export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credit/[creditId]/advisor'>){
@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credit/[cr
         const { creditId } = await ctx.params;
 
         const body = await req.json();
-        const payload = parse(body); // TODO: Comment récupérer si le conseiller a accepté ou non ? 
+        const payload = creditResponseSchema.parse(body); 
 
         const result = await creditFactory().admin.grantCredit.execute({
             advisorId: session.user.id,
