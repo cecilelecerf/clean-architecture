@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { FiltersProps } from "@/utils/endpoint/feedsEndpoint"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,16 +9,17 @@ import { match } from "ts-pattern";
 import { Slider } from "@/components/ui/slider";
 import { TagsFilters } from "./TagsFilters";
 import { CalendarFilter } from "../CalendarFilter";
+import { PostFilters as TPostFIlters } from "@/utils/endpoint/feedsEndpoint";
 ;
 
 type PostFiltersProps = {
-    filters: FiltersProps;
+    filters: TPostFIlters;
     isAdmin?: boolean
-    onChange: (filters: FiltersProps) => void;
+    onChange: (filters: TPostFIlters) => void;
 };
 
 export const PostFilters = ({ filters, onChange, isAdmin }: PostFiltersProps) => {
-    const [localFilters, setLocalFilters] = useState<FiltersProps>(filters);
+    const [localFilters, setLocalFilters] = useState<TPostFIlters>(filters);
 
     useEffect(() => {
         onChange(localFilters);

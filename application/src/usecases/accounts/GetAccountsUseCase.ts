@@ -44,7 +44,6 @@ export class GetAccountsUseCase {
     }
 
     const accounts = await this.accountRepository.findByUserId(client.id);
-    console.log(accounts);
     return accounts.map((account) => account.toDTO());
   }
 }

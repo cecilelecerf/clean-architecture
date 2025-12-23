@@ -9,8 +9,10 @@ let pool: Pool;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const envPath = resolve(__dirname, "../../../../../.env");
-// const envPath = resolve(__dirname, "../../../../.env"); -> Cécile
+// JADE
+// const envPath = resolve(__dirname, "../../../../../.env");
+// CECILE
+const envPath = resolve(__dirname, "../../../../.env");
 const result = dotenv.config({ path: envPath });
 
 if (result.error) {

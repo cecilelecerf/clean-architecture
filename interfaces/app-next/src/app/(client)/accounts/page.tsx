@@ -2,7 +2,6 @@
 
 import { Card } from '@/components/ui/card';
 import { textColorClasses } from '@/utils/color';
-import { toStringTypeAccount } from '@/utils/toStringTypeAccount';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { match } from 'ts-pattern';
@@ -11,7 +10,7 @@ import { ButtonLink } from '@/components/buttons/ButtonLink';
 
 export default function AccountsPage() {
   const router = useRouter();
-  const query = useQuery(endpoints.accounts.getAll())
+  const query = useQuery(endpoints.accounts.getAllByMe())
 
   return (
     <>

@@ -8,13 +8,13 @@ import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailSer
 
 import { ApplyDailyInterestUseCase } from "@application/usecases/accounts/ApplyDailyInterestUseCase";
 import { SavingsRateRepositoryMySQL } from "../repositories/SavingRateRepositoryMySQL";
-import { CreateAccountUseCase } from "@application/usecases/accounts/CreateAccountUsecase";
-import { DeleteAccountUseCase } from "@application/usecases/accounts/DeleteAccountUsecase";
+import { CreateAccountUseCase } from "@application/usecases/accounts/CreateAccountUseCasee";
+import { DeleteAccountUseCase } from "@application/usecases/accounts/DeleteAccountUseCasee";
 import { GetAccountByIBANUseCase } from "@application/usecases/accounts/GetAccountByIBANUseCase";
 import { GetAccountsUseCase } from "@application/usecases/accounts/GetAccountsUseCase";
-import { RenameAccountUseCase } from "@application/usecases/accounts/RenameAccountUsecase";
-import { TransfertBetweenAccountUseCase } from "@application/usecases/accounts/TransfertBetweenAccountUsecase";
+import { TransfertBetweenAccountUseCase } from "@application/usecases/accounts/TransfertBetweenAccountUseCasee";
 import { GetAllAccountsByTypeUserCase } from "@application/usecases/accounts/GetAllAccountsByTypeUseCase";
+import { RenameAccountUseCase } from "@application/usecases/accounts/RenameAccountUseCasee";
 
 export const accountFactory = () => {
   const client = new MySQLClient();
@@ -48,10 +48,7 @@ export const accountFactory = () => {
     accountRepository,
     userRepository
   );
-  const getAccounts = new GetAccountsUseCase(
-    accountRepository,
-    userRepository
-  );
+  const getAccounts = new GetAccountsUseCase(accountRepository, userRepository);
   const getAccountsByType = new GetAllAccountsByTypeUserCase(
     accountRepository,
     userRepository

@@ -23,7 +23,6 @@ export async function GET(
         { status: transaction.statusCode ?? 404 },
       );
     }
-    console.log(transaction);
     return NextResponse.json(transaction);
   } catch (err) {
     console.error(err);

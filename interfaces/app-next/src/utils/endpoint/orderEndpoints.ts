@@ -1,20 +1,20 @@
-import { orderDTOSchema, orderSchema } from "@infrastructure/types/order";
-import z from "zod";
+import { orderDTOSchema, orderSchema } from '@infrastructure/types/order';
+import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { get, post } from '@/lib/apiClient';
 import { queryClient } from '@/lib/queryClient';
-import { safeParseWithLog } from "@/lib/zodUtils";
-import { ActionId } from "@infrastructure/types/action";
+import { safeParseWithLog } from '@/lib/zodUtils';
+import { ActionId } from '@infrastructure/types/action';
 
 // ============================================================================
 // SCHEMAS
 // ============================================================================
 
 export const placeOrderSchema = orderSchema.pick({
-  actionId: true, 
-  type: true, 
-  quantity:true
+  actionId: true,
+  type: true,
+  quantity: true,
 });
 export type placeOrder = z.infer<typeof placeOrderSchema>;
 
@@ -49,7 +49,6 @@ export const ordersEndpoint = createEndpointsNodes({
   create: () =>
     mutationOptions({
       mutationFn: async (payload: placeOrder) => {
-        console.log(payload);
         const data = await post('/orders', payload);
         return orderSchema.parse(data);
       },
@@ -57,4 +56,4 @@ export const ordersEndpoint = createEndpointsNodes({
         queryClient.invalidateQueries({ queryKey: ['orders', 'list'] });
       },
     }),
-})
+});

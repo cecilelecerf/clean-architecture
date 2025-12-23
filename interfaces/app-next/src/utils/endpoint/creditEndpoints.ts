@@ -1,7 +1,7 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
-import { creditDTOSchema, CreditId, creditSchema } from "@infrastructure/types/credit";
-import z from "zod";
+import { creditDTOSchema, CreditId, creditSchema } from '@infrastructure/types/credit';
+import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
@@ -14,7 +14,7 @@ export const requestCreditSchema = creditSchema.pick({
   initialAmount: true,
   insuranceRate: true,
   interestRate: true,
-  durationMonths: true
+  durationMonths: true,
 });
 export type requestCredit = z.infer<typeof requestCreditSchema>;
 
@@ -47,7 +47,6 @@ export const creditsEndpoint = createEndpointsNodes({
   create: () =>
     mutationOptions({
       mutationFn: async (payload: requestCredit) => {
-        console.log(payload);
         const data = await post('/credits', payload);
         return creditSchema.parse(data);
       },
@@ -77,4 +76,4 @@ export const creditsEndpoint = createEndpointsNodes({
         queryClient.invalidateQueries({ queryKey: ['credits', 'list'] });
       },
     }),
-})
+});

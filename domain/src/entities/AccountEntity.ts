@@ -199,6 +199,7 @@ export class AccountEntity {
       currency: this.currency,
       color: this.color.getValue(),
       amount: this.balance.amount,
+      userId: this.userId,
     };
   }
 }
@@ -207,4 +208,4 @@ export type AccountDTO = {
   IBAN: string;
   color: string;
   amount: number;
-} & Pick<AccountEntity, "name" | "type" | "currency">;
+} & Pick<AccountEntity, "name" | "type" | "currency" | "userId">;

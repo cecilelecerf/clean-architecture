@@ -3,7 +3,9 @@ import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import {
   accountDTOSchema,
   AccountId,
+  accountResumeWithUserSchema,
   accountSchema,
+  accountWithUserSchemaDTO,
   NewAccount,
 } from '@infrastructure/types/account';
 import { threadSchema } from '@infrastructure/types/thread';
@@ -12,6 +14,7 @@ import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { transactionEndpoint } from './transactionEndpoints';
+import { UserId } from '@infrastructure/types/user';
 
 // ============================================================================
 // SCHEMAS
@@ -29,7 +32,7 @@ export type renameAccount = z.infer<typeof renameAccountSchema>;
 export const accountsEndpoint = createEndpointsNodes({
   // GET /api/accounts
   // Liste des comptes selon l'utilisateur (client ou banque)
-  getAll: () =>
+  getAllByMe: () =>
     queryOptions({
       queryKey: ['accounts', 'list'],
       queryFn: () =>
@@ -51,7 +54,6 @@ export const accountsEndpoint = createEndpointsNodes({
   create: () =>
     mutationOptions({
       mutationFn: async (payload: NewAccount) => {
-        console.log(payload);
         const data = await post('/accounts', payload);
         return accountSchema.parse(data);
       },
@@ -83,6 +85,25 @@ export const accountsEndpoint = createEndpointsNodes({
         queryClient.invalidateQueries({ queryKey: ['accounts', accountIban] });
         queryClient.invalidateQueries({ queryKey: ['accounts', 'list'] });
       },
+    }),
+  getAllByClient: ({ userId }: { userId: UserId }) =>
+    queryOptions({
+      queryKey: ['accounts', 'users', userId],
+      queryFn: () =>
+        get(`/accounts/users/${userId}`).then((data) => {
+          return safeParseWithLog(accountDTOSchema.array(), data);
+        }),
+    }),
+
+  // GET /api/accounts
+  // Liste des comptes selon l'utilisateur (client ou banque)
+  getAll: ({ type }: { type: 'client' | 'bank' }) =>
+    queryOptions({
+      queryKey: ['accounts', 'list', type],
+      queryFn: () =>
+        get(`/accounts?type=${type}`).then((data) => {
+          return safeParseWithLog(accountWithUserSchemaDTO.array(), data);
+        }),
     }),
   transactions: transactionEndpoint,
 });

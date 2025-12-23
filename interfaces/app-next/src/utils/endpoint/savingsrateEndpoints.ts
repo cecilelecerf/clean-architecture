@@ -1,9 +1,9 @@
-import { savingRateSchema } from "@infrastructure/types/savingsrate";
-import z from "zod";
+import { savingRateSchema } from '@infrastructure/types/savingsrate';
+import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { mutationOptions } from '@tanstack/react-query';
-import { post } from "@/lib/apiClient";
-import { queryClient } from "@/lib/queryClient";
+import { post } from '@/lib/apiClient';
+import { queryClient } from '@/lib/queryClient';
 
 // ============================================================================
 // SCHEMAS
@@ -11,7 +11,7 @@ import { queryClient } from "@/lib/queryClient";
 
 export const newSavingsrateSchema = savingRateSchema.pick({
   rate: true,
-  effectiveDate: true
+  effectiveDate: true,
 });
 export type newSavingsrate = z.infer<typeof newSavingsrateSchema>;
 
@@ -21,11 +21,10 @@ export type newSavingsrate = z.infer<typeof newSavingsrateSchema>;
 
 export const savingsrateEndpoint = createEndpointsNodes({
   // POST /api/savingsrate
-  // Créer un nouveau taux d'interet 
+  // Créer un nouveau taux d'interet
   create: () =>
     mutationOptions({
       mutationFn: async (payload: newSavingsrate) => {
-        console.log(payload);
         const data = await post('/savingsrate', payload);
         return savingRateSchema.parse(data);
       },
@@ -33,4 +32,4 @@ export const savingsrateEndpoint = createEndpointsNodes({
         queryClient.invalidateQueries({ queryKey: ['savingsrate', 'list'] });
       },
     }),
-})
+});
