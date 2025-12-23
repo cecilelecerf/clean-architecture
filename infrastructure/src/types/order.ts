@@ -19,3 +19,13 @@ export const orderSchema = z.object({
     createdAt: z.iso.datetime(),
     updatedAt: z.iso.datetime().optional()
 })
+
+export const orderDTOSchema = orderSchema.pick({
+  id: true,
+  type: true,
+  quantity: true,
+  price: true,
+  fee: true,
+  date: true,
+  status: true
+});
