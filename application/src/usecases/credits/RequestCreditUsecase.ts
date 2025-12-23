@@ -14,7 +14,7 @@ import { InvalidCreditDurationError } from "@domain/errors/credit";
 
 type Props = {
   clientId: UserEntity["id"];
-  principal: number;
+  amount: number;
   interestRate: number;
   insuranceRate: number;
   currency: string;
@@ -30,7 +30,7 @@ export class RequestCreditUsecase {
 
     public async execute({
         clientId,
-        principal,
+        amount,
         currency,
         insuranceRate,
         interestRate,
@@ -51,7 +51,7 @@ export class RequestCreditUsecase {
         if (!client.hasRole({ role: "client" }))
             return new UserRoleMismatchError(["client"], client.role);
 
-        const initialAmountVO = Money.create({ amount: principal, currency });
+        const initialAmountVO = Money.create({ amount: amount, currency });
         if (initialAmountVO instanceof Error) return initialAmountVO;
         
         const insuranceRateVO = Percentage.create(insuranceRate);
