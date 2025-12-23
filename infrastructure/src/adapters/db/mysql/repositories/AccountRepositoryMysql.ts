@@ -47,12 +47,23 @@ export class AccountRepositoryMySQL implements AccountRepository {
   /** Compte d'intérêts de la banque */
   async findBankInterestAccount(): Promise<AccountEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM accounts WHERE type = 'epargne' AND role = 'bank'"
+      "SELECT * FROM accounts WHERE type = 'epargne' AND userId = null"
     );
 
     if (rows.length === 0) return null;
 
     return AccountMapper.mapRowToAccount(rows[0]);
+  }
+
+  /** Trouver une liste de compte par type */
+  async findByType(type: string): Promise<AccountEntity[]>
+  {
+    const rows = await this.client.query<RowDataPacket[]>(
+      "SELECT * FROM accounts WHERE type = ? ORDER BY created_at DESC",
+      [type]
+    );
+
+    return rows.map((row) => AccountMapper.mapRowToAccount(row));
   }
 
   /** Sauvegarder un compte */

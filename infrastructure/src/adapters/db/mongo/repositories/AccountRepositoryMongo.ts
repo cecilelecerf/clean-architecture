@@ -57,6 +57,18 @@ export class AccountRepositoryMongo implements AccountRepository {
     return AccountMapper.mapDocToAccount(doc);
   }
 
+  /** Trouver une liste de compte par type */
+  async findByType(type: string): Promise<AccountEntity[]>
+  {
+    await this.client.connect();
+
+    const docs = await AccountModel.find({ type })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
+  }
+
   /** 📬 Sauvegarder un compte */
   async save(account: AccountEntity): Promise<void> {
     await this.client.connect();
