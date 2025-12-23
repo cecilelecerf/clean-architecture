@@ -3,27 +3,10 @@ import { MongoClient } from "../../MongoClient";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { Email } from "@domain/values/Email";
 import { UserModel } from "../models/UserModel";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class UserRepositoryMongo implements UserRepository {
   constructor(private readonly client: MongoClient) {}
-
-  private mapDocToUser(doc: any): UserEntity {
-    const email = Email.create(doc.email);
-    if (email instanceof Error) throw email;
-
-    return UserEntity.from({
-      id: doc._id.toString(),
-      firstname: doc.firstname,
-      lastname: doc.lastname,
-      email,
-      passwordHash: doc.passwordHash,
-      role: doc.role,
-      isActiveField: doc.isActive,
-      createdAt: doc.createdAt,
-      confirmedAt: doc.confirmedAt ?? null,
-      updatedAt: doc.updatedAt,
-    });
-  }
 
   /** Trouver un utilisateur par ID */
   async findById(id: UserEntity["id"]): Promise<UserEntity | null> {
@@ -32,7 +15,7 @@ export class UserRepositoryMongo implements UserRepository {
     const doc = await UserModel.findById(id).lean();
     if (!doc) return null;
 
-    return this.mapDocToUser(doc);
+    return UserMapper.mapRowToUser(doc);
   }
 
   /** Trouver un utilisateur par email */
@@ -42,7 +25,7 @@ export class UserRepositoryMongo implements UserRepository {
     const doc = await UserModel.findOne({ email: email.value }).lean();
     if (!doc) return null;
 
-    return this.mapDocToUser(doc);
+    return UserMapper.mapRowToUser(doc);
   }
 
   /** Tous les utilisateurs */
@@ -51,7 +34,7 @@ export class UserRepositoryMongo implements UserRepository {
 
     const docs = await UserModel.find().sort({ createdAt: -1 }).lean();
 
-    return docs.map((doc) => this.mapDocToUser(doc));
+    return docs.map((doc) => UserMapper.mapRowToUser(doc));
   }
 
   /** Utilisateurs actifs par rôle */
@@ -73,7 +56,7 @@ export class UserRepositoryMongo implements UserRepository {
       .sort({ lastname: 1, firstname: 1 })
       .lean();
 
-    return docs.map((doc) => this.mapDocToUser(doc));
+    return docs.map((doc) => UserMapper.mapRowToUser(doc));
   }
 
   /** Sauvegarder un utilisateur */

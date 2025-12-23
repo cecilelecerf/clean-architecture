@@ -9,6 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { FiltersProps } from "@/utils/endpoint/transactionEndpoints";
 import { Transaction } from "@infrastructure/types/transaction";
 import { CalendarFilter } from "@/components/CalendarFilter";
+import { Flex } from "@radix-ui/themes";
 ;
 
 type TransactionFiltersProps = {
@@ -17,7 +18,7 @@ type TransactionFiltersProps = {
     onChange: (filters: FiltersProps) => void;
 };
 
-export const PostFilters = ({ filters, onChange, isAdmin }: TransactionFiltersProps) => {
+export const TransactionFilters = ({ filters, onChange, isAdmin }: TransactionFiltersProps) => {
     const [localFilters, setLocalFilters] = useState<FiltersProps>(filters);
 
     useEffect(() => {
@@ -41,33 +42,30 @@ export const PostFilters = ({ filters, onChange, isAdmin }: TransactionFiltersPr
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-65 md:w-90">
                     <div className="flex flex-col gap-4">
-                        {/* Statut publié */}
-                        {isAdmin && (
+                        <Flex direction="column" gap="3" >
+                            <Label>Type</Label>
+                            <Select
+                                value={localFilters.type}
+                                onValueChange={(val) => {
+                                    setLocalFilters((prev) => ({
+                                        ...prev,
+                                        type: val as Transaction["type"]
+                                    }))
+                                    return val
+                                }
+                                }
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Tous" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Tous</SelectItem>
+                                    <SelectItem value="credit">Crédit</SelectItem>
+                                    <SelectItem value="debit">Débit</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </Flex>
 
-                            <div className="flex flex-col gap-1">
-                                <Label>Type</Label>
-                                <Select
-                                    value={localFilters.type}
-                                    onValueChange={(val) => {
-                                        setLocalFilters((prev) => ({
-                                            ...prev,
-                                            type: val as Transaction["type"]
-                                        }))
-                                        return val
-                                    }
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Tous" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">Tous</SelectItem>
-                                        <SelectItem value="credit">Crédit</SelectItem>
-                                        <SelectItem value="debit">Débit</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
                         {/* Dates */}
                         <div className="flex gap-3 flex-col md:flex-row">
                             <CalendarFilter

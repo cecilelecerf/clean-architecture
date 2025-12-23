@@ -23,6 +23,15 @@ interface Props {
   requesterId?: string;
 }
 
+// TODO : faire le même principe mais avec des filtres (exemple dans les posts)
+
+//   if (filters.label) params.set('label', filters.label);
+//   if (filters.page) params.set('page', String(filters.page));
+//   if (filters.limit) params.set('limit', String(filters.limit));
+//   if (filters.fromDate) params.set('fromDate', filters.fromDate);
+//   if (filters.toDate) params.set('toDate', filters.toDate);
+//   if (filters.type) params.set('type', filters.type);
+
 export class GetAllTransactionsByAccountUsecase {
   public constructor(
     private readonly userRepository: UserRepository,
@@ -53,8 +62,6 @@ export class GetAllTransactionsByAccountUsecase {
 
     if (client.hasRole({ role: "client" })) {
       const account = await this.accountRepository.findByIBAN(ibanVO);
-      console.log(account);
-      console.log(account?.isClientAccount(client));
       if (!account?.isClientAccount(client))
         return new InvalidAccountOwnerError();
     }

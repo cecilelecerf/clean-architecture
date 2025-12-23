@@ -6,32 +6,10 @@ import { Money } from "@domain/values/Money";
 import { Color } from "@domain/values/Color";
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { AccountMapper } from "../../mappers/AccountMapper";
 
 export class AccountRepositoryMySQL implements AccountRepository {
   constructor(private readonly client: MySQLClient) {}
-
-  private mapRowToAccount(row: RowDataPacket): AccountEntity {
-    const iban = IBAN.from(row.iban);
-
-    const balance = Money.from({
-      amount: Number(row.balance),
-      currency: row.currency,
-    });
-
-    const color = Color.from(row.color);
-
-    return AccountEntity.from({
-      iban,
-      userId: row.user_id,
-      name: row.name,
-      type: row.type,
-      color,
-      balance,
-      currency: row.currency,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-    });
-  }
 
   /** Tous les comptes d'un utilisateur */
   async findByUserId(
@@ -42,7 +20,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
       [userId]
     );
 
-    return rows.map((row) => this.mapRowToAccount(row));
+    return rows.map((row) => AccountMapper.mapRowToAccount(row));
   }
 
   /** Trouver un compte par IBAN */
@@ -54,7 +32,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
 
     if (rows.length === 0) return null;
 
-    return this.mapRowToAccount(rows[0]);
+    return AccountMapper.mapRowToAccount(rows[0]);
   }
 
   /** Tous les comptes épargne */
@@ -63,7 +41,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
       "SELECT * FROM accounts WHERE type = 'epargne' ORDER BY created_at DESC"
     );
 
-    return rows.map((row) => this.mapRowToAccount(row));
+    return rows.map((row) => AccountMapper.mapRowToAccount(row));
   }
 
   /** Compte d'intérêts de la banque */
@@ -74,7 +52,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
 
     if (rows.length === 0) return null;
 
-    return this.mapRowToAccount(rows[0]);
+    return AccountMapper.mapRowToAccount(rows[0]);
   }
 
   /** Sauvegarder un compte */

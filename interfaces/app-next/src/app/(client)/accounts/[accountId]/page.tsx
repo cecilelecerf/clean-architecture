@@ -12,7 +12,8 @@ import { endpoints } from '@/utils/endpoint';
 import { match } from 'ts-pattern';
 import { GetAllTransactions } from './GetAllTransactions';
 import { use } from 'react';
-import { Skeleton } from '@radix-ui/themes';
+import { Flex, Skeleton } from '@radix-ui/themes';
+import Link from 'next/link';
 
 
 export default function AccountIdPage({
@@ -92,10 +93,15 @@ export default function AccountIdPage({
             </Button>
             <Separator />
             {/* Transactions */}
-            <div className="flex flex-col gap-4">
-              <h2 className="font-semibold text-lg">Dernières transactions</h2>
+            <Flex direction="column" gap="4">
+              <Flex justify="between">
+                <h2 className="font-semibold text-lg">Dernières transactions</h2>
+                <Link href={`/accounts/${account.IBAN}/transactions`}>
+                  <Button variant="link">Voir +</Button>
+                </Link>
+              </Flex>
               <GetAllTransactions accountIban={accountId} filters={{ limit: 7, page: 1 }} onPaginationChange={() => { }} hiddePagination />
-            </div>
+            </Flex>
           </div >
         )
         .exhaustive()}

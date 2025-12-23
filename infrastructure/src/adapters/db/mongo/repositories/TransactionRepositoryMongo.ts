@@ -1,9 +1,15 @@
-import { TransactionRepository } from "@application/ports/repositories/TransactionRepository";
+import {
+  TransactionEntityWithAccount,
+  TransactionRepository,
+} from "@application/ports/repositories/TransactionRepository";
 import { MongoClient } from "../../MongoClient";
 import { IBAN } from "@domain/values/IBAN";
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { TransactionModel } from "../models/TransactionModel";
 import { Money } from "@domain/values/Money";
+import { AccountEntity } from "@domain/entities/AccountEntity";
+import { Color } from "@domain/values/Color";
+import { AccountMapper } from "../../mappers/AccountMapper";
 
 export class TransactionRepositoryMongo implements TransactionRepository {
   constructor(private readonly client: MongoClient) {}
@@ -78,5 +84,42 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     await this.client.connect();
 
     await TransactionModel.deleteOne({ _id: transactionId });
+  }
+
+  /** Trouver une transaction par ID */
+  async findById(
+    id: TransactionEntity["id"]
+  ): Promise<TransactionEntity | null> {
+    await this.client.connect();
+
+    const doc = await TransactionModel.findById(id).lean();
+
+    if (!doc) return null;
+
+    return this.mapDocToTransaction(doc);
+  }
+
+  /** Trouver une transaction avec les comptes associés */
+  async findByIdWithAccount(
+    id: TransactionEntity["id"]
+  ): Promise<TransactionEntityWithAccount | null> {
+    await this.client.connect();
+
+    const doc = await TransactionModel.findById(id)
+      .populate("fromAccountId")
+      .populate("toAccountId")
+      .lean();
+
+    if (!doc) return null;
+
+    // Vérifier que les comptes sont bien populés
+    if (!doc.fromAccountId || !doc.toAccountId) return null;
+
+    // Mapper les entités
+    const transaction = this.mapDocToTransaction(doc);
+    const fromAccount = AccountMapper.mapDocToAccount(doc.fromAccountId);
+    const toAccount = AccountMapper.mapDocToAccount(doc.toAccountId);
+
+    return Object.assign(transaction, { fromAccount, toAccount });
   }
 }

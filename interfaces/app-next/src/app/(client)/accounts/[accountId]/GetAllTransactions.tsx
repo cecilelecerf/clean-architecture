@@ -46,7 +46,7 @@ export const GetAllTransactions = ({ accountIban, filters, onPaginationChange, h
                             <div
                                 className={clsx(
                                     'font-semibold',
-                                    t.amount < 0 ? 'text-red-500' : 'text-green-500',
+                                    t.amount < 0 ? 'text-red-600' : 'text-green-600',
                                 )}
                             >
                                 {t.amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}

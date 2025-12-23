@@ -3,6 +3,7 @@ import { MySQLClient } from "../../MySQLClient";
 import { TransactionRepositoryMySQL } from "../repositories/TransactionRepositoryMySQL";
 import { UserRepositoryMySQL } from "../repositories/UserRepositoryMySQL";
 import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
+import { GetTransactionByIdUseCase } from "@application/usecases/transactions/GetTransactionByIdUsecase";
 
 export const transactionFactory = () => {
   const client = new MySQLClient();
@@ -15,8 +16,13 @@ export const transactionFactory = () => {
     transactionRepository,
     accountRepository
   );
+  const getById = new GetTransactionByIdUseCase(
+    userRepository,
+    transactionRepository
+  );
 
   return {
     getAllByAccount,
+    getById,
   };
 };
