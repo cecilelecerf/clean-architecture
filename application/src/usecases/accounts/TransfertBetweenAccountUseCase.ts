@@ -38,7 +38,7 @@ interface Props {
   label: string;
   icon: string;
 }
-export class TransfertBetweenAccountUsecase {
+export class TransfertBetweenAccountUseCase {
   constructor(
     private readonly accountRepository: AccountRepository,
     private readonly transactionRepository: TransactionRepository,

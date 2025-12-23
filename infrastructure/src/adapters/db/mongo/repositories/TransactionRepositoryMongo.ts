@@ -1,5 +1,6 @@
 import {
   TransactionEntityWithAccount,
+  TransactionEntityWithAccountWithUser,
   TransactionRepository,
 } from "@application/ports/repositories/TransactionRepository";
 import { MongoClient } from "../../MongoClient";
@@ -10,6 +11,7 @@ import { Money } from "@domain/values/Money";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 import { Color } from "@domain/values/Color";
 import { AccountMapper } from "../../mappers/AccountMapper";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class TransactionRepositoryMongo implements TransactionRepository {
   constructor(private readonly client: MongoClient) {}
@@ -122,4 +124,42 @@ export class TransactionRepositoryMongo implements TransactionRepository {
 
     return Object.assign(transaction, { fromAccount, toAccount });
   }
+
+  /** Trouver une transaction avec comptes + utilisateurs associés */
+  async findByIdWithAccountWithUser(
+    id: TransactionEntity["id"]
+  ): Promise<TransactionEntityWithAccountWithUser | null> {
+    await this.client.connect();
+
+    const doc = await TransactionModel.findById(id)
+      .populate({
+        path: "fromAccountId",
+        populate: {
+          path: "userId",
+        },
+      })
+      .populate({
+        path: "toAccountId",
+        populate: {
+          path: "userId",
+        },
+      })
+      .lean();
+
+    if (!doc) return null;
+
+    if (!doc.fromAccountId || !doc.toAccountId) return null;
+
+    const transaction = this.mapDocToTransaction(doc);
+    const fromAccount = AccountMapper.mapDocToAccount(doc.fromAccountId);
+    const toAccount = AccountMapper.mapDocToAccount(doc.toAccountId);
+    const fromUser = UserMapper.mapDocToUser(doc.fromAccountId.userId)
+    const toUser = UserMapper.mapDocToUser(doc.toAccountId.userId)
+
+    return Object.assign(transaction, {
+      fromAccount: Object.assign(fromAccount, { user: fromUser }),
+      toAccount: Object.assign(toAccount, { user: toUser }),
+    });
+  }
+
 }

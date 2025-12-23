@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
         const isAvailable = isAvailableParam === "true";
 
-        const result = await actionFactory().client.getAllActionsByAvailability.execute({
+        const result = await actionFactory().getAllActionsByAvailability.execute({
             userId: session.user.id,
             isAvailable,
         });

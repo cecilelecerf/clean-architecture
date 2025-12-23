@@ -17,7 +17,7 @@ import { IBAN } from "@domain/values/IBAN";
 
 type Props = { iban: string; userId: string };
 
-export class GetAccountByIBANUsercase {
+export class GetAccountByIBANUseCase {
   public constructor(
     private readonly accountRepository: AccountRepository,
     private readonly userRepository: UserRepository

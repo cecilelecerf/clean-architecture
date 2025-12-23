@@ -9,7 +9,7 @@ import { findActiveUser } from "@application/utils/userValidators";
 import { AccountDTO } from "@domain/entities/AccountEntity";
 
 type Props = { clientId: string; requesterId?: string };
-export class GetAccountsUsercase {
+export class GetAccountsUseCase {
   public constructor(
     private readonly accountRepository: AccountRepository,
     private readonly userRepository: UserRepository

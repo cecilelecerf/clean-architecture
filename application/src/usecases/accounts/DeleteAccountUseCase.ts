@@ -19,7 +19,7 @@ import {
 } from "@domain/errors/IBAN";
 import { IBAN } from "@domain/values/IBAN";
 
-export class DeleteAccountUsecase {
+export class DeleteAccountUseCase {
   public constructor(
     private readonly accountRepository: AccountRepository,
     private readonly emailService: EmailService,

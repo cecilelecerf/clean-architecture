@@ -6,14 +6,15 @@ import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
 import { TransactionRepositoryMySQL } from "../repositories/TransactionRepositoryMySQL";
 import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailService";
 
-import { RenameAccountUsecase } from "@application/usecases/accounts/RenameAccountUseCase";
-import { DeleteAccountUsecase } from "@application/usecases/accounts/DeleteAccountUseCase";
 import { ApplyDailyInterestUseCase } from "@application/usecases/accounts/ApplyDailyInterestUseCase";
 import { SavingsRateRepositoryMySQL } from "../repositories/SavingRateRepositoryMySQL";
-import { GetAccountByIBANUsercase } from "@application/usecases/accounts/GetAccountByIBANUseCase";
-import { GetAccountsUsercase } from "@application/usecases/accounts/GetAccountsUseCase";
-import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccountUseCase";
-import { TransfertBetweenAccountUsecase } from "@application/usecases/accounts/TransfertBetweenAccountUseCase";
+import { CreateAccountUseCase } from "@application/usecases/accounts/CreateAccountUsecase";
+import { DeleteAccountUseCase } from "@application/usecases/accounts/DeleteAccountUsecase";
+import { GetAccountByIBANUseCase } from "@application/usecases/accounts/GetAccountByIBANUseCase";
+import { GetAccountsUseCase } from "@application/usecases/accounts/GetAccountsUseCase";
+import { RenameAccountUseCase } from "@application/usecases/accounts/RenameAccountUsecase";
+import { TransfertBetweenAccountUseCase } from "@application/usecases/accounts/TransfertBetweenAccountUsecase";
+import { GetAllAccountsByTypeUserCase } from "@application/usecases/accounts/GetAllAccountsByTypeUseCase";
 
 export const accountFactory = () => {
   const client = new MySQLClient();
@@ -32,32 +33,36 @@ export const accountFactory = () => {
     clockService,
     uuidService
   );
-  const createAccount = new CreateAccountUsecase(
+  const createAccount = new CreateAccountUseCase(
     accountRepository,
     emailService,
     userRepository,
     clockService
   );
-  const deleteAccount = new DeleteAccountUsecase(
+  const deleteAccount = new DeleteAccountUseCase(
     accountRepository,
     emailService,
     userRepository
   );
-  const getAccountByIBAN = new GetAccountByIBANUsercase(
+  const getAccountByIBAN = new GetAccountByIBANUseCase(
     accountRepository,
     userRepository
   );
-  const getAccounts = new GetAccountsUsercase(
+  const getAccounts = new GetAccountsUseCase(
     accountRepository,
     userRepository
   );
-  const renameAccount = new RenameAccountUsecase(
+  const getAccountsByType = new GetAllAccountsByTypeUserCase(
+    accountRepository,
+    userRepository
+  );
+  const renameAccount = new RenameAccountUseCase(
     accountRepository,
     emailService,
     clockService,
     userRepository
   );
-  const transfertBetweenAccount = new TransfertBetweenAccountUsecase(
+  const transfertBetweenAccount = new TransfertBetweenAccountUseCase(
     accountRepository,
     transactionRepository,
     clockService,
@@ -74,6 +79,7 @@ export const accountFactory = () => {
     deleteAccount,
     getAccountByIBAN,
     getAccounts,
+    getAccountsByType,
     renameAccount,
     transfertBetweenAccount,
   };

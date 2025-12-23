@@ -17,7 +17,7 @@ import { findActiveUser } from "@application/utils/userValidators";
 import { InvalidAccountNameError } from "@domain/errors/account";
 import { IBAN } from "@domain/values/IBAN";
 
-export class RenameAccountUsecase {
+export class RenameAccountUseCase {
   public constructor(
     private readonly accountRepository: AccountRepository,
     private readonly emailService: EmailService,
