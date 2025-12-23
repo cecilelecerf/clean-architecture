@@ -26,6 +26,7 @@ export const savingsrateEndpoint = createEndpointsNodes({
     mutationOptions({
       mutationFn: async (payload: newSavingsrate) => {
         const data = await post('/savingsrate', payload);
+        console.log('DATA FROM API:', data);
         return savingRateSchema.parse(data);
       },
       onSuccess: () => {

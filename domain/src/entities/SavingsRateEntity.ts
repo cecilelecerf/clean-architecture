@@ -22,3 +22,11 @@ export class SavingsRateEntity {
     return new SavingsRateEntity(id, rate, effectiveDate, createdAt, updatedAt);
   }
 }
+
+export type SavingsRateDTO = {
+  id: string;
+  rate: number;
+  effectiveDate: Date;
+  createdAt: Date; 
+  updatedAt: Date;
+};

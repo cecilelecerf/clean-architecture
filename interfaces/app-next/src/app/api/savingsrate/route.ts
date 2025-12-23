@@ -13,7 +13,8 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const payload = savingRateSchema.pick({ rate:true, effectiveDate:true }).partial().parse(body);
+        const payload = savingRateSchema.pick({ rate:true, effectiveDate:true }).parse(body);
+        console.log('payload' + payload)
         const result = await savingsrateFactory().admin.setSavingsRate.execute({
             rate: payload.rate,
             effectiveDate: payload.effectiveDate,

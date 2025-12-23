@@ -1,5 +1,5 @@
 import { SavingRateRepository } from "@application/ports/repositories/SavingRateRepository";
-import { SavingsRateEntity } from "@domain/entities/SavingsRateEntity";
+import { SavingsRateDTO, SavingsRateEntity } from "@domain/entities/SavingsRateEntity";
 import { Percentage } from "@domain/values/Percentage";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
@@ -11,6 +11,7 @@ import {
 } from "@application/errors/users";
 import { InvalidPercentageError } from "@domain/errors/percentage";
 import { ClockService } from "@application/ports/services/ClockService";
+import { SavingsRateDTOMapper } from "@application/dto/SavingsrateDTOMapper";
 
 interface Props {
   rate: number;
@@ -36,7 +37,7 @@ export class SetSavingsRateUsecase {
     | UserNotFoundError
     | UserNotActiveError
     | InvalidPercentageError
-    | void
+    | SavingsRateDTO
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -64,5 +65,7 @@ export class SetSavingsRateUsecase {
     });
 
     await this.configRepository.save(savingsRate);
+
+    return SavingsRateDTOMapper.toDTO(savingsRate);
   }
 }
