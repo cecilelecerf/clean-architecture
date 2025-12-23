@@ -2,7 +2,7 @@ import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/UserRepositoryMySQL";
 import { ActionRepositoryMySQL } from "../repositories/ActionRepositoryMySQL";
 
-import { CreateActionUsecase } from "@application/usecases/actions/CreateActionUsecase";
+import { CreateActionUsecase } from "@application/usecases/actions/CreateActionUseCasee";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/actions/GetAllActionsByAvailabilityUseCase";
 import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
