@@ -66,11 +66,11 @@ export const creditsEndpoint = createEndpointsNodes({
       },
     }),
 
-  // PATCH /api/credits/:creditId/advisor
+  // PATCH /api/credits/:creditId/grant
   // Acceptation ou refus du crédit de la part d'un conseiller
   update: ({ creditId }: { creditId: CreditId }) =>
     mutationOptions({
-      mutationFn: (data: { name?: string }) => patch(`/credits/${creditId}/advisor`, data),
+      mutationFn: (data: { name?: string }) => patch(`/credits/${creditId}/grant`, data),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['credits', creditId] });
         queryClient.invalidateQueries({ queryKey: ['credits', 'list'] });
