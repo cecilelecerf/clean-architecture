@@ -40,7 +40,7 @@ export class AccountMapper {
 
     return AccountEntity.from({
       iban,
-      userId: doc.userId,
+      userId: doc.userId ?? null,
       name: doc.name,
       type: doc.type,
       color,

@@ -3,7 +3,7 @@ import { MongoClient } from "../../MongoClient";
 import { SavingsRateRepositoryMongo } from "../repositories/SavingsRateRepositoryMongo";
 import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { SetSavingsRateUsecase } from "@application/usecases/savingRates/SetSavingsRateUsecase";
+import { SetSavingsRateUsecase } from "@application/usecases/savingRates/SetSavingsRateUseCasee";
 
 export const savingsrateFactory = () => {
   const client = new MongoClient();

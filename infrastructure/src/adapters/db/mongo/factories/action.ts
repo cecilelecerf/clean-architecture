@@ -2,7 +2,7 @@ import { SystemClockService } from "@infrastructure/adapters/services/SystemCloc
 import { MongoClient } from "../../MongoClient";
 import { ActionRepositoryMongo } from "../repositories/ActionRepositoryMongo";
 import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
-import { CreateActionUsecase } from "@application/usecases/actions/CreateActionUsecase";
+import { CreateActionUsecase } from "@application/usecases/actions/CreateActionUseCasee";
 import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
 import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/actions/GetAllActionsByAvailabilityUseCase";
 

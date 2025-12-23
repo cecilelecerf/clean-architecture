@@ -33,10 +33,14 @@ export class TransactionDTOMapper {
   ): TransactionEntityWithAccountWithUserDTO {
     return Object.assign(transaction.toDTO(), {
       fromAccount: Object.assign(transaction.fromAccount.toDTO(), {
-        user: transaction.fromAccount.user.toFront(),
+        user: transaction.fromAccount.user
+          ? transaction.fromAccount.user.toFront()
+          : null,
       }),
       toAccount: Object.assign(transaction.toAccount.toDTO(), {
-        user: transaction.toAccount.user.toFront(),
+        user: transaction.toAccount.user
+          ? transaction.toAccount.user.toFront()
+          : null,
       }),
     });
   }

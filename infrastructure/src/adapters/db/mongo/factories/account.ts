@@ -7,14 +7,13 @@ import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailService";
 import { ApplyDailyInterestUseCase } from "@application/usecases/accounts/ApplyDailyInterestUseCase";
-import { CreateAccountUseCase } from "@application/usecases/accounts/CreateAccountUsecase";
-import { DeleteAccountUseCase } from "@application/usecases/accounts/DeleteAccountUsecase";
+import { CreateAccountUseCase } from "@application/usecases/accounts/CreateAccountUseCasee";
+import { DeleteAccountUseCase } from "@application/usecases/accounts/DeleteAccountUseCasee";
 import { GetAccountByIBANUseCase } from "@application/usecases/accounts/GetAccountByIBANUseCase";
 import { GetAccountsUseCase } from "@application/usecases/accounts/GetAccountsUseCase";
-import { RenameAccountUseCase } from "@application/usecases/accounts/RenameAccountUsecase";
-import { TransfertBetweenAccountUseCase } from "@application/usecases/accounts/TransfertBetweenAccountUsecase";
+import { RenameAccountUseCase } from "@application/usecases/accounts/RenameAccountUseCasee";
+import { TransfertBetweenAccountUseCase } from "@application/usecases/accounts/TransfertBetweenAccountUseCasee";
 import { GetAllAccountsByTypeUserCase } from "@application/usecases/accounts/GetAllAccountsByTypeUseCase";
-
 
 export const accountFactory = () => {
   const client = new MongoClient();
@@ -48,10 +47,7 @@ export const accountFactory = () => {
     accountRepository,
     userRepository
   );
-  const getAccounts = new GetAccountsUseCase(
-    accountRepository,
-    userRepository
-  );
+  const getAccounts = new GetAccountsUseCase(accountRepository, userRepository);
   const getAccountsByType = new GetAllAccountsByTypeUserCase(
     accountRepository,
     userRepository
