@@ -24,7 +24,7 @@ interface Props {
   currency: string;
 }
 
-export class CreateAccountUsecase {
+export class CreateAccountUseCase {
   public constructor(
     private readonly accountRepository: AccountRepository,
     private readonly emailService: EmailService,
