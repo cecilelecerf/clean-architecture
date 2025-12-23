@@ -1,10 +1,14 @@
-import { AccountRepository } from "@application/ports/repositories/AccountRepository";
+import {
+  AccountEntityWithUser,
+  AccountRepository,
+} from "@application/ports/repositories/AccountRepository";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { IBAN } from "@domain/values/IBAN";
 import { MongoClient } from "../../MongoClient";
 import { AccountModel } from "../models/AccountModel";
 import { AccountMapper } from "../../mappers/AccountMapper";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class AccountRepositoryMongo implements AccountRepository {
   constructor(private readonly client: MongoClient) {}
@@ -57,9 +61,8 @@ export class AccountRepositoryMongo implements AccountRepository {
     return AccountMapper.mapDocToAccount(doc);
   }
 
-  /** Trouver une liste de compte par type */
-  async findByType(type: string): Promise<AccountEntity[]>
-  {
+  /** 🔍 Trouver une liste de compte par type */
+  async findByType(type: string): Promise<AccountEntity[]> {
     await this.client.connect();
 
     const docs = await AccountModel.find({ type })
@@ -67,6 +70,44 @@ export class AccountRepositoryMongo implements AccountRepository {
       .lean();
 
     return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
+  }
+
+  /** Trouver une liste de compte par type */
+  async findByTypeSection(type: "client" | "bank"): Promise<AccountEntity[]> {
+    await this.client.connect();
+
+    const condition =
+      type === "client" ? { userId: { $ne: null } } : { userId: null };
+
+    const docs = await AccountModel.find(condition)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
+  }
+
+  /** 🔍 Trouver une liste de compte par type avec les users */
+  async findByTypeSectionWithUser(
+    type: "client" | "bank"
+  ): Promise<AccountEntityWithUser[]> {
+    await this.client.connect();
+
+    const condition =
+      type === "client" ? { userId: { $ne: null } } : { userId: null };
+
+    const docs = await AccountModel.find(condition)
+      .populate("userId") // Populate la référence userId
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return docs.map((doc) => {
+      const account = AccountMapper.mapDocToAccount(doc);
+      const user =
+        doc.userId && typeof doc.userId === "object"
+          ? UserMapper.mapDocToUser(doc.userId)
+          : null;
+      return Object.assign(account, { user });
+    });
   }
 
   /** 📬 Sauvegarder un compte */
