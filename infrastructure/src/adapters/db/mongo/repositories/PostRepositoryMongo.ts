@@ -9,6 +9,7 @@ import { TagEntity } from "@domain/entities/TagEntity";
 import { PostModel } from "../models/PostModel";
 import { Color } from "@domain/values/Color";
 import { ColorInvalidFormatError } from "@domain/errors/color";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class PostRepositoryMongo implements PostRepository {
   constructor(private readonly client: MongoClient) {}
@@ -25,21 +26,6 @@ export class PostRepositoryMongo implements PostRepository {
       publishedAt: doc.publishedAt ?? null,
       readBy: doc.readBy || [],
       clientId: doc.clientId ?? null,
-    });
-  }
-
-  private mapDocToAdvisor(doc: any): UserEntity {
-    return UserEntity.from({
-      id: doc._id.toString(),
-      firstname: doc.firstname,
-      lastname: doc.lastname,
-      email: doc.email,
-      passwordHash: doc.passwordHash,
-      role: doc.role,
-      isActiveField: doc.isActive,
-      createdAt: doc.createdAt,
-      confirmedAt: doc.confirmedAt,
-      updatedAt: doc.updatedAt,
     });
   }
 
@@ -172,7 +158,7 @@ export class PostRepositoryMongo implements PostRepository {
       .lean();
 
     if (!doc) return null;
-    const advisor = this.mapDocToAdvisor(doc.advisorId);
+    const advisor = UserMapper.mapDocToUser(doc.advisorId);
 
     const tags: TagEntity[] = (doc.tagsId || [])
       .map((tagDoc: any) => this.mapDocToTag(tagDoc))
@@ -235,7 +221,7 @@ export class PostRepositoryMongo implements PostRepository {
       .map((doc) => {
         if (!doc.advisorId) return null;
 
-        const advisor = this.mapDocToAdvisor(doc.advisorId);
+        const advisor = UserMapper.mapDocToUser(doc.advisorId);
 
         const tags: TagEntity[] = (doc.tagsId || [])
           .map((tagDoc: any) => this.mapDocToTag(tagDoc))
@@ -274,7 +260,7 @@ export class PostRepositoryMongo implements PostRepository {
       .map((doc) => {
         if (!doc.advisorId) return null;
 
-        const advisor = this.mapDocToAdvisor(doc.advisorId);
+        const advisor = UserMapper.mapDocToUser(doc.advisorId);
 
         const tags: TagEntity[] = (doc.tagsId || [])
           .map((tagDoc: any) => this.mapDocToTag(tagDoc))

@@ -9,6 +9,7 @@ import { TagEntity } from "@domain/entities/TagEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { Email } from "@domain/values/Email";
 import { Color } from "@domain/values/Color";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class PostRepositoryMySQL implements PostRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -30,22 +31,6 @@ export class PostRepositoryMySQL implements PostRepository {
       publishedAt: row.published_at ?? undefined,
       readBy: readsId,
       clientId: row.client_id ?? undefined,
-    });
-  }
-
-  // 🔧 Méthode helper pour mapper un row vers UserEntity (advisor)
-  private mapRowToAdvisor(row: RowDataPacket): UserEntity {
-    return UserEntity.from({
-      id: row.advisor_id,
-      firstname: row.advisor_firstname,
-      lastname: row.advisor_lastname,
-      email: Email.from(row.advisor_email),
-      passwordHash: row.advisor_password_hash,
-      role: row.advisor_role,
-      isActiveField: row.advisor_is_active,
-      createdAt: row.advisor_created_at,
-      confirmedAt: row.advisor_confirmed_at,
-      updatedAt: row.advisor_updated_at,
     });
   }
 
@@ -269,7 +254,7 @@ export class PostRepositoryMySQL implements PostRepository {
     const row = rows[0];
     const { tags, tagsId } = await this.getPostTags(id);
     const readsId = await this.getPostReaders(id);
-    const advisor = this.mapRowToAdvisor(row);
+    const advisor = UserMapper.mapRowToUser(row, "advisor_");
     const post = this.mapRowToPost(row, tagsId, readsId);
 
     return Object.assign(post, { tags, advisor });
@@ -361,7 +346,7 @@ export class PostRepositoryMySQL implements PostRepository {
       rows.map(async (row) => {
         const { tags, tagsId } = await this.getPostTags(row.id);
         const readsId = await this.getPostReaders(row.id);
-        const advisor = this.mapRowToAdvisor(row);
+        const advisor = UserMapper.mapRowToUser(row, "advisor_");
         const post = this.mapRowToPost(row, tagsId, readsId);
 
         return Object.assign(post, { tags, advisor });
@@ -431,7 +416,7 @@ export class PostRepositoryMySQL implements PostRepository {
       const postId = row.post_id;
 
       if (!postsMap.has(postId)) {
-        const advisor = this.mapRowToAdvisor(row);
+        const advisor = UserMapper.mapRowToUser(row, "advisor_");
         const readByIds = row.read_by_ids
           ? row.read_by_ids.split(",").filter(Boolean)
           : [];

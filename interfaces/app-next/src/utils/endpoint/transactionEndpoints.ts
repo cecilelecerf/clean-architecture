@@ -8,6 +8,7 @@ import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import {
   NewTransaction,
   transactionDTOSchema,
+  transactionDTOWithAccountResumeSchema,
   TransactionId,
   transactionSchema,
 } from '@infrastructure/types/transaction';
@@ -67,10 +68,10 @@ export const transactionEndpoint = createEndpointsNodes({
   get: ({ transactionId, accountIban }: { transactionId: TransactionId; accountIban: AccountId }) =>
     queryOptions({
       queryKey: ['accounts', accountIban, 'transactions', transactionId],
-      queryFn: () =>
-        get(`/accounts/${accountIban}/transactions/${transactionId}`).then((data) =>
-          transactionDTOSchema.parse(data),
-        ),
+      queryFn: async () => {
+        const data = await get(`/accounts/${accountIban}/transactions/${transactionId}`);
+        return safeParseWithLog(transactionDTOWithAccountResumeSchema, data);
+      },
     }),
 
   // POST /api/accounts/:accountIban/transactions

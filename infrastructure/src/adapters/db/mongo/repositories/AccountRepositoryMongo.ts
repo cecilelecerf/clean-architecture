@@ -4,33 +4,10 @@ import { UserEntity } from "@domain/entities/UserEntity";
 import { IBAN } from "@domain/values/IBAN";
 import { MongoClient } from "../../MongoClient";
 import { AccountModel } from "../models/AccountModel";
-import { Money } from "@domain/values/Money";
-import { Color } from "@domain/values/Color";
+import { AccountMapper } from "../../mappers/AccountMapper";
 
 export class AccountRepositoryMongo implements AccountRepository {
   constructor(private readonly client: MongoClient) {}
-
-  // 🔧 Méthode helper pour mapper un document MongoDB vers AccountEntity
-  private mapDocToAccount(doc: any): AccountEntity {
-    const iban = IBAN.from(doc.iban);
-    const balance = Money.from({
-      amount: Number(doc.balance),
-      currency: doc.currency,
-    });
-    const color = Color.from(doc.color);
-
-    return AccountEntity.from({
-      iban,
-      userId: doc.userId,
-      name: doc.name,
-      type: doc.type,
-      color,
-      balance,
-      currency: doc.currency,
-      createdAt: doc.createdAt,
-      updatedAt: doc.updatedAt,
-    });
-  }
 
   /** 🔍 Trouver tous les comptes d'un user */
   async findByUserId(
@@ -42,7 +19,7 @@ export class AccountRepositoryMongo implements AccountRepository {
       .sort({ createdAt: -1 })
       .lean();
 
-    return docs.map((doc) => this.mapDocToAccount(doc));
+    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
   }
 
   /** 🔍 Trouver un compte par IBAN */
@@ -52,7 +29,7 @@ export class AccountRepositoryMongo implements AccountRepository {
     const doc = await AccountModel.findOne({ iban: iban.value }).lean();
     if (!doc) return null;
 
-    return this.mapDocToAccount(doc);
+    return AccountMapper.mapDocToAccount(doc);
   }
 
   /** 🔍 Tous les comptes épargne */
@@ -63,7 +40,7 @@ export class AccountRepositoryMongo implements AccountRepository {
       .sort({ createdAt: -1 })
       .lean();
 
-    return docs.map((doc) => this.mapDocToAccount(doc));
+    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
   }
 
   /** 🔍 Compte d'intérêts de la banque */
@@ -77,7 +54,7 @@ export class AccountRepositoryMongo implements AccountRepository {
 
     if (!doc) return null;
 
-    return this.mapDocToAccount(doc);
+    return AccountMapper.mapDocToAccount(doc);
   }
 
   /** 📬 Sauvegarder un compte */

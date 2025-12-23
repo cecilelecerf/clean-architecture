@@ -1,9 +1,9 @@
 "use client"
 import { use, useState } from "react";
-import { PostFilters } from "@/components/feeds/PostFilters";
 import { FiltersProps } from "@/utils/endpoint/transactionEndpoints";
 import { GetAllTransactions } from "../GetAllTransactions";
 import { AccountId } from "@infrastructure/types/account";
+import { TransactionFilters } from "../TransactionFilters";
 
 export default function TransactionsPage({ params }: { params: Promise<{ accountId: AccountId }> }) {
     const { accountId } = use(params)
@@ -17,7 +17,7 @@ export default function TransactionsPage({ params }: { params: Promise<{ account
     })
     return (
         <>
-            <PostFilters filters={filters} onChange={(f) => setFilters(f)} />
+            <TransactionFilters filters={filters} onChange={(f) => setFilters(f)} />
             <GetAllTransactions accountIban={accountId} filters={filters} onPaginationChange={(pageNumber) => setFilters((prev) => ({ ...prev, page: pageNumber }))} />
         </>
     )

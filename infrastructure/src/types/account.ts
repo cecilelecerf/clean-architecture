@@ -26,9 +26,15 @@ export const accountDTOSchema = accountSchema.pick({
   currency: true,
   amount: true,
 });
-export const accountDTOWithUserSchema = accountDTOSchema.extend({
+
+export const accountResumeSchema = accountSchema.pick({
+  IBAN: true,
+  name: true,
+});
+export const accountResumeWithUserSchema = accountResumeSchema.extend({
   user: userDtoSchema,
 });
+export type AccountResumeWithUser = z.infer<typeof accountResumeWithUserSchema>;
 
 export const newAccountSchema = accountSchema.pick({
   name: true,

@@ -8,24 +8,10 @@ import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { Email } from "@domain/values/Email";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class MessageRepositoryMySQL implements MessageRepository {
   constructor(private readonly client: MySQLClient) {}
-
-  private mapRowToSender(row: RowDataPacket): UserEntity {
-    return UserEntity.from({
-      id: row.user_id,
-      firstname: row.firstname,
-      lastname: row.lastname,
-      email: Email.from(row.email),
-      passwordHash: row.password_hash,
-      role: row.role,
-      isActiveField: row.is_active,
-      createdAt: row.user_created_at,
-      confirmedAt: row.confirmed_at,
-      updatedAt: row.user_updated_at,
-    });
-  }
 
   private async updateMessageReaders(
     messageId: string,
@@ -163,7 +149,7 @@ export class MessageRepositoryMySQL implements MessageRepository {
         sentAt: new Date(row.sent_at),
         readBy: readerIds,
       });
-      const sender: UserEntity = this.mapRowToSender(row);
+      const sender: UserEntity = UserMapper.mapRowToUser(row);
       return Object.assign(message, { sender });
     });
     console.log(result);

@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { endpoints } from '@/utils/endpoint';
 import { match } from 'ts-pattern';
 import { use } from 'react';
+import { formatDateFrench } from '@/utils/date/formatDateFrench';
 
 
 export default function TransactionIdPage({ params }: { params: Promise<{ accountId: AccountId, transactionId: TransactionId }> }) {
@@ -31,6 +32,7 @@ export default function TransactionIdPage({ params }: { params: Promise<{ accoun
         .with({ status: "pending" }, () => "pending")
         .with({ status: "success" }, ({ data: transaction }) =>
           <>
+            {console.log(transaction)}
             <Card
               className={`rounded-2xl text-white shadow-lg border-0 bg-linear-to-br  ${fromColorClasses[800]['blue']}
             ${toColorClasses[500]['blue']} 
@@ -42,7 +44,7 @@ export default function TransactionIdPage({ params }: { params: Promise<{ accoun
                     {transaction.icon && <span className="mr-3">{transaction.icon}</span>}
                     {transaction.label}
                   </p>
-                  <p className="opacity-80 text-sm">{transaction.date.toLocaleDateString()}</p>
+                  <p className="opacity-80 text-sm">{formatDateFrench(transaction.date)}</p>
                 </div>
                 <div>
                   <p className="text-xs opacity-75 mb-1">Montant</p>

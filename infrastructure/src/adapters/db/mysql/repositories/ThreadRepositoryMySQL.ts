@@ -4,9 +4,9 @@ import {
 } from "@application/ports/repositories/ThreadRepository";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { Email } from "@domain/values/Email";
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class ThreadRepositoryMySQL implements ThreadRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -33,17 +33,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
 
         // Mapper l'administrateur si présent
         thread.administrator = row.admin_id
-          ? UserEntity.from({
-              id: row.admin_id,
-              firstname: row.admin_firstname,
-              lastname: row.admin_lastname,
-              email: Email.from(row.admin_email),
-              role: row.admin_role,
-              createdAt: new Date(row.admin_created_at),
-              isActiveField: row.admin_is_active === 1,
-              passwordHash: row.admin_password_hash,
-              updatedAt: row.admin_updated_at,
-            })
+          ? UserMapper.mapRowToUser(row, "admin_")
           : null;
 
         thread.participants = [];
@@ -59,17 +49,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
 
         if (!alreadyExists) {
           thread.participants.push(
-            UserEntity.from({
-              id: row.participant_id,
-              firstname: row.participant_firstname,
-              lastname: row.participant_lastname,
-              email: Email.from(row.participant_email),
-              role: row.participant_role,
-              createdAt: new Date(row.participant_created_at),
-              isActiveField: row.participant_is_active === 1,
-              passwordHash: row.participant_password_hash,
-              updatedAt: row.updated_at,
-            })
+            UserMapper.mapRowToUser(row, "participant_")
           );
 
           if (!thread.participantsId.includes(row.participant_id)) {
