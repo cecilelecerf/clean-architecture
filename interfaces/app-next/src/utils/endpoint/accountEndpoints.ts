@@ -12,6 +12,7 @@ import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { transactionEndpoint } from './transactionEndpoints';
+import { UserId } from '@infrastructure/types/user';
 
 // ============================================================================
 // SCHEMAS
@@ -29,7 +30,7 @@ export type renameAccount = z.infer<typeof renameAccountSchema>;
 export const accountsEndpoint = createEndpointsNodes({
   // GET /api/accounts
   // Liste des comptes selon l'utilisateur (client ou banque)
-  getAll: () =>
+  getAllByMe: () =>
     queryOptions({
       queryKey: ['accounts', 'list'],
       queryFn: () =>
@@ -83,6 +84,25 @@ export const accountsEndpoint = createEndpointsNodes({
         queryClient.invalidateQueries({ queryKey: ['accounts', accountIban] });
         queryClient.invalidateQueries({ queryKey: ['accounts', 'list'] });
       },
+    }),
+  getAllByClient: ({ userId }: { userId: UserId }) =>
+    queryOptions({
+      queryKey: ['accounts', 'users', userId],
+      queryFn: () =>
+        get(`/accounts/users/${userId}`).then((data) => {
+          return safeParseWithLog(accountDTOSchema.array(), data);
+        }),
+    }),
+
+  // GET /api/accounts
+  // Liste des comptes selon l'utilisateur (client ou banque)
+  getAll: () =>
+    queryOptions({
+      queryKey: ['accounts', 'list'],
+      queryFn: () =>
+        get('/accounts/advisors').then((data) => {
+          return safeParseWithLog(accountDTOSchema.array(), data);
+        }),
     }),
   transactions: transactionEndpoint,
 });

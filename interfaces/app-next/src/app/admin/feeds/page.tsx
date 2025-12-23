@@ -1,15 +1,15 @@
 "use client"
-import { FiltersProps } from "@/utils/endpoint/feedsEndpoint"
+import { PostFilters as TPostFilters } from "@/utils/endpoint/feedsEndpoint"
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { PostFilters } from "@/components/feeds/PostFilters";
 import { Posts } from "@/components/feeds/Posts";
+import { PostFilters } from "@/components/feeds/PostFilters";
 
 export default function PostsPage() {
     const router = useRouter()
-    const [filters, setFilters] = useState<FiltersProps>({
+    const [filters, setFilters] = useState<TPostFilters>({
         title: undefined,
         fromDate: undefined,
         toDate: undefined,

@@ -8,9 +8,9 @@ import { PaginationComponent } from "../PaginationComponent"
 import { useEffect, useState } from "react"
 import { socket } from "@/lib/socket"
 import { queryClient } from "@/lib/queryClient"
-import { FiltersProps } from "@/utils/endpoint/feedsEndpoint"
+import { PostFiltersProps } from "@/utils/endpoint/feedsEndpoint"
 
-type Props = { filters: FiltersProps, onPaginationChange: (pageNumber: number) => void, isAdmin?: boolean }
+type Props = { filters: PostFiltersProps, onPaginationChange: (pageNumber: number) => void, isAdmin?: boolean }
 
 export const Posts = ({ filters, onPaginationChange, isAdmin }: Props) => {
     const query = useQuery(endpoints.feeds.posts.getAll({ filters }))

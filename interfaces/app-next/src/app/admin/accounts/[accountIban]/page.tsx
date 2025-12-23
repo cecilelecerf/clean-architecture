@@ -2,7 +2,6 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Copy, MoreVertical } from 'lucide-react';
 import { fromColorClasses, textColorClasses, toColorClasses } from '@/utils/color';
 import { useRouter } from 'next/navigation';
@@ -10,22 +9,22 @@ import { AccountId } from '@infrastructure/types/account';
 import { useQuery } from '@tanstack/react-query';
 import { endpoints } from '@/utils/endpoint';
 import { match } from 'ts-pattern';
-import { GetAllTransactions } from '../../../../components/transactions/GetAllTransactions';
 import { use } from 'react';
 import { Flex } from '@radix-ui/themes';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { GetAllTransactions } from '@/components/transactions/GetAllTransactions';
 
 
 export default function AccountIdPage({
   params
 }: {
-  params: Promise<{ accountId: AccountId }>
+  params: Promise<{ accountIban: AccountId }>
 }) {
-  const { accountId } = use(params)
+  const { accountIban } = use(params)
 
   const router = useRouter();
-  const query = useQuery(endpoints.accounts.get({ accountIban: accountId }));
+  const query = useQuery(endpoints.accounts.get({ accountIban }));
 
   return (
     <>
@@ -66,14 +65,6 @@ export default function AccountIdPage({
               </CardContent>
             </Card>
 
-            {/* Actions */}
-            <Button
-              onClick={() => router.push(`/accounts/${account.IBAN}/transactions/new`)}
-              className="flex-1 mx-1 bg-gray-100 text-gray-800 hover:bg-gray-200"
-            >
-              Transférer
-            </Button>
-            <Separator />
             {/* Transactions */}
             <Flex direction="column" gap="4">
               <Flex justify="between">
@@ -82,13 +73,7 @@ export default function AccountIdPage({
                   <Button variant="link">Voir +</Button>
                 </Link>
               </Flex>
-              <GetAllTransactions
-                accountIban={accountId}
-                filters={{ limit: 7, page: 1 }}
-                onPaginationChange={() => { }}
-                hiddePagination
-                baseHref={`/accounts/${accountId.toLowerCase()}/transactions`}
-              />
+              <GetAllTransactions accountIban={accountIban} filters={{ limit: 7, page: 1 }} onPaginationChange={() => { }} hiddePagination baseHref={`/admin/accounts/${accountIban.toLowerCase()}/transactions`} />
             </Flex>
           </div >
         )

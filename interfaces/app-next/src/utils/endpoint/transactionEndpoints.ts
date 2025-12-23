@@ -13,22 +13,21 @@ import {
   transactionSchema,
 } from '@infrastructure/types/transaction';
 import { safeParseWithLog } from '@/lib/zodUtils';
+import { paginationSchema } from '@/components/PaginationComponent';
 
-export const querySchema = z.object({
-  page: z.number().optional(),
-  limit: z.number().optional(),
+export const querySchema = paginationSchema.extend({
   type: transactionSchema.shape.type.optional(),
   fromDate: z.string().datetime().optional(),
   toDate: z.string().datetime().optional(),
   label: transactionSchema.shape.label.optional(),
 });
-export type FiltersProps = z.infer<typeof querySchema>;
+export type TransactionFilters = z.infer<typeof querySchema>;
 
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 
-function buildTransactionsQueryParams(filters?: FiltersProps): URLSearchParams {
+function buildTransactionsQueryParams(filters?: TransactionFilters): URLSearchParams {
   const params = new URLSearchParams();
 
   if (!filters) return params;
@@ -50,7 +49,7 @@ function buildTransactionsQueryParams(filters?: FiltersProps): URLSearchParams {
 export const transactionEndpoint = createEndpointsNodes({
   // GET /api/accounts/:accountIban/transactions
   // Transactions d'un account
-  getAll: ({ accountIban, filters }: { accountIban: AccountId; filters?: FiltersProps }) =>
+  getAll: ({ accountIban, filters }: { accountIban: AccountId; filters?: TransactionFilters }) =>
     queryOptions({
       queryKey: ['accounts', accountIban, 'transactions', 'list'],
       queryFn: async () => {

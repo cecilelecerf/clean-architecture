@@ -6,20 +6,20 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { FiltersProps } from "@/utils/endpoint/transactionEndpoints";
 import { Transaction } from "@infrastructure/types/transaction";
 import { CalendarFilter } from "@/components/CalendarFilter";
 import { Flex } from "@radix-ui/themes";
+import { TransactionFilters as TTransactionFilters } from "@/utils/endpoint/transactionEndpoints";
 ;
 
 type TransactionFiltersProps = {
-    filters: FiltersProps;
+    filters: TTransactionFilters;
     isAdmin?: boolean
-    onChange: (filters: FiltersProps) => void;
+    onChange: (filters: TTransactionFilters) => void;
 };
 
 export const TransactionFilters = ({ filters, onChange, isAdmin }: TransactionFiltersProps) => {
-    const [localFilters, setLocalFilters] = useState<FiltersProps>(filters);
+    const [localFilters, setLocalFilters] = useState<TTransactionFilters>(filters);
 
     useEffect(() => {
         onChange(localFilters);

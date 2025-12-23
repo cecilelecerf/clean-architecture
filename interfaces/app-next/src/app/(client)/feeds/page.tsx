@@ -1,11 +1,11 @@
 "use client"
 import { useState } from "react";
-import { FiltersProps } from "@/utils/endpoint/feedsEndpoint";
+import { PostFiltersProps } from "@/utils/endpoint/feedsEndpoint";
 import { PostFilters } from "@/components/feeds/PostFilters";
 import { Posts } from "@/components/feeds/Posts";
 
 export default function PostsPage() {
-    const [filters, setFilters] = useState<FiltersProps>({
+    const [filters, setFilters] = useState<PostFiltersProps>({
         title: undefined,
         fromDate: undefined,
         toDate: undefined,

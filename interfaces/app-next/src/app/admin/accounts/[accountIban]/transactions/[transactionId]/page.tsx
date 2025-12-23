@@ -3,10 +3,8 @@ import { TransactionId } from '@infrastructure/types/transaction';
 import { use } from 'react';
 import { TransactionDetail } from '@/components/transactions/TransactionDetail';
 
-
 export default function TransactionIdPage({ params }: { params: Promise<{ accountId: AccountId, transactionId: TransactionId }> }) {
-  const { accountId, transactionId } = use(params)
+    const { accountId, transactionId } = use(params)
 
-  return (<TransactionDetail accountIban={accountId} transactionId={transactionId} />
-  );
+    return (<TransactionDetail transactionId={transactionId} accountIban={accountId} clickable />);
 }

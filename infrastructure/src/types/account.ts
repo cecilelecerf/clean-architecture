@@ -30,6 +30,8 @@ export const accountDTOSchema = accountSchema.pick({
 export const accountResumeSchema = accountSchema.pick({
   IBAN: true,
   name: true,
+  color: true,
+  type: true,
 });
 export const accountResumeWithUserSchema = accountResumeSchema.extend({
   user: userDtoSchema,

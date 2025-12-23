@@ -1,5 +1,5 @@
 "use client"
-import { ThreadCard } from "@/components/threads/ThreadCard";
+import { ThreadCard, ThreadCardSkeleton } from "@/components/threads/ThreadCard";
 import { socket } from "@/lib/socket";
 import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
@@ -21,7 +21,12 @@ export default function ThreadsPage() {
     return (
         match(query)
             .with({ status: "error" }, () => "error")
-            .with({ status: "pending" }, () => "loading")
+            .with({ status: "pending" }, () =>
+                <div>
+                    {Array.from({ length: 5 }).map((_, index) => (
+                        <ThreadCardSkeleton key={index} />
+                    ))}
+                </div>)
             .with({ status: "success" }, ({ data: threads }) => {
                 if (threads.length === 0) return <>Pas de conversation</>
                 return <div className="">
