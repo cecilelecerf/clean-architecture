@@ -13,6 +13,11 @@ export class SystemClockService implements ClockService {
     return date;
   }
 
+  nowMinusMonths(months: number): Date {
+    const date = new Date();
+    date.setMonth(date.getMonth() - months);
+    return date;
+  }
   /**
    * Renvoie une nouvelle date ajoutant X jours à la date fournie
    */

@@ -2,7 +2,7 @@ import z from "zod";
 import { userIdSchema } from "./user";
 import { moneySchema } from "./money";
 
-export const creditIdSchema = z.string().length(27).brand("credit");
+export const creditIdSchema = z.string().brand("credit");
 export type CreditId = z.infer<typeof creditIdSchema>;
 
 export const creditSchema = z.object({
@@ -35,4 +35,7 @@ export const creditDTOSchema = creditSchema.pick({
   monthlyPayment: true,
   remainingBalance: true,
   status: true,
+  createdAt: true,
+  updatedAt: true,
+  advisorId: true,
 });

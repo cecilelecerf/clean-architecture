@@ -10,21 +10,23 @@ export class CreditRepositoryMySQL implements CreditRepository {
   constructor(private readonly client: MySQLClient) {}
 
   private mapRowToCredit(row: RowDataPacket): CreditEntity {
+    console.log(row);
     const initialAmount = Money.from({
-      amount: row.initial_amount,
+      amount: Number(row.initial_amount),
       currency: row.initial_currency,
     });
     const monthlyPayment = Money.from({
-      amount: row.monthly_amount,
+      amount: Number(row.monthly_amount),
       currency: row.monthly_currency,
     });
     const remainingBalance = Money.from({
-      amount: row.remaining_amount,
+      amount: Number(row.remaining_amount),
       currency: row.remaining_currency,
     });
-    const interestRate = Percentage.from(row.interest_rate);
-    const insuranceRate = Percentage.from(row.insurance_rate);
-
+    const interestRate = Percentage.from({ value: Number(row.interest_rate) });
+    const insuranceRate = Percentage.from({
+      value: Number(row.insurance_rate),
+    });
     return CreditEntity.from({
       id: row.id,
       userId: row.user_id,
@@ -75,6 +77,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
 
   /** Sauvegarder un crédit */
   async save(credit: CreditEntity): Promise<void> {
+    console.log(credit.status);
     await this.client.query<ResultSetHeader>(
       `INSERT INTO credits 
         (id, user_id, initial_amount, initial_currency, interest_rate, insurance_rate, 

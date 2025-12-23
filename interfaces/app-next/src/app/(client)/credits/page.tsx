@@ -15,7 +15,9 @@ import {
     AlertCircle,
     Calendar,
     Percent,
-    TrendingUp
+    TrendingUp,
+    Eye,
+    CalendarClock
 } from "lucide-react";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 
@@ -31,6 +33,12 @@ const statusConfig = {
         variant: "default" as const,
         icon: CheckCircle,
         color: "text-green-600",
+    },
+    ACCEPTED_FUTURE: {
+        label: "Accepté - À venir",
+        variant: "secondary" as const,
+        icon: CalendarClock,
+        color: "text-blue-600",
     },
     REFUSED: {
         label: "Refusé",
@@ -58,11 +66,7 @@ export default function ClientCreditsPage() {
             </div>
 
             {match(query)
-                .with({ status: "error" }, () => (
-                    <div className="text-red-500 text-center border border-red-200 p-6 rounded-lg">
-                        Erreur lors du chargement des crédits
-                    </div>
-                ))
+                .with({ status: "error" }, () => "error")
                 .with({ status: "pending" }, () => <CreditsSkeleton />)
                 .with({ status: "success" }, ({ data: credits }) => {
                     if (credits.length === 0) {
@@ -76,7 +80,7 @@ export default function ClientCreditsPage() {
                                             Vous n'avez pas encore de demande de crédit
                                         </p>
                                     </div>
-                                    <Button onClick={() => router.push("/client/credits/new")}>
+                                    <Button onClick={() => router.push("/credits/new")}>
                                         Faire une demande
                                     </Button>
                                 </CardContent>
@@ -85,95 +89,213 @@ export default function ClientCreditsPage() {
                     }
 
                     return (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {credits.map((credit) => {
-                                const config = statusConfig[credit.status];
-                                const StatusIcon = config.icon;
+                        <div className="space-y-8">
+                            {/* Crédits acceptés/actifs - Grid de cards */}
+                            {credits.some((credit) => credit.status === "ACCEPTED") && (
+                                <section>
+                                    <h2 className="text-xl font-semibold mb-4">Crédits en cours</h2>
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        {credits
+                                            .filter((credit) => credit.status === "ACCEPTED")
+                                            .map((credit) => {
+                                                // Déterminer si le crédit est futur ou actif
+                                                const isFuture = new Date(credit.startDate) > new Date();
+                                                const config = isFuture
+                                                    ? statusConfig.ACCEPTED_FUTURE
+                                                    : statusConfig.ACCEPTED;
+                                                const StatusIcon = config.icon;
 
-                                return (
-                                    <Card
-                                        key={credit.id}
-                                        className="hover:shadow-lg transition-all cursor-pointer"
-                                        onClick={() => router.push(`/client/credits/${credit.id}`)}
-                                    >
-                                        <CardHeader>
-                                            <div className="flex justify-between items-start">
-                                                <CardTitle className="flex items-center gap-2">
-                                                    <StatusIcon className={`w-5 h-5 ${config.color}`} />
-                                                    Crédit {credit.initialAmount.amount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.initialAmount.currency,
-                                                    })}
-                                                </CardTitle>
-                                                <Badge variant={config.variant}>{config.label}</Badge>
-                                            </div>
-                                        </CardHeader>
+                                                return (
+                                                    <Card
+                                                        key={credit.id}
+                                                        className="hover:shadow-lg transition-all cursor-pointer"
+                                                        onClick={() => router.push(`/credits/${credit.id}`)}
+                                                    >
+                                                        <CardHeader>
+                                                            <div className="flex justify-between items-start">
+                                                                <CardTitle className="flex items-center gap-2">
+                                                                    <StatusIcon className={`w-5 h-5 ${config.color}`} />
+                                                                    Crédit{" "}
+                                                                    {credit.initialAmount.amount.toLocaleString("fr-FR", {
+                                                                        style: "currency",
+                                                                        currency: credit.initialAmount.currency,
+                                                                    })}
+                                                                </CardTitle>
+                                                                <Badge variant={config.variant}>{config.label}</Badge>
+                                                            </div>
+                                                        </CardHeader>
 
-                                        <CardContent className="space-y-4">
-                                            {/* Informations principales */}
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-1">
-                                                    <p className="text-xs text-gray-500 flex items-center gap-1">
-                                                        <Calendar className="w-3 h-3" />
-                                                        Durée
-                                                    </p>
-                                                    <p className="font-semibold">{credit.durationMonths} mois</p>
-                                                </div>
+                                                        <CardContent className="space-y-4">
+                                                            {/* Informations principales */}
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <div className="space-y-1">
+                                                                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                                                                        <Calendar className="w-3 h-3" />
+                                                                        Durée
+                                                                    </p>
+                                                                    <p className="font-semibold">{credit.durationMonths} mois</p>
+                                                                </div>
 
-                                                <div className="space-y-1">
-                                                    <p className="text-xs text-gray-500 flex items-center gap-1">
-                                                        <Percent className="w-3 h-3" />
-                                                        Taux d'intérêt
-                                                    </p>
-                                                    <p className="font-semibold">{credit.interestRate}%</p>
-                                                </div>
-                                            </div>
+                                                                <div className="space-y-1">
+                                                                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                                                                        <Percent className="w-3 h-3" />
+                                                                        Taux d'intérêt
+                                                                    </p>
+                                                                    <p className="font-semibold">{credit.interestRate}%</p>
+                                                                </div>
+                                                            </div>
 
-                                            {/* Mensualité */}
-                                            <div className="p-3 bg-gray-50 rounded-lg">
-                                                <p className="text-xs text-gray-500 mb-1">Mensualité</p>
-                                                <p className="text-2xl font-bold">
-                                                    {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.monthlyPayment.currency,
-                                                    })}
-                                                </p>
-                                            </div>
+                                                            {/* Mensualité */}
+                                                            <div className="p-3 bg-gray-50 rounded-lg">
+                                                                <p className="text-xs text-gray-500 mb-1">Mensualité</p>
+                                                                <p className="text-2xl font-bold">
+                                                                    {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
+                                                                        style: "currency",
+                                                                        currency: credit.monthlyPayment.currency,
+                                                                    })}
+                                                                </p>
+                                                            </div>
 
-                                            {/* Solde restant (si accepté ou en cours) */}
-                                            {(credit.status === "ACCEPTED" || credit.status === "COMPLETED") && (
-                                                <div className="flex justify-between items-center pt-2 border-t">
-                                                    <div className="space-y-1">
-                                                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                                                            <TrendingUp className="w-3 h-3" />
-                                                            Reste à payer
-                                                        </p>
-                                                        <p className="font-semibold">
-                                                            {credit.remainingBalance.amount.toLocaleString("fr-FR", {
-                                                                style: "currency",
-                                                                currency: credit.remainingBalance.currency,
+                                                            {/* Affichage différent selon futur/actif */}
+                                                            {isFuture ? (
+                                                                // CRÉDIT FUTUR - Date de début mise en avant
+                                                                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                                                    <div className="flex items-center gap-2 mb-1">
+                                                                        <CalendarClock className="w-4 h-4 text-blue-600" />
+                                                                        <p className="text-xs text-blue-700 font-medium">
+                                                                            Débute le
+                                                                        </p>
+                                                                    </div>
+                                                                    <p className="text-lg font-bold text-blue-700">
+                                                                        {formatDateFrench(credit.startDate)}
+                                                                    </p>
+                                                                </div>
+                                                            ) : (
+                                                                // CRÉDIT ACTIF - Solde restant
+                                                                <div className="flex justify-between items-center pt-2 border-t">
+                                                                    <div className="space-y-1">
+                                                                        <p className="text-xs text-gray-500 flex items-center gap-1">
+                                                                            <TrendingUp className="w-3 h-3" />
+                                                                            Reste à payer
+                                                                        </p>
+                                                                        <p className="font-semibold">
+                                                                            {credit.remainingBalance.amount.toLocaleString("fr-FR", {
+                                                                                style: "currency",
+                                                                                currency: credit.remainingBalance.currency,
+                                                                            })}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <p className="text-xs text-gray-500">Début</p>
+                                                                        <p className="text-sm font-medium">
+                                                                            {formatDateFrench(credit.startDate)}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </CardContent>
+                                                    </Card>
+                                                );
+                                            })}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Autres crédits - Tableau */}
+                            {credits.some((credit) => credit.status !== "ACCEPTED") && (
+                                <section>
+                                    <h2 className="text-xl font-semibold mb-4">Historique des demandes</h2>
+                                    <Card>
+                                        <CardContent className="p-0">
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full">
+                                                    <thead className="bg-gray-50 border-b">
+                                                        <tr>
+                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                                                Statut
+                                                            </th>
+                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                                                Montant
+                                                            </th>
+                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                                                Durée
+                                                            </th>
+                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                                                Taux
+                                                            </th>
+                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                                                Mensualité
+                                                            </th>
+                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                                                Date
+                                                            </th>
+                                                            <th className="text-right p-4 text-sm font-semibold text-gray-600">
+                                                                Action
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y">
+                                                        {credits
+                                                            .filter((credit) => credit.status !== "ACCEPTED")
+                                                            .map((credit) => {
+                                                                const config = statusConfig[credit.status];
+                                                                const StatusIcon = config.icon;
+
+                                                                return (
+                                                                    <tr
+                                                                        key={credit.id}
+                                                                        className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                                                        onClick={() => router.push(`/credits/${credit.id}`)}
+                                                                    >
+                                                                        <td className="p-4">
+                                                                            <Badge variant={config.variant} className="flex items-center gap-1 w-fit">
+                                                                                <StatusIcon className="w-3 h-3" />
+                                                                                {config.label}
+                                                                            </Badge>
+                                                                        </td>
+                                                                        <td className="p-4 font-semibold">
+                                                                            {credit.initialAmount.amount.toLocaleString("fr-FR", {
+                                                                                style: "currency",
+                                                                                currency: credit.initialAmount.currency,
+                                                                            })}
+                                                                        </td>
+                                                                        <td className="p-4 text-gray-600">
+                                                                            {credit.durationMonths} mois
+                                                                        </td>
+                                                                        <td className="p-4 text-gray-600">{credit.interestRate}%</td>
+                                                                        <td className="p-4 font-medium">
+                                                                            {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
+                                                                                style: "currency",
+                                                                                currency: credit.monthlyPayment.currency,
+                                                                            })}
+                                                                        </td>
+                                                                        <td className="p-4 text-sm text-gray-500">
+                                                                            {credit.status === "PENDING"
+                                                                                ? formatDateFrench(credit.createdAt)
+                                                                                : formatDateFrench(credit.updatedAt)}
+                                                                        </td>
+                                                                        <td className="text-right">
+                                                                            <Button
+                                                                                variant="link"
+                                                                                size="sm"
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    router.push(`/credits/${credit.id}`);
+                                                                                }}
+                                                                            >
+                                                                                <Eye className="w-4 h-4 mr-1" /> Détails
+                                                                            </Button>
+                                                                        </td>
+                                                                    </tr>
+                                                                );
                                                             })}
-                                                        </p>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="text-xs text-gray-500">Début</p>
-                                                        <p className="text-sm font-medium">
-                                                            {formatDateFrench(credit.startDate)}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Date de demande */}
-                                            {credit.status === "PENDING" && (
-                                                <div className="text-xs text-gray-500 pt-2 border-t">
-                                                    {/* Demande créée le {formatDateFrench(credit)} */}
-                                                </div>
-                                            )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </CardContent>
                                     </Card>
-                                );
-                            })}
+                                </section>
+                            )}
                         </div>
                     );
                 })

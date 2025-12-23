@@ -5,7 +5,7 @@ import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credi
 import { creditResponseSchema, creditSchema } from '@infrastructure/types/credit';
 import z from 'zod';
 
-export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credit/[creditId]/grant'>) {
+export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credits/[creditId]/grant'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -16,7 +16,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credit/[cr
     const body = await req.json();
     const payload = creditResponseSchema.parse(body);
 
-    const result = await creditFactory().admin.grantCredit.execute({
+    const result = await creditFactory().grantCredit.execute({
       advisorId: session.user.id,
       creditId: creditId,
       accept: payload.accept,

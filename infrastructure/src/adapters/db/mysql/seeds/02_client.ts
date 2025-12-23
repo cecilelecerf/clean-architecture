@@ -130,7 +130,7 @@ export async function seedSQLClient(
       }
 
       const credits: CreditEntity[] = [];
-      for(const rawCredit of raw.credits ?? []){
+      for (const [creditIndex, rawCredit] of (raw.credits ?? []).entries()) {
         const initialAmount = Money.create({
           amount: rawCredit.initialAmount,
           currency: rawCredit.currency,
@@ -152,6 +152,92 @@ export async function seedSQLClient(
           continue;
         }
 
+        // Déterminer le statut et gérer les dates
+        let status: CreditStatus;
+        let startDate: Date;
+        let createdAt: Date;
+        let creditType:
+          | "active"
+          | "future"
+          | "pending"
+          | "refused"
+          | "completed" = "active";
+
+        // Premier crédit => ACCEPTED ACTIF (en cours depuis plusieurs mois)
+        if (creditIndex === 0) {
+          status = CreditStatus.ACCEPTED;
+          creditType = "active";
+          const monthsElapsed = rand(3, 12); // Entre 3 et 12 mois écoulés
+          startDate = clockService.nowMinusMonths(monthsElapsed);
+          createdAt = clockService.addDays(startDate, -rand(30, 90)); // Créé 1-3 mois avant le début
+        }
+        // Deuxième crédit => PENDING (en attente d'acceptation par admin)
+        else if (creditIndex === 1) {
+          status = CreditStatus.PENDING;
+          creditType = "pending";
+          createdAt = clockService.nowMinusDays(rand(1, 15)); // Créé il y a 1-15 jours
+          startDate = clockService.addDays(clockService.now(), rand(30, 60)); // Début prévu dans 1-2 mois SI accepté
+        }
+        // Troisième crédit => ACCEPTED FUTUR (accepté mais pas encore démarré)
+        else if (creditIndex === 2) {
+          status = CreditStatus.ACCEPTED;
+          creditType = "future";
+          createdAt = clockService.nowMinusDays(rand(15, 45)); // Créé il y a 2-6 semaines
+          startDate = clockService.addDays(clockService.now(), rand(60, 180)); // Début dans 2-6 mois
+        }
+        // Quatrième crédit => REFUSED (refusé il y a quelques semaines)
+        else if (creditIndex === 3) {
+          status = CreditStatus.REFUSED;
+          creditType = "refused";
+          createdAt = clockService.nowMinusDays(rand(20, 60)); // Créé il y a 20-60 jours
+          startDate = clockService.addDays(createdAt, rand(30, 60)); // Date de début qui n'aura jamais lieu
+        }
+        // Cinquième crédit => COMPLETED (terminé)
+        else if (creditIndex === 4) {
+          status = CreditStatus.COMPLETED;
+          creditType = "completed";
+          const totalMonths = rawCredit.durationMonths;
+          startDate = clockService.nowMinusMonths(totalMonths + rand(1, 6)); // Terminé il y a 1-6 mois
+          createdAt = clockService.addDays(startDate, -rand(30, 90));
+        }
+        // Crédits suivants => distribution aléatoire
+        else {
+          const random = Math.random();
+          if (random < 0.25) {
+            // ACCEPTED ACTIF (25%)
+            status = CreditStatus.ACCEPTED;
+            creditType = "active";
+            const monthsElapsed = rand(1, rawCredit.durationMonths - 1);
+            startDate = clockService.nowMinusMonths(monthsElapsed);
+            createdAt = clockService.addDays(startDate, -rand(30, 90));
+          } else if (random < 0.4) {
+            // ACCEPTED FUTUR (15%)
+            status = CreditStatus.ACCEPTED;
+            creditType = "future";
+            createdAt = clockService.nowMinusDays(rand(7, 60));
+            startDate = clockService.addDays(clockService.now(), rand(30, 180));
+          } else if (random < 0.6) {
+            // PENDING (20%)
+            status = CreditStatus.PENDING;
+            creditType = "pending";
+            createdAt = clockService.nowMinusDays(rand(1, 30));
+            startDate = clockService.addDays(clockService.now(), rand(30, 90));
+          } else if (random < 0.8) {
+            // REFUSED (20%)
+            status = CreditStatus.REFUSED;
+            creditType = "refused";
+            createdAt = clockService.nowMinusDays(rand(15, 90));
+            startDate = clockService.addDays(createdAt, rand(30, 60));
+          } else {
+            // COMPLETED (20%)
+            status = CreditStatus.COMPLETED;
+            creditType = "completed";
+            const totalMonths = rawCredit.durationMonths;
+            startDate = clockService.nowMinusMonths(totalMonths + rand(1, 12));
+            createdAt = clockService.addDays(startDate, -rand(30, 90));
+          }
+        }
+
         const credit = CreditEntity.create({
           id: uuidService.generate(),
           advisorId: null,
@@ -159,9 +245,12 @@ export async function seedSQLClient(
           initialAmount: initialAmount,
           interestRate: interestRate,
           insuranceRate: insuranceRate,
-          durationMonths:  rawCredit.durationMonths,
-          startDate: rawCredit.startDate,
-          status: CreditStatus.PENDING
+          durationMonths: rawCredit.durationMonths,
+          startDate: startDate,
+          status: status,
+          updatedAt:
+            status === CreditStatus.PENDING ? createdAt : clockService.now(),
+          createdAt: createdAt,
         });
 
         if (credit instanceof Error) {
@@ -169,10 +258,61 @@ export async function seedSQLClient(
           continue;
         }
 
+        // Calculer et mettre à jour le solde restant selon le type
+        if (creditType === "active") {
+          // ACCEPTED ACTIF : Calculer le solde restant réel
+          const monthsElapsed = Math.floor(
+            (clockService.now().getTime() - startDate.getTime()) /
+              (1000 * 60 * 60 * 24 * 30)
+          );
+          const monthsRemaining = Math.max(
+            0,
+            rawCredit.durationMonths - monthsElapsed
+          );
+
+          // Solde restant = mensualités restantes
+          const remainingAmount = Math.max(
+            0,
+            credit.monthlyPayment.amount * monthsRemaining
+          );
+
+          const remainingBalance = Money.create({
+            amount: remainingAmount,
+            currency: credit.initialAmount.currency,
+          });
+          if (remainingBalance instanceof Error) {
+            console.warn(remainingBalance);
+            continue;
+          }
+          // Mettre à jour le remainingBalance
+          credit.remainingBalance = remainingBalance;
+        } else if (creditType === "future") {
+          // ACCEPTED FUTUR : Le solde reste le montant total (pas encore démarré)
+          // credit.updateRemainingBalance(credit.initialAmount);
+        } else if (creditType === "completed") {
+          // COMPLETED : Solde à 0
+          // credit.updateRemainingBalance(Money.create({
+          //   amount: 0,
+          //   currency: credit.initialAmount.currency
+          // }));
+        }
+        // Pour PENDING et REFUSED, le remainingBalance reste égal au montant total par défaut
+        console.log(credit);
         credits.push(credit);
         await creditRepository.save(credit);
-        console.log(credit.id);
 
+        const startDateStr = startDate.toISOString().split("T")[0];
+        const createdAtStr = createdAt.toISOString().split("T")[0];
+        const typeLabel =
+          creditType === "active"
+            ? "(ACTIF)"
+            : creditType === "future"
+            ? "(FUTUR)"
+            : `(${creditType.toUpperCase()})`;
+
+        console.log(
+          `${credit.id} - Status: ${status} ${typeLabel} - Start: ${startDateStr} - Created: ${createdAtStr}`
+        );
       }
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);

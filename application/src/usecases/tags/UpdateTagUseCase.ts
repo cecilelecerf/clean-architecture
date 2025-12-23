@@ -6,6 +6,7 @@ import {
 } from "@application/errors/users";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { TagDTO, TagEntity } from "@domain/entities/TagEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
@@ -22,7 +23,8 @@ interface Props {
 export class UpdateTagUseCase {
   constructor(
     private readonly tagRepository: TagRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly clockService: ClockService
   ) {}
 
   async execute({
@@ -53,9 +55,9 @@ export class UpdateTagUseCase {
       if (colorVo instanceof ColorInvalidFormatError)
         return new ColorInvalidFormatError(color);
     }
-
-    if (label) tag.rename(label);
-    if (colorVo) tag.changeColor(colorVo);
+    const now = this.clockService.now();
+    if (label) tag.rename({ newLabel: label, now });
+    if (colorVo) tag.changeColor({ newColor: colorVo, now });
 
     await this.tagRepository.update(tag);
     return tag.toDTO();

@@ -1,4 +1,3 @@
-import { ClientCreditsUsecase } from "@application/usecases/credits/ListClientCreditsUsecase";
 import { MySQLClient } from "../../MySQLClient";
 import { CreditRepositoryMySQL } from "../repositories/CreditRepositoryMySQL";
 import { UserRepositoryMySQL } from "../repositories/UserRepositoryMySQL";
@@ -8,50 +7,52 @@ import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidServi
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { RequestCreditUsecase } from "@application/usecases/credits/RequestCreditUsecase";
 import { GrantCreditUsecase } from "@application/usecases/credits/admin/GrantCreditUsecase";
+import { GetCreditsByClientUsecase } from "@application/usecases/credits/GetCreditsByClientUsecase";
+import { GetCreditUsecase } from "@application/usecases/credits/GetCreditUsecase";
 
 export const creditFactory = () => {
-    const client = new MySQLClient();
-    const creditRepository = new CreditRepositoryMySQL(client);
-    const userRepository = new UserRepositoryMySQL(client);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
+  const client = new MySQLClient();
+  const creditRepository = new CreditRepositoryMySQL(client);
+  const userRepository = new UserRepositoryMySQL(client);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
 
-    const listClientCredits = new ClientCreditsUsecase(
-        creditRepository,
-        userRepository
-    )
+  const getCreditsByUser = new GetCreditsByClientUsecase(
+    creditRepository,
+    userRepository
+  );
 
-    const creditSchedule = new CreditScheduleUsecase(
-        creditRepository,
-        userRepository
-    )
+  const getCredit = new GetCreditUsecase(creditRepository, userRepository);
 
-    const requestCredit = new RequestCreditUsecase(
-        creditRepository,
-        userRepository,
-        uuidService,
-        clockService
-    )
+  const creditSchedule = new CreditScheduleUsecase(
+    creditRepository,
+    userRepository
+  );
 
-    const applyMonthlyPaiementCredit = new ApplyMonthlyCreditPaiementUsecase(
-        creditRepository,
-        userRepository
-    )
+  const requestCredit = new RequestCreditUsecase(
+    creditRepository,
+    userRepository,
+    uuidService,
+    clockService
+  );
 
-    const grantCredit = new GrantCreditUsecase(
-        creditRepository,
-        userRepository
-    )
+  const applyMonthlyPaiementCredit = new ApplyMonthlyCreditPaiementUsecase(
+    creditRepository,
+    userRepository
+  );
 
-    return {
-        admin: {
-            grantCredit
-        },
-        client: {
-            listClientCredits,
-            creditSchedule,
-            requestCredit,
-            applyMonthlyPaiementCredit
-        }
-    };
-}
+  const grantCredit = new GrantCreditUsecase(
+    creditRepository,
+    userRepository,
+    clockService
+  );
+
+  return {
+    grantCredit,
+    getCreditsByUser,
+    requestCredit,
+    creditSchedule,
+    applyMonthlyPaiementCredit,
+    getCredit,
+  };
+};

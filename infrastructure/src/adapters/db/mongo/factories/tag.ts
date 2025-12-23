@@ -24,7 +24,11 @@ export const tagsFactory = () => {
   );
   const getTagById = new GetTagByIdUseCase(tagRepository, userRepository);
   const getAllTags = new GetAllTagsUseCase(tagRepository);
-  const updateTag = new UpdateTagUseCase(tagRepository, userRepository);
+  const updateTag = new UpdateTagUseCase(
+    tagRepository,
+    userRepository,
+    clockService
+  );
   const deleteTag = new DeleteTagUseCase(tagRepository, userRepository);
 
   return {

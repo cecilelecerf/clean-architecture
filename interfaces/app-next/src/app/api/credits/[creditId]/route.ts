@@ -5,64 +5,65 @@ import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credi
 import { creditSchema } from '@infrastructure/types/credit';
 import z from 'zod';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/credit/[creditId]'>) {
-    try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-        }
-        const { creditId } = await ctx.params;
-        const result = await creditFactory().client.creditSchedule.execute({
-            clientId: session.user.id, 
-            creditId: creditId});
-            
-        if (result instanceof Error) {
-        return NextResponse.json(
-            { name: result.name, message: result.message },
-            { status: result.statusCode ?? 404 },
-        );
-        }
-        return NextResponse.json(result);
-    } catch (err) {
-        console.error(err);
-        return NextResponse.json({ message: err.message || 'Erreur serveur' }, { status: 500 });
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/credits/[creditId]'>) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
+    const { creditId } = await ctx.params;
+    const result = await creditFactory().getCredit.execute({
+      creditId: creditId,
+      userId: session.user.id,
+    });
+
+    if (result instanceof Error) {
+      return NextResponse.json(
+        { name: result.name, message: result.message },
+        { status: result.statusCode ?? 404 },
+      );
+    }
+    return NextResponse.json(result);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ message: err.message || 'Erreur serveur' }, { status: 500 });
+  }
 }
 
-export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credit/[creditId]'>){
-    try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-        }
-        const { creditId } = await ctx.params;
-
-        const result = await creditFactory().client.applyMonthlyPaiementCredit.execute({
-            clientId: session.user.id,
-            id: creditId
-        })
-
-        if (result instanceof Error) {
-            return NextResponse.json(
-                { name: result.name, message: result.message },
-                { status: result.statusCode ?? 400 },
-            );
-        }
-        
-        return NextResponse.json(
-            creditSchema
-                .omit({ createdAt: true, updatedAt: true })
-                .extend({
-                    createdAt: z.date(),
-                    updatedAt: z.date().optional(),
-                })
-                .parse(result),
-        );
-    } catch (err) {
-        console.error(err);
-        return NextResponse.json(
-        { message: err instanceof Error ? err.message : 'Erreur serveur' },
-        { status: 500 },
-        );
+export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credits/[creditId]'>) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
+    const { creditId } = await ctx.params;
+
+    const result = await creditFactory().applyMonthlyPaiementCredit.execute({
+      clientId: session.user.id,
+      id: creditId,
+    });
+
+    if (result instanceof Error) {
+      return NextResponse.json(
+        { name: result.name, message: result.message },
+        { status: result.statusCode ?? 400 },
+      );
+    }
+
+    return NextResponse.json(
+      creditSchema
+        .omit({ createdAt: true, updatedAt: true })
+        .extend({
+          createdAt: z.date(),
+          updatedAt: z.date().optional(),
+        })
+        .parse(result),
+    );
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { message: err instanceof Error ? err.message : 'Erreur serveur' },
+      { status: 500 },
+    );
+  }
 }
