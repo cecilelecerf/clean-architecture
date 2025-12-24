@@ -1,7 +1,7 @@
 import { SavingsRateDTO, SavingsRateEntity } from "@domain/entities/SavingsRateEntity";
 
 export class SavingsRateDTOMapper {
-  static toDTO(entity: SavingsRateEntity): SavingsRateDTO {
+  static map(entity: SavingsRateEntity): SavingsRateDTO {
     return {
       id: entity.id,
       rate: entity.rate.value,

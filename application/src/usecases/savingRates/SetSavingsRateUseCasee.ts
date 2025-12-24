@@ -66,6 +66,9 @@ export class SetSavingsRateUsecase {
 
     await this.configRepository.save(savingsRate);
 
-    return SavingsRateDTOMapper.toDTO(savingsRate);
+    var savingsrateDTO = SavingsRateDTOMapper.map(savingsRate);
+    console.log(savingsrateDTO);
+
+    return savingsrateDTO;
   }
 }
