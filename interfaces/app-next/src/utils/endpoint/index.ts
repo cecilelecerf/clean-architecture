@@ -5,6 +5,7 @@ import { feedsEndpoint } from './feedsEndpoint';
 import { usersEndpoint } from './usersEndpoint';
 import { authEndpoint } from './authEndpoint';
 import { creditsEndpoint } from './creditEndpoints';
+import { savingsrateEndpoint } from './savingsrateEndpoints';
 
 export const endpoints = createEndpointsNodes({
   accounts: accountsEndpoint,
@@ -13,4 +14,5 @@ export const endpoints = createEndpointsNodes({
   users: usersEndpoint,
   auth: authEndpoint,
   credits: creditsEndpoint,
+  savingsRates: savingsrateEndpoint,
 });

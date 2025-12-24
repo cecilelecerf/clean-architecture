@@ -21,4 +21,19 @@ export class SavingsRateEntity {
   >) {
     return new SavingsRateEntity(id, rate, effectiveDate, createdAt, updatedAt);
   }
+
+  toDTO(): SavingsRateDTO {
+    return {
+      id: this.id,
+      rate: this.rate.value,
+      effectiveDate: this.effectiveDate,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
+  }
 }
+
+export type SavingsRateDTO = { rate: number } & Pick<
+  SavingsRateEntity,
+  "id" | "effectiveDate" | "createdAt" | "updatedAt"
+>;

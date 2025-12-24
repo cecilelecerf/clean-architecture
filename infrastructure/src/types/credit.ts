@@ -2,7 +2,7 @@ import z from "zod";
 import { userDtoSchema, userIdSchema } from "./user";
 import { moneySchema } from "./money";
 
-export const creditIdSchema = z.string().brand("credit");
+export const creditIdSchema = z.uuid().brand("credit");
 export type CreditId = z.infer<typeof creditIdSchema>;
 
 export const creditSchema = z.object({

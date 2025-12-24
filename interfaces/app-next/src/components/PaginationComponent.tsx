@@ -1,8 +1,7 @@
 "use client"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import z from "zod"
-
 import { PaginationType } from "@infrastructure/types/pagination"
+
 type Props = { filters: PaginationType, totalPage: number, onPaginationChange: (page: number) => void }
 
 export const PaginationComponent = ({ filters, totalPage, onPaginationChange }: Props) => {

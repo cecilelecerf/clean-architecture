@@ -2,7 +2,7 @@ import z from "zod";
 import { colorSchema } from "./color";
 import { userDtoSchema, userIdSchema } from "./user";
 
-export const accountIdSchema = z.string().length(26).brand("account");
+export const accountIdSchema = z.uuid().brand("account");
 export type AccountId = z.infer<typeof accountIdSchema>;
 
 export const accountSchema = z.object({
