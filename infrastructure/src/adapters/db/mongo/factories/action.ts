@@ -20,7 +20,8 @@ export const actionFactory = () => {
 
   const updateAction = new UpdateActionUsecase(
     actionRepository,
-    userRepository
+    userRepository,
+    clockService
   );
 
   const getAllActionsByAvailability = new GetAllActionsByAvailabilityUsecase(

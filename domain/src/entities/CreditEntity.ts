@@ -7,7 +7,11 @@ import {
   MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
-import { CreditAlreadyPaidError, CreditStatusMismatchError, InvalidCreditDurationError } from "@domain/errors/credit";
+import {
+  CreditAlreadyPaidError,
+  CreditStatusMismatchError,
+  InvalidCreditDurationError,
+} from "@domain/errors/credit";
 
 export type MonthlySchedule = {
   capitalPaid: Money;
@@ -26,6 +30,7 @@ export enum CreditStatus {
 export class CreditEntity {
   private constructor(
     public id: string,
+    // TODO : remplacer userId par accountId
     public userId: UserEntity["id"],
     public initialAmount: Money,
     // taux d'interet annuel
@@ -38,8 +43,8 @@ export class CreditEntity {
     public remainingBalance: Money,
     public status: CreditStatus,
     public createdAt: Date,
-    public advisorId?: UserEntity["id"] | null,
-    public updatedAt?: Date
+    public updatedAt: Date,
+    public advisorId?: UserEntity["id"] | null
   ) {}
 
   public static from({
@@ -84,8 +89,8 @@ export class CreditEntity {
       remainingBalance,
       status,
       createdAt,
-      advisorId,
-      updatedAt
+      updatedAt,
+      advisorId
     );
   }
 
@@ -98,10 +103,12 @@ export class CreditEntity {
     interestRate,
     durationMonths,
     startDate,
-    status
-  }: Pick <
+    status,
+    updatedAt,
+    createdAt,
+  }: Pick<
     CreditEntity,
-    |"id"
+    | "id"
     | "advisorId"
     | "userId"
     | "initialAmount"
@@ -110,40 +117,44 @@ export class CreditEntity {
     | "durationMonths"
     | "startDate"
     | "status"
-  >): | CreditEntity
+    | "updatedAt"
+    | "createdAt"
+  >):
+    | CreditEntity
     | InvalidCreditDurationError
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError {
-      // Validation de la durée
-      if (
-        !Number.isInteger(durationMonths) ||
-        durationMonths <= 0 ||
-        durationMonths > 400
-      ) {
-        return new InvalidCreditDurationError(durationMonths);
-      }
+    // Validation de la durée
+    if (
+      !Number.isInteger(durationMonths) ||
+      durationMonths <= 0 ||
+      durationMonths > 400
+    ) {
+      return new InvalidCreditDurationError(durationMonths);
+    }
 
-      const temp = new CreditEntity(
-        id,
-        userId,
-        initialAmount,
-        insuranceRate,
-        interestRate,
-        durationMonths,
-        startDate,
-        initialAmount,
-        initialAmount,
-        status,
-        startDate,
-        advisorId
-      );
+    const temp = new CreditEntity(
+      id,
+      userId,
+      initialAmount,
+      insuranceRate,
+      interestRate,
+      durationMonths,
+      startDate,
+      initialAmount,
+      initialAmount,
+      status,
+      createdAt,
+      updatedAt,
+      advisorId
+    );
 
-      const monthlyPayment = temp.calculateMonthlyPayment();
-      if (monthlyPayment instanceof Error) return monthlyPayment;
+    const monthlyPayment = temp.calculateMonthlyPayment();
+    if (monthlyPayment instanceof Error) return monthlyPayment;
 
-      temp.monthlyPayment = monthlyPayment;
-      return temp;
+    temp.monthlyPayment = monthlyPayment;
+    return temp;
   }
 
   /** Calcule la mensualité */
@@ -233,24 +244,61 @@ export class CreditEntity {
     return schedule;
   }
 
-  public assignAdvisor(advisorId: string): void {
+  public assignAdvisor({
+    advisorId,
+    now,
+  }: {
+    advisorId: string;
+    now: Date;
+  }): void {
     this.advisorId = advisorId;
-    this.updatedAt = new Date();
+    this.updatedAt = now;
   }
 
-  public accept(): void | CreditStatusMismatchError {
+  public accept({ now }: { now: Date }): void | CreditStatusMismatchError {
     if (this.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(this.status);
     }
     this.status = CreditStatus.ACCEPTED;
-    this.updatedAt = new Date();
+    this.updatedAt = now;
   }
 
-  public refuse(): void | CreditStatusMismatchError{
+  public refuse({ now }: { now: Date }): void | CreditStatusMismatchError {
     if (this.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(this.status);
     }
     this.status = CreditStatus.REFUSED;
-    this.updatedAt = new Date();
+    this.updatedAt = now;
+  }
+
+  public toDTO(): CreditDTO {
+    return {
+      id: this.id,
+      createdAt: this.createdAt,
+      durationMonths: this.durationMonths,
+      status: this.status,
+      startDate: this.startDate,
+      monthlyPayment: this.monthlyPayment,
+      remainingBalance: this.remainingBalance,
+      initialAmount: this.initialAmount,
+      userId: this.userId,
+      interestRate: this.interestRate.value,
+      insuranceRate: this.insuranceRate.value,
+      updatedAt: this.updatedAt,
+    };
   }
 }
+
+export type CreditDTO = { interestRate: number; insuranceRate: number } & Pick<
+  CreditEntity,
+  | "id"
+  | "createdAt"
+  | "durationMonths"
+  | "status"
+  | "startDate"
+  | "monthlyPayment"
+  | "remainingBalance"
+  | "initialAmount"
+  | "userId"
+  | "updatedAt"
+>;

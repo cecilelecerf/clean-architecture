@@ -18,6 +18,7 @@ const menuItems = [
     { icon: <Home size={18} />, label: "Account", href: "/accounts" },
     { icon: <MessageSquare size={18} />, label: "Conversations", href: "/threads" },
     { icon: <MessageSquare size={18} />, label: "Actualités", href: "/feeds" },
+    { icon: <MessageSquare size={18} />, label: "Crédits", href: "/credits" },
 ];
 
 export const MenuDrawer = () => (

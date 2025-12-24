@@ -102,7 +102,7 @@ export class NotificationRepositoryMySQL implements NotificationRepository {
         notification.content,
         notification.isRead ? 1 : 0,
         notification.type,
-        notification.updatedAt || new Date(),
+        notification.updatedAt,
         notification.id,
       ]
     );

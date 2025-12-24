@@ -13,7 +13,7 @@ export const menuItemsClients = [
   { icon: <Users size={18} />, label: "Utilisateurs", href: "/admin/users" },
   { icon: <MessageSquare size={18} />, label: "Conversations clients", href: "/admin/client-threads" },
   { icon: <Wallet size={18} />, label: "Comptes clients", href: "/admin/accounts" },
-  { icon: <CreditCard size={18} />, label: "Demandes de crédits", href: "/admin/credit-requests" },
+  { icon: <CreditCard size={18} />, label: "Demandes de crédits", href: "/admin/credits" },
 
 ]
 

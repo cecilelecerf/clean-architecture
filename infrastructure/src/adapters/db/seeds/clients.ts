@@ -1,5 +1,3 @@
-import { Color } from "@domain/values/Color";
-
 export const rawClients = [
   {
     firstname: "client",
@@ -50,14 +48,14 @@ export const rawClients = [
         ],
       },
     ],
-    credits : [
+    credits: [
       {
         initialAmount: 5000,
         currency: "EUR",
         interestRate: 2.1,
         insuranceRate: 0.2,
         durationMonths: 24,
-        startDate: new Date("2023-01-10")
+        startDate: new Date("2023-01-10"),
       },
       {
         initialAmount: 12000,
@@ -65,9 +63,33 @@ export const rawClients = [
         interestRate: 3.5,
         insuranceRate: 0.3,
         durationMonths: 36,
-        startDate: new Date("2022-05-01")
+        startDate: new Date("2022-05-01"),
       },
-    ]
+      {
+        initialAmount: 8000,
+        currency: "EUR",
+        interestRate: 2.8,
+        insuranceRate: 0.25,
+        durationMonths: 30,
+        startDate: new Date("2024-06-15"),
+      },
+      {
+        initialAmount: 15000,
+        currency: "EUR",
+        interestRate: 3.2,
+        insuranceRate: 0.28,
+        durationMonths: 48,
+        startDate: new Date("2023-09-20"),
+      },
+      {
+        initialAmount: 3500,
+        currency: "EUR",
+        interestRate: 1.9,
+        insuranceRate: 0.15,
+        durationMonths: 18,
+        startDate: new Date("2024-11-01"),
+      },
+    ],
   },
   {
     firstname: "Benjamin",
@@ -101,16 +123,32 @@ export const rawClients = [
         ],
       },
     ],
-    credits : [
+    credits: [
       {
         initialAmount: 80000,
         currency: "EUR",
         interestRate: 3.2,
         insuranceRate: 0.4,
         durationMonths: 120,
-        startDate: new Date("2021-09-20")
-      }
-    ]
+        startDate: new Date("2021-09-20"),
+      },
+      {
+        initialAmount: 20000,
+        currency: "EUR",
+        interestRate: 2.5,
+        insuranceRate: 0.22,
+        durationMonths: 60,
+        startDate: new Date("2023-03-10"),
+      },
+      {
+        initialAmount: 10000,
+        currency: "EUR",
+        interestRate: 2.9,
+        insuranceRate: 0.3,
+        durationMonths: 36,
+        startDate: new Date("2024-08-01"),
+      },
+    ],
   },
   {
     firstname: "Claire",
@@ -144,14 +182,14 @@ export const rawClients = [
         ],
       },
     ],
-    credits : [
+    credits: [
       {
         initialAmount: 150000,
         currency: "EUR",
         interestRate: 4.5,
         insuranceRate: 0.5,
         durationMonths: 240,
-        startDate: new Date("2020-03-01")
+        startDate: new Date("2020-03-01"),
       },
       {
         initialAmount: 300000,
@@ -159,9 +197,25 @@ export const rawClients = [
         interestRate: 3.8,
         insuranceRate: 0.6,
         durationMonths: 300,
-        startDate: new Date("2019-06-10")
-      }
-    ]
+        startDate: new Date("2019-06-10"),
+      },
+      {
+        initialAmount: 25000,
+        currency: "EUR",
+        interestRate: 2.3,
+        insuranceRate: 0.2,
+        durationMonths: 48,
+        startDate: new Date("2024-01-15"),
+      },
+      {
+        initialAmount: 45000,
+        currency: "EUR",
+        interestRate: 3.1,
+        insuranceRate: 0.35,
+        durationMonths: 72,
+        startDate: new Date("2022-11-20"),
+      },
+    ],
   },
   {
     firstname: "David",
@@ -195,16 +249,32 @@ export const rawClients = [
         ],
       },
     ],
-    credits : [
+    credits: [
       {
         initialAmount: 18000,
         currency: "EUR",
         interestRate: 2.4,
         insuranceRate: 0.25,
         durationMonths: 60,
-        startDate: new Date("2022-11-12")
-      }
-    ]
+        startDate: new Date("2022-11-12"),
+      },
+      {
+        initialAmount: 7500,
+        currency: "EUR",
+        interestRate: 1.8,
+        insuranceRate: 0.18,
+        durationMonths: 24,
+        startDate: new Date("2024-05-20"),
+      },
+      {
+        initialAmount: 35000,
+        currency: "EUR",
+        interestRate: 2.7,
+        insuranceRate: 0.28,
+        durationMonths: 84,
+        startDate: new Date("2023-07-10"),
+      },
+    ],
   },
   {
     firstname: "Emma",
@@ -238,16 +308,24 @@ export const rawClients = [
         ],
       },
     ],
-    credits : [
+    credits: [
       {
         initialAmount: 40000,
         currency: "EUR",
         interestRate: 2.7,
         insuranceRate: 0.35,
         durationMonths: 84,
-        startDate: new Date("2021-01-05")
-      }
-    ]
+        startDate: new Date("2021-01-05"),
+      },
+      {
+        initialAmount: 12500,
+        currency: "EUR",
+        interestRate: 2.2,
+        insuranceRate: 0.2,
+        durationMonths: 36,
+        startDate: new Date("2024-04-01"),
+      },
+    ],
   },
   {
     firstname: "Florent",
@@ -281,14 +359,14 @@ export const rawClients = [
         ],
       },
     ],
-    credits : [
+    credits: [
       {
         initialAmount: 6000,
         currency: "EUR",
         interestRate: 1.5,
         insuranceRate: 0.1,
         durationMonths: 18,
-        startDate: new Date("2023-08-01")
+        startDate: new Date("2023-08-01"),
       },
       {
         initialAmount: 90000,
@@ -296,9 +374,25 @@ export const rawClients = [
         interestRate: 2.9,
         insuranceRate: 0.3,
         durationMonths: 180,
-        startDate: new Date("2020-12-25")
-      }
-    ]
+        startDate: new Date("2020-12-25"),
+      },
+      {
+        initialAmount: 28000,
+        currency: "EUR",
+        interestRate: 2.6,
+        insuranceRate: 0.27,
+        durationMonths: 60,
+        startDate: new Date("2023-02-15"),
+      },
+      {
+        initialAmount: 50000,
+        currency: "EUR",
+        interestRate: 3.4,
+        insuranceRate: 0.4,
+        durationMonths: 96,
+        startDate: new Date("2021-10-01"),
+      },
+    ],
   },
   {
     firstname: "Julie",
@@ -332,16 +426,32 @@ export const rawClients = [
         ],
       },
     ],
-    credits : [
+    credits: [
       {
         initialAmount: 25000,
         currency: "EUR",
         interestRate: 1.9,
         insuranceRate: 0.15,
         durationMonths: 48,
-        startDate: new Date("2024-02-15")
-      }
-    ]
+        startDate: new Date("2024-02-15"),
+      },
+      {
+        initialAmount: 9000,
+        currency: "EUR",
+        interestRate: 2.1,
+        insuranceRate: 0.19,
+        durationMonths: 30,
+        startDate: new Date("2024-07-01"),
+      },
+      {
+        initialAmount: 16000,
+        currency: "EUR",
+        interestRate: 2.4,
+        insuranceRate: 0.23,
+        durationMonths: 42,
+        startDate: new Date("2023-12-10"),
+      },
+    ],
   },
   {
     firstname: "Kevin",
@@ -375,14 +485,14 @@ export const rawClients = [
         ],
       },
     ],
-    credits : [
+    credits: [
       {
         initialAmount: 25000,
         currency: "EUR",
         interestRate: 1.9,
         insuranceRate: 0.15,
         durationMonths: 48,
-        startDate: new Date("2024-02-15")
+        startDate: new Date("2024-02-15"),
       },
       {
         initialAmount: 18000,
@@ -390,9 +500,25 @@ export const rawClients = [
         interestRate: 2.1,
         insuranceRate: 0.2,
         durationMonths: 36,
-        startDate: new Date("2024-03-01")
-      }
-    ]
+        startDate: new Date("2024-03-01"),
+      },
+      {
+        initialAmount: 55000,
+        currency: "EUR",
+        interestRate: 3.3,
+        insuranceRate: 0.38,
+        durationMonths: 120,
+        startDate: new Date("2022-08-15"),
+      },
+      {
+        initialAmount: 4500,
+        currency: "EUR",
+        interestRate: 1.6,
+        insuranceRate: 0.12,
+        durationMonths: 12,
+        startDate: new Date("2024-10-01"),
+      },
+    ],
   },
   {
     firstname: "Lucie",
@@ -426,14 +552,14 @@ export const rawClients = [
         ],
       },
     ],
-    credits : [
+    credits: [
       {
         initialAmount: 30000,
         currency: "EUR",
         interestRate: 1.7,
         insuranceRate: 0.1,
         durationMonths: 60,
-        startDate: new Date("2024-01-20")
+        startDate: new Date("2024-01-20"),
       },
       {
         initialAmount: 15000,
@@ -441,9 +567,17 @@ export const rawClients = [
         interestRate: 2.5,
         insuranceRate: 0.25,
         durationMonths: 24,
-        startDate: new Date("2024-04-10")
-      }
-    ]
+        startDate: new Date("2024-04-10"),
+      },
+      {
+        initialAmount: 65000,
+        currency: "EUR",
+        interestRate: 3.0,
+        insuranceRate: 0.33,
+        durationMonths: 144,
+        startDate: new Date("2021-06-01"),
+      },
+    ],
   },
   {
     firstname: "Maxime",
@@ -477,15 +611,31 @@ export const rawClients = [
         ],
       },
     ],
-    credits : [
+    credits: [
       {
         initialAmount: 22000,
         currency: "EUR",
         interestRate: 2.0,
         insuranceRate: 0.15,
         durationMonths: 48,
-        startDate: new Date("2024-02-28")
-      }
-    ]
+        startDate: new Date("2024-02-28"),
+      },
+      {
+        initialAmount: 110000,
+        currency: "EUR",
+        interestRate: 3.7,
+        insuranceRate: 0.45,
+        durationMonths: 180,
+        startDate: new Date("2021-04-12"),
+      },
+      {
+        initialAmount: 32000,
+        currency: "EUR",
+        interestRate: 2.8,
+        insuranceRate: 0.29,
+        durationMonths: 72,
+        startDate: new Date("2022-09-05"),
+      },
+    ],
   },
 ];

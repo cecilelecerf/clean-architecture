@@ -104,7 +104,7 @@ export class NotificationRepositoryMongo implements NotificationRepository {
           content: notification.content,
           isRead: notification.isRead,
           type: notification.type,
-          updatedAt: notification.updatedAt || new Date(),
+          updatedAt: notification.updatedAt,
         },
       }
     );

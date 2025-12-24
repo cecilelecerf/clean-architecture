@@ -1,11 +1,16 @@
-import { UserNotActiveError ,UserNotFoundError,UserRoleMismatchError} from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { CreditEntity, CreditStatus } from "@domain/entities/CreditEntity";
-import { UserEntity } from "@domain/entities/UserEntity"; 
+import { UserEntity } from "@domain/entities/UserEntity";
 import { CreditNotFoundError } from "@application/errors/credits";
 import { CreditStatusMismatchError } from "@application/errors/credits/CreditStatusMismatchError";
+import { ClockService } from "@application/ports/services/ClockService";
 
 type Props = {
   advisorId: UserEntity["id"];
@@ -16,13 +21,14 @@ type Props = {
 export class GrantCreditUsecase {
   constructor(
     private readonly creditRepository: CreditRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly clockService: ClockService
   ) {}
 
   public async execute({
     advisorId,
     creditId,
-    accept
+    accept,
   }: Props): Promise<
     | CreditEntity
     | UserNotFoundError
@@ -43,10 +49,10 @@ export class GrantCreditUsecase {
     if (credit.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(credit.status);
     }
-
-    credit.assignAdvisor(advisorId);
-    accept ? credit.accept() : credit.refuse();
-    if(credit instanceof Error) return credit;
+    const now = this.clockService.now();
+    credit.assignAdvisor({ advisorId, now });
+    accept ? credit.accept({ now }) : credit.refuse({ now });
+    if (credit instanceof Error) return credit;
 
     await this.creditRepository.update(credit);
     return credit;

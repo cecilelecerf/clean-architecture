@@ -51,22 +51,31 @@ export class ActionEntity {
       updatedAt
     );
   }
-  public enable(): void {
+  public enable({ now }: { now: Date }): void {
     this.isAvailable = true;
-    this.updatedAt = new Date();
+    this.updatedAt = now;
   }
 
-  public disable(): void {
+  public disable({ now }: { now: Date }): void {
     this.isAvailable = false;
-    this.updatedAt = new Date();
+    this.updatedAt = now;
   }
 
-  public updatePrice(newPrice: Money): void {
+  public updatePrice({ newPrice, now }: { newPrice: Money; now: Date }): void {
     this.currentPrice = newPrice;
-    this.updatedAt = new Date();
+    this.updatedAt = now;
   }
 
-  update(props: {
+  update({
+    name,
+    totalNb,
+    symbol,
+    market,
+    activitySector,
+    price,
+    isAvailable,
+    now,
+  }: {
     name?: string;
     totalNb?: number;
     symbol?: string;
@@ -74,16 +83,16 @@ export class ActionEntity {
     activitySector?: string;
     price?: Money;
     isAvailable?: boolean;
+    now: Date;
   }) {
-    if (props.name) this.name = props.name;
-    if (props.totalNb) this.totalNb = props.totalNb;
-    if (props.symbol) this.symbol = props.symbol;
-    if (props.market) this.market = props.market;
-    if (props.activitySector) this.activitySector = props.activitySector;
-    if (props.price) this.currentPrice = props.price;
-    if (props.isAvailable !== undefined) {
-      props.isAvailable ? this.enable() : this.disable();
+    if (name) this.name = name;
+    if (totalNb) this.totalNb = totalNb;
+    if (symbol) this.symbol = symbol;
+    if (market) this.market = market;
+    if (activitySector) this.activitySector = activitySector;
+    if (price) this.currentPrice = price;
+    if (isAvailable !== undefined) {
+      isAvailable ? this.enable({ now }) : this.disable({ now });
     }
   }
-
 }

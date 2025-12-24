@@ -25,14 +25,20 @@ export class TagEntity {
     return new TagEntity(id, label, color, createdAt, updatedAt);
   }
 
-  public rename(newLabel: string): void {
+  public rename({ newLabel, now }: { newLabel: string; now: Date }): void {
     this.label = newLabel;
-    this.updatedAt = new Date();
+    this.updatedAt = now;
   }
 
-  public changeColor(newColor: TagEntity["color"]): void {
+  public changeColor({
+    newColor,
+    now,
+  }: {
+    newColor: TagEntity["color"];
+    now: Date;
+  }): void {
     this.color = newColor;
-    this.updatedAt = new Date();
+    this.updatedAt = now;
   }
   public toClientDTO(): TagClientDTO {
     return { id: this.id, label: this.label, color: this.color.getValue() };

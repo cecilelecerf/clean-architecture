@@ -1,6 +1,7 @@
 export interface ClockService {
   now(): Date;
   nowMinusDays(days: number): Date;
+  nowMinusMonths(month: number): Date;
   nowPlus(ms: number): Date;
   nowMinus(ms: number): Date;
   addDays(date: Date, days: number): Date;

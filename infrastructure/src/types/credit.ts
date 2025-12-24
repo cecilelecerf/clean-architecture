@@ -1,5 +1,5 @@
 import z from "zod";
-import { userIdSchema } from "./user";
+import { userDtoSchema, userIdSchema } from "./user";
 import { moneySchema } from "./money";
 
 export const creditIdSchema = z.uuid().brand("credit");
@@ -18,12 +18,13 @@ export const creditSchema = z.object({
   status: z.enum(["PENDING", "ACCEPTED", "REFUSED", "COMPLETED"]),
   createdAt: z.iso.datetime(),
   advisorId: userIdSchema.optional(),
-  updatedAt: z.iso.datetime().optional(),
+  updatedAt: z.iso.datetime(),
 });
 
 export const creditResponseSchema = z.object({
   accept: z.boolean(),
 });
+export type CreditResponse = z.infer<typeof creditResponseSchema>;
 
 export const creditDTOSchema = creditSchema.pick({
   id: true,
@@ -35,4 +36,15 @@ export const creditDTOSchema = creditSchema.pick({
   monthlyPayment: true,
   remainingBalance: true,
   status: true,
+  createdAt: true,
+  updatedAt: true,
+  advisorId: true,
+  userId: true,
 });
+
+export type CreditDTO = z.infer<typeof creditDTOSchema>;
+
+export const creditDTOWithUserSchema = creditDTOSchema.extend({
+  user: userDtoSchema,
+});
+export type CreditDTOWithUser = z.infer<typeof creditDTOWithUserSchema>;

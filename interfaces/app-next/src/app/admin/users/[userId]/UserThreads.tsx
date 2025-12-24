@@ -22,7 +22,7 @@ export const UserThreads = ({ userId }: { userId: UserId }) => {
             if (threads.length === 0) return
             return (
                 <section>
-                    <h2 className="text-lg font-semibold mb-4">Conversations clients</h2>
+                    <h2 className="text-lg font-bold mb-4">Conversations clients</h2>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {threads.map((acc) => (
                             <Card

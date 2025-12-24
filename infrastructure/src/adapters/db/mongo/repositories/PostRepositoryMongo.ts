@@ -114,7 +114,7 @@ export class PostRepositoryMongo implements PostRepository {
         $set: {
           title: post.title,
           content: post.content,
-          updatedAt: post.updatedAt || new Date(),
+          updatedAt: post.updatedAt,
           publishedAt: post.publishedAt || null,
           tagsId: post.tagsId,
           readBy: post.readBy,
