@@ -13,7 +13,7 @@ export const UserAccounts = ({ userId }: { userId: UserId }) => {
 
     return (
         <section>
-            <h2 className="text-lg font-semibold mb-4">Comptes bancaires</h2>
+            <h2 className="text-lg font-bold mb-4">Comptes bancaires</h2>
             {match(query)
                 .with({ status: "error" }, () => ("error"))
                 .with({ status: "pending" }, () => <AccountsSkeleton />)

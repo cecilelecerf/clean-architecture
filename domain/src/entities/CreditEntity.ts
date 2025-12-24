@@ -30,6 +30,7 @@ export enum CreditStatus {
 export class CreditEntity {
   private constructor(
     public id: string,
+    // TODO : remplacer userId par accountId
     public userId: UserEntity["id"],
     public initialAmount: Money,
     // taux d'interet annuel
@@ -280,7 +281,7 @@ export class CreditEntity {
       monthlyPayment: this.monthlyPayment,
       remainingBalance: this.remainingBalance,
       initialAmount: this.initialAmount,
-      userId: this.id,
+      userId: this.userId,
       interestRate: this.interestRate.value,
       insuranceRate: this.insuranceRate.value,
       updatedAt: this.updatedAt,

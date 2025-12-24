@@ -26,6 +26,7 @@ type Props = {
   interestRate: number;
   insuranceRate: number;
   currency: string;
+  startDate: Date;
 } & Pick<CreditEntity, "durationMonths">;
 
 export class RequestCreditUsecase {
@@ -43,6 +44,7 @@ export class RequestCreditUsecase {
     insuranceRate,
     interestRate,
     durationMonths,
+    startDate,
   }: Props): Promise<
     | CreditEntity
     | UserNotFoundError
@@ -76,7 +78,7 @@ export class RequestCreditUsecase {
       interestRate: insuranceRateVO,
       insuranceRate: interestRateVO,
       durationMonths,
-      startDate: this.clockService.now(),
+      startDate,
       status: CreditStatus.PENDING,
       updatedAt: this.clockService.now(),
       createdAt: this.clockService.now(),

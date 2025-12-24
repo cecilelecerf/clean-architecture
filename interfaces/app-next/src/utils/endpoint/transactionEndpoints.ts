@@ -13,7 +13,7 @@ import {
   transactionSchema,
 } from '@infrastructure/types/transaction';
 import { safeParseWithLog } from '@/lib/zodUtils';
-import { paginationSchema } from '@/components/PaginationComponent';
+import { paginationSchema } from '@infrastructure/types/pagination';
 
 export const querySchema = paginationSchema.extend({
   type: transactionSchema.shape.type.optional(),

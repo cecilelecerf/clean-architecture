@@ -26,6 +26,8 @@ export class GetCreditsByClientUsecase {
   }: Props): Promise<
     CreditDTO[] | UserNotFoundError | UserNotActiveError | UserRoleMismatchError
   > {
+    console.log("execute");
+    console.log(clientId, adminId);
     const client = await findActiveUser(this.userRepository, clientId);
     if (client instanceof Error) return client;
     if (!client.hasRole({ role: "client" }))
@@ -33,7 +35,7 @@ export class GetCreditsByClientUsecase {
     if (adminId) {
       const admin = await findActiveUser(this.userRepository, adminId);
       if (admin instanceof Error) return admin;
-      if (!admin.hasRole({ role: "client" }))
+      if (admin.hasRole({ role: "client" }))
         return new UserRoleMismatchError(
           ["conseiller", "directeur"],
           admin.role

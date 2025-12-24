@@ -36,7 +36,13 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const payload = creditSchema
-      .pick({ initialAmount: true, insuranceRate: true, interestRate: true, durationMonths: true })
+      .pick({
+        initialAmount: true,
+        insuranceRate: true,
+        interestRate: true,
+        durationMonths: true,
+        startDate: true,
+      })
       .partial()
       .parse(body);
 
@@ -47,6 +53,7 @@ export async function POST(req: NextRequest) {
       interestRate: payload.interestRate,
       insuranceRate: payload.insuranceRate,
       durationMonths: payload.durationMonths,
+      startDate: new Date(payload.startDate),
     });
 
     if (result instanceof Error) {

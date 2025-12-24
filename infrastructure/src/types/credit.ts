@@ -1,5 +1,5 @@
 import z from "zod";
-import { userIdSchema } from "./user";
+import { userDtoSchema, userIdSchema } from "./user";
 import { moneySchema } from "./money";
 
 export const creditIdSchema = z.string().brand("credit");
@@ -24,6 +24,7 @@ export const creditSchema = z.object({
 export const creditResponseSchema = z.object({
   accept: z.boolean(),
 });
+export type CreditResponse = z.infer<typeof creditResponseSchema>;
 
 export const creditDTOSchema = creditSchema.pick({
   id: true,
@@ -38,4 +39,12 @@ export const creditDTOSchema = creditSchema.pick({
   createdAt: true,
   updatedAt: true,
   advisorId: true,
+  userId: true,
 });
+
+export type CreditDTO = z.infer<typeof creditDTOSchema>;
+
+export const creditDTOWithUserSchema = creditDTOSchema.extend({
+  user: userDtoSchema,
+});
+export type CreditDTOWithUser = z.infer<typeof creditDTOWithUserSchema>;

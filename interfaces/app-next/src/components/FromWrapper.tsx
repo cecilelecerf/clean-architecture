@@ -33,8 +33,8 @@ export type Field = {
   disabled?: boolean
   options?: { label: string; value: string, icon: string }[];
   numberOptions?: {
-    min?: number;
-    max?: number;
+    min?: number | string;
+    max?: number | string;
     step?: number;
   }
 }
@@ -255,6 +255,8 @@ export default function FormWrapper({
                         placeholder={field.placeholder}
                         disabled={loading || field.disabled}
                         className="pl-10"
+                        min={field.numberOptions?.min}
+                        max={field.numberOptions?.max}
                       />
                     </div>
                   ))}

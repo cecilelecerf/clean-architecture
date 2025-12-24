@@ -9,50 +9,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 import {
-    Clock,
-    CheckCircle,
-    XCircle,
     AlertCircle,
     Calendar,
     Percent,
     TrendingUp,
-    Eye,
     CalendarClock
 } from "lucide-react";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
+import { CreditArray } from "@/components/credits/CreditArray";
+import { statusConfig } from "@/components/credits/constant";
 
-const statusConfig = {
-    PENDING: {
-        label: "En attente",
-        variant: "secondary" as const,
-        icon: Clock,
-        color: "text-yellow-600",
-    },
-    ACCEPTED: {
-        label: "Accepté",
-        variant: "default" as const,
-        icon: CheckCircle,
-        color: "text-green-600",
-    },
-    ACCEPTED_FUTURE: {
-        label: "Accepté - À venir",
-        variant: "secondary" as const,
-        icon: CalendarClock,
-        color: "text-blue-600",
-    },
-    REFUSED: {
-        label: "Refusé",
-        variant: "destructive" as const,
-        icon: XCircle,
-        color: "text-red-600",
-    },
-    COMPLETED: {
-        label: "Terminé",
-        variant: "outline" as const,
-        icon: CheckCircle,
-        color: "text-blue-600",
-    },
-};
 
 export default function ClientCreditsPage() {
     const query = useQuery(endpoints.credits.getAll());
@@ -203,98 +169,8 @@ export default function ClientCreditsPage() {
 
                             {/* Autres crédits - Tableau */}
                             {credits.some((credit) => credit.status !== "ACCEPTED") && (
-                                <section>
-                                    <h2 className="text-xl font-semibold mb-4">Historique des demandes</h2>
-                                    <Card>
-                                        <CardContent className="p-0">
-                                            <div className="overflow-x-auto">
-                                                <table className="w-full">
-                                                    <thead className="bg-gray-50 border-b">
-                                                        <tr>
-                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                                                Statut
-                                                            </th>
-                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                                                Montant
-                                                            </th>
-                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                                                Durée
-                                                            </th>
-                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                                                Taux
-                                                            </th>
-                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                                                Mensualité
-                                                            </th>
-                                                            <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                                                Date
-                                                            </th>
-                                                            <th className="text-right p-4 text-sm font-semibold text-gray-600">
-                                                                Action
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className="divide-y">
-                                                        {credits
-                                                            .filter((credit) => credit.status !== "ACCEPTED")
-                                                            .map((credit) => {
-                                                                const config = statusConfig[credit.status];
-                                                                const StatusIcon = config.icon;
-
-                                                                return (
-                                                                    <tr
-                                                                        key={credit.id}
-                                                                        className="hover:bg-gray-50 transition-colors cursor-pointer"
-                                                                        onClick={() => router.push(`/credits/${credit.id}`)}
-                                                                    >
-                                                                        <td className="p-4">
-                                                                            <Badge variant={config.variant} className="flex items-center gap-1 w-fit">
-                                                                                <StatusIcon className="w-3 h-3" />
-                                                                                {config.label}
-                                                                            </Badge>
-                                                                        </td>
-                                                                        <td className="p-4 font-semibold">
-                                                                            {credit.initialAmount.amount.toLocaleString("fr-FR", {
-                                                                                style: "currency",
-                                                                                currency: credit.initialAmount.currency,
-                                                                            })}
-                                                                        </td>
-                                                                        <td className="p-4 text-gray-600">
-                                                                            {credit.durationMonths} mois
-                                                                        </td>
-                                                                        <td className="p-4 text-gray-600">{credit.interestRate}%</td>
-                                                                        <td className="p-4 font-medium">
-                                                                            {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
-                                                                                style: "currency",
-                                                                                currency: credit.monthlyPayment.currency,
-                                                                            })}
-                                                                        </td>
-                                                                        <td className="p-4 text-sm text-gray-500">
-                                                                            {credit.status === "PENDING"
-                                                                                ? formatDateFrench(credit.createdAt)
-                                                                                : formatDateFrench(credit.updatedAt)}
-                                                                        </td>
-                                                                        <td className="text-right">
-                                                                            <Button
-                                                                                variant="link"
-                                                                                size="sm"
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    router.push(`/credits/${credit.id}`);
-                                                                                }}
-                                                                            >
-                                                                                <Eye className="w-4 h-4 mr-1" /> Détails
-                                                                            </Button>
-                                                                        </td>
-                                                                    </tr>
-                                                                );
-                                                            })}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </section>
+                                <CreditArray title="Autres demande" credits={credits
+                                    .filter((credit) => credit.status !== "ACCEPTED")} basePath="" />
                             )}
                         </div>
                     );
