@@ -1,5 +1,8 @@
 import { SavingRateRepository } from "@application/ports/repositories/SavingRateRepository";
-import { SavingsRateDTO, SavingsRateEntity } from "@domain/entities/SavingsRateEntity";
+import {
+  SavingsRateDTO,
+  SavingsRateEntity,
+} from "@domain/entities/SavingsRateEntity";
 import { Percentage } from "@domain/values/Percentage";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
@@ -11,7 +14,6 @@ import {
 } from "@application/errors/users";
 import { InvalidPercentageError } from "@domain/errors/percentage";
 import { ClockService } from "@application/ports/services/ClockService";
-import { SavingsRateDTOMapper } from "@application/dto/SavingsrateDTOMapper";
 
 interface Props {
   rate: number;
@@ -27,7 +29,6 @@ export class SetSavingsRateUsecase {
     private readonly clockService: ClockService
   ) {}
 
-  // Enregistrement du taux d'interêt que pour les user ayant le rôle de directeur
   public async execute({
     rate,
     effectiveDate,
@@ -41,10 +42,7 @@ export class SetSavingsRateUsecase {
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-    if (
-      user.hasRole({ role: "client" }) ||
-      user.hasRole({ role: "conseiller" })
-    )
+    if (!user.hasRole({ role: "directeur" }))
       return new UserRoleMismatchError(["directeur"], user.role);
 
     const percentage = Percentage.create(rate);
@@ -53,8 +51,8 @@ export class SetSavingsRateUsecase {
     }
 
     const effectiveDateResult = this.clockService.toDate(effectiveDate);
-
     const today = this.clockService.now();
+    // TODO : vérifier que l'effectiveDate soit posterieur à la date actuelle
 
     const savingsRate = SavingsRateEntity.from({
       id: this.uuidService.generate(),
@@ -66,9 +64,6 @@ export class SetSavingsRateUsecase {
 
     await this.configRepository.save(savingsRate);
 
-    var savingsrateDTO = SavingsRateDTOMapper.map(savingsRate);
-    console.log(savingsrateDTO);
-
-    return savingsrateDTO;
+    return savingsRate.toDTO();
   }
 }

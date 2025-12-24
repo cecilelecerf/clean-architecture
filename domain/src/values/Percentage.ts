@@ -4,7 +4,11 @@ export class Percentage {
   private constructor(public readonly value: number) {}
 
   public static from({ value }: Pick<Percentage, "value">): Percentage {
-    return new Percentage(value);
+    return new Percentage(Number(value));
+  }
+
+  public getValue(): Percentage["value"] {
+    return this.value;
   }
 
   /**

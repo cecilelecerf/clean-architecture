@@ -11,6 +11,7 @@ import {
 } from "@domain/errors/money";
 import { InvalidAccountNameError } from "@domain/errors/account";
 import { InvalidAccountTypeError } from "@domain/errors/account/InvalidAccountType";
+import { TransactionEntity } from "./TransactionEntity";
 
 export class AccountEntity {
   private constructor(
@@ -21,8 +22,9 @@ export class AccountEntity {
     public balance: Money,
     public currency: string,
     public createdAt: Date,
+    public updatedAt: Date,
     public userId?: UserEntity["id"] | null,
-    public updatedAt?: Date
+    public lastInterestTransactionId?: TransactionEntity["id"] | null
   ) {}
 
   public static create({
@@ -35,6 +37,7 @@ export class AccountEntity {
     createdAt,
     userId,
     updatedAt,
+    lastInterestTransactionId,
   }: Pick<
     AccountEntity,
     | "iban"
@@ -46,6 +49,7 @@ export class AccountEntity {
     | "createdAt"
     | "userId"
     | "updatedAt"
+    | "lastInterestTransactionId"
   >): AccountEntity | InvalidAccountNameError {
     const verifiedName = this.verifyName(name);
     if (verifiedName instanceof Error) return verifiedName;
@@ -58,8 +62,9 @@ export class AccountEntity {
       balance,
       currency,
       createdAt,
+      updatedAt,
       userId,
-      updatedAt
+      lastInterestTransactionId
     );
   }
 
@@ -73,6 +78,7 @@ export class AccountEntity {
     createdAt,
     userId,
     updatedAt,
+    lastInterestTransactionId,
   }: Pick<
     AccountEntity,
     | "iban"
@@ -84,6 +90,7 @@ export class AccountEntity {
     | "createdAt"
     | "userId"
     | "updatedAt"
+    | "lastInterestTransactionId"
   >) {
     return new AccountEntity(
       iban,
@@ -93,8 +100,9 @@ export class AccountEntity {
       balance,
       currency,
       createdAt,
+      updatedAt,
       userId,
-      updatedAt
+      lastInterestTransactionId
     );
   }
 
@@ -164,7 +172,6 @@ export class AccountEntity {
   }
 
   public applyDailyInterest(
-    bankAccount: AccountEntity,
     dailyRate: number
   ):
     | FactorNegativeError
@@ -172,23 +179,18 @@ export class AccountEntity {
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | MoneyCurrencyMismatchError
     | Money {
     if (this.type !== "epargne") return new InvalidAccountTypeError();
 
     const interest = this.balance.multiply(dailyRate);
     if (interest instanceof Error) return interest;
 
-    const depositResult = this.deposit(interest);
-    if (depositResult instanceof Error) return depositResult;
-
-    const withdrawResult = bankAccount.withdraw(interest);
-    if (withdrawResult instanceof Error) {
-      this.withdraw(interest);
-      return withdrawResult;
-    }
-
-    return this.getBalance();
+    return interest;
+  }
+  public updateLastInterestTransaction(
+    transactionId: TransactionEntity["id"]
+  ): void {
+    this.lastInterestTransactionId = transactionId;
   }
 
   public toDTO(): AccountDTO {

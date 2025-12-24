@@ -12,5 +12,5 @@ export const endpoints = createEndpointsNodes({
   feeds: feedsEndpoint,
   users: usersEndpoint,
   auth: authEndpoint,
-  savingrate: savingsrateEndpoint
+  savingsRates: savingsrateEndpoint,
 });

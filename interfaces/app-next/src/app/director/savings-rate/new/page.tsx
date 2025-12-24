@@ -1,31 +1,30 @@
 "use client"
 
-import { newSavingsrate } from "@/utils/endpoint/savingsrateEndpoints"
+import { NewSavingsrate } from "@/utils/endpoint/savingsrateEndpoints"
 import { useState } from "react"
 import { endpoints } from '@/utils/endpoint';
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
 import FormWrapper, { Field as TField } from '@/components/FromWrapper';
 import router from "next/router";
 
-export default function NewSavingsRatePage(){
-    const [field, setField]= useState<newSavingsrate>({
+export default function NewSavingsRatePage() {
+    const [field, setField] = useState<NewSavingsrate>({
         rate: 0,
         effectiveDate: ''
     })
-    const mutation = useMutation(endpoints.savingrate.create());
+    const mutation = useMutation(endpoints.savingsRates.create());
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         // Validation
-        if (!field.rate || !field.effectiveDate ) {
+        if (!field.rate || !field.effectiveDate) {
             return;
         }
 
         const effectiveDateISO = new Date(field.effectiveDate).toISOString();
 
-        mutation.mutate({ rate: field.rate, effectiveDate: effectiveDateISO}, { onSuccess: () => router.push(`/savingsrate`) });
+        mutation.mutate({ rate: field.rate, effectiveDate: effectiveDateISO }, { onSuccess: () => router.push(`/savingsrate`) });
     };
 
     const fields: TField[] = [
@@ -55,7 +54,7 @@ export default function NewSavingsRatePage(){
         },
     ]
 
-    return(
+    return (
         <form onSubmit={handleSubmit}>
             <FormWrapper
                 title="Nouveau taux d'épargne"

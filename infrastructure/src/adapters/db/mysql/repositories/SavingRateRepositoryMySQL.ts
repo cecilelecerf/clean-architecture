@@ -8,8 +8,9 @@ export class SavingsRateRepositoryMySQL implements SavingRateRepository {
   constructor(private readonly client: MySQLClient) {}
 
   private mapRowToSavingsRate(row: RowDataPacket): SavingsRateEntity {
-    const rate = Percentage.from(row.rate);
-
+    console.log(row);
+    const rate = Percentage.from({ value: row.rate });
+    console.log(rate);
     return SavingsRateEntity.from({
       id: row.id,
       rate,
@@ -20,9 +21,13 @@ export class SavingsRateRepositoryMySQL implements SavingRateRepository {
   }
 
   /** Taux d'épargne actuel */
-  async findCurrent(): Promise<SavingsRateEntity | null> {
+  async findRateAtDate(date: Date): Promise<SavingsRateEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM savings_rates ORDER BY effective_date DESC LIMIT 1`
+      `SELECT * FROM savings_rates 
+       WHERE effective_date <= ? 
+       ORDER BY effective_date DESC 
+       LIMIT 1`,
+      [date]
     );
 
     if (rows.length === 0) return null;

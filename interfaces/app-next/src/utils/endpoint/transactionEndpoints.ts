@@ -1,19 +1,17 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
-import { deleteEntity, get, patch, post } from '@/lib/apiClient';
-import { AccountId, accountSchema, NewAccount } from '@infrastructure/types/account';
-import { threadSchema } from '@infrastructure/types/thread';
+import { get, post } from '@/lib/apiClient';
+import { AccountId, accountSchema } from '@infrastructure/types/account';
 import z from 'zod';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import {
   NewTransaction,
-  transactionDTOSchema,
   transactionDTOWithAccountResumeSchema,
   TransactionId,
   transactionSchema,
 } from '@infrastructure/types/transaction';
 import { safeParseWithLog } from '@/lib/zodUtils';
-import { paginationSchema } from '@/components/PaginationComponent';
+import { paginationSchema } from '@infrastructure/types/pagination';
 
 export const querySchema = paginationSchema.extend({
   type: transactionSchema.shape.type.optional(),

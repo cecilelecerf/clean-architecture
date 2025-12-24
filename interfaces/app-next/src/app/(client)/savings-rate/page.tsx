@@ -3,18 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { TitleAdminPage } from "@/components/TitleAdminPage";
+import { SavingsRateHeroBanner } from "./GetCurrentSavingRate";
 
-export default function SavingsRatePage(){
+export default function SavingsRatePage() {
     const router = useRouter();
-    return(
+    return (
         <>
             <TitleAdminPage title="Taux d'épargne" />
-            <Button
-                size="sm"
-                onClick={() => router.push(`/director/saving-rate/new/`)}
-            >
-                Créer un nouveau taux
-            </Button>
+            <SavingsRateHeroBanner />
         </>
     )
 }
