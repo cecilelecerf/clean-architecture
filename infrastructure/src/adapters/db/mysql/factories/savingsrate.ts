@@ -5,24 +5,32 @@ import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidServi
 
 import { SetSavingsRateUsecase } from "@application/usecases/savingRates/SetSavingsRateUseCasee";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
+import { GetAllSavingRatesUsecase } from "@application/usecases/savingRates/GetAllSavingRatesUsecase";
+import { GetCurrentSavingRateUsecase } from "@application/usecases/savingRates/GetCurrentSavingRateUsecase";
 
 export const savingsrateFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);
-  const configRepository = new SavingsRateRepositoryMySQL(client);
+  const savingRateRepo = new SavingsRateRepositoryMySQL(client);
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
 
   const setSavingsRate = new SetSavingsRateUsecase(
-    configRepository,
+    savingRateRepo,
     userRepository,
     uuidService,
     clockService
   );
 
+  const getAll = new GetAllSavingRatesUsecase(savingRateRepo, userRepository);
+  const getCurrent = new GetCurrentSavingRateUsecase(
+    savingRateRepo,
+    userRepository,
+    clockService
+  );
   return {
-    admin: {
-      setSavingsRate,
-    },
+    setSavingsRate,
+    getAll,
+    getCurrent,
   };
 };

@@ -13,8 +13,8 @@ export class CreditRepositoryMongo implements CreditRepository {
     const initialAmount = Money.from(doc.initialAmount);
     const monthlyPayment = Money.from(doc.monthlyPayment);
     const remainingBalance = Money.from(doc.remainingBalance);
-    const interestRate = Percentage.from(doc.interestRate);
-    const insuranceRate = Percentage.from(doc.insuranceRate);
+    const interestRate = Percentage.from({ value: doc.interestRate });
+    const insuranceRate = Percentage.from({ value: doc.insuranceRate });
 
     return CreditEntity.from({
       id: doc._id.toString(),

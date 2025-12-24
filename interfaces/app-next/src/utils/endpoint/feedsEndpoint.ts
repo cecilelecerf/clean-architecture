@@ -13,7 +13,7 @@ import {
 import z from 'zod';
 import { queryClient } from '@/lib/queryClient';
 import { userDtoSchema } from '@infrastructure/types/user';
-import { paginationSchema } from '@/components/PaginationComponent';
+import { paginationSchema } from '@infrastructure/types/pagination';
 
 // ============================================================================
 // SCHEMAS

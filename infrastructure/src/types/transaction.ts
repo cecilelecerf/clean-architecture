@@ -4,7 +4,6 @@ import {
   accountIdSchema,
   accountResumeWithUserSchema,
 } from "./account";
-import { userDtoSchema } from "./user";
 
 const transactionIdSchema = z.uuid().brand("transaction");
 export type TransactionId = z.infer<typeof transactionIdSchema>;

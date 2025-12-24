@@ -1,12 +1,6 @@
 "use client"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import z from "zod"
-
-export const paginationSchema = z.object({
-    page: z.number().optional(),
-    limit: z.number().optional(),
-})
-export type PaginationType = z.infer<typeof paginationSchema>
+import { PaginationType } from "@infrastructure/types/pagination"
 
 type Props = { filters: PaginationType, totalPage: number, onPaginationChange: (page: number) => void }
 

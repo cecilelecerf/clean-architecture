@@ -22,8 +22,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
       amount: row.remaining_amount,
       currency: row.remaining_currency,
     });
-    const interestRate = Percentage.from(row.interest_rate);
-    const insuranceRate = Percentage.from(row.insurance_rate);
+    const interestRate = Percentage.from({ value: row.interest_rate });
+    const insuranceRate = Percentage.from({ value: row.insurance_rate });
 
     return CreditEntity.from({
       id: row.id,
