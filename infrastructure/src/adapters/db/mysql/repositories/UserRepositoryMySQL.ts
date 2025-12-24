@@ -3,26 +3,10 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { Email } from "@domain/values/Email";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class UserRepositoryMySQL implements UserRepository {
   constructor(private readonly client: MySQLClient) {}
-
-  private mapRowToUser(row: RowDataPacket): UserEntity {
-    const email = Email.from(row.email);
-
-    return UserEntity.from({
-      id: row.id,
-      firstname: row.firstname,
-      lastname: row.lastname,
-      email,
-      passwordHash: row.password_hash,
-      role: row.role,
-      isActiveField: row.is_active,
-      createdAt: row.created_at,
-      confirmedAt: row.confirmed_at ?? null,
-      updatedAt: row.updated_at,
-    });
-  }
 
   /** Trouver un utilisateur par ID */
   async findById(id: UserEntity["id"]): Promise<UserEntity | null> {
@@ -33,7 +17,7 @@ export class UserRepositoryMySQL implements UserRepository {
 
     if (rows.length === 0) return null;
 
-    return this.mapRowToUser(rows[0]);
+    return UserMapper.mapRowToUser(rows[0]);
   }
 
   /** Trouver un utilisateur par email */
@@ -45,7 +29,7 @@ export class UserRepositoryMySQL implements UserRepository {
 
     if (rows.length === 0) return null;
 
-    return this.mapRowToUser(rows[0]);
+    return UserMapper.mapRowToUser(rows[0]);
   }
 
   /** Tous les utilisateurs */
@@ -54,7 +38,7 @@ export class UserRepositoryMySQL implements UserRepository {
       "SELECT * FROM users ORDER BY created_at DESC"
     );
 
-    return rows.map((row) => this.mapRowToUser(row));
+    return rows.map((row) => UserMapper.mapRowToUser(row));
   }
 
   /** Utilisateurs actifs par rôle */
@@ -74,7 +58,7 @@ export class UserRepositoryMySQL implements UserRepository {
 
     const rows = await this.client.query<RowDataPacket[]>(query, params);
 
-    return rows.map((row) => this.mapRowToUser(row));
+    return rows.map((row) => UserMapper.mapRowToUser(row));
   }
 
   /** Sauvegarder un utilisateur */

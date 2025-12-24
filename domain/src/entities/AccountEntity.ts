@@ -10,39 +10,41 @@ import {
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import { InvalidAccountNameError } from "@domain/errors/account";
-import { AccountOwner } from "@domain/values/AccountOwner";
 import { InvalidAccountTypeError } from "@domain/errors/account/InvalidAccountType";
 
 export class AccountEntity {
   private constructor(
     public iban: IBAN,
-    public owner: AccountOwner,
     public name: string,
     public type: "courant" | "epargne",
     public color: Color,
     public balance: Money,
+    public currency: string,
     public createdAt: Date,
-    public updatedAt: Date
+    public userId?: UserEntity["id"] | null,
+    public updatedAt?: Date
   ) {}
 
   public static create({
     iban,
-    owner,
     name,
     type,
     balance,
+    currency,
     color,
     createdAt,
+    userId,
     updatedAt,
   }: Pick<
     AccountEntity,
     | "iban"
-    | "owner"
     | "name"
     | "type"
     | "color"
     | "balance"
+    | "currency"
     | "createdAt"
+    | "userId"
     | "updatedAt"
   >): AccountEntity | InvalidAccountNameError {
     const verifiedName = this.verifyName(name);
@@ -50,44 +52,48 @@ export class AccountEntity {
 
     return new AccountEntity(
       iban,
-      owner,
       name,
       type,
       color,
       balance,
+      currency,
       createdAt,
+      userId,
       updatedAt
     );
   }
 
   public static from({
     iban,
-    owner,
     name,
     type,
     balance,
+    currency,
     color,
     createdAt,
+    userId,
     updatedAt,
   }: Pick<
     AccountEntity,
     | "iban"
-    | "owner"
     | "name"
     | "type"
     | "color"
     | "balance"
+    | "currency"
     | "createdAt"
+    | "userId"
     | "updatedAt"
   >) {
     return new AccountEntity(
       iban,
-      owner,
       name,
       type,
       color,
       balance,
+      currency,
       createdAt,
+      userId,
       updatedAt
     );
   }
@@ -129,20 +135,16 @@ export class AccountEntity {
     return trimedName;
   }
 
-  public canBeModifiedBy(user: UserEntity): boolean {
-    return this.owner.belongsTo(user.id);
-  }
-
   public isBankAccount(): boolean {
-    return this.owner.role === "bank";
+    return this.userId === null;
   }
 
-  public isClientAccount(): boolean {
-    return this.owner.role === "client";
+  public isClientAccount(user: UserEntity): boolean {
+    return user.hasRole({ role: "client" }) && user.id === this.userId;
   }
 
   public canBeRenamedBy(user: UserEntity): boolean {
-    return user.hasRole({ role: "client" }) && this.owner.belongsTo(user.id);
+    return user.hasRole({ role: "client" }) && user.id === this.userId;
   }
 
   public rename(
@@ -151,10 +153,6 @@ export class AccountEntity {
     updatedAt: Date
   ): InvalidAccountNameError | InvalidAccountNameError | void {
     if (!user.hasRole({ role: "client" })) {
-      return new InvalidAccountNameError();
-    }
-
-    if (!this.owner.belongsTo(user.id)) {
       return new InvalidAccountNameError();
     }
 
@@ -192,4 +190,22 @@ export class AccountEntity {
 
     return this.getBalance();
   }
+
+  public toDTO(): AccountDTO {
+    return {
+      IBAN: this.iban.value,
+      name: this.name,
+      type: this.type,
+      currency: this.currency,
+      color: this.color.getValue(),
+      amount: this.balance.amount,
+      userId: this.userId,
+    };
+  }
 }
+
+export type AccountDTO = {
+  IBAN: string;
+  color: string;
+  amount: number;
+} & Pick<AccountEntity, "name" | "type" | "currency" | "userId">;

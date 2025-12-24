@@ -11,7 +11,13 @@ import {
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 
-export class PlaceOrderUsecase {
+interface Props {
+  userId: string;
+  actionId: string;
+  type: "buy" | "sell";
+  quantity: number;
+}
+export class PlaceOrderUseCase {
   public constructor(
     private readonly orderRepository: OrderRepository,
     private readonly actionRepository: ActionRepository,
@@ -19,12 +25,12 @@ export class PlaceOrderUsecase {
     private readonly clockService: ClockService
   ) {}
 
-  public async execute(
-    userId: string,
-    actionId: string,
-    type: "buy" | "sell",
-    quantity: number
-  ): Promise<
+  public async execute({
+    userId,
+    actionId,
+    type,
+    quantity
+  }: Props): Promise<
     | ActionNotFoundError
     | FactorNegativeError
     | MoneyCurrencyMissingError

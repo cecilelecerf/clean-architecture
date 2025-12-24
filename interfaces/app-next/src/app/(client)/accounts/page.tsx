@@ -2,7 +2,6 @@
 
 import { Card } from '@/components/ui/card';
 import { textColorClasses } from '@/utils/color';
-import { toStringTypeAccount } from '@/utils/toStringTypeAccount';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { match } from 'ts-pattern';
@@ -11,7 +10,7 @@ import { ButtonLink } from '@/components/buttons/ButtonLink';
 
 export default function AccountsPage() {
   const router = useRouter();
-  const query = useQuery(endpoints.accounts.getAll())
+  const query = useQuery(endpoints.accounts.getAllByMe())
 
   return (
     <>
@@ -31,13 +30,13 @@ export default function AccountsPage() {
 
                 <div>
                   <p className={`font-semibold text-lg leading-5`}>{account.name}</p>
-                  <p className="text-sm text-gray-500">{toStringTypeAccount(account)}</p>
+                  <p className="text-sm text-gray-500">{account.type}</p>
                 </div>
 
                 {/* Right side */}
                 <div className="text-right">
                   <p className={`font-bold text-gray-800 ${textColorClasses[700][account.color]}`}>
-                    {account.balance.toLocaleString('fr-FR', {
+                    {account.amount.toLocaleString('fr-FR', {
                       style: 'currency',
                       currency: 'EUR',
                     })}

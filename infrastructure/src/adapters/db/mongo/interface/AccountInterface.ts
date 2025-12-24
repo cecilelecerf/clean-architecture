@@ -3,10 +3,7 @@ import { Types } from "mongoose";
 export interface AccountInterface {
   _id: Types.UUID;
   iban: string;
-  owner: {
-    role: "bank" | "client";
-    userId: string;
-  };
+  userId: Types.UUID;
   name: string;
   type: "courant" | "epargne";
   color: string;
@@ -14,6 +11,7 @@ export interface AccountInterface {
     amount: number;
     currency: string;
   };
+  currency: string,
   createdAt: Date;
   updatedAt: Date;
 }

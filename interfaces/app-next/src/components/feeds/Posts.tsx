@@ -4,13 +4,13 @@ import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint"
 import { useQuery } from "@tanstack/react-query"
 import { match } from "ts-pattern"
 import { PostCard } from "./PostCard"
-import { PaginationPosts } from "./PaginationPosts"
+import { PaginationComponent } from "../PaginationComponent"
 import { useEffect, useState } from "react"
 import { socket } from "@/lib/socket"
 import { queryClient } from "@/lib/queryClient"
-import { FiltersProps } from "@/utils/endpoint/feedsEndpoint"
+import { PostFiltersProps } from "@/utils/endpoint/feedsEndpoint"
 
-type Props = { filters: FiltersProps, onPaginationChange: (pageNumber: number) => void, isAdmin?: boolean }
+type Props = { filters: PostFiltersProps, onPaginationChange: (pageNumber: number) => void, isAdmin?: boolean }
 
 export const Posts = ({ filters, onPaginationChange, isAdmin }: Props) => {
     const query = useQuery(endpoints.feeds.posts.getAll({ filters }))
@@ -36,7 +36,7 @@ export const Posts = ({ filters, onPaginationChange, isAdmin }: Props) => {
                         <DisplayPost dataPost={post} key={post.id} isAdmin={isAdmin} />
                     ))
                 )}
-                <PaginationPosts onPaginationChange={onPaginationChange} totalPage={data.total} filters={filters} />
+                <PaginationComponent onPaginationChange={onPaginationChange} totalPage={data.total} filters={{ ...filters }} />
             </div>
         </>
         )

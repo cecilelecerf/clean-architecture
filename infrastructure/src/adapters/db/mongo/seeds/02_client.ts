@@ -14,7 +14,9 @@ import { Money } from "@domain/values/Money";
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
 import { Color } from "@domain/values/Color";
-import { AccountOwner } from "@domain/values/AccountOwner";
+import { CreditEntity, CreditStatus } from "@domain/entities/CreditEntity";
+import { Percentage } from "@domain/values/Percentage";
+import { CreditRepositoryMongo } from "../repositories/CreditRepositoryMongo";
 
 export async function seedMongoClient(
   mongoClient: MongoClient
@@ -26,6 +28,7 @@ export async function seedMongoClient(
   const userRepository = new UserRepositoryMongo(mongoClient);
   const accountRepository = new AccountRepositoryMongo(mongoClient);
   const transactionRepository = new TransactionRepositoryMongo(mongoClient);
+  const creditRepository = new CreditRepositoryMongo(mongoClient);
 
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
@@ -82,16 +85,14 @@ export async function seedMongoClient(
         const account = AccountEntity.from({
           ...rawAccount,
           iban,
-          owner: AccountOwner.from({
-            role: "client",
-            userId: user.id,
-          }),
+          userId: user.id,
           createdAt: clockService.now(),
           color,
           balance: Money.from({
             amount: rawAccount.balance,
             currency: rawAccount.currency,
           }),
+          currency: rawAccount.currency,
           updatedAt: clockService.now(),
         });
 
@@ -118,6 +119,51 @@ export async function seedMongoClient(
           await transactionRepository.save(transaction);
           console.log(transaction.id);
         }
+      }
+
+      const credits: CreditEntity[] = [];
+      for(const rawCredit of raw.credits ?? []){
+        const initialAmount = Money.create({
+          amount: rawCredit.initialAmount,
+          currency: rawCredit.currency,
+        });
+        if (initialAmount instanceof Error) {
+          console.warn(initialAmount);
+          continue;
+        }
+        
+        const interestRate = Percentage.create(rawCredit.interestRate);
+        if (interestRate instanceof Error) {
+          console.warn(interestRate);
+          continue;
+        }
+        
+        const insuranceRate = Percentage.create(rawCredit.insuranceRate);
+        if (insuranceRate instanceof Error) {
+          console.warn(insuranceRate);
+          continue;
+        }
+
+        const credit = CreditEntity.create({
+          id: uuidService.generate(),
+          advisorId: null,
+          userId: user.id,
+          initialAmount: initialAmount,
+          interestRate: interestRate,
+          insuranceRate: insuranceRate,
+          durationMonths:  rawCredit.durationMonths,
+          startDate: rawCredit.startDate,
+          status: CreditStatus.PENDING
+        });
+        
+        if (credit instanceof Error) {
+          console.warn(credit);
+          continue;
+        }
+        
+        credits.push(credit);
+        await creditRepository.save(credit);
+        console.log(credit.id);
       }
     } catch (err) {
       console.error(`Skipping user ${raw.email}`, err);

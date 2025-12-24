@@ -6,6 +6,7 @@ import { MongoClient } from "../../MongoClient";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { ThreadModel } from "../models/ThreadModel";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class ThreadRepositoryMongo implements ThreadRepository {
   constructor(private readonly client: MongoClient) {}
@@ -25,36 +26,12 @@ export class ThreadRepositoryMongo implements ThreadRepository {
 
   private mapThreadWithUsers(doc: any): ThreadEntityWithUsers {
     const administrator = doc.administratorId?._id
-      ? UserEntity.from({
-          id: doc.administratorId._id.toString(),
-          firstname: doc.administratorId.firstname,
-          lastname: doc.administratorId.lastname,
-          email: doc.administratorId.email,
-          passwordHash: "",
-          role: doc.administratorId.role,
-          isActiveField: doc.administratorId.isActive,
-          createdAt: doc.administratorId.createdAt,
-          confirmedAt: doc.administratorId.confirmedAt,
-          updatedAt: doc.administratorId.updatedAt,
-        })
+      ? UserMapper.mapDocToUser(doc.administratorId)
       : null;
 
     const participants: UserEntity[] = (doc.participantsId || [])
       .filter((p: any) => p?._id)
-      .map((p: any) =>
-        UserEntity.from({
-          id: p._id.toString(),
-          firstname: p.firstname,
-          lastname: p.lastname,
-          email: p.email,
-          passwordHash: "",
-          role: p.role,
-          isActiveField: p.isActive,
-          createdAt: p.createdAt,
-          confirmedAt: p.confirmedAt,
-          updatedAt: p.updatedAt,
-        })
-      );
+      .map((p: any) => UserMapper.mapDocToUser(p));
 
     const thread = ThreadEntity.from({
       id: doc._id.toString(),

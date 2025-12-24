@@ -1,14 +1,23 @@
 import { CreditNotFoundError } from "@application/errors/credits";
+import { UserNotActiveError, UserNotFoundError, UserRoleMismatchError } from "@application/errors/users";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
+import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { findActiveUser } from "@application/utils/userValidators";
 import { CreditEntity } from "@domain/entities/CreditEntity"; 
+import { UserEntity } from "@domain/entities/UserEntity";
 import { CreditAlreadyPaidError } from "@domain/errors/credit";
 import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
 
-type Props = {} & Pick<CreditEntity, "id">;
-// TODO : il y a du avoir un problème lors de la création des fichiers le nom est pas bon (je pense de ma faute dsl)
-export class GrantCreditUsecase {
-  constructor(private readonly creditRepository: CreditRepository) {}
+type Props = {clientId: UserEntity["id"];} & Pick<CreditEntity, "id">;
+
+export class ApplyMonthlyCreditPaiementUsecase {
+  constructor(
+    private readonly creditRepository: CreditRepository,
+    private readonly userRepository: UserRepository
+  ) {}
+
   public async execute({
+    clientId,
     id,
   }: Props): Promise<
     | CreditEntity
@@ -18,8 +27,15 @@ export class GrantCreditUsecase {
     | MoneyCurrencyMismatchError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
+    | UserNotFoundError 
+    | UserNotActiveError
+    | UserRoleMismatchError
   > {
-    // TODO : faire une vérification de qui fait la requête et son rôle
+    const client = await findActiveUser(this.userRepository, clientId);
+    if (client instanceof Error) return client;
+    if (!client.hasRole({ role: "client" }))
+      return new UserRoleMismatchError(["client"], client.role);
+
     const credit = await this.creditRepository.findById(id);
     if (!credit) return new CreditNotFoundError();
 
@@ -27,6 +43,7 @@ export class GrantCreditUsecase {
 
     const updatedCredit = credit.payMonthly();
     if (updatedCredit instanceof Error) return updatedCredit;
+
     await this.creditRepository.update(credit);
     return credit;
   }

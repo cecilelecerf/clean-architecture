@@ -13,6 +13,7 @@ import {
 import z from 'zod';
 import { queryClient } from '@/lib/queryClient';
 import { userDtoSchema } from '@infrastructure/types/user';
+import { paginationSchema } from '@/components/PaginationComponent';
 
 // ============================================================================
 // SCHEMAS
@@ -42,16 +43,14 @@ export const publishActionSchema = z.object({
 });
 export type PublishAction = z.infer<typeof publishActionSchema>;
 
-export const querySchema = z.object({
-  page: z.number().optional(),
-  limit: z.number().optional(),
+export const querySchema = paginationSchema.extend({
   tagsId: tagIdSchema.array().optional(),
   status: z.boolean().optional(),
   fromDate: z.string().datetime().optional(),
   toDate: z.string().datetime().optional(),
   title: z.string().optional(),
 });
-export type FiltersProps = z.infer<typeof querySchema>;
+export type PostFilters = z.infer<typeof querySchema>;
 
 export const postsListResponseSchema = z.object({
   posts: postWithTagsAndUserSchema.array(),
@@ -68,7 +67,7 @@ export const feedsQueryKeys = {
   posts: {
     all: () => [...feedsQueryKeys.all, 'posts'] as const,
     lists: () => [...feedsQueryKeys.posts.all(), 'list'] as const,
-    list: (filters?: FiltersProps) => [...feedsQueryKeys.posts.lists(), filters ?? {}] as const,
+    list: (filters?: PostFilters) => [...feedsQueryKeys.posts.lists(), filters ?? {}] as const,
     details: () => [...feedsQueryKeys.posts.all(), 'detail'] as const,
     detail: (id: PostId) => [...feedsQueryKeys.posts.details(), id] as const,
     unread: () => [...feedsQueryKeys.posts.all(), 'unread'] as const,
@@ -86,7 +85,7 @@ export const feedsQueryKeys = {
 // HELPER FUNCTIONS
 // ============================================================================
 
-function buildPostsQueryParams(filters?: FiltersProps): URLSearchParams {
+function buildPostsQueryParams(filters?: PostFilters): URLSearchParams {
   const params = new URLSearchParams();
 
   if (!filters) return params;
@@ -134,7 +133,7 @@ const invalidateHelpers = {
 
 export const feedsEndpoint = createEndpointsNodes({
   posts: {
-    getAll: ({ filters }: { filters?: FiltersProps }) =>
+    getAll: ({ filters }: { filters?: PostFilters }) =>
       queryOptions({
         queryKey: feedsQueryKeys.posts.list(filters),
         queryFn: async () => {

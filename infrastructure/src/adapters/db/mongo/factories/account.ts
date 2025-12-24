@@ -7,10 +7,13 @@ import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailService";
 import { ApplyDailyInterestUseCase } from "@application/usecases/accounts/ApplyDailyInterestUseCase";
-import { CreateAccountUsecase } from "@application/usecases/accounts/CreateAccountUsecase";
-import { DeleteAccountUsecase } from "@application/usecases/accounts/DeleteAccountUsecase";
-import { RenameAccountUsecase } from "@application/usecases/accounts/RenameAccountUsecase";
-import { TransfertBetweenAccountUsecase } from "@application/usecases/accounts/TransfertBetweenAccountUsecase";
+import { CreateAccountUseCase } from "@application/usecases/accounts/CreateAccountUseCasee";
+import { DeleteAccountUseCase } from "@application/usecases/accounts/DeleteAccountUseCasee";
+import { GetAccountByIBANUseCase } from "@application/usecases/accounts/GetAccountByIBANUseCase";
+import { GetAccountsUseCase } from "@application/usecases/accounts/GetAccountsUseCase";
+import { RenameAccountUseCase } from "@application/usecases/accounts/RenameAccountUseCasee";
+import { TransfertBetweenAccountUseCase } from "@application/usecases/accounts/TransfertBetweenAccountUseCasee";
+import { GetAllAccountsByTypeUserCase } from "@application/usecases/accounts/GetAllAccountsByTypeUseCase";
 
 export const accountFactory = () => {
   const client = new MongoClient();
@@ -29,24 +32,33 @@ export const accountFactory = () => {
     clockService,
     uuidService
   );
-  const createAccount = new CreateAccountUsecase(
+  const createAccount = new CreateAccountUseCase(
     accountRepository,
     emailService,
     userRepository,
     clockService
   );
-  const deleteAccount = new DeleteAccountUsecase(
+  const deleteAccount = new DeleteAccountUseCase(
     accountRepository,
     emailService,
     userRepository
   );
-  const renameAccount = new RenameAccountUsecase(
+  const getAccountByIBAN = new GetAccountByIBANUseCase(
+    accountRepository,
+    userRepository
+  );
+  const getAccounts = new GetAccountsUseCase(accountRepository, userRepository);
+  const getAccountsByType = new GetAllAccountsByTypeUserCase(
+    accountRepository,
+    userRepository
+  );
+  const renameAccount = new RenameAccountUseCase(
     accountRepository,
     emailService,
     clockService,
     userRepository
   );
-  const transfertBetweenAccount = new TransfertBetweenAccountUsecase(
+  const transfertBetweenAccount = new TransfertBetweenAccountUseCase(
     accountRepository,
     transactionRepository,
     clockService,
@@ -58,11 +70,13 @@ export const accountFactory = () => {
     admin: {
       applyDailyInterest,
     },
-    client: {
-      createAccount,
-      deleteAccount,
-      renameAccount,
-      transfertBetweenAccount,
-    },
+
+    createAccount,
+    deleteAccount,
+    getAccountByIBAN,
+    getAccounts,
+    getAccountsByType,
+    renameAccount,
+    transfertBetweenAccount,
   };
 };

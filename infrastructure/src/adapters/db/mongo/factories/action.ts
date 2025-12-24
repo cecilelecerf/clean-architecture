@@ -2,8 +2,9 @@ import { SystemClockService } from "@infrastructure/adapters/services/SystemCloc
 import { MongoClient } from "../../MongoClient";
 import { ActionRepositoryMongo } from "../repositories/ActionRepositoryMongo";
 import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
-import { CreateActionUsecase } from "@application/usecases/actions/CreateActionUsecase";
-import { ManageActionAvailabilityUsecase } from "@application/usecases/actions/ManageActionAvailabilityUsecase";
+import { CreateActionUsecase } from "@application/usecases/actions/CreateActionUseCasee";
+import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
+import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/actions/GetAllActionsByAvailabilityUseCase";
 
 export const actionFactory = () => {
   const client = new MongoClient();
@@ -17,14 +18,23 @@ export const actionFactory = () => {
     clockService
   );
 
-  const manageActionAvailability = new ManageActionAvailabilityUsecase(
-    actionRepository
+  const updateAction = new UpdateActionUsecase(
+    actionRepository,
+    userRepository
+  );
+
+  const getAllActionsByAvailability = new GetAllActionsByAvailabilityUsecase(
+    actionRepository,
+    userRepository
   );
 
   return {
     admin: {
-      manageActionAvailability,
       createAction,
+      updateAction,
+    },
+    client: {
+      getAllActionsByAvailability,
     },
   };
 };

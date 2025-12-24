@@ -1,5 +1,10 @@
 import z from "zod";
-import { accountIdSchema } from "./account";
+import {
+  accountDTOSchema,
+  accountIdSchema,
+  accountResumeWithUserSchema,
+} from "./account";
+import { userDtoSchema } from "./user";
 
 const transactionIdSchema = z.uuid().brand("transaction");
 export type TransactionId = z.infer<typeof transactionIdSchema>;
@@ -7,12 +12,46 @@ export type TransactionId = z.infer<typeof transactionIdSchema>;
 export const transactionSchema = z.object({
   id: transactionIdSchema,
   label: z.string(),
-  fromAccountId: accountIdSchema,
-  toAccountId: accountIdSchema,
+  fromAccountIban: accountIdSchema,
+  toAccountIban: accountIdSchema,
   amount: z.any(),
-  date: z.date(),
+  currency: z.string().min(1),
+  date: z.iso.datetime(),
   type: z.enum(["credit", "debit"]),
   icon: z.string(),
 });
 
 export type Transaction = z.infer<typeof transactionSchema>;
+
+export const transactionDTOSchema = transactionSchema
+  .pick({
+    id: true,
+    label: true,
+    amount: true,
+    currency: true,
+    date: true,
+    icon: true,
+    type: true,
+  })
+  .extend({
+    fromAccount: accountDTOSchema,
+    toAccount: accountDTOSchema,
+  });
+export type TransactionDTO = z.infer<typeof transactionDTOSchema>;
+
+export const transactionDTOWithAccountResumeSchema =
+  transactionDTOSchema.extend({
+    fromAccount: accountResumeWithUserSchema,
+    toAccount: accountResumeWithUserSchema,
+  });
+export type TransactionWithAccountDTO = z.infer<
+  typeof transactionDTOWithAccountResumeSchema
+>;
+export const newTransactionSchema = transactionSchema.pick({
+  label: true,
+  amount: true,
+  icon: true,
+  toAccountIban: true,
+  currency: true,
+});
+export type NewTransaction = z.infer<typeof newTransactionSchema>;

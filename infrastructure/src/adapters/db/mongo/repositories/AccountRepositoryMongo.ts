@@ -1,44 +1,29 @@
-import { AccountRepository } from "@application/ports/repositories/AccountRepository";
+import {
+  AccountEntityWithUser,
+  AccountRepository,
+} from "@application/ports/repositories/AccountRepository";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { IBAN } from "@domain/values/IBAN";
 import { MongoClient } from "../../MongoClient";
 import { AccountModel } from "../models/AccountModel";
-import { Money } from "@domain/values/Money";
-import { Color } from "@domain/values/Color";
-import { AccountOwner } from "@domain/values/AccountOwner";
+import { AccountMapper } from "../../mappers/AccountMapper";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class AccountRepositoryMongo implements AccountRepository {
   constructor(private readonly client: MongoClient) {}
 
-  // 🔧 Méthode helper pour mapper un document MongoDB vers AccountEntity
-  private mapDocToAccount(doc: any): AccountEntity {
-    const iban = IBAN.from(doc.iban);
-    const owner = AccountOwner.from(doc.owner);
-    const balance = Money.from(doc.balance);
-    const color = Color.from(doc.color);
-
-    return AccountEntity.from({
-      iban,
-      owner,
-      name: doc.name,
-      type: doc.type,
-      color,
-      balance,
-      createdAt: doc.createdAt,
-      updatedAt: doc.updatedAt,
-    });
-  }
-
   /** 🔍 Trouver tous les comptes d'un user */
-  async findByUserId(userId: UserEntity["id"]): Promise<AccountEntity[]> {
+  async findByUserId(
+    userId: UserEntity["id"] | null
+  ): Promise<AccountEntity[]> {
     await this.client.connect();
 
     const docs = await AccountModel.find({ userId })
       .sort({ createdAt: -1 })
       .lean();
 
-    return docs.map((doc) => this.mapDocToAccount(doc));
+    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
   }
 
   /** 🔍 Trouver un compte par IBAN */
@@ -48,7 +33,7 @@ export class AccountRepositoryMongo implements AccountRepository {
     const doc = await AccountModel.findOne({ iban: iban.value }).lean();
     if (!doc) return null;
 
-    return this.mapDocToAccount(doc);
+    return AccountMapper.mapDocToAccount(doc);
   }
 
   /** 🔍 Tous les comptes épargne */
@@ -59,7 +44,7 @@ export class AccountRepositoryMongo implements AccountRepository {
       .sort({ createdAt: -1 })
       .lean();
 
-    return docs.map((doc) => this.mapDocToAccount(doc));
+    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
   }
 
   /** 🔍 Compte d'intérêts de la banque */
@@ -73,7 +58,56 @@ export class AccountRepositoryMongo implements AccountRepository {
 
     if (!doc) return null;
 
-    return this.mapDocToAccount(doc);
+    return AccountMapper.mapDocToAccount(doc);
+  }
+
+  /** 🔍 Trouver une liste de compte par type */
+  async findByType(type: string): Promise<AccountEntity[]> {
+    await this.client.connect();
+
+    const docs = await AccountModel.find({ type })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
+  }
+
+  /** Trouver une liste de compte par type */
+  async findByTypeSection(type: "client" | "bank"): Promise<AccountEntity[]> {
+    await this.client.connect();
+
+    const condition =
+      type === "client" ? { userId: { $ne: null } } : { userId: null };
+
+    const docs = await AccountModel.find(condition)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
+  }
+
+  /** 🔍 Trouver une liste de compte par type avec les users */
+  async findByTypeSectionWithUser(
+    type: "client" | "bank"
+  ): Promise<AccountEntityWithUser[]> {
+    await this.client.connect();
+
+    const condition =
+      type === "client" ? { userId: { $ne: null } } : { userId: null };
+
+    const docs = await AccountModel.find(condition)
+      .populate("userId") // Populate la référence userId
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return docs.map((doc) => {
+      const account = AccountMapper.mapDocToAccount(doc);
+      const user =
+        doc.userId && typeof doc.userId === "object"
+          ? UserMapper.mapDocToUser(doc.userId)
+          : null;
+      return Object.assign(account, { user });
+    });
   }
 
   /** 📬 Sauvegarder un compte */
@@ -81,10 +115,7 @@ export class AccountRepositoryMongo implements AccountRepository {
     await this.client.connect();
     await AccountModel.create({
       iban: account.iban.value,
-      owner: {
-        role: account.owner.role,
-        userId: account.owner.userId ?? null,
-      },
+      userId: account.userId,
       name: account.name,
       type: account.type,
       color: account.color.getValue(),
@@ -92,6 +123,7 @@ export class AccountRepositoryMongo implements AccountRepository {
         amount: account.balance.amount,
         currency: account.balance.currency,
       },
+      currency: account.currency,
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,
     });
@@ -105,10 +137,7 @@ export class AccountRepositoryMongo implements AccountRepository {
       { iban: account.iban.value },
       {
         $set: {
-          owner: {
-            role: account.owner.role,
-            userId: account.owner.userId ?? null,
-          },
+          userId: account.userId,
           name: account.name,
           type: account.type,
           color: account.color.getValue(),
@@ -116,6 +145,7 @@ export class AccountRepositoryMongo implements AccountRepository {
             amount: account.balance.amount,
             currency: account.balance.currency,
           },
+          currency: account.currency,
           updatedAt: account.updatedAt,
         },
       }

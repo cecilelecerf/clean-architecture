@@ -5,7 +5,6 @@ import { JwtTokenService } from "@infrastructure/adapters/services/JwtTokenServi
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { LogoutUsecase } from "@application/usecases/users/LogoutUsecase";
 import { LoginUsecase } from "@application/usecases/users/LoginUsecase";
 import { GetMeUsecase } from "@application/usecases/users/GetMeUsecase";
 import { ForgotPasswordUsecase } from "@application/usecases/users/ForgotPasswordUsecase";
@@ -32,7 +31,6 @@ export const usersFactory = () => {
     emailService,
     tokenService
   );
-  const logout = new LogoutUsecase(tokenService);
   const login = new LoginUsecase(
     userRepository,
     encryptionService,
@@ -55,7 +53,6 @@ export const usersFactory = () => {
 
   return {
     register,
-    logout,
     login,
     getUser,
     getMe,
