@@ -1,9 +1,10 @@
 import { Color } from "@domain/values/Color";
 
-export type TagDTO = { color: string } & Pick<
-  TagEntity,
-  "id" | "label" | "updatedAt" | "createdAt"
->;
+export type TagDTO = {
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+} & Pick<TagEntity, "id" | "label">;
 
 export type TagClientDTO = Pick<TagDTO, "id" | "color" | "label">;
 export class TagEntity {
@@ -48,8 +49,8 @@ export class TagEntity {
       id: this.id,
       label: this.label,
       color: this.color.getValue(),
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
     };
   }
 }

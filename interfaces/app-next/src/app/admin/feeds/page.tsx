@@ -20,7 +20,7 @@ export default function PostsPage() {
     return (
         <>
             <PostFilters filters={filters} onChange={(f) => setFilters(f)} isAdmin />
-            <Posts filters={filters} onPaginationChange={(pageNumber) => setFilters((prev) => ({ ...prev, page: pageNumber }))} isAdmin />
+            <Posts filters={filters} onPaginationChange={(pageNumber) => setFilters((prev) => ({ ...prev, page: pageNumber }))} isAdmin basePath="/admin" />
             <Button
                 className="fixed bottom-3 right-3 group flex items-center justify-center overflow-hidden w-12 h-12  transition-all duration-300 hover:w-auto gap-0"
                 onClick={() => router.push("/admin/feeds/new")}

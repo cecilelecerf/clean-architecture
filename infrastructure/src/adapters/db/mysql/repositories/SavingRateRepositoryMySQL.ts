@@ -8,9 +8,7 @@ export class SavingsRateRepositoryMySQL implements SavingRateRepository {
   constructor(private readonly client: MySQLClient) {}
 
   private mapRowToSavingsRate(row: RowDataPacket): SavingsRateEntity {
-    console.log(row);
     const rate = Percentage.from({ value: row.rate });
-    console.log(rate);
     return SavingsRateEntity.from({
       id: row.id,
       rate,

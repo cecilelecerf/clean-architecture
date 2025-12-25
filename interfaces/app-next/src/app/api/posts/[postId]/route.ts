@@ -56,12 +56,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/posts/[pos
         { status: result.statusCode ?? 400 },
       );
     }
-    return NextResponse.json(
-      postSchema
-        .omit({ updatedAt: true, publishedAt: true, createdAt: true })
-        .extend({ updatedAt: z.date(), publishedAt: z.date().optional(), createdAt: z.date() })
-        .parse(result),
-    );
+    return NextResponse.json(postSchema.parse(result));
   } catch (err) {
     console.error(err);
     return NextResponse.json(

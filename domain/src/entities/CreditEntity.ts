@@ -274,31 +274,34 @@ export class CreditEntity {
   public toDTO(): CreditDTO {
     return {
       id: this.id,
-      createdAt: this.createdAt,
+      createdAt: this.createdAt.toISOString(),
       durationMonths: this.durationMonths,
       status: this.status,
-      startDate: this.startDate,
+      startDate: this.startDate.toISOString(),
       monthlyPayment: this.monthlyPayment,
       remainingBalance: this.remainingBalance,
       initialAmount: this.initialAmount,
       userId: this.userId,
       interestRate: this.interestRate.value,
       insuranceRate: this.insuranceRate.value,
-      updatedAt: this.updatedAt,
+      updatedAt: this.updatedAt.toISOString(),
     };
   }
 }
 
-export type CreditDTO = { interestRate: number; insuranceRate: number } & Pick<
+export type CreditDTO = {
+  interestRate: number;
+  insuranceRate: number;
+  updatedAt: string;
+  createdAt: string;
+  startDate: string;
+} & Pick<
   CreditEntity,
   | "id"
-  | "createdAt"
   | "durationMonths"
   | "status"
-  | "startDate"
   | "monthlyPayment"
   | "remainingBalance"
   | "initialAmount"
   | "userId"
-  | "updatedAt"
 >;

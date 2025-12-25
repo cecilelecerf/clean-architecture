@@ -8,7 +8,7 @@ import { EmailService } from "@application/ports/services/EmailService";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
 import { UuidService } from "@application/ports/services/UuidService";
-import { UserEntity, UserToFront } from "@domain/entities/UserEntity";
+import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import { Email } from "@domain/values/Email";
 
@@ -35,7 +35,7 @@ export class RegisterUsecase {
     plainedPassword,
     confirmationUrl,
   }: Props): Promise<
-    | UserToFront
+    | UserToDTO
     | EmailInvalidFormatError
     | EmailAlreadyExistsError
     | UserNotFoundError
@@ -73,6 +73,6 @@ export class RegisterUsecase {
       firstname: user.firstname,
       confirmationLink,
     });
-    return user.toFront();
+    return user.toDTO();
   }
 }

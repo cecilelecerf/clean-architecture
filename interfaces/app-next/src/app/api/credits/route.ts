@@ -63,15 +63,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(
-      creditSchema
-        .omit({ createdAt: true, updatedAt: true })
-        .extend({
-          createdAt: z.date(),
-          updatedAt: z.date().optional(),
-        })
-        .parse(result),
-    );
+    return NextResponse.json(creditSchema.parse(result));
   } catch (err) {
     console.error(err);
     return NextResponse.json(

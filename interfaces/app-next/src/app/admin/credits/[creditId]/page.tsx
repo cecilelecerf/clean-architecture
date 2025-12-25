@@ -91,7 +91,6 @@ export default function AdminCreditDetailPage({
     const { creditId } = use(params);
     const router = useRouter();
     const query = useQuery(endpoints.credits.get({ creditId }));
-    console.log(query)
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogAction, setDialogAction] = useState<"accept" | "refuse">("accept");
     const [refusalReason, setRefusalReason] = useState("");

@@ -35,7 +35,6 @@ export class GetCreditUsecase {
     if (user instanceof Error) return user;
     const credit = await this.creditRepository.findById(creditId);
     if (!credit) return new CreditNotFoundError();
-    console.log(user);
     if (user.hasRole({ role: "client" }) && credit.userId !== user.id)
       return new UserRoleMismatchError(["client"], user.role);
     return credit.toDTO();

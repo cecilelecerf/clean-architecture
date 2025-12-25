@@ -68,6 +68,6 @@ export class SendMessage {
     if (validateContent instanceof Error) return validateContent;
     await this.messageRepository.save(message);
 
-    return Object.assign(message, { sender: user.toFront() });
+    return Object.assign(message, { sender: user.toDTO() });
   }
 }

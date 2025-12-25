@@ -70,16 +70,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(
-      postSchema
-        .omit({ createdAt: true, updatedAt: true, publishedAt: true })
-        .extend({
-          createdAt: z.date(),
-          updatedAt: z.date().optional(),
-          publishedAt: z.date().optional(),
-        })
-        .parse(result),
-    );
+    return NextResponse.json(postSchema.parse(result));
   } catch (err) {
     console.error(err);
     return NextResponse.json(

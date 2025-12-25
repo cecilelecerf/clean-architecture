@@ -1,5 +1,15 @@
-import { InvalidThreadAccessError,ThreadNotFoundError } from "@application/errors/threads";
- import { UserNotActiveError ,UserNotFoundError} from "@application/errors/users";
+import {
+  MessageDTOMapper,
+  MessageEntityWithUsersDTO,
+} from "@application/dto/MessageDTOMapper";
+import {
+  InvalidThreadAccessError,
+  ThreadNotFoundError,
+} from "@application/errors/threads";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import {
   MessageRepository,
   MessageWithUser,
@@ -7,7 +17,7 @@ import {
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
- import { ThreadEntity } from "@domain/entities/ThreadEntity";
+import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { ThreadClosedError } from "@domain/errors/thread";
 
@@ -23,7 +33,7 @@ export class GetThreadMessages {
     userId,
     id,
   }: Props): Promise<
-    | MessageWithUser[]
+    | MessageEntityWithUsersDTO[]
     | UserNotFoundError
     | ThreadNotFoundError
     | InvalidThreadAccessError
@@ -40,6 +50,6 @@ export class GetThreadMessages {
     const messages = await this.messageRepository.findAllWithUserByThread(
       thread.id
     );
-    return messages;
+    return MessageDTOMapper.maps(messages);
   }
 }

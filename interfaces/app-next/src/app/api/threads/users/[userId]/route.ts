@@ -15,9 +15,9 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/threads/user
     const type = searchParams.get('type') as 'external' | 'internal' | null;
 
     const result = await threadsFactory().getThreadsByUserAndTypeUsecase.execute({
-    userId,
-    type: type ??undefined,
-    advisorId: session.user.id,
+      userId,
+      type: type ?? undefined,
+      advisorId: session.user.id,
     });
     if (result instanceof Error) {
       return NextResponse.json(

@@ -10,9 +10,9 @@ import { socket } from "@/lib/socket"
 import { queryClient } from "@/lib/queryClient"
 import { SkeletonPost } from "@/app/(client)/feeds/[postId]/PostQuery"
 
-type Props = { filters: PostFilters, onPaginationChange: (pageNumber: number) => void, isAdmin?: boolean }
+type Props = { filters: PostFilters, onPaginationChange: (pageNumber: number) => void, isAdmin?: boolean, basePath: string }
 
-export const Posts = ({ filters, onPaginationChange, isAdmin }: Props) => {
+export const Posts = ({ filters, onPaginationChange, isAdmin, basePath }: Props) => {
     const query = useQuery(endpoints.feeds.posts.getAll({ filters }))
     useEffect(() => {
         if (!socket) return;
@@ -33,18 +33,18 @@ export const Posts = ({ filters, onPaginationChange, isAdmin }: Props) => {
                     <div className="text-gray-500">Aucun post trouvé</div>
                 ) : (
                     data.posts.map((post) => (
-                        <DisplayPost dataPost={post} key={post.id} isAdmin={isAdmin} />
+                        <DisplayPost dataPost={post} key={post.id} isAdmin={isAdmin} basePath={basePath} />
                     ))
                 )}
-                <PaginationComponent onPaginationChange={onPaginationChange} totalPage={data.total} filters={{ ...filters }} />
             </div>
+            {data.posts.length !== 0 && <PaginationComponent onPaginationChange={onPaginationChange} totalPage={data.total} filters={{ ...filters }} />}
         </>
         )
 
         .exhaustive()
 }
 
-const DisplayPost = ({ dataPost, isAdmin }: { dataPost: PostWithTagsAndUser, isAdmin?: boolean }) => {
+const DisplayPost = ({ dataPost, isAdmin, basePath }: { dataPost: PostWithTagsAndUser, isAdmin?: boolean, basePath: string }) => {
     const [post, setPost] = useState<PostWithTagsAndUser>(dataPost)
 
     useEffect(() => {
@@ -62,5 +62,5 @@ const DisplayPost = ({ dataPost, isAdmin }: { dataPost: PostWithTagsAndUser, isA
         setPost(dataPost)
     }, [dataPost])
 
-    return <PostCard post={post} key={post.id} isAdmin={isAdmin} />
+    return <PostCard post={post} key={post.id} isAdmin={isAdmin} basePath={basePath} />
 }

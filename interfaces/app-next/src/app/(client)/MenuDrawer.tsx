@@ -35,7 +35,7 @@ export const MenuDrawer = () => (
             </Button>
         </DrawerTrigger>
         <DrawerContent className="h-full w-[300px] sm:w-[350px]">
-            <DrawerHeader className="flex justify-between items-start">
+            <DrawerHeader className="flex justify-between items-start flex-row">
                 <div className="space-y-1">
                     <DrawerTitle className="text-xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                         A.V.E.N.I.R

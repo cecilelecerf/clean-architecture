@@ -26,14 +26,16 @@ export class SavingsRateEntity {
     return {
       id: this.id,
       rate: this.rate.value,
-      effectiveDate: this.effectiveDate,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      effectiveDate: this.effectiveDate.toISOString(),
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
     };
   }
 }
 
-export type SavingsRateDTO = { rate: number } & Pick<
-  SavingsRateEntity,
-  "id" | "effectiveDate" | "createdAt" | "updatedAt"
->;
+export type SavingsRateDTO = {
+  rate: number;
+  effectiveDate: string;
+  createdAt: string;
+  updatedAt: string;
+} & Pick<SavingsRateEntity, "id">;

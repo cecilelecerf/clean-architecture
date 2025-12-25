@@ -16,7 +16,7 @@ export default function PostsPage() {
     return (
         <>
             <PostFilters filters={filters} onChange={(f) => setFilters(f)} />
-            <Posts filters={filters} onPaginationChange={(pageNumber) => setFilters((prev) => ({ ...prev, page: pageNumber }))} />
+            <Posts filters={filters} onPaginationChange={(pageNumber) => setFilters((prev) => ({ ...prev, page: pageNumber }))} basePath="" />
         </>
     )
 

@@ -91,7 +91,7 @@ export class TransactionEntity {
       label: this.label,
       icon: this.icon,
       type: this.type,
-      date: this.date,
+      date: this.date.toISOString(),
       amount: this.amount.amount,
       currency: this.amount.currency,
       fromAccountIban: this.fromAccountId.value,
@@ -105,4 +105,5 @@ export type TransactionDTO = {
   currency: string;
   fromAccountIban: string;
   toAccountIban: string;
-} & Pick<TransactionEntity, "id" | "date" | "icon" | "label" | "type">;
+  date: string;
+} & Pick<TransactionEntity, "id" | "icon" | "label" | "type">;
