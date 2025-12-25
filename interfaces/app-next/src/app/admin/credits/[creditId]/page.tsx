@@ -39,6 +39,7 @@ import {
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { use, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserId } from "@infrastructure/types/user";
 
 const statusConfig = {
     PENDING: {
@@ -107,9 +108,10 @@ export default function AdminCreditDetailPage({
         setDialogOpen(true);
     };
 
-    const confirmAction = () => {
+    const confirmAction = (userId: UserId) => {
         grantMutation.mutate({
-            accept: dialogAction === "accept",
+            payload: { accept: dialogAction === "accept" },
+            userId
         }, {
             onSuccess: () => {
                 setDialogOpen(false);
@@ -147,74 +149,76 @@ export default function AdminCreditDetailPage({
                     const isPending = credit.status === "PENDING";
 
                     return (
-                        <div className="space-y-6">
-                            {/* Card principale - Statut */}
-                            <Card className={`${config.bgColor} border-2 ${config.borderColor}`}>
-                                <CardContent className="p-6">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <StatusIcon className={`w-6 h-6 ${config.color}`} />
-                                                <h2 className="text-2xl font-bold">
-                                                    {credit.initialAmount.amount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.initialAmount.currency,
-                                                    })}
-                                                </h2>
+                        <>
+
+                            <div className="space-y-6">
+                                {/* Card principale - Statut */}
+                                <Card className={`${config.bgColor} border-2 ${config.borderColor}`}>
+                                    <CardContent className="p-6">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <StatusIcon className={`w-6 h-6 ${config.color}`} />
+                                                    <h2 className="text-2xl font-bold">
+                                                        {credit.initialAmount.amount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.initialAmount.currency,
+                                                        })}
+                                                    </h2>
+                                                </div>
+                                                <p className="text-sm text-gray-600 mb-1">
+                                                    Demande créée le {formatDateFrench(credit.createdAt)}
+                                                </p>
                                             </div>
-                                            <p className="text-sm text-gray-600 mb-1">
-                                                Demande créée le {formatDateFrench(credit.createdAt)}
-                                            </p>
+                                            <Badge variant={config.variant} className="text-base px-4 py-2">
+                                                {config.label}
+                                            </Badge>
                                         </div>
-                                        <Badge variant={config.variant} className="text-base px-4 py-2">
-                                            {config.label}
-                                        </Badge>
-                                    </div>
 
-                                    {/* Actions pour les crédits en attente */}
-                                    {isPending && (
-                                        <div className="flex gap-3 mt-4 pt-4 border-t border-yellow-300">
-                                            <Button
-                                                className="flex-1"
-                                                onClick={handleAccept}
-                                                disabled={grantMutation.isPending}
-                                            >
-                                                <Check className="w-4 h-4 mr-2" />
-                                                Accepter la demande
-                                            </Button>
-                                            <Button
-                                                variant="destructive"
-                                                className="flex-1"
-                                                onClick={handleRefuse}
-                                                disabled={grantMutation.isPending}
-                                            >
-                                                <X className="w-4 h-4 mr-2" />
-                                                Refuser la demande
-                                            </Button>
-                                        </div>
-                                    )}
+                                        {/* Actions pour les crédits en attente */}
+                                        {isPending && (
+                                            <div className="flex gap-3 mt-4 pt-4 border-t border-yellow-300">
+                                                <Button
+                                                    className="flex-1"
+                                                    onClick={handleAccept}
+                                                    disabled={grantMutation.isPending}
+                                                >
+                                                    <Check className="w-4 h-4 mr-2" />
+                                                    Accepter la demande
+                                                </Button>
+                                                <Button
+                                                    variant="destructive"
+                                                    className="flex-1"
+                                                    onClick={handleRefuse}
+                                                    disabled={grantMutation.isPending}
+                                                >
+                                                    <X className="w-4 h-4 mr-2" />
+                                                    Refuser la demande
+                                                </Button>
+                                            </div>
+                                        )}
 
-                                    {/* Messages selon le statut */}
-                                    {credit.status === "PENDING" && (
-                                        <div className="mt-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg">
-                                            <p className="text-sm text-yellow-800">
-                                                ⏳ Cette demande est en attente de validation. Examinez les informations ci-dessous avant de prendre une décision.
-                                            </p>
-                                        </div>
-                                    )}
+                                        {/* Messages selon le statut */}
+                                        {credit.status === "PENDING" && (
+                                            <div className="mt-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg">
+                                                <p className="text-sm text-yellow-800">
+                                                    ⏳ Cette demande est en attente de validation. Examinez les informations ci-dessous avant de prendre une décision.
+                                                </p>
+                                            </div>
+                                        )}
 
-                                    {isFuture && credit.status === "ACCEPTED" && (
-                                        <div className="mt-4 p-4 bg-blue-100 border border-blue-300 rounded-lg">
-                                            <p className="text-sm text-blue-800 font-medium mb-1">
-                                                📅 Ce crédit débutera le {formatDateFrench(credit.startDate)}
-                                            </p>
-                                            <p className="text-xs text-blue-700">
-                                                Les prélèvements automatiques commenceront à cette date.
-                                            </p>
-                                        </div>
-                                    )}
+                                        {isFuture && credit.status === "ACCEPTED" && (
+                                            <div className="mt-4 p-4 bg-blue-100 border border-blue-300 rounded-lg">
+                                                <p className="text-sm text-blue-800 font-medium mb-1">
+                                                    📅 Ce crédit débutera le {formatDateFrench(credit.startDate)}
+                                                </p>
+                                                <p className="text-xs text-blue-700">
+                                                    Les prélèvements automatiques commenceront à cette date.
+                                                </p>
+                                            </div>
+                                        )}
 
-                                    {/* {credit.status === "REFUSED" && credit.refusalReason && (
+                                        {/* {credit.status === "REFUSED" && credit.refusalReason && (
                                         <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg">
                                             <p className="text-sm text-red-800 font-medium mb-1">
                                                 ❌ Refus
@@ -223,157 +227,78 @@ export default function AdminCreditDetailPage({
                                         </div>
                                     )} */}
 
-                                    {credit.status === "COMPLETED" && (
-                                        <div className="mt-4 p-4 bg-green-100 border border-green-300 rounded-lg">
-                                            <p className="text-sm text-green-800">
-                                                ✅ Ce crédit est entièrement remboursé.
-                                            </p>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-
-                            {/* Informations du client */}
-                            <Button
-                                variant="secondary"
-                                className="w-full"
-                                onClick={() => router.push(`/admin/users/${credit.userId}`)}
-                            >
-                                <User className="w-5 h-5" /> Voir le profil client
-                            </Button>
-
-                            {/* Progression du remboursement */}
-                            {(credit.status === "ACCEPTED" && !isFuture) || credit.status === "COMPLETED" ? (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <TrendingUp className="w-5 h-5" />
-                                            Progression du remboursement
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        <div>
-                                            <div className="flex justify-between mb-2">
-                                                <span className="text-sm text-gray-600">
-                                                    {progressPercentage}% remboursé
-                                                </span>
-                                                <span className="text-sm font-medium">
-                                                    {paidAmount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.initialAmount.currency,
-                                                    })}{" "}
-                                                    / {totalAmount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.initialAmount.currency,
-                                                    })}
-                                                </span>
-                                            </div>
-                                            <Progress value={progressPercentage} className="h-3" />
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                                            <div className="p-4 bg-green-50 rounded-lg">
-                                                <p className="text-xs text-gray-600 mb-1">Montant payé</p>
-                                                <p className="text-xl font-bold text-green-600">
-                                                    {paidAmount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.initialAmount.currency,
-                                                    })}
+                                        {credit.status === "COMPLETED" && (
+                                            <div className="mt-4 p-4 bg-green-100 border border-green-300 rounded-lg">
+                                                <p className="text-sm text-green-800">
+                                                    ✅ Ce crédit est entièrement remboursé.
                                                 </p>
                                             </div>
-
-                                            <div className="p-4 bg-orange-50 rounded-lg">
-                                                <p className="text-xs text-gray-600 mb-1">Reste à payer</p>
-                                                <p className="text-xl font-bold text-orange-600">
-                                                    {remainingAmount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.remainingBalance.currency,
-                                                    })}
-                                                </p>
-                                            </div>
-
-                                            <div className="p-4 bg-blue-50 rounded-lg">
-                                                <p className="text-xs text-gray-600 mb-1">Mensualité</p>
-                                                <p className="text-xl font-bold text-blue-600">
-                                                    {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.monthlyPayment.currency,
-                                                    })}
-                                                </p>
-                                            </div>
-                                        </div>
+                                        )}
                                     </CardContent>
                                 </Card>
-                            ) : null}
 
-                            {/* Détails du crédit */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Building2 className="w-5 h-5" />
-                                        Caractéristiques du crédit
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-4">
-                                            <div className="flex items-start gap-3">
-                                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Montant emprunté</p>
-                                                    <p className="text-lg font-semibold">
-                                                        {credit.initialAmount.amount.toLocaleString("fr-FR", {
+                                {/* Informations du client */}
+                                <Button
+                                    variant="secondary"
+                                    className="w-full"
+                                    onClick={() => router.push(`/admin/users/${credit.userId}`)}
+                                >
+                                    <User className="w-5 h-5" /> Voir le profil client
+                                </Button>
+
+                                {/* Progression du remboursement */}
+                                {(credit.status === "ACCEPTED" && !isFuture) || credit.status === "COMPLETED" ? (
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center gap-2">
+                                                <TrendingUp className="w-5 h-5" />
+                                                Progression du remboursement
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div>
+                                                <div className="flex justify-between mb-2">
+                                                    <span className="text-sm text-gray-600">
+                                                        {progressPercentage}% remboursé
+                                                    </span>
+                                                    <span className="text-sm font-medium">
+                                                        {paidAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.initialAmount.currency,
+                                                        })}{" "}
+                                                        / {totalAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.initialAmount.currency,
+                                                        })}
+                                                    </span>
+                                                </div>
+                                                <Progress value={progressPercentage} className="h-3" />
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                                                <div className="p-4 bg-green-50 rounded-lg">
+                                                    <p className="text-xs text-gray-600 mb-1">Montant payé</p>
+                                                    <p className="text-xl font-bold text-green-600">
+                                                        {paidAmount.toLocaleString("fr-FR", {
                                                             style: "currency",
                                                             currency: credit.initialAmount.currency,
                                                         })}
                                                     </p>
                                                 </div>
-                                            </div>
 
-                                            <div className="flex items-start gap-3">
-                                                <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Durée du crédit</p>
-                                                    <p className="text-lg font-semibold">
-                                                        {credit.durationMonths} mois
-                                                        ({Math.round(credit.durationMonths / 12)} ans)
+                                                <div className="p-4 bg-orange-50 rounded-lg">
+                                                    <p className="text-xs text-gray-600 mb-1">Reste à payer</p>
+                                                    <p className="text-xl font-bold text-orange-600">
+                                                        {remainingAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.remainingBalance.currency,
+                                                        })}
                                                     </p>
                                                 </div>
-                                            </div>
 
-                                            <div className="flex items-start gap-3">
-                                                <Percent className="w-5 h-5 text-gray-400 mt-0.5" />
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Taux d'intérêt</p>
-                                                    <p className="text-lg font-semibold">{credit.interestRate}%</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-4">
-                                            <div className="flex items-start gap-3">
-                                                <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Taux d'assurance</p>
-                                                    <p className="text-lg font-semibold">{credit.insuranceRate}%</p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-start gap-3">
-                                                <CalendarClock className="w-5 h-5 text-gray-400 mt-0.5" />
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Date de début</p>
-                                                    <p className="text-lg font-semibold">
-                                                        {formatDateFrench(credit.startDate)}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-start gap-3">
-                                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Mensualité</p>
-                                                    <p className="text-lg font-semibold">
+                                                <div className="p-4 bg-blue-50 rounded-lg">
+                                                    <p className="text-xs text-gray-600 mb-1">Mensualité</p>
+                                                    <p className="text-xl font-bold text-blue-600">
                                                         {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
                                                             style: "currency",
                                                             currency: credit.monthlyPayment.currency,
@@ -381,67 +306,148 @@ export default function AdminCreditDetailPage({
                                                     </p>
                                                 </div>
                                             </div>
+                                        </CardContent>
+                                    </Card>
+                                ) : null}
+
+                                {/* Détails du crédit */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Building2 className="w-5 h-5" />
+                                            Caractéristiques du crédit
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-4">
+                                                <div className="flex items-start gap-3">
+                                                    <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">Montant emprunté</p>
+                                                        <p className="text-lg font-semibold">
+                                                            {credit.initialAmount.amount.toLocaleString("fr-FR", {
+                                                                style: "currency",
+                                                                currency: credit.initialAmount.currency,
+                                                            })}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-start gap-3">
+                                                    <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">Durée du crédit</p>
+                                                        <p className="text-lg font-semibold">
+                                                            {credit.durationMonths} mois
+                                                            ({Math.round(credit.durationMonths / 12)} ans)
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-start gap-3">
+                                                    <Percent className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">Taux d'intérêt</p>
+                                                        <p className="text-lg font-semibold">{credit.interestRate}%</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <div className="flex items-start gap-3">
+                                                    <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">Taux d'assurance</p>
+                                                        <p className="text-lg font-semibold">{credit.insuranceRate}%</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-start gap-3">
+                                                    <CalendarClock className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">Date de début</p>
+                                                        <p className="text-lg font-semibold">
+                                                            {formatDateFrench(credit.startDate)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-start gap-3">
+                                                    <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">Mensualité</p>
+                                                        <p className="text-lg font-semibold">
+                                                            {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
+                                                                style: "currency",
+                                                                currency: credit.monthlyPayment.currency,
+                                                            })}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                            {/* Dialog de confirmation */}
+                            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            {dialogAction === "accept"
+                                                ? "Accepter la demande de crédit"
+                                                : "Refuser la demande de crédit"}
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            {dialogAction === "accept"
+                                                ? "Êtes-vous sûr de vouloir accepter cette demande ? Le client sera notifié et le crédit sera activé."
+                                                : "Veuillez indiquer la raison du refus. Le client recevra cette information."}
+                                        </DialogDescription>
+                                    </DialogHeader>
+
+                                    {dialogAction === "refuse" && (
+                                        <Textarea
+                                            placeholder="Raison du refus (ex: revenus insuffisants, taux d'endettement trop élevé...)"
+                                            value={refusalReason}
+                                            onChange={(e) => setRefusalReason(e.target.value)}
+                                            className="min-h-[100px]"
+                                        />
+                                    )}
+
+                                    <DialogFooter>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                setDialogOpen(false);
+                                                setRefusalReason("");
+                                            }}
+                                        >
+                                            Annuler
+                                        </Button>
+                                        <Button
+                                            variant={dialogAction === "accept" ? "default" : "destructive"}
+                                            onClick={() => confirmAction(credit.userId)}
+                                            disabled={
+                                                grantMutation.isPending ||
+                                                (dialogAction === "refuse" && !refusalReason.trim())
+                                            }
+                                        >
+                                            {grantMutation.isPending
+                                                ? "En cours..."
+                                                : dialogAction === "accept"
+                                                    ? "Confirmer l'acceptation"
+                                                    : "Confirmer le refus"}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </>
                     );
                 })
                 .exhaustive()}
 
-            {/* Dialog de confirmation */}
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>
-                            {dialogAction === "accept"
-                                ? "Accepter la demande de crédit"
-                                : "Refuser la demande de crédit"}
-                        </DialogTitle>
-                        <DialogDescription>
-                            {dialogAction === "accept"
-                                ? "Êtes-vous sûr de vouloir accepter cette demande ? Le client sera notifié et le crédit sera activé."
-                                : "Veuillez indiquer la raison du refus. Le client recevra cette information."}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    {dialogAction === "refuse" && (
-                        <Textarea
-                            placeholder="Raison du refus (ex: revenus insuffisants, taux d'endettement trop élevé...)"
-                            value={refusalReason}
-                            onChange={(e) => setRefusalReason(e.target.value)}
-                            className="min-h-[100px]"
-                        />
-                    )}
-
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                setDialogOpen(false);
-                                setRefusalReason("");
-                            }}
-                        >
-                            Annuler
-                        </Button>
-                        <Button
-                            variant={dialogAction === "accept" ? "default" : "destructive"}
-                            onClick={confirmAction}
-                            disabled={
-                                grantMutation.isPending ||
-                                (dialogAction === "refuse" && !refusalReason.trim())
-                            }
-                        >
-                            {grantMutation.isPending
-                                ? "En cours..."
-                                : dialogAction === "accept"
-                                    ? "Confirmer l'acceptation"
-                                    : "Confirmer le refus"}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </>
     );
 }

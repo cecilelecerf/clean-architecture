@@ -51,7 +51,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                                     {participant.firstname} {participant.lastname}
                                 </p>
                             </Flex>
-                            {isAdmin && (
+                            {isAdmin && type === "internal" && (
                                 <Popover>
                                     <PopoverTrigger asChild><Button variant="ghost" size="icon-sm"><Settings2 /></Button>
                                     </PopoverTrigger>
@@ -89,6 +89,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                 <DialogFooter >
                     {isAdmin && (
                         <>
+                            {/* TODO : faire la cloture du compte */}
                             {!isClose &&
                                 <ButtonLoading loading={false} variant="destructive"  >
                                     <Trash2 /> Cloturer la conversation ?

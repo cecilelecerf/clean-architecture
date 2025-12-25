@@ -6,7 +6,7 @@ import {
 import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { PostEntity } from "@domain/entities/PostEntity";
+import { PostDTO, PostEntity } from "@domain/entities/PostEntity";
 
 type Props = { userId: string; postId: string };
 
@@ -20,7 +20,7 @@ export class MarkPostAsReadUsecase {
     userId,
     postId,
   }: Props): Promise<
-    PostEntity | PostNotFoundError | UserNotFoundError | UserNotActiveError
+    PostDTO | PostNotFoundError | UserNotFoundError | UserNotActiveError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -30,6 +30,6 @@ export class MarkPostAsReadUsecase {
     post.markAsRead(userId);
     await this.feedRepository.update(post);
 
-    return post;
+    return post.toDTO();
   }
 }

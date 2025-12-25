@@ -39,7 +39,7 @@ export class GetThreadByIdUsecase {
 
     const thread = await this.threadRepository.findWithUserById(threadId);
     if (!thread) return new ThreadNotFoundError();
-    if (!thread.hasAccess(user.id))
+    if (!thread.hasAccess(user.id) && thread.administratorId !== null)
       return new InvalidThreadAccessError(user.id, thread.id);
 
     return ThreadDTOMapper.map(thread);

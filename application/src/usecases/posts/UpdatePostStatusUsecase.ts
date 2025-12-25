@@ -11,7 +11,7 @@ import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { PostEntity } from "@domain/entities/PostEntity";
+import { PostDTO, PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 type Props = {
   postId: PostEntity["id"];
@@ -30,7 +30,7 @@ export class UpdatePostStatusUsecase {
     postId,
     status,
   }: Props): Promise<
-    | PostEntity
+    | PostDTO
     | UserNotFoundError
     | UserNotActiveError
     | PostNotFoundError
@@ -49,6 +49,6 @@ export class UpdatePostStatusUsecase {
     post.updateStatus(status, this.clockService.now());
 
     await this.feedRepository.update(post);
-    return post;
+    return post.toDTO();
   }
 }

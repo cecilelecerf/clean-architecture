@@ -13,7 +13,7 @@ import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { PostEntity } from "@domain/entities/PostEntity";
+import { PostDTO, PostEntity } from "@domain/entities/PostEntity";
 type Props = {
   userId: PostEntity["advisorId"];
 } & Pick<PostEntity, "id" | "tagsId">;
@@ -28,7 +28,7 @@ export class UpdateTagsPostUsecase {
     id: postId,
     tagsId,
   }: Props): Promise<
-    | PostEntity
+    | PostDTO
     | UserNotFoundError
     | UserNotActiveError
     | PostNotFoundError
@@ -52,6 +52,6 @@ export class UpdateTagsPostUsecase {
       post.tagsId = [...post.tagsId, tag.id];
     }
     await this.feedRepository.update(post);
-    return post;
+    return post.toDTO();
   }
 }

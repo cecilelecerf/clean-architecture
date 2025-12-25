@@ -167,4 +167,28 @@ export class PostEntity {
   public isReadBy(userId: UserEntity["id"]): boolean {
     return this.readBy.includes(userId);
   }
+
+  public toDTO(): PostDTO {
+    return {
+      id: this.id,
+      advisorId: this.advisorId,
+      title: this.title,
+      content: this.content,
+      tagsId: this.tagsId,
+      readBy: this.readBy,
+      clientId: this.clientId,
+      updatedAt: this.updatedAt.toISOString(),
+      createdAt: this.createdAt.toISOString(),
+      publishedAt: this.publishedAt?.toISOString(),
+    };
+  }
 }
+
+export type PostDTO = {
+  updatedAt: string;
+  createdAt: string;
+  publishedAt?: string;
+} & Pick<
+  PostEntity,
+  "id" | "advisorId" | "title" | "content" | "tagsId" | "readBy" | "clientId"
+>;

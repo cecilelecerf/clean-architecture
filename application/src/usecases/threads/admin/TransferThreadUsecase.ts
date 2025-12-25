@@ -15,6 +15,7 @@ import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { ThreadClosedError } from "@domain/errors/thread";
 
+// TODO : gérer le transfer lors de thread externe
 type Props = {
   newAdministratorId: UserEntity["id"];
   administratorId: UserEntity["id"];

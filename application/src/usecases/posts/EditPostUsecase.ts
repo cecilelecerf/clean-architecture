@@ -12,7 +12,7 @@ import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { PostEntity } from "@domain/entities/PostEntity";
+import { PostDTO, PostEntity } from "@domain/entities/PostEntity";
 import { UpdateTagsPostUsecase } from "./UpdateTagsPostUsecase";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import {
@@ -38,7 +38,7 @@ export class EditPostUsecase {
     tagsId,
     id: postId,
   }: Props): Promise<
-    | PostEntity
+    | PostDTO
     | UserNotFoundError
     | UserNotActiveError
     | PostNotFoundError
@@ -84,6 +84,6 @@ export class EditPostUsecase {
     }
 
     await this.feedRepository.update(post);
-    return post;
+    return post.toDTO();
   }
 }
