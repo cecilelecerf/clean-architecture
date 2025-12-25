@@ -42,6 +42,6 @@ export class FindPostByIdWithTagsUsecase {
     if (user.hasRole({ role: "client" }) && !post.publishedAt)
       return new InvalidPostAccessError(user.id, post.id);
 
-    return PostDTOMapper.map(post);
+    return PostDTOMapper.tagsAndUserMap(post);
   }
 }

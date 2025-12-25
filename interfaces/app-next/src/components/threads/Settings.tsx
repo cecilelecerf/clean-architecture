@@ -24,10 +24,15 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
     if (!session?.user?.id) return <div>Unauthorized</div>;
     const transfer = useMutation(endpoints.threads.transfer({ threadId: id }))
     const removeParticipant = useMutation(endpoints.threads.participants.remove({ threadId: id }))
+    const closeThread = useMutation(endpoints.threads.close({ threadId: id }))
     const isAdmin = administrator ? session.user.id === administrator.id : false
     return (
         <Dialog>
-            <DialogTrigger asChild><Button size="icon" variant="ghost"><SettingsIcon /></Button></DialogTrigger>
+            <DialogTrigger asChild>
+                <Button size="icon" variant="ghost">
+                    <SettingsIcon />
+                </Button>
+            </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Paramètre de discution</DialogTitle>
@@ -91,7 +96,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                         <>
                             {/* TODO : faire la cloture du compte */}
                             {!isClose &&
-                                <ButtonLoading loading={false} variant="destructive"  >
+                                <ButtonLoading loading={false} variant="destructive" onClick={() => closeThread.mutate()}>
                                     <Trash2 /> Cloturer la conversation ?
                                 </ButtonLoading>
                             }

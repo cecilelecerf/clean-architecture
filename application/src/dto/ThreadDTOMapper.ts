@@ -1,15 +1,15 @@
 import { ThreadEntityWithUsers } from "@application/ports/repositories/ThreadRepository";
-import { ThreadEntity } from "@domain/entities/ThreadEntity";
+import { ThreadDTO, ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserToDTO } from "@domain/entities/UserEntity";
 
-export type ThreadEntityWithUsersDTO = ThreadEntity & {
+export type ThreadEntityWithUsersDTO = ThreadDTO & {
   administrator: UserToDTO | null;
   participants: UserToDTO[];
 };
 
 export class ThreadDTOMapper {
   static map(thread: ThreadEntityWithUsers): ThreadEntityWithUsersDTO {
-    return Object.assign(thread, {
+    return Object.assign(thread.toDTO(), {
       administrator: thread.administrator ? thread.administrator.toDTO() : null,
       participants: thread.participants.map((p) => p.toDTO()),
     });

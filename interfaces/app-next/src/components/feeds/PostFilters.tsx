@@ -72,7 +72,10 @@ export const PostFilters = ({ filters, onChange, isAdmin }: PostFiltersProps) =>
                                 </Select>
                             </div>
                         )}
-                        <TagsFilters setLocalFilters={setLocalFilters} localFilters={localFilters} />
+                        <TagsFilters setSelectedTagsId={(value) => setLocalFilters((prev) => ({
+                            ...prev,
+                            tagsId: typeof value === 'function' ? value(prev.tagsId) : value
+                        }))} selectedTagsId={localFilters.tagsId} />
                         {/* Dates */}
                         <div className="flex gap-3 flex-col md:flex-row">
                             <CalendarFilter

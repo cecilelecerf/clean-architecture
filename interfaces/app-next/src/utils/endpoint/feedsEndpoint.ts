@@ -5,6 +5,7 @@ import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import {
   PostId,
   postSchema,
+  postWithTagsSchema,
   TagId,
   tagIdSchema,
   tagSchema,
@@ -191,7 +192,7 @@ export const feedsEndpoint = createEndpointsNodes({
       mutationOptions({
         mutationFn: async (payload: Partial<NewPost>) => {
           const data = await patch(`/posts/${id}`, payload);
-          return postSchema.parse(data);
+          return postWithTagsSchema.parse(data);
         },
         onSuccess: async () => {
           await Promise.all([

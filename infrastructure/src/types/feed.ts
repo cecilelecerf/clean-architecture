@@ -37,3 +37,7 @@ export const postSchema = z.object({
   clientId: userIdSchema.optional(),
 });
 export type Post = z.infer<typeof postSchema>;
+
+export const postWithTagsSchema = postSchema.extend({
+  tags: tagToFrontSchema.array(),
+});

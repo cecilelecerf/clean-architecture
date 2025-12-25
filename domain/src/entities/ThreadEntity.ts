@@ -222,4 +222,22 @@ export class ThreadEntity {
     if (error instanceof Error) return error;
     this.administratorId = userId;
   }
+
+  toDTO(): ThreadDTO {
+    return {
+      id: this.id,
+      participantsId: this.participantsId,
+      title: this.title,
+      isClose: this.isClose,
+      type: this.type,
+      administratorId: this.administratorId,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
+  }
 }
+
+export type ThreadDTO = { createdAt: string; updatedAt: string } & Pick<
+  ThreadEntity,
+  "id" | "participantsId" | "title" | "isClose" | "type" | "administratorId"
+>;

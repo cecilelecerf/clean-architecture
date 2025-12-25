@@ -1,9 +1,10 @@
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
+import { threadSchema } from '@infrastructure/types/thread';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(_req: NextRequest, ctx: RouteContext<'/api/threads/[threadId]'>) {
+export async function POST(_req: NextRequest, ctx: RouteContext<'/api/threads/[threadId]/close'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -22,7 +23,7 @@ export async function POST(_req: NextRequest, ctx: RouteContext<'/api/threads/[t
       );
     }
 
-    return NextResponse.json(thread);
+    return NextResponse.json(threadSchema.parse(thread));
   } catch (err) {
     console.error('Error in POST /api/threads:', err);
     return NextResponse.json(

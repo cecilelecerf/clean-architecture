@@ -21,7 +21,6 @@ type Props = { tagsId: TagEntity["id"][]; published?: boolean } & Pick<
   "content" | "title" | "advisorId"
 >;
 
-// TODO : gérer les tags dans le front
 export class AddPostUsecase {
   constructor(
     private readonly feedRepository: PostRepository,

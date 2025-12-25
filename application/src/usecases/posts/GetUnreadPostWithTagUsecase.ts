@@ -36,6 +36,6 @@ export class GetUnreadPostWithTagUsecase {
       return new UserRoleMismatchError(["client"], user.role);
 
     const posts = await this.postRepository.findAllUnreadWithTags(clientId);
-    return PostDTOMapper.maps(posts);
+    return PostDTOMapper.tagsAndUserMaps(posts);
   }
 }

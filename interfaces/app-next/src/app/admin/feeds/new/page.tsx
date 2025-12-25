@@ -1,5 +1,6 @@
 "use client"
 import { ButtonBack } from "@/components/buttons/ButtonBack";
+import { TagsFilters } from "@/components/feeds/TagsFilters";
 import FormWrapper, { Field } from "@/components/FromWrapper";
 import { socket } from "@/lib/socket";
 import { endpoints } from "@/utils/endpoint";
@@ -16,14 +17,23 @@ export default function PostsPage() {
         {
             label: 'Titre',
             get: field.title,
-            set: (e) => setField((prev) => ({ ...prev, title: e })),
+            set: (e) => setField((prev) => ({ ...prev, title: Array.isArray(e) ? e[0] : e })),
         },
         {
             label: 'Contenu',
             get: field.content,
-            set: (e) => setField((prev) => ({ ...prev, content: e })),
+            set: (e) => setField((prev) => ({ ...prev, content: Array.isArray(e) ? e[0] : e })),
             type: "textarea"
-        },
+        }, {
+            label: "Tags",
+            get: field.tagsId,
+            set: (e) => { },
+            type: "other",
+            layout: <TagsFilters setSelectedTagsId={(value) => setField((prev) => ({
+                ...prev,
+                tagsId: typeof value === 'function' ? value(prev.tagsId) : value
+            }))} selectedTagsId={field.tagsId} />
+        }
     ];
 
     const mutate = useMutation<Post, Error, NewPost>(endpoints.feeds.posts.add())
