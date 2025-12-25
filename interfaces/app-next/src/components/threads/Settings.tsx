@@ -15,6 +15,7 @@ import { Check, Plus, Settings2, SettingsIcon, Trash2, UserRoundX, UserStar } fr
 import { useSession } from "next-auth/react"
 import { useMemo, useState } from "react"
 import { match } from "ts-pattern"
+import { Skeleton } from "../ui/skeleton"
 
 type Props = {} & ThreadWithUser
 
@@ -227,6 +228,14 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
 
             )
         })
-        .otherwise(() => "pending")
+        .otherwise(() => <SkeletonAddParticipant />)
 
 }
+
+const SkeletonAddParticipant = () => {
+    return (
+        <div className="space-y-2">
+            <Skeleton className="h-10 w-full" />
+        </div>
+    );
+};

@@ -35,8 +35,6 @@ export class GetCurrentSavingRateUsecase {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    if (!user.hasRole({ role: "directeur" }))
-      return new UserRoleMismatchError(["directeur"], user.role);
     const savingRate = await this.savingRateRepository.findRateAtDate(
       this.clockService.now()
     );

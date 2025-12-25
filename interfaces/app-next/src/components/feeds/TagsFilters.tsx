@@ -3,15 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { bgColorClasses, borderColorClasses, textColorClasses } from "@/utils/color";
-import { feedsEndpoint, PostFiltersProps } from "@/utils/endpoint/feedsEndpoint";
+import { feedsEndpoint, PostFilters } from "@/utils/endpoint/feedsEndpoint";
 import { TagId } from "@infrastructure/types/feed";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
 import { match } from "ts-pattern";
 type Props = {
-    localFilters: PostFiltersProps
-    setLocalFilters: Dispatch<SetStateAction<PostFiltersProps>>
+    localFilters: PostFilters
+    setLocalFilters: Dispatch<SetStateAction<PostFilters>>
 }
 export const TagsFilters = ({ localFilters, setLocalFilters }: Props) => {
     const tagsQuery = useQuery(feedsEndpoint.tags.getAll());

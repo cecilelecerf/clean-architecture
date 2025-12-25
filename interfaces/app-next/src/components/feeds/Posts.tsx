@@ -1,6 +1,6 @@
 "use client"
 import { endpoints } from "@/utils/endpoint"
-import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint"
+import { PostFilters, PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint"
 import { useQuery } from "@tanstack/react-query"
 import { match } from "ts-pattern"
 import { PostCard } from "./PostCard"
@@ -8,9 +8,9 @@ import { PaginationComponent } from "../PaginationComponent"
 import { useEffect, useState } from "react"
 import { socket } from "@/lib/socket"
 import { queryClient } from "@/lib/queryClient"
-import { PostFiltersProps } from "@/utils/endpoint/feedsEndpoint"
+import { SkeletonPost } from "@/app/(client)/feeds/[postId]/PostQuery"
 
-type Props = { filters: PostFiltersProps, onPaginationChange: (pageNumber: number) => void, isAdmin?: boolean }
+type Props = { filters: PostFilters, onPaginationChange: (pageNumber: number) => void, isAdmin?: boolean }
 
 export const Posts = ({ filters, onPaginationChange, isAdmin }: Props) => {
     const query = useQuery(endpoints.feeds.posts.getAll({ filters }))
@@ -26,9 +26,9 @@ export const Posts = ({ filters, onPaginationChange, isAdmin }: Props) => {
     }, []);
     return match(query)
         .with({ status: "error" }, () => "error")
-        .with({ status: "pending" }, () => "pending")
+        .with({ status: "pending" }, () => new Array(6).map((i) => <SkeletonPost key={i} />))
         .with({ status: "success" }, ({ data }) => <>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {data.posts.length === 0 ? (
                     <div className="text-gray-500">Aucun post trouvé</div>
                 ) : (

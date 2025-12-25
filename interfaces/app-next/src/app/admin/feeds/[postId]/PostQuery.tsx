@@ -1,4 +1,5 @@
 "use client"
+import { SkeletonPost } from "@/app/(client)/feeds/[postId]/PostQuery";
 import { ButtonLoading } from "@/components/buttons/ButtonLoading";
 import { SwitchComponent } from "@/components/SwitchComponent";
 import { Tag } from "@/components/Tag";
@@ -24,7 +25,7 @@ export const PostQuery = ({ postId }: Props) => {
 
     return match(query)
         .with({ status: "error" }, () => "error")
-        .with({ status: "pending" }, () => "pending")
+        .with({ status: "pending" }, () => <SkeletonPost />)
         .with({ status: "success" }, ({ data: post }) => <PostDisplay postData={post} />
         ).exhaustive()
 
