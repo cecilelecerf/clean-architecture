@@ -111,7 +111,6 @@ export async function seedSQLClient(
           userId: user.id,
           balance,
           currency: rawAccount.currency,
-          updatedAt: clockService.now(),
         });
 
         if (account instanceof Error) {
