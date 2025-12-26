@@ -1,3 +1,5 @@
+import { InvalidLastnameError } from "@domain/errors/user";
+import { InvalidFirstnameError } from "@domain/errors/user/InvalidFirstnameError";
 import { Email } from "@domain/values/Email";
 
 export class UserEntity {
@@ -52,6 +54,61 @@ export class UserEntity {
     );
   }
 
+  public static create({
+    id,
+    firstname,
+    lastname,
+    email,
+    passwordHash,
+    role,
+    createdAt,
+  }: Pick<
+    UserEntity,
+    | "id"
+    | "email"
+    | "firstname"
+    | "lastname"
+    | "passwordHash"
+    | "role"
+    | "confirmedAt"
+    | "createdAt"
+  >): UserEntity | InvalidFirstnameError | InvalidLastnameError {
+    const firstnameStr = this.validateFirstname(firstname);
+    if (firstnameStr instanceof Error) return firstnameStr;
+    const lastnameStr = this.validateLastname(lastname);
+    if (lastnameStr instanceof Error) return lastnameStr;
+    return new UserEntity(
+      id,
+      firstnameStr,
+      lastnameStr,
+      email,
+      passwordHash,
+      role,
+      true,
+      createdAt,
+      createdAt
+    );
+  }
+
+  private static validateFirstname(
+    firstname: string
+  ): string | InvalidFirstnameError {
+    const trimmed = firstname.trim();
+    if (trimmed.length < 2 || trimmed.length > 50) {
+      return new InvalidFirstnameError(firstname);
+    }
+    return trimmed;
+  }
+
+  private static validateLastname(
+    lastname: string
+  ): string | InvalidLastnameError {
+    const trimmed = lastname.trim();
+    if (trimmed.length < 2 || trimmed.length > 50) {
+      return new InvalidLastnameError(lastname);
+    }
+    return trimmed;
+  }
   public isActive(): boolean {
     return this.isActiveField && !!this.confirmedAt;
   }

@@ -66,7 +66,6 @@ export class AddPostUsecase {
     const post = PostEntity.create({
       id,
       createdAt,
-      updatedAt: createdAt,
       advisorId: advisor.id,
       content,
       title,

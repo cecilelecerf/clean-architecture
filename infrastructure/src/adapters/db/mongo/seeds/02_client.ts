@@ -79,8 +79,15 @@ export async function seedMongoClient(
         const iban = IBAN.create(generateFrenchIBAN());
         if (iban instanceof Error) continue;
 
-        const color = Color.from(rawAccount.color);
+        const color = Color.create(rawAccount.color);
         if (color instanceof Error) continue;
+
+        const balance = Money.create({
+            amount: rawAccount.balance,
+            currency: rawAccount.currency,
+          });
+          if (balance instanceof Error) {console.warn(balance); continue};
+
 
         const account = AccountEntity.from({
           ...rawAccount,
@@ -88,10 +95,7 @@ export async function seedMongoClient(
           userId: user.id,
           createdAt: clockService.now(),
           color,
-          balance: Money.from({
-            amount: rawAccount.balance,
-            currency: rawAccount.currency,
-          }),
+          balance,
           currency: rawAccount.currency,
           updatedAt: clockService.now(),
         });
@@ -122,7 +126,7 @@ export async function seedMongoClient(
       }
 
       const credits: CreditEntity[] = [];
-      for(const rawCredit of raw.credits ?? []){
+      for (const rawCredit of raw.credits ?? []) {
         const initialAmount = Money.create({
           amount: rawCredit.initialAmount,
           currency: rawCredit.currency,
@@ -131,36 +135,40 @@ export async function seedMongoClient(
           console.warn(initialAmount);
           continue;
         }
-        
+
         const interestRate = Percentage.create(rawCredit.interestRate);
         if (interestRate instanceof Error) {
           console.warn(interestRate);
           continue;
         }
-        
+
         const insuranceRate = Percentage.create(rawCredit.insuranceRate);
         if (insuranceRate instanceof Error) {
           console.warn(insuranceRate);
           continue;
         }
 
-        const credit = CreditEntity.create({
+        const credit = CreditEntity.from({
           id: uuidService.generate(),
           advisorId: null,
           userId: user.id,
           initialAmount: initialAmount,
           interestRate: interestRate,
           insuranceRate: insuranceRate,
-          durationMonths:  rawCredit.durationMonths,
+          durationMonths: rawCredit.durationMonths,
           startDate: rawCredit.startDate,
-          status: CreditStatus.PENDING
+          status: CreditStatus.PENDING,
+          updatedAt:
+            status === CreditStatus.PENDING ? createdAt : clockService.now(),
+          createdAt: clockService.now(),
+          monthlyPayment: 
         });
-        
+
         if (credit instanceof Error) {
           console.warn(credit);
           continue;
         }
-        
+
         credits.push(credit);
         await creditRepository.save(credit);
         console.log(credit.id);

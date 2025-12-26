@@ -27,17 +27,20 @@ export async function seedMongoAdministrator(
         continue;
       }
       const passwordHash = await hasher.hash(raw.password);
-      const user = UserEntity.from({
+      const user = UserEntity.create({
         ...raw,
         email,
         passwordHash,
         id: uuidService.generate(),
         role: "conseiller",
         createdAt: clockService.now(),
-        isActiveField: true,
         confirmedAt: clockService.now(),
-        updatedAt: clockService.now(),
       });
+
+      if (user instanceof Error) {
+        console.warn(user);
+        continue;
+      }
 
       advisors.push(user);
       userRepository.save(user);

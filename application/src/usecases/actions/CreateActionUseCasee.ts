@@ -9,6 +9,12 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import {
+  InvalidActionNameError,
+  InvalidISINError,
+  InvalidSymbolError,
+  InvalidTotalNbError,
+} from "@domain/errors/action";
+import {
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
   MoneyCurrencyMissingError,
@@ -54,15 +60,16 @@ export class CreateActionUsecase {
     | MoneyAmountNegativeError
     | UserNotFoundError
     | UserNotActiveError
+    | InvalidISINError
+    | InvalidActionNameError
+    | InvalidSymbolError
+    | InvalidTotalNbError
     | void
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    if (
-      user.hasRole({ role: "client" }) ||
-      user.hasRole({ role: "conseiller" })
-    )
+    if (!user.hasRole({ role: "directeur" }))
       return new UserRoleMismatchError(["directeur"], user.role);
 
     const price = Money.create({
@@ -74,7 +81,7 @@ export class CreateActionUsecase {
 
     const today = this.clockService.now();
 
-    const action = ActionEntity.from({
+    const action = ActionEntity.create({
       ISIN,
       name,
       totalNb,
@@ -84,8 +91,8 @@ export class CreateActionUsecase {
       currentPrice: price,
       isAvailable,
       createdAt: today,
-      updatedAt: today,
     });
+    if (action instanceof Error) return action;
 
     await this.actionRepository.save(action);
   }

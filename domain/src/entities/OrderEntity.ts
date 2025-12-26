@@ -8,7 +8,11 @@ import {
   MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
-import { InvalidOrderStatusTransitionError } from "@domain/errors/order";
+import {
+  InvalidOrderStatusTransitionError,
+  InvalidOrderTypeError,
+  InvalidQuantityError,
+} from "@domain/errors/order";
 
 export class OrderEntity {
   private constructor(
@@ -25,6 +29,43 @@ export class OrderEntity {
     public updatedAt: Date
   ) {}
 
+  private static validateQuantity(
+    quantity: number
+  ): number | InvalidQuantityError {
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      return new InvalidQuantityError(quantity);
+    }
+    return quantity;
+  }
+
+  private static validateType(
+    type: string
+  ): "buy" | "sell" | InvalidOrderTypeError {
+    if (type !== "buy" && type !== "sell") {
+      return new InvalidOrderTypeError(type);
+    }
+    return type;
+  }
+
+  private static calculateFee(
+    price: Money,
+    quantity: number
+  ):
+    | Money
+    | FactorNegativeError
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError {
+    const feeRate = 0.01;
+    const totalPrice = price.multiply(quantity);
+    if (totalPrice instanceof Error) return totalPrice;
+
+    const fee = totalPrice.multiply(feeRate);
+    if (fee instanceof Error) return fee;
+
+    return fee;
+  }
+
   public static create({
     id,
     userId,
@@ -33,9 +74,7 @@ export class OrderEntity {
     quantity,
     price,
     date,
-    status,
     createdAt,
-    updatedAt,
   }: Pick<
     OrderEntity,
     | "id"
@@ -45,27 +84,36 @@ export class OrderEntity {
     | "quantity"
     | "price"
     | "date"
-    | "status"
     | "createdAt"
-    | "updatedAt"
-  >) {
-    const feeMoney = Money.create({ amount: 1, currency: price.currency });
-    if (feeMoney instanceof Error) {
-      return feeMoney;
-    }
+  >):
+    | OrderEntity
+    | InvalidQuantityError
+    | InvalidOrderTypeError
+    | FactorNegativeError
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError {
+    const validatedQuantity = this.validateQuantity(quantity);
+    if (validatedQuantity instanceof Error) return validatedQuantity;
+
+    const validatedType = this.validateType(type);
+    if (validatedType instanceof Error) return validatedType;
+
+    const fee = this.calculateFee(price, validatedQuantity);
+    if (fee instanceof Error) return fee;
 
     return new OrderEntity(
       id,
       userId,
       actionId,
-      type,
-      quantity,
+      validatedType,
+      validatedQuantity,
       price,
-      feeMoney,
+      fee,
       date,
-      status,
+      "pending",
       createdAt,
-      updatedAt
+      createdAt
     );
   }
 

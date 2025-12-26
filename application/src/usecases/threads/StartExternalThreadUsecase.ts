@@ -65,11 +65,9 @@ export class StartExternalThreadUsecase {
     const thread = ThreadEntity.create({
       id,
       createdAt,
-      updatedAt: createdAt,
       type: "external",
       participantsId: [clientId],
       title,
-      isClose: false,
       administratorId: null,
     });
     if (thread instanceof Error) return thread;
