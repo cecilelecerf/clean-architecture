@@ -8,7 +8,6 @@ import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
-import { Email } from "@domain/values/Email";
 import { Color } from "@domain/values/Color";
 import { UserMapper } from "../../mappers/UserMapper";
 

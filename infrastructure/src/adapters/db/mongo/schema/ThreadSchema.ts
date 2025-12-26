@@ -16,7 +16,6 @@ export const ThreadSchema = new Schema<ThreadInterface>(
     administratorId: {
       type: Schema.Types.UUID,
       ref: "User",
-      required: true,
     },
     createdAt: { type: Date, required: true },
     updatedAt: { type: Date, required: true },

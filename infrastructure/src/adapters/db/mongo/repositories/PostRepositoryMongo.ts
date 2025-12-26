@@ -1,5 +1,6 @@
 import {
   PostRepository,
+  PostWithTags,
   PostWithTagsAndUser,
 } from "@application/ports/repositories/PostRepository";
 import { MongoClient } from "../../MongoClient";
@@ -53,7 +54,11 @@ export class PostRepositoryMongo implements PostRepository {
     return Object.assign(post, { advisor, tags });
   }
 
-  /** 📬 Sauvegarder un post */
+  private combinePostWithTags(doc: any, tags: TagEntity[]): PostWithTags {
+    const post = this.mapDocToPost(doc);
+    return Object.assign(post, { tags });
+  }
+
   async save(post: PostEntity): Promise<void> {
     await this.client.connect();
 
@@ -71,7 +76,6 @@ export class PostRepositoryMongo implements PostRepository {
     });
   }
 
-  /** 🔍 Trouver un post par ID */
   async findById(id: PostEntity["id"]): Promise<PostEntity | null> {
     await this.client.connect();
 
@@ -81,7 +85,25 @@ export class PostRepositoryMongo implements PostRepository {
     return this.mapDocToPost(doc);
   }
 
-  /** 🔍 Tous les posts d'un advisor */
+  async findByIdWithTags(id: PostEntity["id"]): Promise<PostWithTags | null> {
+    await this.client.connect();
+
+    const doc = await PostModel.findById(id)
+      .populate({
+        path: "tagsId",
+        select: "label color createdAt updatedAt",
+      })
+      .lean();
+
+    if (!doc) return null;
+
+    const tags: TagEntity[] = (doc.tagsId || [])
+      .map((tagDoc: any) => this.mapDocToTag(tagDoc))
+      .filter((tag: TagEntity) => !!tag);
+
+    return this.combinePostWithTags(doc, tags);
+  }
+
   async findAllByAdvisorId(advisorId: UserEntity["id"]): Promise<PostEntity[]> {
     await this.client.connect();
 
@@ -92,7 +114,6 @@ export class PostRepositoryMongo implements PostRepository {
     return docs.map((doc) => this.mapDocToPost(doc));
   }
 
-  /** 🔍 Posts récents */
   async findAllRecent(limit: number = 10): Promise<PostEntity[]> {
     await this.client.connect();
 
@@ -104,7 +125,6 @@ export class PostRepositoryMongo implements PostRepository {
     return docs.map((doc) => this.mapDocToPost(doc));
   }
 
-  /** 🔄 Mettre à jour un post */
   async update(post: PostEntity): Promise<void> {
     await this.client.connect();
 
@@ -124,14 +144,12 @@ export class PostRepositoryMongo implements PostRepository {
     );
   }
 
-  /** ❌ Supprimer un post */
   async delete(id: PostEntity["id"]): Promise<void> {
     await this.client.connect();
 
     await PostModel.deleteOne({ _id: id });
   }
 
-  /** 🔍 Posts par tag */
   async findAllByTags(tagId: TagEntity["id"]): Promise<PostEntity[]> {
     await this.client.connect();
 
@@ -142,7 +160,6 @@ export class PostRepositoryMongo implements PostRepository {
     return docs.map((doc) => this.mapDocToPost(doc));
   }
 
-  /** 🔍 Post avec tags et user par ID (refactorisé avec populate) */
   async findWithTagsAndUserById(
     id: PostEntity["id"]
   ): Promise<PostWithTagsAndUser | null> {
@@ -166,7 +183,6 @@ export class PostRepositoryMongo implements PostRepository {
     return this.combinePostWithTagsAndUser(doc, advisor, tags);
   }
 
-  /** 🔍 Posts paginés avec filtres */
   async findAllPaginatedWithTagsAndUserByFilters(
     filters: {
       dateFrom?: Date;
@@ -233,7 +249,6 @@ export class PostRepositoryMongo implements PostRepository {
     return { posts, total: Math.ceil(total / pagination.limit) };
   }
 
-  /** 🔍 Posts non lus avec tags */
   async findAllUnreadWithTags(
     userId: UserEntity["id"]
   ): Promise<PostWithTagsAndUser[]> {

@@ -17,7 +17,6 @@ export class SavingsRateRepositoryMongo implements SavingRateRepository {
     });
   }
 
-  /** Taux d'épargne actuel */
   async findCurrent(): Promise<SavingsRateEntity | null> {
     await this.client.connect();
 
@@ -30,7 +29,21 @@ export class SavingsRateRepositoryMongo implements SavingRateRepository {
     return this.mapDocToSavingsRate(doc);
   }
 
-  /** Tous les taux d'épargne */
+  async findRateAtDate(date: Date): Promise<SavingsRateEntity | null> {
+    await this.client.connect();
+
+    const doc = await SavingsRateModel.findOne({
+      effectiveDate: { $lte: date },
+    })
+      .sort({ effectiveDate: -1 })
+      .limit(1)
+      .lean();
+
+    if (!doc) return null;
+
+    return this.mapDocToSavingsRate(doc);
+  }
+
   async findAll(): Promise<SavingsRateEntity[]> {
     await this.client.connect();
 
@@ -41,7 +54,6 @@ export class SavingsRateRepositoryMongo implements SavingRateRepository {
     return docs.map((doc) => this.mapDocToSavingsRate(doc));
   }
 
-  /** Trouver un taux par ID */
   async findById(
     id: SavingsRateEntity["id"]
   ): Promise<SavingsRateEntity | null> {
@@ -53,7 +65,6 @@ export class SavingsRateRepositoryMongo implements SavingRateRepository {
     return this.mapDocToSavingsRate(doc);
   }
 
-  /** Sauvegarder un taux d'épargne */
   async save(savingsRate: SavingsRateEntity): Promise<void> {
     await this.client.connect();
 
@@ -66,7 +77,6 @@ export class SavingsRateRepositoryMongo implements SavingRateRepository {
     });
   }
 
-  /** Mettre à jour un taux d'épargne */
   async update(savingsRate: SavingsRateEntity): Promise<void> {
     await this.client.connect();
 
