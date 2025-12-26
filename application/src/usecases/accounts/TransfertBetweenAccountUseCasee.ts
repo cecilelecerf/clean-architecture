@@ -7,8 +7,8 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import {
   AccountNotFoundError,
+  SameAccountTransactionError,
   UnauthorizedAccessAccountError,
-  SameAccountTransferError,
 } from "@application/errors/accounts";
 import {
   IBANInvalidCheckDigitsError,
@@ -28,6 +28,10 @@ import {
   UserNotActiveError,
   UserNotFoundError,
 } from "@application/errors/users";
+import {
+  InvalidTransactionAmountError,
+  InvalidTransactionLabelError,
+} from "@domain/errors/transaction";
 
 interface Props {
   requestUserId: string;
@@ -58,7 +62,6 @@ export class TransfertBetweenAccountUseCase {
   }: Props): Promise<
     | AccountNotFoundError
     | UnauthorizedAccessAccountError
-    | SameAccountTransferError
     | IBANTooShortError
     | IBANTooLongError
     | IBANInvalidFormatError
@@ -69,27 +72,24 @@ export class TransfertBetweenAccountUseCase {
     | MoneyCurrencyMismatchError
     | UserNotFoundError
     | UserNotActiveError
+    | SameAccountTransactionError
+    | InvalidTransactionLabelError
+    | InvalidTransactionAmountError
     | void
   > {
     const fromIbanResult = IBAN.create(fromIbanString);
-    if (fromIbanResult instanceof Error) {
-      return fromIbanResult;
-    }
+    if (fromIbanResult instanceof Error) return fromIbanResult;
     const fromIBAN = fromIbanResult;
 
     const toIbanResult = IBAN.create(toIbanString);
-    if (toIbanResult instanceof Error) {
-      return toIbanResult;
-    }
+    if (toIbanResult instanceof Error) return toIbanResult;
     const toIBAN = toIbanResult;
 
     const amount = Money.create({
       amount: amountValue,
       currency: amountCurrency,
     });
-    if (amount instanceof Error) {
-      return amount;
-    }
+    if (amount instanceof Error) return amount;
 
     const fromAccount = await this.accountRepository.findByIBAN(fromIBAN);
     if (!fromAccount) return new AccountNotFoundError();
@@ -104,10 +104,6 @@ export class TransfertBetweenAccountUseCase {
       return new UnauthorizedAccessAccountError();
     }
 
-    if (fromAccount.iban.is(toAccount.iban)) {
-      return new SameAccountTransferError();
-    }
-
     const withdrawResult = fromAccount.withdraw(amount);
     if (withdrawResult instanceof Error) return withdrawResult;
 
@@ -116,7 +112,7 @@ export class TransfertBetweenAccountUseCase {
 
     const now = this.clockService.now();
 
-    const transaction = TransactionEntity.from({
+    const transaction = TransactionEntity.create({
       id: this.uuidService.generate(),
       fromAccountId: fromAccount.iban,
       toAccountId: toAccount.iban,
@@ -125,7 +121,7 @@ export class TransfertBetweenAccountUseCase {
       icon,
       date: now,
     });
-
+    if (transaction instanceof Error) return transaction;
     await this.transactionRepository.save(transaction);
 
     await this.accountRepository.save(fromAccount);

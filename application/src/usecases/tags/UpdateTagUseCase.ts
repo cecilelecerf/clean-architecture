@@ -51,7 +51,7 @@ export class UpdateTagUseCase {
     }
     let colorVo;
     if (color) {
-      colorVo = Color.from(color);
+      colorVo = Color.create(color);
       if (colorVo instanceof ColorInvalidFormatError)
         return new ColorInvalidFormatError(color);
     }

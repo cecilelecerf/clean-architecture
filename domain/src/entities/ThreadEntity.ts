@@ -23,37 +23,52 @@ export class ThreadEntity {
     public updatedAt: Date
   ) {}
 
+  private static validateTitle(title: string): string | InvalidTitleError {
+    const trimmed = title.trim();
+    if (trimmed.length < 3 || trimmed.length > 100) {
+      return new InvalidTitleError(title, trimmed.length);
+    }
+    return trimmed;
+  }
+
+  private static validateType(
+    type: string
+  ): "external" | "internal" | InvalidThreadTypeError {
+    if (type !== "external" && type !== "internal") {
+      return new InvalidThreadTypeError("unknown", type, [
+        "external",
+        "internal",
+      ]);
+    }
+    return type;
+  }
+
   public static create({
     id,
     participantsId,
     administratorId,
     title,
     createdAt,
-    updatedAt,
-    isClose,
     type,
   }: Pick<
     ThreadEntity,
-    | "id"
-    | "administratorId"
-    | "createdAt"
-    | "updatedAt"
-    | "participantsId"
-    | "title"
-    | "isClose"
-    | "type"
-  >): ThreadEntity | InvalidTitleError {
-    const verifiedTitle = this.validateTitle(title);
-    if (verifiedTitle instanceof Error) return verifiedTitle;
+    "id" | "administratorId" | "createdAt" | "participantsId" | "title" | "type"
+  >): ThreadEntity | InvalidTitleError | InvalidThreadTypeError {
+    const validatedTitle = this.validateTitle(title);
+    if (validatedTitle instanceof Error) return validatedTitle;
+
+    const validatedType = this.validateType(type);
+    if (validatedType instanceof Error) return validatedType;
+
     return new ThreadEntity(
       id,
       participantsId,
-      verifiedTitle,
+      validatedTitle,
       createdAt,
-      isClose,
-      type,
+      false,
+      validatedType,
       administratorId,
-      updatedAt
+      createdAt
     );
   }
 
@@ -110,31 +125,20 @@ export class ThreadEntity {
 
     const formerAdministratorId = this.administratorId;
 
-    // ✅ Comportement différent selon le type de thread
     if (this.type === "internal") {
-      // 🔄 Thread INTERNAL: échange admin ↔ participant
-
-      // 1. Retirer le nouveau admin des participants
       const removeResult = this.removeParticipant(newAdministratorId, now);
       if (removeResult instanceof Error) return removeResult;
 
-      // 2. Changer l'admin
       this.administratorId = newAdministratorId;
 
-      // 3. Ajouter l'ancien admin aux participants
       const addResult = this.addParticipant(formerAdministratorId, now);
       if (addResult instanceof Error) {
-        // Rollback en cas d'erreur
         this.administratorId = formerAdministratorId;
         return addResult;
       }
     } else if (this.type === "external") {
-      // 🔄 Thread EXTERNAL: changement d'admin uniquement (pas de modification des participants)
-
-      // Juste changer l'admin, les participants restent inchangés
       this.administratorId = newAdministratorId;
     } else {
-      // Type de thread invalide
       return new InvalidThreadTypeError(this.id, this.type, [
         "external",
         "internal",
@@ -149,18 +153,15 @@ export class ThreadEntity {
     this.updatedAt = now;
     this.isClose = true;
   }
-  /** Vérifie si un utilisateur est participant du thread */
   public isParticipant(userId: UserEntity["id"]): boolean {
     if (!this.participantsId) return false;
     return this.participantsId.includes(userId);
   }
 
-  /** Vérifie si un utilisateur est l’administrateur du thread */
   public isAdministrator(userId: UserEntity["id"]): boolean {
     return this.administratorId === userId;
   }
 
-  /** Vérifie si un utilisateur a accès au thread (admin ou participant) */
   public hasAccess(userId: UserEntity["id"]): boolean {
     return this.isAdministrator(userId) || this.isParticipant(userId);
   }
@@ -192,15 +193,6 @@ export class ThreadEntity {
     this.updatedAt = now;
 
     return this;
-  }
-
-  public static validateTitle(
-    newTitle: ThreadEntity["title"]
-  ): InvalidTitleError | ThreadEntity["title"] {
-    const trimedTitle = newTitle.trim();
-    if (trimedTitle.length < 3 || trimedTitle.length > 50)
-      return new InvalidTitleError(newTitle);
-    return trimedTitle;
   }
 
   public updateTitle(

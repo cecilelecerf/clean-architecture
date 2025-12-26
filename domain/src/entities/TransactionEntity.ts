@@ -1,6 +1,11 @@
 import { Money } from "@domain/values/Money";
 import { AccountEntity } from "./AccountEntity";
 import { IBAN } from "@domain/values/IBAN";
+import {
+  InvalidTransactionAmountError,
+  InvalidTransactionLabelError,
+  SameAccountTransactionError,
+} from "@domain/errors/transaction";
 
 export class TransactionEntity {
   private constructor(
@@ -12,6 +17,37 @@ export class TransactionEntity {
     public amount: Money,
     public date: Date
   ) {}
+
+  private static validateLabel(
+    label: string
+  ): string | InvalidTransactionLabelError {
+    const trimmed = label.trim();
+
+    if (trimmed.length < 2 || trimmed.length > 100) {
+      return new InvalidTransactionLabelError(label, trimmed.length);
+    }
+
+    return trimmed;
+  }
+
+  private static validateAmount(
+    amount: Money
+  ): Money | InvalidTransactionAmountError {
+    if (amount.amount <= 0) {
+      return new InvalidTransactionAmountError(amount.amount);
+    }
+
+    return amount;
+  }
+
+  private static validateAccounts(
+    fromAccountId: IBAN,
+    toAccountId: IBAN
+  ): void | SameAccountTransactionError {
+    if (fromAccountId.is(toAccountId)) {
+      return new SameAccountTransactionError(fromAccountId);
+    }
+  }
 
   public static create({
     id,
@@ -30,24 +66,30 @@ export class TransactionEntity {
     | "label"
     | "icon"
     | "date"
-  >): TransactionEntity | Error {
-    // Création d'une vraie error
-    if (fromAccountId === toAccountId) {
-      return new Error("Transaction cannot be made to the same account");
-    }
+  >):
+    | TransactionEntity
+    | SameAccountTransactionError
+    | InvalidTransactionLabelError
+    | InvalidTransactionAmountError {
+    const accountsValidation = this.validateAccounts(
+      fromAccountId,
+      toAccountId
+    );
+    if (accountsValidation instanceof Error) return accountsValidation;
 
-    // Error impossible car déjà vérifier avec le type Date
-    if (amount.amount <= 0) {
-      return new Error("Transaction amount must be positive");
-    }
+    const validatedLabel = this.validateLabel(label);
+    if (validatedLabel instanceof Error) return validatedLabel;
+
+    const validatedAmount = this.validateAmount(amount);
+    if (validatedAmount instanceof Error) return validatedAmount;
 
     return new TransactionEntity(
       id,
-      label,
+      validatedLabel,
       icon,
       fromAccountId,
       toAccountId,
-      amount,
+      validatedAmount,
       date
     );
   }

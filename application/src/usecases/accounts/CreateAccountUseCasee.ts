@@ -73,12 +73,11 @@ export class CreateAccountUseCase {
       iban: ibanVO,
       userId: requestUser,
       name,
-      type: type,
+      type,
       color: colorVO,
       balance: balanceVO,
       currency: currency,
       createdAt: today,
-      updatedAt: today,
     });
 
     if (account instanceof Error) return account;

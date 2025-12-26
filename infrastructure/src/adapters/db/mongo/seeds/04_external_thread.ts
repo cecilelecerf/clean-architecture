@@ -85,10 +85,7 @@ export const generateExternalThreadsMongo = async (
     const msgCount = rand(minMessages, maxMessages);
 
     for (let m = 0; m < msgCount; m++) {
-      currentTime = clockService.addMinutes(
-        currentTime,
-        rand(30, 60 * 24 * 2)
-      );
+      currentTime = clockService.addMinutes(currentTime, rand(30, 60 * 24 * 2));
 
       const sender = m % 2 === 0 ? client : advisor;
       const readBy = [sender.id];

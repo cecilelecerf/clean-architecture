@@ -1,1 +1,2 @@
-export * from "./ContentEmptyError"
+export * from "./ContentEmptyError";
+export * from "./ContentTooLongError";

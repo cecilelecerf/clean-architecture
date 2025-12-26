@@ -3,7 +3,7 @@ export class InvalidThreadTypeError extends Error {
 
   constructor(
     public readonly threadId: string,
-    public readonly currentType: "external" | "internal",
+    public readonly currentType: string,
     public readonly expectedType: ("external" | "internal")[]
   ) {
     super(

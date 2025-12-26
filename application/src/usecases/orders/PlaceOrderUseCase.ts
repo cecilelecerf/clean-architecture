@@ -10,6 +10,10 @@ import {
   MoneyAmountNegativeError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
+import {
+  InvalidOrderTypeError,
+  InvalidQuantityError,
+} from "@domain/errors/order";
 
 interface Props {
   userId: string;
@@ -29,21 +33,19 @@ export class PlaceOrderUseCase {
     userId,
     actionId,
     type,
-    quantity
+    quantity,
   }: Props): Promise<
     | ActionNotFoundError
     | FactorNegativeError
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
+    | InvalidQuantityError
+    | InvalidOrderTypeError
     | void
   > {
     const action = await this.actionRepository.findByISIN(actionId);
     if (!action) return new ActionNotFoundError();
-
-    const totalPriceResult = action.currentPrice.multiply(quantity);
-    if (totalPriceResult instanceof Error) return totalPriceResult;
-    const totalPrice = totalPriceResult;
 
     const today = this.clockService.now();
 
@@ -53,11 +55,9 @@ export class PlaceOrderUseCase {
       actionId: action.ISIN,
       type,
       quantity,
-      price: totalPrice,
+      price: action.currentPrice,
       date: today,
-      status: "pending",
       createdAt: today,
-      updatedAt: today,
     });
 
     if (order instanceof Error) {

@@ -14,6 +14,10 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
+import {
+  InvalidFirstnameError,
+  InvalidLastnameError,
+} from "@domain/errors/user";
 import { Email } from "@domain/values/Email";
 
 type Props = {
@@ -40,12 +44,14 @@ export class RegisterAdvisorStatus {
     confirmationUrl,
     directorId,
   }: Props): Promise<
+    | UserEntity
     | UserNotFoundError
     | UserNotActiveError
     | EmailInvalidFormatError
     | EmailAlreadyExistsError
     | UserRoleMismatchError
-    | UserEntity
+    | InvalidFirstnameError
+    | InvalidLastnameError
   > {
     const actor = await findActiveUser(this.userRepository, directorId);
     if (actor instanceof Error) return actor;
@@ -65,7 +71,7 @@ export class RegisterAdvisorStatus {
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
 
-    const user = UserEntity.from({
+    const user = UserEntity.create({
       id,
       email: emailVO,
       firstname,
@@ -73,10 +79,9 @@ export class RegisterAdvisorStatus {
       passwordHash,
       createdAt,
       role: "conseiller",
-      isActiveField: false,
-      updatedAt: createdAt,
     });
 
+    if (user instanceof Error) return user;
     await this.userRepository.save(user);
 
     const token = await this.tokenService.generateConfirmationToken({
