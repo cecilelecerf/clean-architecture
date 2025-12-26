@@ -22,7 +22,7 @@ export default function TransactionsPage({ params }: { params: Promise<{ account
                 accountIban={accountId}
                 filters={filters}
                 onPaginationChange={(pageNumber) => setFilters((prev) => ({ ...prev, page: pageNumber }))}
-                baseHref={`/accounts/${accountId.toLowerCase()}/transactions`}
+                baseHref={`/accounts/${accountId}/transactions`}
             />
         </>
     )

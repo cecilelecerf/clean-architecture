@@ -5,6 +5,7 @@ import { newTransactionSchema } from '@infrastructure/types/transaction';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { transactionFactory } from '@infrastructure/adapters/db/mysql/factories/transaction';
 import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
+import { querySchema } from '@/utils/endpoint/transactionEndpoints';
 
 export async function GET(
   req: NextRequest,
@@ -16,9 +17,20 @@ export async function GET(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     const { accountIban } = await ctx.params;
+    const searchParams = req.nextUrl.searchParams;
+    const type = searchParams.get('type');
+    const filters = querySchema.parse({
+      label: searchParams.get('label') ?? undefined,
+      type: type && type !== 'all' ? (searchParams.get('type') as 'debit' | 'credit') : undefined,
+      fromDate: searchParams.get('fromDate') ?? undefined,
+      toDate: searchParams.get('toDate') ?? undefined,
+      page: searchParams.get('page') ? Number(searchParams.get('page')) : undefined,
+      limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined,
+    });
     const result = await transactionFactory().getAllByAccount.execute({
       iban: accountIban,
       clientId: session.user.id,
+      filters,
     });
     if (result instanceof Error) {
       return NextResponse.json(
@@ -26,7 +38,7 @@ export async function GET(
         { status: result.statusCode ?? 404 },
       );
     }
-    return NextResponse.json({ transactions: result, total: result.length });
+    return NextResponse.json({ transactions: result.transactions, total: result.totalPages });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: err.message || 'Erreur serveur' }, { status: 500 });

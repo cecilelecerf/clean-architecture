@@ -6,6 +6,7 @@ import {
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { TransactionRepository } from "@application/ports/repositories/TransactionRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { TransactionDTO } from "@domain/entities/TransactionEntity";
 import { InvalidAccountOwnerError } from "@domain/errors/account";
@@ -17,34 +18,43 @@ import {
 } from "@domain/errors/IBAN";
 import { IBAN } from "@domain/values/IBAN";
 
+export type TransactionFilters = {
+  label?: string;
+  type?: "debit" | "credit";
+  fromDate?: string;
+  toDate?: string;
+  page?: number;
+  limit?: number;
+};
+
 interface Props {
   iban: string;
   clientId: string;
   requesterId?: string;
+  filters?: TransactionFilters;
 }
-
-// TODO : faire le même principe mais avec des filtres (exemple dans les posts)
-
-//   if (filters.label) params.set('label', filters.label);
-//   if (filters.page) params.set('page', String(filters.page));
-//   if (filters.limit) params.set('limit', String(filters.limit));
-//   if (filters.fromDate) params.set('fromDate', filters.fromDate);
-//   if (filters.toDate) params.set('toDate', filters.toDate);
-//   if (filters.type) params.set('type', filters.type);
 
 export class GetAllTransactionsByAccountUsecase {
   public constructor(
     private readonly userRepository: UserRepository,
     private readonly transactionRepository: TransactionRepository,
-    private readonly accountRepository: AccountRepository
+    private readonly accountRepository: AccountRepository,
+    private readonly clockService: ClockService
   ) {}
 
   public async execute({
     iban,
     clientId,
     requesterId,
+    filters,
   }: Props): Promise<
-    | TransactionDTO[]
+    | {
+        transactions: TransactionDTO[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+      }
     | UserNotFoundError
     | UserNotActiveError
     | IBANTooShortError
@@ -62,21 +72,44 @@ export class GetAllTransactionsByAccountUsecase {
 
     if (client.hasRole({ role: "client" })) {
       const account = await this.accountRepository.findByIBAN(ibanVO);
-      if (!account?.isClientAccount(client))
+      if (!account?.isClientAccount(client)) {
         return new InvalidAccountOwnerError();
+      }
     }
 
     if (requesterId) {
       const admin = await findActiveUser(this.userRepository, requesterId);
       if (admin instanceof Error) return admin;
-      if (admin.hasRole({ role: "client" }))
+      if (admin.hasRole({ role: "client" })) {
         return new UserRoleMismatchError(
           ["conseiller", "directeur"],
           admin.role
         );
+      }
     }
 
-    const transactions = await this.transactionRepository.findByIban(ibanVO);
-    return transactions.map((transaction) => transaction.toDTO());
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? 20;
+
+    const result = await this.transactionRepository.findAllByAccountWithFilters(
+      ibanVO,
+      {
+        ...filters,
+        page,
+        limit,
+      }
+    );
+
+    const totalPages = Math.ceil(result.total / limit);
+
+    return {
+      transactions: result.transactions.map((transaction) =>
+        transaction.toDTO(ibanVO)
+      ),
+      total: result.total,
+      page,
+      limit,
+      totalPages,
+    };
   }
 }

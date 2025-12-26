@@ -41,11 +41,12 @@ export default function LoginPage() {
 
   return (
     <form onSubmit={(e) => handleSubmit(e)}>
+      <Link href="/">ACCUEIL</Link>
       <FormWrapper
         title="Se connecter"
         fields={[
-          { get: email, set: (e) => setEmail(e), label: 'Email', type: 'email' },
-          { get: password, set: (e) => setPassword(e), label: 'Mot de passe', type: 'password' },
+          { get: email, set: (e) => setEmail(e as string), label: 'Email', type: 'email' },
+          { get: password, set: (e) => setPassword(e as string), label: 'Mot de passe', type: 'password' },
         ]}
         button="Connexion"
         loading={false}

@@ -1,5 +1,6 @@
 import { Money } from "@domain/values/Money";
 import { AccountEntity } from "./AccountEntity";
+import { IBAN } from "@domain/values/IBAN";
 
 export class TransactionEntity {
   private constructor(
@@ -9,8 +10,7 @@ export class TransactionEntity {
     public fromAccountId: AccountEntity["iban"],
     public toAccountId: AccountEntity["iban"],
     public amount: Money,
-    public date: Date,
-    public type: "credit" | "debit"
+    public date: Date
   ) {}
 
   public static create({
@@ -20,16 +20,16 @@ export class TransactionEntity {
     icon,
     toAccountId,
     amount,
-    type,
+    date,
   }: Pick<
     TransactionEntity,
     | "fromAccountId"
     | "toAccountId"
     | "amount"
-    | "type"
     | "id"
     | "label"
     | "icon"
+    | "date"
   >): TransactionEntity | Error {
     // Création d'une vraie error
     if (fromAccountId === toAccountId) {
@@ -41,7 +41,6 @@ export class TransactionEntity {
       return new Error("Transaction amount must be positive");
     }
 
-    const now = new Date();
     return new TransactionEntity(
       id,
       label,
@@ -49,8 +48,7 @@ export class TransactionEntity {
       fromAccountId,
       toAccountId,
       amount,
-      now,
-      type
+      date
     );
   }
 
@@ -62,7 +60,6 @@ export class TransactionEntity {
     toAccountId,
     amount,
     date,
-    type,
   }: Pick<
     TransactionEntity,
     | "id"
@@ -72,7 +69,6 @@ export class TransactionEntity {
     | "icon"
     | "amount"
     | "date"
-    | "type"
   >) {
     return new TransactionEntity(
       id,
@@ -81,21 +77,23 @@ export class TransactionEntity {
       fromAccountId,
       toAccountId,
       amount,
-      date,
-      type
+      date
     );
   }
-  toDTO(): TransactionDTO {
+  public getTypeForAccount(accountIban: IBAN): "debit" | "credit" {
+    return this.fromAccountId.is(accountIban) ? "debit" : "credit";
+  }
+  toDTO(contextIban?: IBAN): TransactionDTO {
     return {
       id: this.id,
       label: this.label,
       icon: this.icon,
-      type: this.type,
       date: this.date.toISOString(),
       amount: this.amount.amount,
       currency: this.amount.currency,
       fromAccountIban: this.fromAccountId.value,
       toAccountIban: this.toAccountId.value,
+      type: contextIban ? this.getTypeForAccount(contextIban) : undefined,
     };
   }
 }
@@ -106,4 +104,5 @@ export type TransactionDTO = {
   fromAccountIban: string;
   toAccountIban: string;
   date: string;
-} & Pick<TransactionEntity, "id" | "icon" | "label" | "type">;
+  type?: "debit" | "credit";
+} & Pick<TransactionEntity, "id" | "icon" | "label">;
