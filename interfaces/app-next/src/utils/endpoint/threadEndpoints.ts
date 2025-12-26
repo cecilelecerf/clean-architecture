@@ -146,7 +146,6 @@ export const threadsEndpoint = createEndpointsNodes({
       mutationFn: ({ newAdministratorId }: AddParticipant) =>
         post(`/threads/${threadId}/transfer`, { newAdministratorId }),
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['threads', threadId] });
         queryClient.invalidateQueries({ queryKey: ['threads', 'list'] });
       },
     }),

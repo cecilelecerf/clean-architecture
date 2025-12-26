@@ -17,8 +17,14 @@ const all = async () => {
   const advisors = await seedSQLAdministrator(mysqlClient);
   const clients = await seedSQLClient(mysqlClient);
   const directors = await seedSQLDirector(mysqlClient);
-  await generateExternalThreads(clients, advisors, mysqlClient);
-  await generateInternalThreads(directors, advisors, mysqlClient);
+  await generateExternalThreads(advisors, clients, mysqlClient);
+  await generateInternalThreads(directors, advisors, mysqlClient, {
+    threadsCount: 15,
+    minAdminsPerThread: 2,
+    maxAdminsPerThread: 5,
+    minMessages: 4,
+    maxMessages: 12,
+  });
   const tags = await generateTags(mysqlClient);
   await generatePosts(advisors, directors, clients, tags, mysqlClient);
   const actions = await generateActions(mysqlClient);

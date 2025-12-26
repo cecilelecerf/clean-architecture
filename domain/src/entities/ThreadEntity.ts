@@ -96,7 +96,8 @@ export class ThreadEntity {
     | ThreadEntity
     | ThreadClosedError
     | ThreadTransferToSameAdministratorError
-    | InvalidThreadAccessError {
+    | InvalidThreadAccessError
+    | InvalidThreadTypeError {
     if (this.isClose) return new ThreadClosedError(this.id);
     if (!this.administratorId)
       return new InvalidThreadAccessError(null, this.id);
@@ -109,15 +110,35 @@ export class ThreadEntity {
 
     const formerAdministratorId = this.administratorId;
 
-    const removeResult = this.removeParticipant(newAdministratorId, now);
-    if (removeResult instanceof Error) return removeResult;
+    // ✅ Comportement différent selon le type de thread
+    if (this.type === "internal") {
+      // 🔄 Thread INTERNAL: échange admin ↔ participant
 
-    this.administratorId = newAdministratorId;
+      // 1. Retirer le nouveau admin des participants
+      const removeResult = this.removeParticipant(newAdministratorId, now);
+      if (removeResult instanceof Error) return removeResult;
 
-    const addResult = this.addParticipant(formerAdministratorId, now);
-    if (addResult instanceof Error) {
-      this.administratorId = formerAdministratorId;
-      return addResult;
+      // 2. Changer l'admin
+      this.administratorId = newAdministratorId;
+
+      // 3. Ajouter l'ancien admin aux participants
+      const addResult = this.addParticipant(formerAdministratorId, now);
+      if (addResult instanceof Error) {
+        // Rollback en cas d'erreur
+        this.administratorId = formerAdministratorId;
+        return addResult;
+      }
+    } else if (this.type === "external") {
+      // 🔄 Thread EXTERNAL: changement d'admin uniquement (pas de modification des participants)
+
+      // Juste changer l'admin, les participants restent inchangés
+      this.administratorId = newAdministratorId;
+    } else {
+      // Type de thread invalide
+      return new InvalidThreadTypeError(this.id, this.type, [
+        "external",
+        "internal",
+      ]);
     }
 
     this.updatedAt = now;
@@ -212,7 +233,7 @@ export class ThreadEntity {
       );
     }
     if (this.type !== "external")
-      return new InvalidThreadTypeError(this.id, this.type, "external");
+      return new InvalidThreadTypeError(this.id, this.type, ["external"]);
   }
 
   public assignAdvisor(

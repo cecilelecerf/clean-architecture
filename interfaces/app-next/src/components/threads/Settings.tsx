@@ -10,12 +10,14 @@ import { endpoints } from "@/utils/endpoint"
 import { ThreadWithUser } from "@/utils/endpoint/threadEndpoints"
 import { UserId } from "@infrastructure/types/user"
 import { Flex } from "@radix-ui/themes"
-import { useMutation, useQueries } from "@tanstack/react-query"
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query"
 import { Check, Plus, Settings2, SettingsIcon, Trash2, UserRoundX, UserStar } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useMemo, useState } from "react"
 import { match } from "ts-pattern"
 import { Skeleton } from "../ui/skeleton"
+import { useRouter } from "next/navigation"
+import { queryClient } from "@/lib/queryClient"
 
 type Props = {} & ThreadWithUser
 
@@ -56,7 +58,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                                     {participant.firstname} {participant.lastname}
                                 </p>
                             </Flex>
-                            {isAdmin && type === "internal" && (
+                            {isAdmin && type === "internal" && !isClose && (
                                 <Popover>
                                     <PopoverTrigger asChild><Button variant="ghost" size="icon-sm"><Settings2 /></Button>
                                     </PopoverTrigger>
@@ -66,7 +68,16 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                                                 <ButtonLoading
                                                     variant="ghost"
                                                     loading={transfer.isPending}
-                                                    onClick={() => transfer.mutate({ newAdministratorId: participant.id })} className="text-gray-500
+                                                    onClick={() => transfer.mutate({ newAdministratorId: participant.id }, {
+                                                        onSuccess: () => {
+                                                            queryClient.invalidateQueries({
+                                                                queryKey: ['threads', id]
+                                                            });
+                                                            queryClient.invalidateQueries({
+                                                                queryKey: ['threads', 'list']
+                                                            });
+                                                        }
+                                                    })} className="text-gray-500
                                             ">
                                                     <UserStar />
                                                     Désigner admin
@@ -88,19 +99,18 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                         </Flex>
                     )}
                 </Flex>
-                {isAdmin && type === "internal" && (
+                {isAdmin && type === "internal" && !isClose && (
                     <AddParticipant administratorId={administrator.id} participantsId={participantsId} id={id} />
                 )}
+                {isAdmin && type === 'external' && !isClose && (
+                    <TransferToAdvisor id={id} />
+                )}
                 <DialogFooter >
-                    {isAdmin && (
-                        <>
-                            {/* TODO : faire la cloture du compte */}
-                            {!isClose &&
-                                <ButtonLoading loading={false} variant="destructive" onClick={() => closeThread.mutate()}>
-                                    <Trash2 /> Cloturer la conversation ?
-                                </ButtonLoading>
-                            }
-                        </>
+                    {isAdmin && !isClose && (
+                        <ButtonLoading loading={false} variant="destructive" onClick={() => closeThread.mutate()}>
+                            <Trash2 /> Cloturer la conversation ?
+                        </ButtonLoading>
+
                     )}</DialogFooter>
             </DialogContent>
         </Dialog >
@@ -235,6 +245,107 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
             )
         })
         .otherwise(() => <SkeletonAddParticipant />)
+
+}
+
+
+
+const TransferToAdvisor = ({ id }: Pick<Props, "id">) => {
+    const { data: session } = useSession();
+    if (!session?.user?.id) return <div>Unauthorized</div>;
+    const [selectedUserId, setSelectedUserId] = useState<UserId | null>(null);
+    const [open, setOpen] = useState(false);
+    const router = useRouter()
+
+    const queries = useQuery(endpoints.users.getAll({ role: "conseiller" }))
+    const transferTo = useMutation(endpoints.threads.transfer({ threadId: id }));
+
+
+    return match(queries)
+        .with({ status: "error" }, () => "error")
+        .with({ status: "pending" }, () => "pending")
+        .with({ status: 'success' }, ({ data: users }) => {
+            if (users.length === 0) {
+                return (
+                    <Button variant="secondary" disabled>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Aucun participant disponible
+                    </Button>
+                );
+            }
+
+            return (
+                <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                        <Button variant="secondary">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Transférer la conversation
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0" align="start">
+                        <Command>
+                            <CommandInput placeholder="Rechercher un utilisateur..." />
+                            <CommandList>
+                                <CommandEmpty>Aucun utilisateur trouvé.</CommandEmpty>
+                                <CommandGroup heading="Conseillers">
+                                    {users
+                                        .filter((user) => user.id !== session.user.id)
+                                        .map((user) => (
+                                            <CommandItem
+                                                key={user.id}
+                                                value={`${user.firstname} ${user.lastname}`}
+                                                onSelect={() => setSelectedUserId(user.id)}
+                                            >
+                                                <Flex align="center" gap="2" className="flex-1">
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarFallback>
+                                                            {user.firstname[0]}{user.lastname[0]}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <span>
+                                                        {user.firstname} {user.lastname}
+                                                    </span>
+                                                </Flex>
+                                                <Check
+                                                    className={cn(
+                                                        "ml-auto h-4 w-4",
+                                                        selectedUserId === user.id ? "opacity-100" : "opacity-0"
+                                                    )}
+                                                />
+                                            </CommandItem>
+                                        ))}
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                        {selectedUserId && (
+                            <div className="border-t p-2">
+                                <ButtonLoading
+                                    loading={transferTo.isPending}
+                                    onClick={() => transferTo.mutate({ newAdministratorId: selectedUserId }, {
+                                        onSuccess: () => {
+                                            router.push("/admin/client-threads");
+                                            setTimeout(() => {
+                                                queryClient.invalidateQueries({
+                                                    queryKey: ['threads', id]
+                                                });
+                                                queryClient.invalidateQueries({
+                                                    queryKey: ['threads', 'list']
+                                                });
+                                            }, 100);
+                                        }
+                                    })}
+                                    className="w-full"
+                                >
+                                    Transférer
+                                </ButtonLoading>
+                            </div>
+                        )}
+                    </PopoverContent>
+                </Popover >
+
+            )
+        })
+        .exhaustive()
 
 }
 
