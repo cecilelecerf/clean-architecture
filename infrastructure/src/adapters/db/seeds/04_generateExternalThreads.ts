@@ -1,12 +1,11 @@
-import { MessageEntity } from "@domain/entities/MessageEntity";
-import { pick, rand } from "./utils";
-import { ThreadEntity } from "@domain/entities/ThreadEntity";
-import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { MySQLClient } from "../../MySQLClient";
-import { MessageRepositoryMySQL } from "../repositories/MessageRepositoryMySQL";
-import { ThreadRepositoryMySQL } from "../repositories/ThreadRepositoryMySQL";
+import { ThreadEntity } from "@domain/entities/ThreadEntity";
+import { MessageEntity } from "@domain/entities/MessageEntity";
+import { SeedThreadUseCase } from "@application/usecases/seeds/SeedThreadUseCase";
+import { SeedMessageUseCase } from "@application/usecases/seeds/SeedMessageUseCase";
+import { ClockService } from "@application/ports/services/ClockService";
+import { pick, rand } from "./utils";
+
 const loremExternal = [
   "Bonjour, j'aimerais ouvrir un compte épargne.",
   "Quels sont les taux actuels pour un prêt immobilier ?",
@@ -26,22 +25,22 @@ const titlesExternal = [
   "Rendez-vous en agence",
   "Modification de contrat",
 ];
+
+interface ExternalThreadOptions {
+  threadsCount?: number;
+  minMessages?: number;
+  maxMessages?: number;
+}
+
 export const generateExternalThreads = async (
   conseillers: UserEntity[],
   clients: UserEntity[],
-  mySqlClient: MySQLClient,
-  opts?: {
-    threadsCount?: number;
-    minMessages?: number;
-    maxMessages?: number;
-  }
+  seedThreadUseCase: SeedThreadUseCase,
+  seedMessageUseCase: SeedMessageUseCase,
+  clockService: ClockService,
+  opts?: ExternalThreadOptions
 ): Promise<{ threads: ThreadEntity[]; messages: MessageEntity[] }> => {
   console.log("-- Génération des threads externes --");
-
-  const threadRepository = new ThreadRepositoryMySQL(mySqlClient);
-  const messageRepository = new MessageRepositoryMySQL(mySqlClient);
-  const clockService = new SystemClockService();
-  const uuidService = new NodeUuidService();
 
   if (!conseillers.length || !clients.length) {
     throw new Error("Tu dois fournir au moins un conseiller et un client.");
@@ -56,58 +55,55 @@ export const generateExternalThreads = async (
   const threads: ThreadEntity[] = [];
   const messages: MessageEntity[] = [];
 
-  const client0 = clients[0]; // Client à l'index 0
-  const conseiller0 = conseillers[0]; // Conseiller à l'index 0
+  const client0 = clients[0];
+  const conseiller0 = conseillers[0];
 
-  // ✅ 1. Thread NORMAL pour client[0] avec conseiller[0]
+  // 1. Thread NORMAL pour client[0] avec conseiller[0]
   console.log(`📌 Création thread NORMAL pour ${client0.id}`);
   const threadNormal = await createExternalThread({
     client: client0,
     conseiller: conseiller0,
     status: "normal",
-    threadRepository,
-    messageRepository,
+    seedThreadUseCase,
+    seedMessageUseCase,
     clockService,
-    uuidService,
     minMessages,
     maxMessages,
   });
   threads.push(threadNormal.thread);
   messages.push(...threadNormal.messages);
 
-  // ✅ 2. Thread SANS ADMIN pour client[0]
+  // 2. Thread SANS ADMIN pour client[0]
   console.log(`📌 Création thread SANS ADMIN pour ${client0.id}`);
   const threadNoAdmin = await createExternalThread({
     client: client0,
     conseiller: null,
     status: "no-admin",
-    threadRepository,
-    messageRepository,
+    seedThreadUseCase,
+    seedMessageUseCase,
     clockService,
-    uuidService,
     minMessages,
     maxMessages,
   });
   threads.push(threadNoAdmin.thread);
   messages.push(...threadNoAdmin.messages);
 
-  // ✅ 3. Thread FERMÉ pour client[0] avec conseiller[0]
+  // 3. Thread FERMÉ pour client[0] avec conseiller[0]
   console.log(`📌 Création thread FERMÉ pour ${client0.id}`);
   const threadClosed = await createExternalThread({
     client: client0,
     conseiller: conseiller0,
     status: "closed",
-    threadRepository,
-    messageRepository,
+    seedThreadUseCase,
+    seedMessageUseCase,
     clockService,
-    uuidService,
     minMessages,
     maxMessages,
   });
   threads.push(threadClosed.thread);
   messages.push(...threadClosed.messages);
 
-  // ✅ 4. Au moins 1 autre thread pour conseiller[0] avec un autre client
+  // 4. Au moins 1 autre thread pour conseiller[0]
   console.log(
     `📌 Création thread supplémentaire pour conseiller ${conseiller0.id}`
   );
@@ -116,17 +112,16 @@ export const generateExternalThreads = async (
     client: otherClient,
     conseiller: conseiller0,
     status: "normal",
-    threadRepository,
-    messageRepository,
+    seedThreadUseCase,
+    seedMessageUseCase,
     clockService,
-    uuidService,
     minMessages,
     maxMessages,
   });
   threads.push(threadForConseiller.thread);
   messages.push(...threadForConseiller.messages);
 
-  // ✅ 5. Génération des threads aléatoires restants
+  // 5. Threads aléatoires restants
   const remainingThreadsCount = Math.max(0, threadsCount - 4);
   console.log(`📌 Création de ${remainingThreadsCount} threads aléatoires`);
 
@@ -143,10 +138,9 @@ export const generateExternalThreads = async (
       client,
       conseiller,
       status,
-      threadRepository,
-      messageRepository,
+      seedThreadUseCase,
+      seedMessageUseCase,
       clockService,
-      uuidService,
       minMessages,
       maxMessages,
     });
@@ -155,7 +149,7 @@ export const generateExternalThreads = async (
     messages.push(...randomThread.messages);
   }
 
-  console.log(`✅ ${threads.length} threads externes créés`);
+  console.log(`✅ ${threads.length} threads externes créés\n`);
   return { threads, messages };
 };
 
@@ -166,44 +160,42 @@ async function createExternalThread({
   client,
   conseiller,
   status,
-  threadRepository,
-  messageRepository,
+  seedThreadUseCase,
+  seedMessageUseCase,
   clockService,
-  uuidService,
   minMessages,
   maxMessages,
 }: {
   client: UserEntity;
   conseiller: UserEntity | null;
   status: "normal" | "no-admin" | "closed";
-  threadRepository: ThreadRepositoryMySQL;
-  messageRepository: MessageRepositoryMySQL;
-  clockService: SystemClockService;
-  uuidService: NodeUuidService;
+  seedThreadUseCase: SeedThreadUseCase;
+  seedMessageUseCase: SeedMessageUseCase;
+  clockService: ClockService;
   minMessages: number;
   maxMessages: number;
 }): Promise<{ thread: ThreadEntity; messages: MessageEntity[] }> {
   const createdAt = clockService.nowMinusDays(rand(1, 60));
   const lastUpdatedAt = clockService.addDays(createdAt, rand(0, 15));
 
-  const thread = ThreadEntity.from({
-    id: uuidService.generate(),
+  // Créer le thread via use case
+  const thread = await seedThreadUseCase.execute({
     administratorId: conseiller?.id ?? null,
     participantsId: [client.id],
     title: pick(titlesExternal),
+    type: "external",
+    isClose: status === "closed",
     createdAt,
     updatedAt: lastUpdatedAt,
-    isClose: status === "closed",
-    type: "external",
   });
 
-  await threadRepository.save(thread);
   console.log(
     `  Thread ${status.toUpperCase()}: ${thread.id} (client: ${
       client.id
     }, conseiller: ${conseiller?.id ?? "NONE"})`
   );
 
+  // Créer les messages
   const messages: MessageEntity[] = [];
   const msgCount = rand(minMessages, maxMessages);
   let currentTime = new Date(createdAt);
@@ -211,9 +203,10 @@ async function createExternalThread({
   for (let m = 0; m < msgCount; m++) {
     currentTime = clockService.addMinutes(currentTime, rand(30, 1800));
 
-    // Alternance client / conseiller (si conseiller existe)
+    // Alternance client / conseiller
     const sender = conseiller && m % 2 === 1 ? conseiller : client;
 
+    // Déterminer qui a lu le message
     const readBy: string[] = [];
     if (conseiller && Math.random() < 0.7) {
       readBy.push(conseiller.id);
@@ -222,8 +215,7 @@ async function createExternalThread({
       readBy.push(client.id);
     }
 
-    const msg = MessageEntity.from({
-      id: uuidService.generate(),
+    const message = await seedMessageUseCase.execute({
       threadId: thread.id,
       senderId: sender.id,
       content: pick(loremExternal),
@@ -231,8 +223,7 @@ async function createExternalThread({
       readBy: Array.from(new Set(readBy)),
     });
 
-    messages.push(msg);
-    await messageRepository.save(msg);
+    messages.push(message);
   }
 
   return { thread, messages };

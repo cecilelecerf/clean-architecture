@@ -38,15 +38,11 @@ export class AccountEntity {
     userId,
   }: Pick<
     AccountEntity,
-    | "iban"
-    | "name"
-    | "type"
-    | "color"
-    | "balance"
-    | "currency"
-    | "createdAt"
-    | "userId"
-  >): AccountEntity | InvalidAccountNameError | InvalidAccountTypeError {
+    "iban" | "name" | "color" | "balance" | "currency" | "createdAt" | "userId"
+  > & { type: string }):
+    | AccountEntity
+    | InvalidAccountNameError
+    | InvalidAccountTypeError {
     const verifiedName = this.verifyName(name);
     if (verifiedName instanceof Error) return verifiedName;
 

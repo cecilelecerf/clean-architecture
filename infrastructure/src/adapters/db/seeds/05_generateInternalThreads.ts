@@ -1,12 +1,10 @@
-import { ThreadRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/ThreadRepositoryMySQL";
-import { MessageRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositories/MessageRepositoryMySQL";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { MessageEntity } from "@domain/entities/MessageEntity";
-import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
-import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
-import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { SeedThreadUseCase } from "@application/usecases/seeds/SeedThreadUseCase";
+import { SeedMessageUseCase } from "@application/usecases/seeds/SeedMessageUseCase";
 import { pick, rand } from "./utils";
+import { ClockService } from "@application/ports/services/ClockService";
 
 const lorem = [
   "Merci pour la mise à jour du rapport.",
@@ -27,27 +25,26 @@ const titlesInternal = [
   "Communication interne",
 ];
 
+interface InternalThreadOptions {
+  threadsCount?: number;
+  minAdminsPerThread?: number;
+  maxAdminsPerThread?: number;
+  minMessages?: number;
+  maxMessages?: number;
+}
+
 /**
  * Génère des threads internes (directeur ↔ administrateurs)
  */
 export const generateInternalThreads = async (
   directors: UserEntity[],
   administrators: UserEntity[],
-  mySqlClient: MySQLClient,
-  opts?: {
-    threadsCount?: number;
-    minAdminsPerThread?: number;
-    maxAdminsPerThread?: number;
-    minMessages?: number;
-    maxMessages?: number;
-  }
+  seedThreadUseCase: SeedThreadUseCase,
+  seedMessageUseCase: SeedMessageUseCase,
+  clockService: ClockService,
+  opts?: InternalThreadOptions
 ): Promise<{ threads: ThreadEntity[]; messages: MessageEntity[] }> => {
   console.log("-- Génération des threads internes --");
-
-  const threadRepository = new ThreadRepositoryMySQL(mySqlClient);
-  const messageRepository = new MessageRepositoryMySQL(mySqlClient);
-  const clockService = new SystemClockService();
-  const uuidService = new NodeUuidService();
 
   if (!directors.length || !administrators.length) {
     throw new Error(
@@ -81,19 +78,19 @@ export const generateInternalThreads = async (
     const createdAt = clockService.nowMinusDays(rand(1, 30));
     const lastUpdatedAt = clockService.addDays(createdAt, rand(0, 10));
 
-    const thread = ThreadEntity.from({
-      id: uuidService.generate(),
+    // Créer le thread via use case
+    const thread = await seedThreadUseCase.execute({
       administratorId: director.id,
       participantsId: adminsInThread,
       title: pick(titlesInternal),
+      type: "internal",
+      isClose: Math.random() < 0.1,
       createdAt,
       updatedAt: lastUpdatedAt,
-      isClose: Math.random() < 0.1,
-      type: "internal",
     });
+
     threads.push(thread);
-    await threadRepository.save(thread);
-    console.log(`Thread interne créé: ${thread.id}`);
+    console.log(`  ✅ Thread interne créé: ${thread.id}`);
 
     let currentTime = new Date(createdAt);
     const msgCount = rand(minMessages, maxMessages);
@@ -108,8 +105,7 @@ export const generateInternalThreads = async (
 
       const readBy = adminsInThread.filter(() => Math.random() < 0.8);
 
-      const msg = MessageEntity.from({
-        id: uuidService.generate(),
+      const message = await seedMessageUseCase.execute({
         threadId: thread.id,
         senderId: sender.id,
         content: pick(lorem),
@@ -117,10 +113,10 @@ export const generateInternalThreads = async (
         readBy: Array.from(new Set([director.id, ...readBy])),
       });
 
-      messages.push(msg);
-      await messageRepository.save(msg);
+      messages.push(message);
     }
   }
 
+  console.log(`✅ ${threads.length} threads internes créés\n`);
   return { threads, messages };
 };
