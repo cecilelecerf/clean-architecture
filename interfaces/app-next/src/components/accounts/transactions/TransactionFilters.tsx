@@ -51,6 +51,7 @@ export const TransactionFilters = ({ filters, onChange, isAdmin }: TransactionFi
                                         ...prev,
                                         type: val as Transaction["type"]
                                     }))
+
                                     return val
                                 }
                                 }

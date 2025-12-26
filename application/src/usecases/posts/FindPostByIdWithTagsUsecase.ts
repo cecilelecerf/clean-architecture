@@ -6,10 +6,7 @@ import {
   UserNotActiveError,
   UserNotFoundError,
 } from "@application/errors/users";
-import {
-  PostRepository,
-  PostWithTagsAndUser,
-} from "@application/ports/repositories/PostRepository";
+import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import {
   PostDTOMapper,
@@ -45,6 +42,6 @@ export class FindPostByIdWithTagsUsecase {
     if (user.hasRole({ role: "client" }) && !post.publishedAt)
       return new InvalidPostAccessError(user.id, post.id);
 
-    return PostDTOMapper.map(post);
+    return PostDTOMapper.tagsAndUserMap(post);
   }
 }

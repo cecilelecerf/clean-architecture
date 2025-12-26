@@ -7,6 +7,7 @@ import { PostId } from "@infrastructure/types/feed";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = { postId: PostId }
 
@@ -15,7 +16,7 @@ export const PostQuery = ({ postId }: Props) => {
     const query = useQuery(endpoints.feeds.posts.get({ id: postId }));
     return match(query)
         .with({ status: "error" }, () => "error")
-        .with({ status: "pending" }, () => "pending")
+        .with({ status: "pending" }, () => <SkeletonPost />)
         .with({ status: "success" }, ({ data: post }) => (
             <PostDisplay postData={post} />)
         ).exhaustive()
@@ -62,4 +63,38 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
                 </p>
             </div>
         </>)
+}
+
+export const SkeletonPost = () => {
+    return (
+        <>
+            <div className="flex justify-between items-center gap-3">
+                <Skeleton className="h-8 w-3/4 max-w-lg" />
+            </div>
+            <div className="space-y-6 mt-4">
+                <div className="space-y-2">
+                    {/* Tags skeleton */}
+                    <div className="flex flex-wrap gap-2">
+                        {Array.from({ length: 3 }).map((_, index) => (
+                            <Skeleton
+                                key={index}
+                                className="h-6 w-16 rounded-full"
+                            />
+                        ))}
+                    </div>
+                    {/* Date skeleton */}
+                    <Skeleton className="h-4 w-40" />
+                </div>
+                {/* Content skeleton */}
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-4/5" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                </div>
+            </div>
+        </>
+    )
 }

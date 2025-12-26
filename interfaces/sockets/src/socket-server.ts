@@ -1,7 +1,7 @@
 import { createServer } from "http";
-import { MessageWithUser } from "infrastructure/src/types/message";
 import { Server } from "socket.io";
 import { PostWithTagsAndUser } from "@application/ports/repositories/PostRepository";
+import { MessageWithUserDTO } from "@infrastructure/types/message";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -24,7 +24,7 @@ io.on("connection", (socket) => {
   });
   socket.on(
     "thread:new_message",
-    ({ message }: { message: MessageWithUser }) => {
+    ({ message }: { message: MessageWithUserDTO }) => {
       io.to(message.threadId).emit(
         `thread:${message.threadId}:new_message`,
         message
@@ -33,6 +33,8 @@ io.on("connection", (socket) => {
   );
 
   socket.on("post:update", ({ post }: { post: PostWithTagsAndUser }) => {
+    console.log(post);
+    console.log(`post:${post.id}:update`);
     io.emit(`post:${post.id}:update`, post);
   });
   socket.on("post:status", ({ post }: { post: PostWithTagsAndUser }) => {

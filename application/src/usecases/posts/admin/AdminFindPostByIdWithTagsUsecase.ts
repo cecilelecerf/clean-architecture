@@ -40,6 +40,6 @@ export class AdminFindPostByIdWithTagsUsecase {
     const post = await this.feedRepository.findWithTagsAndUserById(postId);
     if (!post) return new PostNotFoundError();
 
-    return PostDTOMapper.map(post);
+    return PostDTOMapper.tagsAndUserMap(post);
   }
 }

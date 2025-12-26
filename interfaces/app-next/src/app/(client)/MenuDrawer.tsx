@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from '@/components/ui/button';
 import {
     Drawer,
@@ -12,39 +14,65 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { MenuLink } from './MenuLink';
 import { SignOutButton } from '@/components/SignOutButton';
-import { CircleX, Home, Menu, MessageSquare } from 'lucide-react';
+import { CircleX, Home, Menu, MessageSquare, TrendingUp, CreditCard } from 'lucide-react';
 
 const menuItems = [
-    { icon: <Home size={18} />, label: "Account", href: "/accounts" },
-    { icon: <MessageSquare size={18} />, label: "Conversations", href: "/threads" },
-    { icon: <MessageSquare size={18} />, label: "Actualités", href: "/feeds" },
-    { icon: <MessageSquare size={18} />, label: "Crédits", href: "/credits" },
-];
+    { icon: Home, label: "Comptes", href: "/accounts" },
+    { icon: MessageSquare, label: "Conversations", href: "/threads" },
+    { icon: TrendingUp, label: "Actualités", href: "/feeds" },
+    { icon: CreditCard, label: "Crédits", href: "/credits" },
+] as const;
 
 export const MenuDrawer = () => (
     <Drawer direction="right">
         <DrawerTrigger asChild>
-            <Button variant="outline" >
-                <Menu className="h-5 w-5 text-muted-foreground" />
+            <Button
+                variant="outline"
+                size="icon"
+                aria-label="Ouvrir le menu"
+            >
+                <Menu className="h-5 w-5" />
             </Button>
         </DrawerTrigger>
-        <DrawerContent>
-            <DrawerHeader className="flex justify-between flex-row">
-                <div>
-                    <DrawerTitle>A.V.E.N.I.R</DrawerTitle>
-                    <DrawerDescription>Menu</DrawerDescription>
+        <DrawerContent className="h-full w-[300px] sm:w-[350px]">
+            <DrawerHeader className="flex justify-between items-start flex-row">
+                <div className="space-y-1">
+                    <DrawerTitle className="text-xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        A.V.E.N.I.R
+                    </DrawerTitle>
+                    <DrawerDescription className="text-sm">
+                        Menu principal
+                    </DrawerDescription>
                 </div>
-                <DrawerClose>
-                    <CircleX />
+                <DrawerClose asChild>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full"
+                        aria-label="Fermer le menu"
+                    >
+                        <CircleX className="h-5 w-5" />
+                    </Button>
                 </DrawerClose>
             </DrawerHeader>
-            <Separator />
-            <div className="flex flex-col items-start">
-                {menuItems.map((item, i) => <MenuLink {...item} key={i} />)}
-            </div>
-            <DrawerFooter>
+
+            <Separator className="my-2" />
+
+            <nav className="flex-1 overflow-y-auto px-4 py-2" aria-label="Menu principal">
+                <ul className="space-y-1">
+                    {menuItems.map((item) => (
+                        <li key={item.href}>
+                            <MenuLink {...item} />
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+
+            <Separator className="my-2" />
+
+            <DrawerFooter className="pt-4">
                 <SignOutButton />
             </DrawerFooter>
         </DrawerContent>
     </Drawer>
-)
+);

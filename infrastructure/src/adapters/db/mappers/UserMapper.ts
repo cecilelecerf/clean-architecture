@@ -5,7 +5,6 @@ import { RowDataPacket } from "mysql2/promise";
 export class UserMapper {
   static mapRowToUser(row: RowDataPacket, prefix: string = ""): UserEntity {
     const email = Email.from(row[`${prefix}email`]);
-
     return UserEntity.from({
       id: row[`${prefix}id`],
       email: email,

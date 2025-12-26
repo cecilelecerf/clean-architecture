@@ -8,10 +8,11 @@ import { Button } from '@/components/ui/button';
 import { UserDto } from '@infrastructure/types/user';
 import { useRouter } from 'next/navigation';
 import { endpoints } from '@/utils/endpoint';
-import { WrapperThread } from '@/components/threads/WrapperThread';
+import { SkeletonThread, WrapperThread } from '@/components/threads/WrapperThread';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
+    console.log(threadId)
     const queries = useQueries({
         queries: [
             endpoints.threads.get({ threadId }),
@@ -43,6 +44,6 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
                     </span>}
             />)
         )
-        .otherwise(() => "pending")
+        .otherwise(() => <SkeletonThread />)
 }
 

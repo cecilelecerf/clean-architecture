@@ -29,15 +29,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credits/[c
       );
     }
 
-    return NextResponse.json(
-      creditSchema
-        .omit({ createdAt: true, updatedAt: true })
-        .extend({
-          createdAt: z.date(),
-          updatedAt: z.date().optional(),
-        })
-        .parse(result),
-    );
+    return NextResponse.json(creditSchema.safeParse(result));
   } catch (err) {
     console.error(err);
     return NextResponse.json(

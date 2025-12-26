@@ -5,6 +5,7 @@ import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import {
   PostId,
   postSchema,
+  postWithTagsSchema,
   TagId,
   tagIdSchema,
   tagSchema,
@@ -46,8 +47,8 @@ export type PublishAction = z.infer<typeof publishActionSchema>;
 export const querySchema = paginationSchema.extend({
   tagsId: tagIdSchema.array().optional(),
   status: z.boolean().optional(),
-  fromDate: z.string().datetime().optional(),
-  toDate: z.string().datetime().optional(),
+  fromDate: z.iso.datetime().optional(),
+  toDate: z.iso.datetime().optional(),
   title: z.string().optional(),
 });
 export type PostFilters = z.infer<typeof querySchema>;
@@ -191,7 +192,7 @@ export const feedsEndpoint = createEndpointsNodes({
       mutationOptions({
         mutationFn: async (payload: Partial<NewPost>) => {
           const data = await patch(`/posts/${id}`, payload);
-          return postSchema.parse(data);
+          return postWithTagsSchema.parse(data);
         },
         onSuccess: async () => {
           await Promise.all([

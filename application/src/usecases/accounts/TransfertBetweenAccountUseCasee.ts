@@ -116,30 +116,17 @@ export class TransfertBetweenAccountUseCase {
 
     const now = this.clockService.now();
 
-    const debitTransaction = TransactionEntity.from({
+    const transaction = TransactionEntity.from({
       id: this.uuidService.generate(),
       fromAccountId: fromAccount.iban,
       toAccountId: toAccount.iban,
       amount,
       label,
       icon,
-      type: "debit",
       date: now,
     });
 
-    const creditTransaction = TransactionEntity.from({
-      id: this.uuidService.generate(),
-      fromAccountId: fromAccount.iban,
-      toAccountId: toAccount.iban,
-      amount,
-      label,
-      icon,
-      type: "credit",
-      date: now,
-    });
-
-    await this.transactionRepository.save(debitTransaction);
-    await this.transactionRepository.save(creditTransaction);
+    await this.transactionRepository.save(transaction);
 
     await this.accountRepository.save(fromAccount);
     await this.accountRepository.save(toAccount);

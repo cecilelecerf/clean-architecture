@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge";
 
 type PostCardProps = {
     post: PostWithTagsAndUser;
-    isAdmin?: boolean
+    isAdmin?: boolean,
+    basePath: string
 };
 
-export const PostCard = ({ post, isAdmin }: PostCardProps) => {
+export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
     const router = useRouter();
 
     const { data: session } = useSession();
@@ -19,7 +20,7 @@ export const PostCard = ({ post, isAdmin }: PostCardProps) => {
 
     return (
         <div
-            onClick={() => router.push(`/admin/feeds/${post.id}`)
+            onClick={() => router.push(`${basePath}/feeds/${post.id}`)
             }
             className="cursor-pointer border rounded-xl shadow hover:shadow-lg transition p-6 bg-white relative flex justify-between"
         >

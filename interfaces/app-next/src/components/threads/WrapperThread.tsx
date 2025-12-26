@@ -7,10 +7,11 @@ import { ThreadWithUser } from "@/utils/endpoint/threadEndpoints";
 import { UserDto } from "@infrastructure/types/user";
 import { match } from "ts-pattern";
 import { PostMessage } from "./PostMessage";
-import { JoinThread } from "@/app/admin/client-threads/[threadIdd]/Join";
+import { JoinThread } from "@/app/admin/client-threads/[threadId]/Join";
 import { ButtonBack } from "../buttons/ButtonBack";
 import { useSession } from "next-auth/react";
 import { MessageWithUserDTO } from "@infrastructure/types/message";
+import { Skeleton } from "../ui/skeleton";
 
 type Props = { thread: ThreadWithUser, defaultMessages: MessageWithUserDTO[], userId: UserDto["id"], withSetting?: boolean, addElementInTop?: ReactNode }
 
@@ -75,3 +76,45 @@ export const WrapperThread = ({ thread, defaultMessages, userId, withSetting, ad
         </div>
     )
 }
+
+export const SkeletonThread = () => {
+    return (
+        <div className="h-full">
+            <ButtonBack />
+            <div className="flex flex-col">
+                <Flex justify="between" align="center" className="border-b pb-2 mb-4">
+                    <Skeleton className="h-7 w-48" />
+                    <Skeleton className="h-9 w-9 rounded-md" />
+                </Flex>
+
+                {/* Messages skeleton */}
+                <div className="flex-1 overflow-y-scroll space-y-3 max-h-[60vh] sm:max-h-[67vh] md:max-h-[65vh] min-h-[60vh] sm:min-h-[67vh] md:min-h-[65vh]">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                        <SkeletonMessage key={index} isRight={index % 2 === 0} />
+                    ))}
+                </div>
+
+                {/* Input skeleton */}
+                <div className="mt-4 flex gap-2">
+                    <Skeleton className="h-10 flex-1 rounded-lg" />
+                    <Skeleton className="h-10 w-20 rounded-lg" />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const SkeletonMessage = ({ isRight }: { isRight: boolean }) => {
+    return (
+        <div className={`flex ${isRight ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-[70%] space-y-1 ${isRight ? 'items-end' : 'items-start'} flex flex-col`}>
+                {!isRight && <Skeleton className="h-3 w-20" />}
+                <Skeleton
+                    className={`h-16 w-full rounded-lg ${isRight ? 'rounded-tr-none' : 'rounded-tl-none'
+                        }`}
+                />
+                <Skeleton className="h-2.5 w-16" />
+            </div>
+        </div>
+    );
+};

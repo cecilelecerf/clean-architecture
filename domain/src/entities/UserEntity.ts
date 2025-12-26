@@ -64,20 +64,20 @@ export class UserEntity {
     return role === this.role;
   }
 
-  public toFront(): UserToFront {
+  public toDTO(): UserToDTO {
     return {
       id: this.id,
       email: this.email.value,
       firstname: this.firstname,
       lastname: this.lastname,
       role: this.role,
-      confirmedAt: this.confirmedAt,
+      confirmedAt: this.confirmedAt?.toISOString(),
       isActiveField: this.isActiveField,
     };
   }
 }
 
-export type UserToFront = { email: string } & Pick<
+export type UserToDTO = { email: string; confirmedAt?: string } & Pick<
   UserEntity,
-  "id" | "firstname" | "lastname" | "role" | "isActiveField" | "confirmedAt"
+  "id" | "firstname" | "lastname" | "role" | "isActiveField"
 >;

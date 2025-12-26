@@ -12,25 +12,23 @@ const lorem = [
   "Merci pour la mise à jour du rapport.",
   "On doit revoir la stratégie avant la fin du mois.",
   "Peux-tu valider le dernier document RH ?",
-  "Je pense qu’on doit ajuster la communication.",
+  "Je pense qu'on doit ajuster la communication.",
   "Bonne idée, on met ça en place dès lundi.",
   "Je valide la proposition, allons-y.",
   "On se retrouve demain pour en discuter.",
-  "Je t’envoie les chiffres dès que possible.",
+  "Je t'envoie les chiffres dès que possible.",
 ];
 
-const titles = [
+const titlesInternal = [
   "Réunion interne",
   "Organisation mensuelle",
   "Mise à jour du service",
-  "Suivi d’équipe",
+  "Suivi d'équipe",
   "Communication interne",
 ];
 
 /**
  * Génère des threads internes (directeur ↔ administrateurs)
- * @param directors tableau d'userId des directeurs
- * @param administrators tableau d'userId des administrateurs
  */
 export const generateInternalThreads = async (
   directors: UserEntity[],
@@ -44,7 +42,7 @@ export const generateInternalThreads = async (
     maxMessages?: number;
   }
 ): Promise<{ threads: ThreadEntity[]; messages: MessageEntity[] }> => {
-  console.log("-- Generation des threads internes --");
+  console.log("-- Génération des threads internes --");
 
   const threadRepository = new ThreadRepositoryMySQL(mySqlClient);
   const messageRepository = new MessageRepositoryMySQL(mySqlClient);
@@ -71,7 +69,6 @@ export const generateInternalThreads = async (
   for (let i = 0; i < threadsCount; i++) {
     const director = pick(directors);
 
-    // choisir aléatoirement plusieurs admins
     const adminsInThread = Array.from(
       new Set(
         Array.from(
@@ -88,7 +85,7 @@ export const generateInternalThreads = async (
       id: uuidService.generate(),
       administratorId: director.id,
       participantsId: adminsInThread,
-      title: pick(titles),
+      title: pick(titlesInternal),
       createdAt,
       updatedAt: lastUpdatedAt,
       isClose: Math.random() < 0.1,
@@ -96,7 +93,7 @@ export const generateInternalThreads = async (
     });
     threads.push(thread);
     await threadRepository.save(thread);
-    console.log(thread.id);
+    console.log(`Thread interne créé: ${thread.id}`);
 
     let currentTime = new Date(createdAt);
     const msgCount = rand(minMessages, maxMessages);

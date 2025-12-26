@@ -10,7 +10,7 @@ import { ThreadRepository } from "@application/ports/repositories/ThreadReposito
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { ThreadEntity } from "@domain/entities/ThreadEntity";
+import { ThreadDTO, ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 
 type Props = { userId: UserEntity["id"]; threadId: ThreadEntity["id"] };
@@ -25,7 +25,7 @@ export class CloseThreadUsecase {
     threadId,
     userId,
   }: Props): Promise<
-    | ThreadEntity
+    | ThreadDTO
     | ThreadNotFoundError
     | InvalidThreadAccessError
     | UserNotFoundError
@@ -43,6 +43,6 @@ export class CloseThreadUsecase {
     thread.close(this.clockService.now());
 
     this.threadRepository.update(thread);
-    return thread;
+    return thread.toDTO();
   }
 }

@@ -71,6 +71,9 @@ export class FindPostWithFilterUsecase {
         { page, limit }
       );
 
-    return { posts: PostDTOMapper.maps(posts.posts), total: posts.total };
+    return {
+      posts: PostDTOMapper.tagsAndUserMaps(posts.posts),
+      total: posts.total,
+    };
   }
 }

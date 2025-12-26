@@ -13,7 +13,10 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { ThreadClosedError } from "@domain/errors/thread";
+import {
+  InvalidThreadTypeError,
+  ThreadClosedError,
+} from "@domain/errors/thread";
 
 type Props = {
   newAdministratorId: UserEntity["id"];
@@ -38,6 +41,7 @@ export class TransferThreadUsecase {
     | InvalidThreadAccessError
     | UserNotActiveError
     | ThreadClosedError
+    | InvalidThreadTypeError
   > {
     const administrator = await findActiveUser(
       this.userRepository,

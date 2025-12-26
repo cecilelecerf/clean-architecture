@@ -1,5 +1,6 @@
 "use client"
 import { ThreadCard } from "@/components/threads/ThreadCard";
+import { SkeletonThread } from "@/components/threads/WrapperThread";
 import { socket } from "@/lib/socket";
 import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
@@ -21,7 +22,7 @@ export default function ClientsThreadsPage() {
     return (
         match(query)
             .with({ status: "error" }, () => "error")
-            .with({ status: "pending" }, () => "loading")
+            .with({ status: "pending" }, () => <SkeletonThread />)
             .with({ status: "success" }, ({ data: threads }) => {
                 if (threads.length === 0) return <>Pas de conversation</>
                 return <div className="">

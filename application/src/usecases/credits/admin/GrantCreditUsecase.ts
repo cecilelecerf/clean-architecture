@@ -6,7 +6,11 @@ import {
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { CreditEntity, CreditStatus } from "@domain/entities/CreditEntity";
+import {
+  CreditDTO,
+  CreditEntity,
+  CreditStatus,
+} from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { CreditNotFoundError } from "@application/errors/credits";
 import { CreditStatusMismatchError } from "@application/errors/credits/CreditStatusMismatchError";
@@ -30,7 +34,7 @@ export class GrantCreditUsecase {
     creditId,
     accept,
   }: Props): Promise<
-    | CreditEntity
+    | CreditDTO
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -42,19 +46,20 @@ export class GrantCreditUsecase {
     if (advisor instanceof Error) return advisor;
     if (!advisor.hasRole({ role: "conseiller" }))
       return new UserRoleMismatchError(["conseiller"], advisor.role);
-
+    console.log(advisor);
     const credit = await this.creditRepository.findById(creditId);
     if (!credit) return new CreditNotFoundError();
-
+    console.log(credit);
     if (credit.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(credit.status);
     }
+    console.log("test---");
     const now = this.clockService.now();
     credit.assignAdvisor({ advisorId, now });
     accept ? credit.accept({ now }) : credit.refuse({ now });
-    if (credit instanceof Error) return credit;
+    if (credit instanceof Error) return credit.toDTO();
 
     await this.creditRepository.update(credit);
-    return credit;
+    return credit.toDTO();
   }
 }

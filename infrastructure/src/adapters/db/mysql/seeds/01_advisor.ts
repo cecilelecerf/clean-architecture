@@ -26,7 +26,7 @@ export async function seedSQLAdministrator(
         continue;
       }
       const passwordHash = await hasher.hash(raw.password);
-      const now = clockService.now()
+      const now = clockService.now();
       const user = UserEntity.from({
         ...raw,
         email,
@@ -36,9 +36,10 @@ export async function seedSQLAdministrator(
         createdAt: now,
         isActiveField: true,
         confirmedAt: now,
-                                        updatedAt:   Math.random() < 0.3
-                                                ? clockService.addDays(now, rand(1, 10))
-                                                :  clockService.nowMinusDays(rand(0, 60))
+        updatedAt:
+          Math.random() < 0.3
+            ? clockService.addDays(now, rand(1, 10))
+            : clockService.nowMinusDays(rand(0, 60)),
       });
 
       advisors.push(user);

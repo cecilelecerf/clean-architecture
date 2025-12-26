@@ -1,15 +1,15 @@
 import { MessageWithUser } from "@application/ports/repositories/MessageRepository";
 import { MessageEntity } from "@domain/entities/MessageEntity";
-import { UserToFront } from "@domain/entities/UserEntity";
+import { UserToDTO } from "@domain/entities/UserEntity";
 
 export type MessageEntityWithUsersDTO = MessageEntity & {
-  sender: UserToFront;
+  sender: UserToDTO;
 };
 
 export class MessageDTOMapper {
   static map(message: MessageWithUser): MessageEntityWithUsersDTO {
     return Object.assign(message, {
-      sender: message.sender.toFront(),
+      sender: message.sender.toDTO(),
     });
   }
   static maps(messages: MessageWithUser[]): MessageEntityWithUsersDTO[] {

@@ -10,7 +10,7 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { PostEntity } from "@domain/entities/PostEntity";
+import { PostDTO, PostEntity } from "@domain/entities/PostEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 import {
   InvalidPostContentError,
@@ -20,6 +20,7 @@ type Props = { tagsId: TagEntity["id"][]; published?: boolean } & Pick<
   PostEntity,
   "content" | "title" | "advisorId"
 >;
+
 export class AddPostUsecase {
   constructor(
     private readonly feedRepository: PostRepository,
@@ -35,7 +36,7 @@ export class AddPostUsecase {
     tagsId,
     published,
   }: Props): Promise<
-    | PostEntity
+    | PostDTO
     | UserNotFoundError
     | UserNotActiveError
     | InvalidPostContentError
@@ -74,7 +75,7 @@ export class AddPostUsecase {
     });
     if (post instanceof Error) return post;
     await this.feedRepository.save(post);
-    return post;
+    return post.toDTO();
   }
 }
 

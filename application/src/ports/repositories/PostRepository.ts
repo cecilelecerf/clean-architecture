@@ -7,9 +7,12 @@ export type PostWithTagsAndUser = PostEntity & {
   advisor: UserEntity;
 };
 
+export type PostWithTags = PostEntity & { tags: TagEntity[] };
+
 export interface PostRepository {
   save(feed: PostEntity): Promise<void>;
   findById(id: PostEntity["id"]): Promise<PostEntity | null>;
+  findByIdWithTags(id: PostEntity["id"]): Promise<PostWithTags | null>;
   findAllByAdvisorId(advisorId: UserEntity["id"]): Promise<PostEntity[]>;
   update(feed: PostEntity): Promise<void>;
   delete(id: PostEntity["id"]): Promise<void>;
