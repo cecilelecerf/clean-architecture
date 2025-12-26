@@ -1,3 +1,4 @@
+import { EffectiveDateInPastError } from "@domain/errors/savingsRate";
 import { Percentage } from "@domain/values/Percentage";
 
 export class SavingsRateEntity {
@@ -20,6 +21,20 @@ export class SavingsRateEntity {
     "id" | "rate" | "effectiveDate" | "createdAt" | "updatedAt"
   >) {
     return new SavingsRateEntity(id, rate, effectiveDate, createdAt, updatedAt);
+  }
+
+  public static create({
+    id,
+    rate,
+    effectiveDate,
+    createdAt,
+  }: Pick<SavingsRateEntity, "id" | "rate" | "effectiveDate" | "createdAt">):
+    | EffectiveDateInPastError
+    | SavingsRateEntity {
+    if (effectiveDate <= createdAt)
+      return new EffectiveDateInPastError(effectiveDate, createdAt);
+
+    return new SavingsRateEntity(id, rate, effectiveDate, createdAt, createdAt);
   }
 
   toDTO(): SavingsRateDTO {
