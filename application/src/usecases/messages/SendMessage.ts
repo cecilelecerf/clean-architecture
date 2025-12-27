@@ -67,6 +67,7 @@ export class SendMessage {
 
     if (message instanceof Error) return message;
 
+    this.messageRepository.save(message);
     return Object.assign(message, { sender: user.toDTO() });
   }
 }

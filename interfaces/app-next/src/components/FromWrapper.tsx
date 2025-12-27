@@ -31,7 +31,7 @@ export type Field = {
   set: (e: string | string[]) => void;
   layout?: ReactNode;
   disabled?: boolean
-  options?: { label: string; value: string, icon: string }[];
+  options?: { label: string; value: string, icon?: string }[];
   numberOptions?: {
     min?: number | string;
     max?: number | string;

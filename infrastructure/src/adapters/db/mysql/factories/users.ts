@@ -10,10 +10,13 @@ import { LoginUsecase } from "@application/usecases/users/LoginUsecase";
 import { GetMeUsecase } from "@application/usecases/users/GetMeUsecase";
 import { ForgotPasswordUsecase } from "@application/usecases/users/ForgotPasswordUsecase";
 import { ConfirmRegistrationUsecase } from "@application/usecases/users/ConfirmRegistrationUsecase";
-import { BanClientUsecase } from "@application/usecases/users/BanClientUsecase";
 import { GetUsersByRoleUseCase } from "@application/usecases/users/GetUsersByRoleUseCase";
 import { GetUserUsercase } from "@application/usecases/users/GetUserUsercase";
 import { ResetPasswordUsecase } from "@application/usecases/users/ResetPasswordUsecase";
+import { RegisterAdvisorUsecase } from "@application/usecases/users/RegisterAdvisorUsecase";
+import { NodePasswordGenerateService } from "@infrastructure/adapters/services/NodePasswordGenerateService";
+import { BanUserUsecase } from "@application/usecases/users/BanUserUsecase";
+import { UnbanUserUsecase } from "@application/usecases/users/UnBanUserUsecase";
 
 export const usersFactory = () => {
   const client = new MySQLClient();
@@ -24,6 +27,7 @@ export const usersFactory = () => {
   const uuidSerivce = new NodeUuidService();
   const emailService = new NodeEmailService();
   const clockService = new SystemClockService();
+  const passwordGenerateService = new NodePasswordGenerateService();
 
   const register = new RegisterUsecase(
     userRepository,
@@ -55,9 +59,19 @@ export const usersFactory = () => {
     clockService,
     tokenService
   );
-  const banClient = new BanClientUsecase(userRepository, clockService);
+  const banUser = new BanUserUsecase(userRepository, clockService);
   const getUsersByRole = new GetUsersByRoleUseCase(userRepository);
   const getUser = new GetUserUsercase(userRepository);
+  const createUser = new RegisterAdvisorUsecase(
+    userRepository,
+    encryptionService,
+    uuidSerivce,
+    clockService,
+    emailService,
+    tokenService,
+    passwordGenerateService
+  );
+  const unbanUser = new UnbanUserUsecase(userRepository, clockService);
 
   return {
     register,
@@ -67,7 +81,9 @@ export const usersFactory = () => {
     forgotPassword,
     resetPassword,
     confirmRegistration,
-    banClient,
+    banUser,
     getUsersByRole,
+    createUser,
+    unbanUser,
   };
 };

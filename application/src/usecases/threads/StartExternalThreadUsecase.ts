@@ -29,6 +29,7 @@ import { ContentEmptyError } from "@domain/errors/message";
 type Props = {
   clientId: UserEntity["id"];
   messageContent: MessageEntity["content"];
+  actorId: UserEntity["id"];
 } & Pick<ThreadEntity, "title">;
 export class StartExternalThreadUsecase {
   constructor(
@@ -42,6 +43,7 @@ export class StartExternalThreadUsecase {
     title,
     clientId,
     messageContent,
+    actorId,
   }: Props): Promise<
     | ThreadEntity
     | UserNotFoundError
@@ -60,6 +62,11 @@ export class StartExternalThreadUsecase {
 
     if (!client?.hasRole({ role: "client" })) return new UserNotFoundError();
 
+    const actor = await findActiveUser(this.userRepository, actorId);
+    if (actor instanceof Error) return actor;
+    if (actor.hasRole({ role: "client" }) && actor.id !== client.id)
+      return new UserRoleMismatchError(["conseiller", "directeur"], actor.role);
+
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
     const thread = ThreadEntity.create({
@@ -68,7 +75,7 @@ export class StartExternalThreadUsecase {
       type: "external",
       participantsId: [clientId],
       title,
-      administratorId: null,
+      administratorId: actor.hasRole({ role: "client" }) ? null : actor.id,
     });
     if (thread instanceof Error) return thread;
     await this.threadRepository.save(thread);
@@ -81,7 +88,7 @@ export class StartExternalThreadUsecase {
       this.clockService
     ).execute({
       content: messageContent,
-      senderId: client.id,
+      senderId: actor.id,
       threadId: thread.id,
     });
     if (message instanceof Error) return message;

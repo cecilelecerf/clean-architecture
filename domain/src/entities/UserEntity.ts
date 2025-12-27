@@ -1,5 +1,12 @@
-import { InvalidLastnameError } from "@domain/errors/user";
+import {
+  InvalidLastnameError,
+  UserAlreadyBannedError,
+  UserCannotBanDirectorError,
+  UserCannotBanSelfError,
+  UserNotBannedError,
+} from "@domain/errors/user";
 import { InvalidFirstnameError } from "@domain/errors/user/InvalidFirstnameError";
+import { UserCannotUnbanDirectorError } from "@domain/errors/user/UserCannotUnbanDirectorError";
 import { Email } from "@domain/values/Email";
 
 export class UserEntity {
@@ -113,8 +120,38 @@ export class UserEntity {
     return this.isActiveField && !!this.confirmedAt;
   }
 
-  public ban(): void {
+  public ban(
+    actorId: UserEntity["id"],
+    now: Date
+  ):
+    | void
+    | UserCannotBanDirectorError
+    | UserAlreadyBannedError
+    | UserCannotBanSelfError {
+    if (actorId === this.id) {
+      return new UserCannotBanSelfError();
+    }
+    if (!this.isActiveField) {
+      return new UserAlreadyBannedError(this.id);
+    }
+    if (this.hasRole({ role: "directeur" })) {
+      return new UserCannotBanDirectorError();
+    }
+    this.updatedAt = now;
     this.isActiveField = false;
+  }
+
+  public unban(
+    now: Date
+  ): void | UserNotBannedError | UserCannotUnbanDirectorError {
+    if (this.isActiveField) {
+      return new UserNotBannedError(this.id);
+    }
+    if (this.hasRole({ role: "directeur" })) {
+      return new UserCannotUnbanDirectorError();
+    }
+    this.updatedAt = now;
+    this.isActiveField = true;
   }
 
   public hasRole({ role }: Pick<UserEntity, "role">): boolean {

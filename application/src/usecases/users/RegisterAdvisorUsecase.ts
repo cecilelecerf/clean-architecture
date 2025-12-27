@@ -12,7 +12,7 @@ import { PasswordGenerateService } from "@application/ports/services/PasswordGen
 import { TokenService } from "@application/ports/services/TokenService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { UserEntity } from "@domain/entities/UserEntity";
+import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import {
   InvalidFirstnameError,
@@ -24,9 +24,10 @@ type Props = {
   email: string;
   confirmationUrl: string;
   directorId: UserEntity["id"];
+  role: string;
 } & Pick<UserEntity, "firstname" | "lastname">;
-
-export class RegisterAdvisorStatus {
+// Register for advisro or director create par director
+export class RegisterAdvisorUsecase {
   public constructor(
     private readonly userRepository: UserRepository,
     private readonly encryptionService: EncryptionService,
@@ -43,8 +44,9 @@ export class RegisterAdvisorStatus {
     email,
     confirmationUrl,
     directorId,
+    role,
   }: Props): Promise<
-    | UserEntity
+    | UserToDTO
     | UserNotFoundError
     | UserNotActiveError
     | EmailInvalidFormatError
@@ -71,6 +73,7 @@ export class RegisterAdvisorStatus {
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
 
+    // TODO : vérification du rôle
     const user = UserEntity.create({
       id,
       email: emailVO,
@@ -78,9 +81,9 @@ export class RegisterAdvisorStatus {
       lastname,
       passwordHash,
       createdAt,
-      role: "conseiller",
+      role: role as UserEntity["role"],
     });
-
+    console.log(user);
     if (user instanceof Error) return user;
     await this.userRepository.save(user);
 
@@ -99,6 +102,6 @@ export class RegisterAdvisorStatus {
       Pense à changer de mot de passe lors de ta première connexion.
       `,
     });
-    return user;
+    return user.toDTO();
   }
 }

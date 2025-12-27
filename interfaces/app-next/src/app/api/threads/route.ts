@@ -33,12 +33,15 @@ export async function GET(req: NextRequest) {
   }
 }
 
-const newThreadSchmea = threadSchema.pick({ title: true }).extend({
-  messageContent: messageSchema.shape.content,
-  type: threadSchema.shape.type.optional(),
-  participantsId: userIdSchema.array().optional(),
+const newThreadSchema = threadSchema.pick({ title: true }).extend({
+  participantsId: userIdSchema.array(),
 });
-export type NewThread = z.infer<typeof newThreadSchmea>;
+
+export type NewThread = z.infer<typeof newThreadSchema>;
+const newExternalThreadSchema = newThreadSchema.extend({
+  messageContent: messageSchema.shape.content,
+});
+export type NewExternalThread = z.infer<typeof newExternalThreadSchema>;
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,12 +52,13 @@ export async function POST(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const type = searchParams.get('type') as 'external' | 'internal' | null;
-    const json = await req.json();
-    const data = newThreadSchmea.parse(json);
     if (type === 'external') {
+      const json = await req.json();
+      const data = newExternalThreadSchema.parse(json);
       const result = await threadsFactory().startExternalThread.execute({
-        clientId: session.user.id,
+        clientId: data.participantsId[0],
         ...data,
+        actorId: session.user.id,
       });
       if (result instanceof Error) {
         return NextResponse.json(
@@ -63,7 +67,9 @@ export async function POST(req: NextRequest) {
         );
       }
       return NextResponse.json(result, { status: 201 });
-    } else if (data.type === 'internal') {
+    } else if (type === 'internal') {
+      const json = await req.json();
+      const data = newThreadSchema.parse(json);
       const result = await threadsFactory().startInternalThread.execute({
         administratorId: session.user.id,
         ...data,

@@ -10,9 +10,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/users/[userI
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     const { userId } = await ctx.params;
-    if (!userId) {
-      return NextResponse.json({ message: 'Missing userId' }, { status: 400 });
-    }
+
     const result = await usersFactory().getUser.execute({
       clientId: userId,
       advisorId: session.user.id,

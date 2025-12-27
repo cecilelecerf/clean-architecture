@@ -58,8 +58,11 @@ export class StartInternalThreadUsecase {
         );
         if (participant instanceof Error) return participant;
 
-        if (!participant.hasRole({ role: "conseiller" })) {
-          return new UserRoleMismatchError(["conseiller"], participant.role);
+        if (participant.hasRole({ role: "client" })) {
+          return new UserRoleMismatchError(
+            ["conseiller", "directeur"],
+            participant.role
+          );
         }
 
         return participant;
