@@ -1,4 +1,8 @@
-import { InvalidCredentialsError ,UserNotFoundError} from "@application/errors/users";
+import {
+  InvalidCredentialsError,
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
@@ -26,11 +30,15 @@ export class LoginUsecase {
     | UserNotFoundError
     | InvalidCredentialsError
     | EmailInvalidFormatError
+    | UserNotActiveError
   > {
     const emailVo = Email.create(email);
     if (emailVo instanceof Error) return emailVo;
     const user = await this.userRepository.findByEmail(emailVo);
     if (!user) return new UserNotFoundError();
+    console.log(user.isActive());
+    console.log(user.isActiveField);
+    if (!user.isActive()) return new UserNotActiveError(user.id);
     const isValidPassword = await this.encryptionService.compare(
       plainedPassword,
       user.passwordHash

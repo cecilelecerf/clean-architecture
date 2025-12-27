@@ -27,6 +27,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/threads/[thr
         { status: messages.statusCode ?? 404 },
       );
     }
+    console.log(messages);
 
     return NextResponse.json(messages);
   } catch (err) {
@@ -58,7 +59,7 @@ export async function POST(
         { status: message.statusCode ?? 404 },
       );
     }
-
+    console.log(message);
     return NextResponse.json(message);
   } catch (err) {
     console.error(err);
