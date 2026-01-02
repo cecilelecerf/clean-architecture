@@ -2,7 +2,9 @@ import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import {
   creditDTOSchema,
-  creditDTOWithUserSchema,
+  creditDTOWithFormuleAndAccountSchema,
+  creditDTOWithFormuleAndAdvisorSchema,
+  creditDTOWithFormuleSchema,
   CreditId,
   CreditResponse,
   creditSchema,
@@ -20,12 +22,12 @@ import { UserId } from '@infrastructure/types/user';
 
 export const requestCreditSchema = creditSchema
   .pick({
-    insuranceRate: true,
-    interestRate: true,
+    accountId: true,
+    formuleCreditId: true,
     durationMonths: true,
     startDate: true,
+    initialAmount: true
   })
-  .extend({ amount: moneySchema.shape.amount, currency: moneySchema.shape.currency });
 export type RequestCredit = z.infer<typeof requestCreditSchema>;
 
 // ============================================================================
@@ -40,7 +42,7 @@ export const creditsEndpoint = createEndpointsNodes({
       queryKey: ['credits', 'list'],
       queryFn: () =>
         get('/credits').then((data) => {
-          return safeParseWithLog(creditDTOSchema.array(), data);
+          return safeParseWithLog(creditDTOWithFormuleSchema.array(), data);
         }),
     }),
 
@@ -50,7 +52,38 @@ export const creditsEndpoint = createEndpointsNodes({
     queryOptions({
       queryKey: ['credits', creditId],
       queryFn: () =>
-        get(`/credits/${creditId}`).then((data) => safeParseWithLog(creditDTOSchema, data)),
+        get(`/credits/${creditId}`).then((data) => safeParseWithLog(creditDTOWithFormuleAndAdvisorSchema, data)),
+    }),
+
+  // GET /api/credits/:creditId/details
+  // Détails d'un compte
+  getOneWithDetails: ({ creditId }: { creditId: CreditId }) =>
+    queryOptions({
+      queryKey: ['credits', creditId],
+      queryFn: () =>
+        get(`/credits/${creditId}/details`).then((data) => safeParseWithLog(creditDTOWithFormuleAndAccountSchema, data)),
+    }),
+  
+  // GET /api/credits/pending
+  // Liste des crédits des clients en cours de traitement 
+  getAllPending: () =>
+    queryOptions({
+      queryKey: ['credits', 'list'],
+      queryFn: () =>
+        get('/credits/admin').then((data) => {
+          return safeParseWithLog(creditDTOWithFormuleSchema.array(), data);
+        }),
+    }),
+
+  // GET /api/credits/active
+  // Liste des crédits actifs des clients
+  getAllActive: () =>
+    queryOptions({
+      queryKey: ['credits', 'list'],
+      queryFn: () =>
+        get('/credits/active').then((data) => {
+          return safeParseWithLog(creditDTOWithFormuleSchema.array(), data);
+        }),
     }),
 
   // POST /api/credits

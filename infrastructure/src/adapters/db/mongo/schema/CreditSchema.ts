@@ -9,7 +9,8 @@ export const CreditSchema = new Schema<CreditInterface>(
       unique: true,
       index: true,
     },
-    userId: { type: Schema.Types.UUID, ref: "User", required: true },
+    accountId: { type: Schema.Types.UUID, ref: "Account", required: true },
+    formuleCreditId: { type: Schema.Types.UUID, ref: "Formule", required: true },
     initialAmount: {
       type: {
         amount: { type: Number, required: true },
@@ -17,7 +18,6 @@ export const CreditSchema = new Schema<CreditInterface>(
       },
       required: true,
     },
-    interestRate: { type: Number, required: true },
     insuranceRate: { type: Number, required: true },
     durationMonths: { type: Number, required: true },
     startDate: { type: Date, required: true },
@@ -39,6 +39,7 @@ export const CreditSchema = new Schema<CreditInterface>(
     createdAt: { type: Date, required: true },
     advisor: { type: Schema.Types.UUID, ref: "User", required: false },
     updatedAt: { type: Date, required: false },
+    reason: { type: String, required: false}
   },
   {
     collection: "credits",

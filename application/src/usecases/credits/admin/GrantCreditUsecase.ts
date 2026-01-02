@@ -16,6 +16,7 @@ type Props = {
   advisorId: UserEntity["id"];
   creditId: string;
   accept: boolean;
+  reason: string
 };
 
 export class GrantCreditUsecase {
@@ -29,6 +30,7 @@ export class GrantCreditUsecase {
     advisorId,
     creditId,
     accept,
+    reason
   }: Props): Promise<
     | CreditEntity
     | UserNotFoundError
@@ -51,7 +53,7 @@ export class GrantCreditUsecase {
     }
     const now = this.clockService.now();
     credit.assignAdvisor({ advisorId, now });
-    accept ? credit.accept({ now }) : credit.refuse({ now });
+    accept ? credit.accept({ now, reason }) : credit.refuse({ now, reason });
     if (credit instanceof Error) return credit;
 
     await this.creditRepository.update(credit);

@@ -30,6 +30,7 @@ export class AccountMapper {
       updatedAt: row[`${prefix}updated_at`],
     });
   }
+  
   static mapDocToAccount(doc: any): AccountEntity {
     const iban = IBAN.from(doc.iban);
     const balance = Money.from({

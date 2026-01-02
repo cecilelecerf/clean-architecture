@@ -20,9 +20,12 @@ import {
     TrendingUp,
     CalendarClock,
     DollarSign,
-    FileText,
+    Building2,
     User,
     Shield,
+    Type,
+    Tag,
+    AtSign,
 } from "lucide-react";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { use } from "react";
@@ -175,9 +178,14 @@ export default function CreditDetailPage({
                             {(credit.status === "ACCEPTED" && !isFuture) || credit.status === "COMPLETED" ? (
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <TrendingUp className="w-5 h-5" />
-                                            Progression du remboursement
+                                        <CardTitle className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <TrendingUp className="w-5 h-5" />
+                                                Progression du remboursement
+                                            </div>
+                                            <Button variant="link" onClick={() => router.push(`/credits/${credit.id}/monthly-paiement`)}>
+                                                Voir les mensualités
+                                            </Button>
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
@@ -235,11 +243,90 @@ export default function CreditDetailPage({
                                 </Card>
                             ) : null}
 
+                            {/* Détails de la formule du crédit */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Building2 className="w-5 h-5" />
+                                        Caractéristiques de la formule du  crédit
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <Type className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Type du crédit</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.formule.type}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <Tag  className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Label du crédit</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.formule.label} 
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <Percent className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Taux d'intérêt</p>
+                                                    <p className="text-lg font-semibold">{credit.formule.interestRate}%</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Taux d'assurance</p>
+                                                    <p className="text-lg font-semibold">{credit.formule.insuranceRate}%</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Montant minimum</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.formule.minAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.formule.currency,
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Montant maximum</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.formule.maxAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.formule.currency,
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
                             {/* Détails du crédit */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
-                                        <FileText className="w-5 h-5" />
+                                        <Building2 className="w-5 h-5" />
                                         Caractéristiques du crédit
                                     </CardTitle>
                                 </CardHeader>
@@ -269,25 +356,9 @@ export default function CreditDetailPage({
                                                     </p>
                                                 </div>
                                             </div>
-
-                                            <div className="flex items-start gap-3">
-                                                <Percent className="w-5 h-5 text-gray-400 mt-0.5" />
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Taux d'intérêt</p>
-                                                    <p className="text-lg font-semibold">{credit.interestRate}%</p>
-                                                </div>
-                                            </div>
                                         </div>
 
                                         <div className="space-y-4">
-                                            <div className="flex items-start gap-3">
-                                                <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Taux d'assurance</p>
-                                                    <p className="text-lg font-semibold">{credit.insuranceRate}%</p>
-                                                </div>
-                                            </div>
-
                                             <div className="flex items-start gap-3">
                                                 <CalendarClock className="w-5 h-5 text-gray-400 mt-0.5" />
                                                 <div>
@@ -317,7 +388,7 @@ export default function CreditDetailPage({
 
                             {/* Conseiller (si assigné) */}
                             {credit.advisorId && (
-                                <Card>
+                                <Card className="bg-blue-100 border border-blue-300">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
                                             <User className="w-5 h-5" />
@@ -325,10 +396,32 @@ export default function CreditDetailPage({
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm text-gray-600">
-                                            Conseiller assigné : ID {credit.advisorId}
-                                        </p>
-                                        <Button variant="outline" className="mt-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-4">
+                                                <div className="flex items-start gap-3">
+                                                    <User className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">Conseiller assigné</p>
+                                                        <p className="text-lg font-semibold">
+                                                            {credit.advisor.firstname}  {credit.advisor.lastname}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-4">
+                                               <div className="flex items-start gap-3">
+                                                    <AtSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">Email</p>
+                                                        <p className="text-lg font-semibold">
+                                                            {credit.advisor.email}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {/* TODO: Fonctionnalité de contact du conseiller ? */}
+                                        <Button variant="default" className="mt-4">
                                             Contacter mon conseiller
                                         </Button>
                                     </CardContent>

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { match } from 'ts-pattern';
 import { Textarea } from './ui/textarea';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from './ui/label';
 import { AlertCircle, Calendar, CheckCircle2, Mail, User, Lock, DollarSign, ArrowLeft } from 'lucide-react';
@@ -25,13 +25,13 @@ import { useRouter } from 'next/navigation';
 
 export type Field = {
   label: string;
-  type?: "text" | "email" | "textarea" | "password" | "date" | "checkbox" | "radio" | "select" | "number" | "other" | "icon";
+  type?: "text" | "email" | "textarea" | "password" | "date" | "checkbox" | "radio" | "select" | "creatable-select" | "number" | "other" | "icon";
   placeholder?: string;
   get: string | string[];
   set: (e: string | string[]) => void;
   layout?: ReactNode;
   disabled?: boolean
-  options?: { label: string; value: string, icon: string }[];
+  options?: { label: string; value: string, icon?: string }[];
   numberOptions?: {
     min?: number | string;
     max?: number | string;
@@ -182,6 +182,49 @@ export default function FormWrapper({
                       </SelectContent>
                     </Select>
                   ))
+                  .with("creatable-select", () => {
+                    const value = field.get as string;
+                    const [isOpen, setIsOpen] = useState(false);
+
+                    const filteredOptions =
+                      field.options?.filter(option =>
+                        option.label.toLowerCase().includes((value ?? '').toLowerCase())
+                      ) || [];
+
+                    const handleSelect = (val: string) => {
+                      field.set(val);
+                      setIsOpen(false); 
+                    };
+
+                    return (
+                      <div className="relative">
+                        <Input
+                          type="text"
+                          placeholder={field.placeholder ?? "Sélectionnez ou créez"}
+                          value={value ?? ''}
+                          onChange={(e) => {
+                            field.set(e.target.value);
+                            setIsOpen(true);
+                          }}
+                          disabled={loading || field.disabled}
+                        />
+
+                        {value && filteredOptions.length > 0 && (
+                          <div className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
+                            {filteredOptions.map((option, idx) => (
+                              <div
+                                key={idx}
+                                className="p-2 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleSelect(option.value)}
+                              >
+                                {option.label}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
                   .with("checkbox", () => (
                     <Flex gap="5">
                       {field.options?.map((option, idx) => (

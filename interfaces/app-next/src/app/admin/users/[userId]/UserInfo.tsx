@@ -37,8 +37,6 @@ export const UserInfo = ({ userId }: { userId: UserId }) => {
                 </CardContent>
             </Card>
 
-
-
             <div className="flex justify-end">
                 <Button>
                     <Phone size={16} className="mr-2" /> Contacter le client

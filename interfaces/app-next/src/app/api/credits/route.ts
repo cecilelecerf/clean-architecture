@@ -37,9 +37,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const payload = creditSchema
       .pick({
+        accountId: true,
+        formuleCreditId: true,
         initialAmount: true,
-        insuranceRate: true,
-        interestRate: true,
         durationMonths: true,
         startDate: true,
       })
@@ -48,10 +48,10 @@ export async function POST(req: NextRequest) {
 
     const result = await creditFactory().requestCredit.execute({
       clientId: session.user.id,
+      accountId: payload.accountId,
+      formuleCreditId: payload.formuleCreditId,
       amount: payload.initialAmount.amount,
       currency: payload.initialAmount.currency,
-      interestRate: payload.interestRate,
-      insuranceRate: payload.insuranceRate,
       durationMonths: payload.durationMonths,
       startDate: new Date(payload.startDate),
     });

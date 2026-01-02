@@ -13,7 +13,7 @@ import {
   SheetTrigger,
   SheetContent
 } from "@/components/ui/sheet";
-import { menuItems, menuItemsClients } from "./menu-item";
+import { menuItems, menuItemsClients, menuItemsCredit } from "./menu-item";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 
@@ -95,6 +95,27 @@ function SidebarContent({ pathname }: { pathname: string }) {
           </h2>
           <nav className="space-y-1">
             {menuItemsClients.map((item, i) => (
+              <MenuLink
+                key={item.href}
+                icon={item.icon}
+                label={item.label}
+                href={item.href}
+                active={
+                  pathname === item.href ||
+                  (pathname.startsWith(item.href + "/") && i !== 0)
+                }
+              />
+            ))}
+          </nav>
+        </div>
+
+        {/* Section Crédit */}
+        <div>
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
+            Crédit
+          </h2>
+          <nav className="space-y-1">
+            {menuItemsCredit.map((item, i) => (
               <MenuLink
                 key={item.href}
                 icon={item.icon}

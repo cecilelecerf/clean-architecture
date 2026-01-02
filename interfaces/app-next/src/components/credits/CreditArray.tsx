@@ -1,9 +1,9 @@
-import { CreditDTO } from "@infrastructure/types/credit"
+import { CreditDTOWithFormule } from "@infrastructure/types/credit"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { CreditCardMobile } from "./CreditCard"
 import { CreditRow } from "./CreditRow"
 import { useSession } from "next-auth/react"
-type Props = { credits: CreditDTO[], title: string, isAdmin?: boolean, basePath: string }
+type Props = { credits: CreditDTOWithFormule[], title: string, isAdmin?: boolean, basePath: string }
 
 export const CreditArray = ({ credits, title, isAdmin, basePath }: Props) => {
 

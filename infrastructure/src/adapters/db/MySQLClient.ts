@@ -10,9 +10,9 @@ let pool: Pool;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 // JADE
-// const envPath = resolve(__dirname, "../../../../../.env");
+const envPath = resolve(__dirname, "../../../../../.env");
 // CECILE
-const envPath = resolve(__dirname, "../../../../.env");
+// const envPath = resolve(__dirname, "../../../../.env");
 const result = dotenv.config({ path: envPath });
 
 if (result.error) {
@@ -78,6 +78,19 @@ export class MySQLClient {
   ): Promise<T> {
     const [rows] = await this.pool.execute<T>(sql, params);
     return rows;
+  }
+
+  async queryRows<T extends RowDataPacket[]>(
+    sql: string,
+    params: any[] = []
+  ): Promise<T> {
+    const [rows] = await this.pool.execute<T>(sql, params);
+    return rows;
+  }
+
+  async queryResult(sql: string, params: any[] = []): Promise<ResultSetHeader> {
+    const [result] = await this.pool.execute<ResultSetHeader>(sql, params);
+    return result;
   }
 
   /**

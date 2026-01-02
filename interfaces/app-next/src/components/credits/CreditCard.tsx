@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { endpoints } from "@/utils/endpoint";
 import { UserId } from "@infrastructure/types/user";
-import { CreditDTO } from "@infrastructure/types/credit";
+import { CreditDTOWithFormule } from "@infrastructure/types/credit";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
@@ -23,7 +23,7 @@ import { CreditDialog } from "@/components/credits/CreditRow";
 
 
 
-export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditDTO; userId: UserId, basePath: string }) => {
+export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditDTOWithFormule; userId: UserId, basePath: string }) => {
     const router = useRouter();
     const queryClient = useQueryClient();
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -87,7 +87,7 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
                         </div>
                         <div className="flex items-center gap-2">
                             <Percent className="w-4 h-4 text-gray-400" />
-                            <span className="text-gray-600">{credit.interestRate}%</span>
+                            <span className="text-gray-600">{credit.formule.interestRate}%</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <DollarSign className="w-4 h-4 text-gray-400" />

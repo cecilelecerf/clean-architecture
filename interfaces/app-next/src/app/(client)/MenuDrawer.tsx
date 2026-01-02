@@ -7,18 +7,19 @@ import {
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
-    DrawerTrigger,
+    DrawerTrigger
 } from '@/components/ui/drawer';
 import { Separator } from '@/components/ui/separator';
 import { MenuLink } from './MenuLink';
 import { SignOutButton } from '@/components/SignOutButton';
-import { CircleX, Home, Menu, MessageSquare } from 'lucide-react';
+import { CircleX, Home, Menu, MessageSquare, CreditCard, ClockFading, Newspaper } from 'lucide-react';
 
 const menuItems = [
-    { icon: <Home size={18} />, label: "Account", href: "/accounts" },
+    { icon: <Home size={18} />, label: "Mes comptes", href: "/accounts" },
     { icon: <MessageSquare size={18} />, label: "Conversations", href: "/threads" },
-    { icon: <MessageSquare size={18} />, label: "Actualités", href: "/feeds" },
-    { icon: <MessageSquare size={18} />, label: "Crédits", href: "/credits" },
+    { icon: <Newspaper size={18} />, label: "Actualités", href: "/feeds" },
+    { icon: <ClockFading size={18} />, label: "Demandes de crédits", href: "/credits" },
+    { icon: <CreditCard size={18} />, label: "Formule de crédits", href: "/formules" },
 ];
 
 export const MenuDrawer = () => (

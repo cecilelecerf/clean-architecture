@@ -4,6 +4,8 @@ import { UserEntity } from "@domain/entities/UserEntity";
 import { Email } from "@domain/values/Email";
 import { UserModel } from "../models/UserModel";
 import { UserMapper } from "../../mappers/UserMapper";
+import { IBAN } from "@domain/values/IBAN";
+import { AccountEntity } from "@domain/entities/AccountEntity";
 
 export class UserRepositoryMongo implements UserRepository {
   constructor(private readonly client: MongoClient) {}
@@ -35,6 +37,16 @@ export class UserRepositoryMongo implements UserRepository {
     const docs = await UserModel.find().sort({ createdAt: -1 }).lean();
 
     return docs.map((doc) => UserMapper.mapRowToUser(doc));
+  }
+
+  /** Trouver un utilisateur par iban */
+  async findByIban(iban: AccountEntity["iban"]): Promise<UserEntity | null> {
+    await this.client.connect();
+
+    const doc = await UserModel.findOne({ iban: iban }).lean();
+    if (!doc) return null;
+
+    return UserMapper.mapRowToUser(doc);
   }
 
   /** Utilisateurs actifs par rôle */

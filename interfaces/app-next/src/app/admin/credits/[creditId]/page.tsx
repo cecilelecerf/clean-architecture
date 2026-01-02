@@ -35,6 +35,14 @@ import {
     Check,
     X,
     Building2,
+    NotebookPen,
+    Tag,
+    UserCog,
+    AtSign,
+    WalletMinimal,
+    BriefcaseBusiness,
+    ArrowBigRight,
+    Type
 } from "lucide-react";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { use, useState } from "react";
@@ -90,11 +98,10 @@ export default function AdminCreditDetailPage({
 }) {
     const { creditId } = use(params);
     const router = useRouter();
-    const query = useQuery(endpoints.credits.get({ creditId }));
-    console.log(query)
+    const query = useQuery(endpoints.credits.getOneWithDetails({ creditId }));
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogAction, setDialogAction] = useState<"accept" | "refuse">("accept");
-    const [refusalReason, setRefusalReason] = useState("");
+    const [reason, setReason] = useState("");
 
     const grantMutation = useMutation(endpoints.credits.grant({ creditId }));
 
@@ -111,10 +118,11 @@ export default function AdminCreditDetailPage({
     const confirmAction = () => {
         grantMutation.mutate({
             accept: dialogAction === "accept",
+            reason: reason.trim() || null
         }, {
             onSuccess: () => {
                 setDialogOpen(false);
-                setRefusalReason("");
+                setReason("");
             },
         });
     };
@@ -215,14 +223,14 @@ export default function AdminCreditDetailPage({
                                         </div>
                                     )}
 
-                                    {/* {credit.status === "REFUSED" && credit.refusalReason && (
+                                    {credit.status === "REFUSED" && credit.reason && (
                                         <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg">
                                             <p className="text-sm text-red-800 font-medium mb-1">
                                                 ❌ Refus
                                             </p>
-                                            <p className="text-sm text-red-700">{credit.refusalReason}</p>
+                                            <p className="text-sm text-red-700">{credit.reason}</p>
                                         </div>
-                                    )} */}
+                                    )}
 
                                     {credit.status === "COMPLETED" && (
                                         <div className="mt-4 p-4 bg-green-100 border border-green-300 rounded-lg">
@@ -235,13 +243,13 @@ export default function AdminCreditDetailPage({
                             </Card>
 
                             {/* Informations du client */}
-                            <Button
+                            {/* <Button
                                 variant="secondary"
                                 className="w-full"
                                 onClick={() => router.push(`/admin/users/${credit.userId}`)}
                             >
                                 <User className="w-5 h-5" /> Voir le profil client
-                            </Button>
+                            </Button> */}
 
                             {/* Progression du remboursement */}
                             {(credit.status === "ACCEPTED" && !isFuture) || credit.status === "COMPLETED" ? (
@@ -307,6 +315,85 @@ export default function AdminCreditDetailPage({
                                 </Card>
                             ) : null}
 
+                            {/* Détails de la formule du crédit */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Building2 className="w-5 h-5" />
+                                        Caractéristiques de la formule du  crédit
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <Type className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Type du crédit</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.formule.type}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <Tag  className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Label du crédit</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.formule.label} 
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <Percent className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Taux d'intérêt</p>
+                                                    <p className="text-lg font-semibold">{credit.formule.interestRate}%</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Taux d'assurance</p>
+                                                    <p className="text-lg font-semibold">{credit.formule.insuranceRate}%</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Montant minimum</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.formule.minAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.formule.currency,
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Montant maximum</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.formule.maxAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.formule.currency,
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
                             {/* Détails du crédit */}
                             <Card>
                                 <CardHeader>
@@ -341,25 +428,9 @@ export default function AdminCreditDetailPage({
                                                     </p>
                                                 </div>
                                             </div>
-
-                                            <div className="flex items-start gap-3">
-                                                <Percent className="w-5 h-5 text-gray-400 mt-0.5" />
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Taux d'intérêt</p>
-                                                    <p className="text-lg font-semibold">{credit.interestRate}%</p>
-                                                </div>
-                                            </div>
                                         </div>
 
                                         <div className="space-y-4">
-                                            <div className="flex items-start gap-3">
-                                                <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Taux d'assurance</p>
-                                                    <p className="text-lg font-semibold">{credit.insuranceRate}%</p>
-                                                </div>
-                                            </div>
-
                                             <div className="flex items-start gap-3">
                                                 <CalendarClock className="w-5 h-5 text-gray-400 mt-0.5" />
                                                 <div>
@@ -378,6 +449,125 @@ export default function AdminCreditDetailPage({
                                                         {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
                                                             style: "currency",
                                                             currency: credit.monthlyPayment.currency,
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Détails de l'utilisateur */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <UserCog className="w-5 h-5" />
+                                        Détail sur l'utilisateur
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <User className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Nom</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.account.user.lastname}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <AtSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Email</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.account.user.email}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <User  className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Prénom</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.account.user.firstname}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* TODO: Ajouter le statut professionnel dans l'entité user */}
+                                            <div className="flex items-start gap-3">
+                                                <BriefcaseBusiness className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Statut professionnel</p>
+                                                    <p className="text-lg font-semibold">
+                                                        Employé
+                                                        {/* {credit.account.user.profesionalStatus} */}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Détails du compte */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <WalletMinimal className="w-5 h-5" />
+                                        Détail du compte
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">IBAN</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.account.IBAN}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <ArrowBigRight className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Nom</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.account.name}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <Type className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Type</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.account.type}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Balance actuelle</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.account.amount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.account.currency,
                                                         })}
                                                     </p>
                                                 </div>
@@ -410,8 +600,8 @@ export default function AdminCreditDetailPage({
                     {dialogAction === "refuse" && (
                         <Textarea
                             placeholder="Raison du refus (ex: revenus insuffisants, taux d'endettement trop élevé...)"
-                            value={refusalReason}
-                            onChange={(e) => setRefusalReason(e.target.value)}
+                            value={reason}
+                            onChange={(e) => setReason(e.target.value)}
                             className="min-h-[100px]"
                         />
                     )}
@@ -421,7 +611,7 @@ export default function AdminCreditDetailPage({
                             variant="outline"
                             onClick={() => {
                                 setDialogOpen(false);
-                                setRefusalReason("");
+                                setReason("");
                             }}
                         >
                             Annuler
@@ -431,7 +621,7 @@ export default function AdminCreditDetailPage({
                             onClick={confirmAction}
                             disabled={
                                 grantMutation.isPending ||
-                                (dialogAction === "refuse" && !refusalReason.trim())
+                                (dialogAction === "refuse" && !reason.trim())
                             }
                         >
                             {grantMutation.isPending

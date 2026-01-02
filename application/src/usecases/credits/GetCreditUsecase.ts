@@ -1,3 +1,4 @@
+import { CreditDTOMapper } from "@application/dto/CreditDTOMapper";
 import { CreditNotFoundError } from "@application/errors/credits";
 import {
   UserNotActiveError,
@@ -25,7 +26,7 @@ export class GetCreditUsecase {
     creditId,
     userId,
   }: Props): Promise<
-    | CreditDTO
+    | CreditDTOMapper
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -35,9 +36,13 @@ export class GetCreditUsecase {
     if (user instanceof Error) return user;
     const credit = await this.creditRepository.findById(creditId);
     if (!credit) return new CreditNotFoundError();
-    console.log(user);
-    if (user.hasRole({ role: "client" }) && credit.userId !== user.id)
-      return new UserRoleMismatchError(["client"], user.role);
-    return credit.toDTO();
+
+    const creditUser = await this.userRepository.findByIban(credit.accountId);
+    if (!creditUser) return new UserNotFoundError();
+    
+    if (user.hasRole({ role: "client" }) && creditUser.id !== user.id)
+    return new UserRoleMismatchError(["client"], user.role);
+
+    return CreditDTOMapper.mapWithAdvisor(credit);
   }
 }

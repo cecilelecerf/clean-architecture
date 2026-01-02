@@ -1,10 +1,9 @@
 CREATE TABLE IF NOT EXISTS credits (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
-    user_id VARCHAR(36) NOT NULL,
+    account_id VARCHAR(34) NOT NULL,
+    formule_id VARCHAR(36) NOT NULL,
     initial_amount DECIMAL(15,2) NOT NULL,
     initial_currency CHAR(3) NOT NULL,
-    interest_rate DECIMAL(5,2) NOT NULL,
-    insurance_rate DECIMAL(5,2) NOT NULL,
     duration_months INT NOT NULL,
     start_date DATETIME NOT NULL,
     monthly_amount DECIMAL(15,2) NOT NULL,
@@ -15,7 +14,9 @@ CREATE TABLE IF NOT EXISTS credits (
     created_at DATETIME NOT NULL,
     advisor_id VARCHAR(36) NULL,
     updated_at DATETIME NULL,
+    reason VARCHAR(255) NULL,
 
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (account_id) REFERENCES accounts(iban) ON DELETE CASCADE,
+    FOREIGN KEY (formule_id) REFERENCES formules(id) ON DELETE CASCADE,
     FOREIGN KEY (advisor_id) REFERENCES users(id) ON DELETE CASCADE
 );

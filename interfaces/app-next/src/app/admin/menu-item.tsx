@@ -5,16 +5,14 @@ import {
   CreditCard,
   Inbox,
   Newspaper,
-  Wallet
+  Wallet,
+  ClockFading 
 } from "lucide-react";
 
 export const menuItemsClients = [
-
   { icon: <Users size={18} />, label: "Utilisateurs", href: "/admin/users" },
   { icon: <MessageSquare size={18} />, label: "Conversations clients", href: "/admin/client-threads" },
-  { icon: <Wallet size={18} />, label: "Comptes clients", href: "/admin/accounts" },
-  { icon: <CreditCard size={18} />, label: "Demandes de crédits", href: "/admin/credits" },
-
+  { icon: <Wallet size={18} />, label: "Comptes clients", href: "/admin/accounts" }
 ]
 
 export const menuItems = [
@@ -23,3 +21,8 @@ export const menuItems = [
   { icon: <Newspaper size={18} />, label: "Actualités", href: "/admin/feeds" },
   { icon: <Wallet size={18} />, label: "Compte de la banque", href: "/admin/bank-accounts" },
 ];
+
+export const menuItemsCredit = [
+  { icon: <CreditCard size={18} />, label: "Demandes de crédits", href: "/admin/credits" },
+  { icon: <ClockFading size={18} />, label: "Crédits en cours", href: "/admin/current-credits" },
+]

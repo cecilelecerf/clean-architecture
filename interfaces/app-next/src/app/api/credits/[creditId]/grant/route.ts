@@ -14,12 +14,13 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credits/[c
     const { creditId } = await ctx.params;
 
     const body = await req.json();
-    const payload = creditResponseSchema.parse(body);
+    const payload = creditResponseSchema.partial().parse(body);
 
     const result = await creditFactory().grantCredit.execute({
       advisorId: session.user.id,
       creditId: creditId,
       accept: payload.accept,
+      reason: payload.reason
     });
 
     if (result instanceof Error) {
