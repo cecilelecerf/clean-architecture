@@ -20,6 +20,7 @@ import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { useState } from "react";
 import { statusConfig } from "@/components/credits/constant";
 import { CreditDialog } from "@/components/credits/CreditRow";
+import { useSession } from "next-auth/react";
 
 
 
@@ -30,6 +31,8 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
     const [dialogAction, setDialogAction] = useState<"accept" | "refuse">("accept");
     const [refusalReason, setRefusalReason] = useState("");
 
+    const { data: session } = useSession();
+    if (!session?.user?.id) return <div>Unauthorized</div>;
     const config = statusConfig[credit.status];
     const StatusIcon = config.icon;
     const isPending = credit.status === "PENDING";
@@ -66,7 +69,6 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
         <>
             <Card >
                 <CardContent className="p-4 space-y-3 py-0">
-                    {/* Header: Status + Montant */}
                     <div className="flex justify-between items-start">
                         <div>
                             <Badge variant={config.variant} className="flex items-center gap-1 w-fit mb-2">
@@ -117,7 +119,7 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
                             <Eye className="w-4 h-4 mr-1" />
                             Détails
                         </Button>
-                        {isPending && (
+                        {isPending && session.user.role !== "client" && (
                             <>
                                 <Button
                                     variant="default"

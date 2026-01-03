@@ -102,7 +102,7 @@ export class CreateFormuleCreditUseCase {
 
     const iban = IBAN.create(accountId);
     if (iban instanceof Error) return iban;
-    const account = this.accountRepository.findByIBAN(iban);
+    const account = await this.accountRepository.findByIBAN(iban);
     if (!account) return new AccountNotFoundError();
 
     let minAmountVO: Money | undefined;
@@ -127,7 +127,7 @@ export class CreateFormuleCreditUseCase {
       type,
       label,
       description,
-      accountId,
+      accountId: account.iban,
       createdAt: this.clockService.now(),
       minAmount: minAmountVO,
       maxAmount: maxAmountVO,

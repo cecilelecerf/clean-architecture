@@ -39,7 +39,6 @@ export class GrantCreditUsecase {
     | CreditNotFoundError
     | CreditStatusMismatchError
   > {
-    // Conseiller qui accepte ou non le credit
     const advisor = await findActiveUser(this.userRepository, advisorId);
     if (advisor instanceof Error) return advisor;
     if (!advisor.hasRole({ role: "conseiller" }))

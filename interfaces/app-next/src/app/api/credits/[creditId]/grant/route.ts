@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credit';
 import { creditResponseSchema, creditSchema } from '@infrastructure/types/credit';
-import z from 'zod';
 
 export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credits/[creditId]/grant'>) {
   try {
@@ -14,13 +13,13 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credits/[c
     const { creditId } = await ctx.params;
 
     const body = await req.json();
-    const payload = creditResponseSchema.partial().parse(body);
+    const payload = creditResponseSchema.parse(body);
 
     const result = await creditFactory().grantCredit.execute({
       advisorId: session.user.id,
       creditId: creditId,
       accept: payload.accept,
-      reason: payload.reason
+      reason: payload.reason,
     });
 
     if (result instanceof Error) {

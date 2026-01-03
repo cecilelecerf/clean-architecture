@@ -52,17 +52,6 @@ export const creditsEndpoint = createEndpointsNodes({
       queryKey: ['credits', creditId],
       queryFn: () =>
         get(`/credits/${creditId}`).then((data) =>
-          safeParseWithLog(creditDTOWithFormuleAndAdvisorSchema, data),
-        ),
-    }),
-
-  // GET /api/credits/:creditId/details
-  // Détails d'un compte
-  getOneWithDetails: ({ creditId }: { creditId: CreditId }) =>
-    queryOptions({
-      queryKey: ['credits', creditId],
-      queryFn: () =>
-        get(`/credits/${creditId}/details`).then((data) =>
           safeParseWithLog(creditDTOWithFormuleAndAccountSchema, data),
         ),
     }),
@@ -133,7 +122,7 @@ export const creditsEndpoint = createEndpointsNodes({
       queryKey: ['credits', 'list', 'users', userId],
       queryFn: () =>
         get(`/credits/users/${userId}`).then((data) => {
-          return safeParseWithLog(creditDTOSchema.array(), data);
+          return safeParseWithLog(creditDTOWithFormuleSchema.array(), data);
         }),
     }),
 

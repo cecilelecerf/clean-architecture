@@ -25,20 +25,20 @@ export class CreditRepositoryMySQL implements CreditRepository {
   ): Promise<CreditEntityWithFormuleAndAdvisor | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
-        c.*,
-        f.id as form_id,
-        f.interest_rate as form_interest_rate,
-        f.insurance_rate as form_insurance_rate,
-        f.type as form_type,
-        f.label as form_label,
-        f.description as form_description,
-        f.is_active as form_is_active,
-        f.account_id as form_account_id,
-        f.created_at as form_created_at,
-        f.min_amount as form_min_amount,
-        f.max_amount as form_max_amount,
-        f.currency as form_currency,
-        f.updated_at as form_updated_at,
+      c.*,
+      f.id as form_id,
+      f.interest_rate as form_interest_rate,
+      f.insurance_rate as form_insurance_rate,
+      f.type as form_type,
+      f.label as form_label,
+      f.description as form_description,
+      f.is_active as form_is_active,
+      f.account_id as form_account_id,
+      f.created_at as form_created_at,
+      f.min_amount as form_min_amount,
+      f.max_amount as form_max_amount,
+      f.currency as form_currency,
+      f.updated_at as form_updated_at,
 
         u.id as user_id,
         u.email as user_email,
@@ -69,8 +69,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
         t.to_account_id as transaction_to_account_id,
         t.amount as transaction_amount,
         t.currency as transaction_currency,
-        t.date as transaction_date,
-        t.type as transaction_type
+        t.date as transaction_date
       FROM credits c
       LEFT JOIN formules f ON c.formule_id = f.id
       LEFT JOIN users u ON c.advisor_id = u.id
@@ -82,7 +81,6 @@ export class CreditRepositoryMySQL implements CreditRepository {
       ORDER BY t.date ASC`,
       [id]
     );
-
     if (rows.length === 0) return null;
 
     const row = rows[0];
@@ -136,6 +134,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
         a.currency as account_currency,
         a.created_at as account_created_at,
         a.updated_at as account_updated_at,
+        a.user_id as account_user_id,
 
         u.id as user_id,
         u.email as user_email,
@@ -163,7 +162,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
     let account: AccountEntityWithUser | null = null;
     if (row.account_iban) {
       const baseAccount = AccountMapper.mapRowToAccount(row, "account_");
-      const user = row.user_id ? UserMapper.mapRowToUser(row, "user_") : null;
+      const user = UserMapper.mapRowToUser(row, "user_");
 
       (baseAccount as AccountEntityWithUser).user = user;
       account = baseAccount as AccountEntityWithUser;
@@ -317,7 +316,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
            remaining_amount = ?, remaining_currency = ?, status = ?, advisor_id = ?, updated_at = ?, reason = ?
        WHERE id = ?`,
       [
-        credit.accountId,
+        credit.accountId.value,
         credit.formuleCreditId,
         credit.initialAmount.amount,
         credit.initialAmount.currency,

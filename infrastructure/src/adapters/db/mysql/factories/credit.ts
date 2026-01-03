@@ -13,7 +13,6 @@ import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
 import { GetCreditUsecase } from "@application/usecases/credits/GetCreditUsecase";
 import { GetCreditByAccountUseCase } from "@application/usecases/credits/GetCreditByAccountUseCase";
 import { GetPendingCreditsUseCase } from "@application/usecases/credits/admin/GetPendingCreditsUseCase";
-import { GetCreditsWithDetailsUseCase } from "@application/usecases/credits/admin/GetCreditsWithDetailUseCase";
 import { GetActiveCreditsUseCase } from "@application/usecases/credits/admin/GetActiveCreditsUseCase";
 
 export const creditFactory = () => {
@@ -76,11 +75,6 @@ export const creditFactory = () => {
     clockService
   );
 
-  const getOneWithDetails = new GetCreditsWithDetailsUseCase(
-    creditRepository,
-    userRepository
-  );
-
   return {
     grantCredit,
     getCreditsByUser,
@@ -91,6 +85,5 @@ export const creditFactory = () => {
     getCreditsByAccount,
     getPending,
     getActive,
-    getOneWithDetails,
   };
 };
