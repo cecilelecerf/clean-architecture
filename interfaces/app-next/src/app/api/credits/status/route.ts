@@ -3,15 +3,19 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credit';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/credits/active'>) {
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/credits/status'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const result = await creditFactory().getActive.execute({
-      advisorId: session.user.id,
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get('label');
+    console.log(status);
+    const result = await creditFactory().getAllByStatus.execute({
+      actorId: session.user.id,
+      status,
     });
     if (result instanceof Error) {
       return NextResponse.json(

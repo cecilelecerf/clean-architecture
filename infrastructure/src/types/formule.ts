@@ -15,7 +15,7 @@ export const formuleSchema = z.object({
   createdAt: z.iso.datetime(),
   minAmount: z.number().nonnegative().optional(),
   maxAmount: z.number().nonnegative().optional(),
-  updatedAt: z.iso.datetime().optional(),
+  updatedAt: z.iso.datetime(),
   currency: z.string().optional(),
 });
 
@@ -31,12 +31,15 @@ export const formuleDTOSchema = formuleSchema.pick({
   minAmount: true,
   maxAmount: true,
   currency: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export type FormuleDTO = z.infer<typeof formuleDTOSchema>;
 
-export const formuleTypesSchema = formuleSchema.pick({
-  type: true,
+export const formuleTypesSchema = z.object({
+  value: formuleSchema.shape.type,
+  label: z.string(),
 });
 
 export type FormuleTypes = z.infer<typeof formuleTypesSchema>;

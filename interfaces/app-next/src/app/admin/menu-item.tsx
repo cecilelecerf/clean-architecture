@@ -6,7 +6,7 @@ import {
   Inbox,
   Newspaper,
   Wallet,
-  ClockFading 
+  ClockFading
 } from "lucide-react";
 
 export const menuItemsClients = [
@@ -23,6 +23,6 @@ export const menuItems = [
 ];
 
 export const menuItemsCredit = [
-  { icon: <CreditCard size={18} />, label: "Demandes de crédits", href: "/admin/credits" },
-  { icon: <ClockFading size={18} />, label: "Crédits en cours", href: "/admin/current-credits" },
+  { icon: <CreditCard size={18} />, label: "Demandes de crédits", href: "/admin/credits?label=pending" },
+  { icon: <ClockFading size={18} />, label: "Crédits en cours", href: "/admin/credits?label=accepted" },
 ]

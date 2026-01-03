@@ -1,4 +1,9 @@
-import { CreditEntityWithFormule, CreditEntityWithFormuleAndAccount, CreditEntityWithFormuleAndAdvisor, CreditRepository } from "@application/ports/repositories/CreditRepository";
+import {
+  CreditEntityWithFormule,
+  CreditEntityWithFormuleAndAccount,
+  CreditEntityWithFormuleAndAdvisor,
+  CreditRepository,
+} from "@application/ports/repositories/CreditRepository";
 import { CreditEntity } from "@domain/entities/CreditEntity";
 import { CreditModel } from "../models/CreditModel";
 import { Money } from "@domain/values/Money";
@@ -18,23 +23,25 @@ export class CreditRepositoryMongo implements CreditRepository {
   constructor(private readonly client: MongoClient) {}
 
   /** Trouver un crédit par ID */
-  async findById(id: CreditEntity["id"]): Promise<CreditEntityWithFormuleAndAdvisor | null> {
+  async findById(
+    id: CreditEntity["id"]
+  ): Promise<CreditEntityWithFormuleAndAdvisor | null> {
     await this.client.connect();
 
     const doc = await CreditModel.findById(id)
-    .populate({
+      .populate({
         path: "formuleCreditId",
         model: "Formule",
       })
-    .populate({
+      .populate({
         path: "advisor",
         model: "User",
       })
-    .populate({
-      path: "accountId",
-      model: "Account",
-    })
-    .lean();
+      .populate({
+        path: "accountId",
+        model: "Account",
+      })
+      .lean();
     if (!doc) return null;
 
     const credit = CreditMapper.mapDocToCredit(doc);
@@ -56,25 +63,26 @@ export class CreditRepositoryMongo implements CreditRepository {
         toAccountId: doc.formuleId.accountId,
       }).lean();
 
-      transactions = transactionDocs.map(t =>
+      transactions = transactionDocs.map((t) =>
         TransactionMapper.mapDocToTransaction(t)
       );
     }
 
-      return Object.assign(credit, {
-        formule,
-        advisor,
-        account,
-        transactions,
-      }) as CreditEntityWithFormuleAndAdvisor;
+    return Object.assign(credit, {
+      formule,
+      advisor,
+      account,
+      transactions,
+    }) as CreditEntityWithFormuleAndAdvisor;
   }
 
   /** Trouver un crédit par ID avec les détails du comptes, de l'utilisateur du compte ainsi que de la formule du crédit*/
-  async findByIdWithDetails(id: CreditEntity["id"]): Promise<CreditEntityWithFormuleAndAccount | null> {
+  async findByIdWithDetails(
+    id: CreditEntity["id"]
+  ): Promise<CreditEntityWithFormuleAndAccount | null> {
     await this.client.connect();
 
-    const doc = await CreditModel
-      .findById(id)
+    const doc = await CreditModel.findById(id)
       .populate({
         path: "accountId",
         model: "Account",
@@ -90,7 +98,7 @@ export class CreditRepositoryMongo implements CreditRepository {
         model: "Formule",
       })
       .lean();
-    
+
     if (!doc) return null;
 
     const credit = CreditMapper.mapDocToCredit(doc);
@@ -98,10 +106,7 @@ export class CreditRepositoryMongo implements CreditRepository {
     let account: AccountEntityWithUser | null = null;
     if (doc.accountId) {
       const baseAccount = AccountMapper.mapDocToAccount(doc.accountId);
-      const user = doc.accountId.userId
-        ? UserMapper.mapDocToUser(doc.accountId.userId)
-        : null;
-
+      const user = UserMapper.mapDocToUser(doc.accountId.userId);
       (baseAccount as AccountEntityWithUser).user = user;
       account = baseAccount as AccountEntityWithUser;
     }
@@ -110,14 +115,21 @@ export class CreditRepositoryMongo implements CreditRepository {
       ? FormuleMapper.mapDocToFormule(doc.formuleId)
       : null;
 
-    return Object.assign(credit, { account, formule }) as CreditEntityWithFormuleAndAccount;
+    return Object.assign(credit, {
+      account,
+      formule,
+    }) as CreditEntityWithFormuleAndAccount;
   }
 
   /** Tous les crédits d'un compte */
-  async findAllByAccountIban(accountId: IBAN): Promise<CreditEntityWithFormule[]> {
+  async findAllByAccountIban(
+    accountId: IBAN
+  ): Promise<CreditEntityWithFormule[]> {
     await this.client.connect();
 
-    const docs = await CreditModel.find({ accountId: accountId.value.toString() })
+    const docs = await CreditModel.find({
+      accountId: accountId.value.toString(),
+    })
       .populate({
         path: "formuleCreditId",
         model: "Formule",
@@ -142,12 +154,11 @@ export class CreditRepositoryMongo implements CreditRepository {
     // const startOfToday = new Date(today);
     // startOfToday.setHours(0, 0, 0, 0);
 
-    const docs = await CreditModel
-      .find({
-        status: 'ACCEPTED',
-        "remainingBalance.amount": { $gt: 0 },
-        startDate: { $gte: today },
-      })
+    const docs = await CreditModel.find({
+      status: "ACCEPTED",
+      "remainingBalance.amount": { $gt: 0 },
+      startDate: { $gte: today },
+    })
       .populate({
         path: "formuleCreditId",
         model: "Formule",
@@ -168,10 +179,9 @@ export class CreditRepositoryMongo implements CreditRepository {
   async findPendingCredits(): Promise<CreditEntityWithFormule[]> {
     await this.client.connect();
 
-    const docs = await CreditModel
-      .find({
-        "status": { $gt: 'PENDING' },
-      })
+    const docs = await CreditModel.find({
+      status: { $gt: "PENDING" },
+    })
       .populate({
         path: "formuleCreditId",
         model: "Formule",
@@ -212,7 +222,7 @@ export class CreditRepositoryMongo implements CreditRepository {
       },
       createdAt: credit.createdAt,
       updatedAt: credit.updatedAt,
-      reason: credit.reason
+      reason: credit.reason,
     });
   }
 
@@ -241,7 +251,7 @@ export class CreditRepositoryMongo implements CreditRepository {
             currency: credit.remainingBalance.currency,
           },
           updatedAt: credit.updatedAt,
-          reason: credit.reason
+          reason: credit.reason,
         },
       }
     );

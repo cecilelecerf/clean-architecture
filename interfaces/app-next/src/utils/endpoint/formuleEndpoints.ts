@@ -34,7 +34,6 @@ export const updateFormuleSchema = formuleSchema.pick({
   type: true,
   label: true,
   description: true,
-  accountId: true,
   minAmount: true,
   maxAmount: true,
   currency: true,
@@ -69,12 +68,9 @@ export const formuleEndpoint = createEndpointsNodes({
 
   getTypes: () =>
     queryOptions({
-      queryKey: ['formules', 'list'],
-      queryFn: async () => {
-        const data = await get(`/formules/type`);
-        const parsed = safeParseWithLog(formuleTypesSchema.array(), data);
-        return parsed || [];
-      },
+      queryKey: ['formules', 'types', 'list'],
+      queryFn: async () =>
+        get(`/formules/type`).then((data) => safeParseWithLog(formuleTypesSchema.array(), data)),
     }),
 
   // POST /api/formules

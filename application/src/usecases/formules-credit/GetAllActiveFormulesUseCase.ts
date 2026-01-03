@@ -27,7 +27,6 @@ export class GetAllActiveFormulesUsecase {
     if (user instanceof Error) return user;
 
     const formules = await this.formuleRepository.findAllActive();
-    console.log(formules);
     return formules.map((formule) => formule.toDTO());
   }
 }

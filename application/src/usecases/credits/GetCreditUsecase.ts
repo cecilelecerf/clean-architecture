@@ -34,12 +34,10 @@ export class GetCreditUsecase {
     | UserNotActiveError
     | CreditNotFoundError
   > {
-    console.log("enter");
     const actor = await findActiveUser(this.userRepository, actorId);
     if (actor instanceof Error) return actor;
     const credit = await this.creditRepository.findByIdWithDetails(creditId);
     if (!credit) return new CreditNotFoundError();
-    console.log(credit.account.userId, actor.id);
     if (
       actor.hasRole({ role: "client" }) &&
       credit.account.user.id !== actor.id

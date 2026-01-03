@@ -11,6 +11,7 @@ import {
   CreditAlreadyPaidError,
   CreditStatusMismatchError,
   InvalidCreditDurationError,
+  InvalidCreditStatusError,
 } from "@domain/errors/credit";
 import { AccountEntity } from "./AccountEntity";
 import { FormuleCreditEntity } from "./FormuleCreditEntity";
@@ -319,6 +320,20 @@ export class CreditEntity {
       advisorId: this.advisorId,
     };
   }
+
+  static isValidCreditStatus(status: string): status is CreditStatus {
+    return Object.values(CreditStatus).includes(status as CreditStatus);
+  }
+  static validateCreditStatus(
+    status: string
+  ): CreditStatus | InvalidCreditStatusError {
+    if (this.isValidCreditStatus(status)) {
+      return status;
+    }
+    return new InvalidCreditStatusError(status);
+  }
+
+  // ✅ Alternative : fonction qui retourne le status validé ou une erreur
 }
 
 export type CreditDTO = {

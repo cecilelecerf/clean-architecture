@@ -37,7 +37,7 @@ export const creditFactory = () => {
     creditRepository,
     userRepository,
     accountRepository
-  )
+  );
 
   const creditSchedule = new CreditScheduleUsecase(
     creditRepository,
@@ -62,13 +62,7 @@ export const creditFactory = () => {
 
   const getPending = new GetPendingCreditsUseCase(
     creditRepository,
-    userRepository,
-  );
-
-  const getActive = new GetActiveCreditsUseCase(
-    creditRepository,
-    userRepository,
-    clockService
+    userRepository
   );
 
   const grantCredit = new GrantCreditUsecase(
@@ -79,8 +73,8 @@ export const creditFactory = () => {
 
   const getOneWithDetails = new GetCreditsWithDetailsUseCase(
     creditRepository,
-    userRepository,
-  )
+    userRepository
+  );
 
   return {
     grantCredit,
@@ -92,6 +86,6 @@ export const creditFactory = () => {
     getCreditsByAccount,
     getPending,
     getActive,
-    getOneWithDetails
+    getOneWithDetails,
   };
 };

@@ -17,7 +17,7 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
         formule.id,
         formule.interestRate.value,
         formule.insuranceRate.value,
-        formule.type,
+        formule.type.value,
         formule.label,
         formule.description,
         formule.isActive,
@@ -40,7 +40,7 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
       [
         formule.interestRate.value,
         formule.insuranceRate.value,
-        formule.type,
+        formule.type.value,
         formule.label,
         formule.description,
         formule.isActive,

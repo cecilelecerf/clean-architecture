@@ -12,8 +12,8 @@ import { FormuleCreditRepositoryMySQL } from "../repositories/FormuleCreditRepos
 import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
 import { GetCreditUsecase } from "@application/usecases/credits/GetCreditUsecase";
 import { GetCreditByAccountUseCase } from "@application/usecases/credits/GetCreditByAccountUseCase";
-import { GetPendingCreditsUseCase } from "@application/usecases/credits/admin/GetPendingCreditsUseCase";
-import { GetActiveCreditsUseCase } from "@application/usecases/credits/admin/GetActiveCreditsUseCase";
+import { GetAllByStatusUseCase } from "@application/usecases/credits/admin/GetAllByStatusUseCase";
+import { GetAllByFormuleUsecase } from "@application/usecases/credits/GetAllByFormuleIdUsecase";
 
 export const creditFactory = () => {
   const client = new MySQLClient();
@@ -58,21 +58,20 @@ export const creditFactory = () => {
     formuleRepository
   );
 
-  const getPending = new GetPendingCreditsUseCase(
-    creditRepository,
-    userRepository
-  );
-
-  const getActive = new GetActiveCreditsUseCase(
-    creditRepository,
-    userRepository,
-    clockService
-  );
-
   const grantCredit = new GrantCreditUsecase(
     creditRepository,
     userRepository,
     clockService
+  );
+  const getAllByStatus = new GetAllByStatusUseCase(
+    creditRepository,
+    userRepository
+  );
+
+  const getAllByFormule = new GetAllByFormuleUsecase(
+    creditRepository,
+    userRepository,
+    formuleRepository
   );
 
   return {
@@ -83,7 +82,7 @@ export const creditFactory = () => {
     applyMonthlyPaiementCredit,
     getCredit,
     getCreditsByAccount,
-    getPending,
-    getActive,
+    getAllByStatus,
+    getAllByFormule,
   };
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {  useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { endpoints } from "@/utils/endpoint";
@@ -15,7 +15,7 @@ export const UpdateFormuleForm = ({ formuleId }: { formuleId: FormuleId }) => {
   const query = useQuery(endpoints.formules.get({ formuleId }));
 
   const queryTypeOptions = useQuery(endpoints.formules.getTypes());
-  
+
   const typeOptions = (queryTypeOptions.data || []).map((t) => ({
     label: t.type,
     value: t.type,
@@ -58,7 +58,7 @@ export const UpdateFormuleForm = ({ formuleId }: { formuleId: FormuleId }) => {
 
     if (!field.type || !field.interestRate) return;
 
-    mutation.mutate(field , { onSuccess: () => router.push(`/director/formules/${formuleId}`) });
+    mutation.mutate(field, { onSuccess: () => router.push(`/director/formules/${formuleId}`) });
   };
 
   if (query.isLoading) return "Chargement...";
@@ -93,17 +93,8 @@ export const UpdateFormuleForm = ({ formuleId }: { formuleId: FormuleId }) => {
         step: 0.01,
       },
     },
-    // {
-    //   label: "Type de prêt",
-    //   type: "text",
-    //   get: field.type,
-    //   set: (e) =>
-    //     setField((prev) => ({
-    //       ...prev,
-    //       type: e as string,
-    //     })),
-    // },
     {
+
       label: "Type de prêt",
       type: "creatable-select",
       placeholder: "Sélectionnez ou créez un type",
