@@ -11,5 +11,4 @@ export interface TransactionInterface {
     currency: string;
   };
   date: Date;
-  type: "credit" | "debit";
 }

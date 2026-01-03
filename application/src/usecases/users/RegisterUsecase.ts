@@ -8,8 +8,12 @@ import { EmailService } from "@application/ports/services/EmailService";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
 import { UuidService } from "@application/ports/services/UuidService";
-import { UserEntity, UserToFront } from "@domain/entities/UserEntity";
+import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
+import {
+  InvalidFirstnameError,
+  InvalidLastnameError,
+} from "@domain/errors/user";
 import { Email } from "@domain/values/Email";
 
 type Props = {
@@ -35,10 +39,12 @@ export class RegisterUsecase {
     plainedPassword,
     confirmationUrl,
   }: Props): Promise<
-    | UserToFront
+    | UserToDTO
     | EmailInvalidFormatError
     | EmailAlreadyExistsError
     | UserNotFoundError
+    | InvalidFirstnameError
+    | InvalidLastnameError
   > {
     const emailVO = Email.create(email);
     if (emailVO instanceof Error) return emailVO;
@@ -51,7 +57,7 @@ export class RegisterUsecase {
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
 
-    const user = UserEntity.from({
+    const user = UserEntity.create({
       id,
       email: emailVO,
       firstname,
@@ -59,10 +65,9 @@ export class RegisterUsecase {
       passwordHash,
       createdAt,
       role: "client",
-      isActiveField: false,
-      updatedAt: createdAt,
     });
 
+    if (user instanceof Error) return user;
     this.userRepository.save(user);
 
     const token = await this.tokenService.generateConfirmationToken({
@@ -73,6 +78,6 @@ export class RegisterUsecase {
       firstname: user.firstname,
       confirmationLink,
     });
-    return user.toFront();
+    return user.toDTO();
   }
 }

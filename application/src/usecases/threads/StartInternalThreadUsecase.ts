@@ -11,7 +11,10 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { InvalidTitleError } from "@domain/errors/thread";
+import {
+  InvalidThreadTypeError,
+  InvalidTitleError,
+} from "@domain/errors/thread";
 
 type Props = { administratorId: UserEntity["id"] } & Pick<
   ThreadEntity,
@@ -36,6 +39,7 @@ export class StartInternalThreadUsecase {
     | InvalidThreadParticipantsError
     | UserNotActiveError
     | InvalidTitleError
+    | InvalidThreadTypeError
   > {
     const administrator = await findActiveUser(
       this.userRepository,
@@ -54,8 +58,11 @@ export class StartInternalThreadUsecase {
         );
         if (participant instanceof Error) return participant;
 
-        if (!participant.hasRole({ role: "conseiller" })) {
-          return new UserRoleMismatchError(["conseiller"], participant.role);
+        if (participant.hasRole({ role: "client" })) {
+          return new UserRoleMismatchError(
+            ["conseiller", "directeur"],
+            participant.role
+          );
         }
 
         return participant;
@@ -76,8 +83,6 @@ export class StartInternalThreadUsecase {
       participantsId,
       administratorId,
       title,
-      isClose: false,
-      updatedAt:createdAt
     });
 
     if (thread instanceof Error) return thread;

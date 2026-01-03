@@ -1,3 +1,4 @@
+// infrastructure/adapters/db/mongo/repositories/TransactionRepositoryMongo.ts
 import {
   TransactionEntityWithAccount,
   TransactionEntityWithAccountWithUser,
@@ -8,10 +9,9 @@ import { IBAN } from "@domain/values/IBAN";
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { TransactionModel } from "../models/TransactionModel";
 import { Money } from "@domain/values/Money";
-import { AccountEntity } from "@domain/entities/AccountEntity";
-import { Color } from "@domain/values/Color";
 import { AccountMapper } from "../../mappers/AccountMapper";
 import { UserMapper } from "../../mappers/UserMapper";
+import { TransactionFilters } from "@application/usecases/transactions/GetAllTransactionsByAccountUseCase";
 
 export class TransactionRepositoryMongo implements TransactionRepository {
   constructor(private readonly client: MongoClient) {}
@@ -29,11 +29,9 @@ export class TransactionRepositoryMongo implements TransactionRepository {
       label: doc.label,
       icon: doc.icon,
       date: doc.date,
-      type: doc.type,
     });
   }
 
-  /** Transactions par période */
   async findByDateRange(
     startDate: Date,
     endDate: Date
@@ -49,7 +47,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     return docs.map((doc) => this.mapDocToTransaction(doc));
   }
 
-  /** Transactions par IBAN */
   async findByIban(iban: IBAN): Promise<TransactionEntity[]> {
     await this.client.connect();
 
@@ -62,7 +59,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     return docs.map((doc) => this.mapDocToTransaction(doc));
   }
 
-  /** Sauvegarder une transaction */
   async save(transaction: TransactionEntity): Promise<void> {
     await this.client.connect();
 
@@ -77,18 +73,15 @@ export class TransactionRepositoryMongo implements TransactionRepository {
         currency: transaction.amount.currency,
       },
       date: transaction.date,
-      type: transaction.type,
     });
   }
 
-  /** Supprimer une transaction */
   async delete(transactionId: TransactionEntity["id"]): Promise<void> {
     await this.client.connect();
 
     await TransactionModel.deleteOne({ _id: transactionId });
   }
 
-  /** Trouver une transaction par ID */
   async findById(
     id: TransactionEntity["id"]
   ): Promise<TransactionEntity | null> {
@@ -101,7 +94,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     return this.mapDocToTransaction(doc);
   }
 
-  /** Trouver une transaction avec les comptes associés */
   async findByIdWithAccount(
     id: TransactionEntity["id"]
   ): Promise<TransactionEntityWithAccount | null> {
@@ -114,10 +106,8 @@ export class TransactionRepositoryMongo implements TransactionRepository {
 
     if (!doc) return null;
 
-    // Vérifier que les comptes sont bien populés
     if (!doc.fromAccountId || !doc.toAccountId) return null;
 
-    // Mapper les entités
     const transaction = this.mapDocToTransaction(doc);
     const fromAccount = AccountMapper.mapDocToAccount(doc.fromAccountId);
     const toAccount = AccountMapper.mapDocToAccount(doc.toAccountId);
@@ -125,7 +115,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     return Object.assign(transaction, { fromAccount, toAccount });
   }
 
-  /** Trouver une transaction avec comptes + utilisateurs associés */
   async findByIdWithAccountWithUser(
     id: TransactionEntity["id"]
   ): Promise<TransactionEntityWithAccountWithUser | null> {
@@ -153,8 +142,8 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     const transaction = this.mapDocToTransaction(doc);
     const fromAccount = AccountMapper.mapDocToAccount(doc.fromAccountId);
     const toAccount = AccountMapper.mapDocToAccount(doc.toAccountId);
-    const fromUser = UserMapper.mapDocToUser(doc.fromAccountId.userId)
-    const toUser = UserMapper.mapDocToUser(doc.toAccountId.userId)
+    const fromUser = UserMapper.mapDocToUser(doc.fromAccountId.userId);
+    const toUser = UserMapper.mapDocToUser(doc.toAccountId.userId);
 
     return Object.assign(transaction, {
       fromAccount: Object.assign(fromAccount, { user: fromUser }),
@@ -162,4 +151,55 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     });
   }
 
+  async findAllByAccountWithFilters(
+    iban: IBAN,
+    filters?: TransactionFilters
+  ): Promise<{ transactions: TransactionEntity[]; total: number }> {
+    await this.client.connect();
+
+    const query: any = {};
+
+    if (filters?.type) {
+      if (filters.type === "debit") {
+        query.fromAccountId = iban.value;
+      } else if (filters.type === "credit") {
+        query.toAccountId = iban.value;
+      }
+    } else {
+      query.$or = [{ fromAccountId: iban.value }, { toAccountId: iban.value }];
+    }
+
+    if (filters?.label) {
+      query.label = { $regex: filters.label, $options: "i" };
+    }
+
+    if (filters?.fromDate || filters?.toDate) {
+      query.date = {};
+      if (filters.fromDate) {
+        query.date.$gte = filters.fromDate;
+      }
+      if (filters.toDate) {
+        query.date.$lte = filters.toDate;
+      }
+    }
+
+    const total = await TransactionModel.countDocuments(query);
+
+    const page = Math.max(1, parseInt(String(filters?.page ?? 1), 10));
+    const limit = Math.max(
+      1,
+      Math.min(100, parseInt(String(filters?.limit ?? 20), 10))
+    );
+    const skip = (page - 1) * limit;
+
+    const docs = await TransactionModel.find(query)
+      .sort({ date: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const transactions = docs.map((doc) => this.mapDocToTransaction(doc));
+
+    return { transactions, total };
+  }
 }

@@ -36,11 +36,7 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
 
     const grantMutation = useMutation({
         ...endpoints.credits.grant({ creditId: credit.id }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["credits", userId] });
-            setDialogOpen(false);
-            setRefusalReason("");
-        },
+
     });
 
     const handleAccept = () => {
@@ -55,7 +51,14 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
 
     const confirmAction = () => {
         grantMutation.mutate({
-            accept: dialogAction === "accept",
+            payload: { accept: dialogAction === "accept" },
+            userId
+        }, {
+            onSuccess: () => {
+                queryClient.invalidateQueries({ queryKey: ["credits", userId] });
+                setDialogOpen(false);
+                setRefusalReason("");
+            },
         });
     };
 

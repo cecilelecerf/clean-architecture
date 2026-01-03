@@ -99,20 +99,20 @@ export class ApplyDailyInterestUseCase {
       }
 
       const transactionId = this.uuidService.generate();
-      const transaction = TransactionEntity.from({
+      const transaction = TransactionEntity.create({
         id: transactionId,
         fromAccountId: bankAccount.iban,
         toAccountId: savingAccount.iban,
         amount: interest,
         label: `Intérêts journaliers (${rateConfig.rate.getValue()}%)`,
         icon: "💰",
-        type: "credit",
         date: today,
       });
 
+      if (transaction instanceof Error) return transaction;
+
       await this.transactionRepository.save(transaction);
 
-      // Mettre à jour avec ID de la transaction
       savingAccount.updateLastInterestTransaction(transactionId);
       await this.accountRepository.update(savingAccount);
 

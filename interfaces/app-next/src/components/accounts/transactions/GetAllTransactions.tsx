@@ -17,7 +17,8 @@ type Props = {
     baseHref: string
 }
 export const GetAllTransactions = ({ accountIban, filters, onPaginationChange, hiddePagination, baseHref }: Props) => {
-    const query = useQuery(endpoints.accounts.transactions.getAll({ accountIban }))
+    console.log(filters)
+    const query = useQuery(endpoints.accounts.transactions.getAll({ accountIban, filters }))
     return match(query)
         .with({ status: "pending" }, () => <TransactionsSkeleton />)
         .with({ status: "error" }, () => "error")
@@ -40,10 +41,10 @@ export const GetAllTransactions = ({ accountIban, filters, onPaginationChange, h
                             <div
                                 className={clsx(
                                     'font-semibold',
-                                    t.amount < 0 ? 'text-red-600' : 'text-green-600',
+                                    match(t).with({ type: "credit" }, () => 'text-emerald-500').with({ type: "debit" }, () => 'text-red-500').otherwise(() => 'text-gray-600')
                                 )}
                             >
-                                {t.amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                                {t.type === "debit" && "-"}   {t.amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
                             </div>
                         </Link>
                     ))}

@@ -28,7 +28,6 @@ export const TransactionSchema = new Schema<TransactionInterface>(
       },
       required: true,
     },
-    type: { type: String, enum: ["credit", "debit"], required: true },
     date: { type: Date, required: true },
   },
   {

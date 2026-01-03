@@ -16,7 +16,7 @@ export const transactionSchema = z.object({
   amount: z.any(),
   currency: z.string().min(1),
   date: z.iso.datetime(),
-  type: z.enum(["credit", "debit"]),
+  type: z.enum(["credit", "debit"]).optional(),
   icon: z.string(),
 });
 

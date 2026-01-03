@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS transactions (
     label VARCHAR(40) NOT NULL,
     icon VARCHAR(5),
     date DATETIME NOT NULL,
-    type ENUM('credit','debit') NOT NULL,
     CONSTRAINT fk_transactions_from_account FOREIGN KEY (from_account_id) REFERENCES accounts(iban) ON DELETE CASCADE,
     CONSTRAINT fk_transactions_to_account FOREIGN KEY (to_account_id) REFERENCES accounts(iban) ON DELETE CASCADE
 );

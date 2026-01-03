@@ -40,35 +40,30 @@ export class AccountEntity {
     color,
     createdAt,
     userId,
-    updatedAt,
-    lastInterestTransactionId,
   }: Pick<
     AccountEntity,
-    | "iban"
-    | "name"
-    | "type"
-    | "color"
-    | "balance"
-    | "currency"
-    | "createdAt"
-    | "userId"
-    | "updatedAt"
-    | "lastInterestTransactionId"
-  >): AccountEntity | InvalidAccountNameError {
+    "iban" | "name" | "color" | "balance" | "currency" | "createdAt" | "userId"
+  > & { type: string }):
+    | AccountEntity
+    | InvalidAccountNameError
+    | InvalidAccountTypeError {
     const verifiedName = this.verifyName(name);
     if (verifiedName instanceof Error) return verifiedName;
+
+    const validateType = this.validateType(type);
+    if (validateType instanceof Error) return validateType;
 
     return new AccountEntity(
       iban,
       name,
-      type,
+      validateType,
       color,
       balance,
       currency,
       createdAt,
-      updatedAt,
+      createdAt,
       userId,
-      lastInterestTransactionId
+      null
     );
   }
 
@@ -138,13 +133,21 @@ export class AccountEntity {
     return this.balance;
   }
 
-  public static verifyName(
+  private static verifyName(
     name: AccountEntity["name"]
   ): InvalidAccountNameError | AccountEntity["name"] {
     const trimedName = name.trim();
     if (trimedName.length < 10 || trimedName.length > 100)
       return new InvalidAccountNameError();
     return trimedName;
+  }
+  private static validateType(
+    type: string
+  ): "courant" | "epargne" | InvalidAccountTypeError {
+    if (type !== "courant" && type !== "epargne") {
+      return new InvalidAccountTypeError(type);
+    }
+    return type;
   }
 
   public isBankAccount(): boolean {

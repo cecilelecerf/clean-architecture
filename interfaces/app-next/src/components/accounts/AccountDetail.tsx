@@ -82,7 +82,7 @@ export const AccountDetail = ({ accountIban, basePath, withUserInfo, withTransfe
                                     <Button variant="link">Voir +</Button>
                                 </Link>
                             </Flex>
-                            <GetAllTransactions accountIban={accountIban} filters={{ limit: 7, page: 1 }} onPaginationChange={() => { }} hiddePagination baseHref={`${basePath}/${accountIban}/transactions`} />
+                            <GetAllTransactions accountIban={accountIban} filters={{ limit: 4, page: 1 }} onPaginationChange={() => { }} hiddePagination baseHref={`${basePath}/${accountIban}/transactions`} />
                         </Flex>
                     </div >
                 )

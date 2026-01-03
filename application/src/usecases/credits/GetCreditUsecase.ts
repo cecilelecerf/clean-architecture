@@ -8,7 +8,7 @@ import {
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { CreditDTO, CreditEntity } from "@domain/entities/CreditEntity";
+import { CreditEntity } from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 
 type Props = {
@@ -39,8 +39,6 @@ export class GetCreditUsecase {
 
     if (user.hasRole({ role: "client" }) && credit.account.userId !== user.id)
       return new UserRoleMismatchError(["client"], user.role);
-    console.log(credit);
-    console.log(CreditDTOMapper.mapWithAdvisor(credit));
     return CreditDTOMapper.mapWithAdvisor(credit);
   }
 }

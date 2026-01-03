@@ -12,8 +12,8 @@ export default function ClientPage() {
     const { userId } = useParams<{ userId: UserId }>();
     return (
         <>
-            <UserInfo userId={userId} />
             <Flex direction="column" gap="8" className="w-full">
+                <UserInfo userId={userId} />
                 <UserAccounts userId={userId} />
                 <UserThreads userId={userId} />
                 <AdminUserCredits userId={userId} />

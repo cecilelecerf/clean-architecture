@@ -3,7 +3,7 @@ import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts'
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { newPostSchema } from '@/utils/endpoint/feedsEndpoint';
-import { postSchema } from '@infrastructure/types/feed';
+import { postSchema, postWithTagsSchema } from '@infrastructure/types/feed';
 import z from 'zod';
 
 export async function GET(req: NextRequest, ctx: RouteContext<'/api/posts/[postId]'>) {
@@ -56,12 +56,8 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/posts/[pos
         { status: result.statusCode ?? 400 },
       );
     }
-    return NextResponse.json(
-      postSchema
-        .omit({ updatedAt: true, publishedAt: true, createdAt: true })
-        .extend({ updatedAt: z.date(), publishedAt: z.date().optional(), createdAt: z.date() })
-        .parse(result),
-    );
+    console.log(result);
+    return NextResponse.json(postWithTagsSchema.parse(result));
   } catch (err) {
     console.error(err);
     return NextResponse.json(

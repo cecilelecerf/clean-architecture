@@ -6,7 +6,7 @@ import { useQueries } from '@tanstack/react-query';
 import { match } from 'ts-pattern';
 import { UserDto } from '@infrastructure/types/user';
 import { endpoints } from '@/utils/endpoint';
-import { WrapperThread } from '@/components/threads/WrapperThread';
+import { SkeletonThread, WrapperThread } from '@/components/threads/WrapperThread';
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
@@ -28,5 +28,5 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
                 withSetting
             />
         )
-        .otherwise(() => "pending")
+        .otherwise(() => <SkeletonThread />)
 }

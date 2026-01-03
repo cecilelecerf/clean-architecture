@@ -16,7 +16,7 @@ export const GetAllSavingsRate = ({ current }: { current: SavingRate | null }) =
 
     return match(query)
         .with({ status: "error" }, () => "error")
-        .with({ status: "pending" }, () => "pendig ")
+        .with({ status: "pending" }, () => new Array(5).map((i) => <SavingsRatesSkeleton key={i} />))
         .with({ status: "success" }, ({ data: rates }) => {
             if (rates.length === 0) {
                 return (
@@ -131,7 +131,7 @@ const SavingsRateCard = ({
 };
 
 
-const SavingsRatesSkeleton = () => (
+export const SavingsRatesSkeleton = () => (
     <div className="space-y-4">
         <Skeleton className="h-6 w-48" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

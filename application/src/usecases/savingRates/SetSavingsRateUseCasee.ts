@@ -14,6 +14,7 @@ import {
 } from "@application/errors/users";
 import { InvalidPercentageError } from "@domain/errors/percentage";
 import { ClockService } from "@application/ports/services/ClockService";
+import { EffectiveDateInPastError } from "@domain/errors/savingsRate";
 
 interface Props {
   rate: number;
@@ -34,11 +35,12 @@ export class SetSavingsRateUsecase {
     effectiveDate,
     userId,
   }: Props): Promise<
+    | SavingsRateDTO
     | UserRoleMismatchError
     | UserNotFoundError
     | UserNotActiveError
     | InvalidPercentageError
-    | SavingsRateDTO
+    | EffectiveDateInPastError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -52,15 +54,14 @@ export class SetSavingsRateUsecase {
 
     const effectiveDateResult = this.clockService.toDate(effectiveDate);
     const today = this.clockService.now();
-    // TODO : vérifier que l'effectiveDate soit posterieur à la date actuelle
 
-    const savingsRate = SavingsRateEntity.from({
+    const savingsRate = SavingsRateEntity.create({
       id: this.uuidService.generate(),
       rate: percentage,
       effectiveDate: effectiveDateResult,
       createdAt: today,
-      updatedAt: today,
     });
+    if (savingsRate instanceof Error) return savingsRate;
 
     await this.configRepository.save(savingsRate);
 

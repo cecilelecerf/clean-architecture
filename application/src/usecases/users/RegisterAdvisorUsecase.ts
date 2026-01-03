@@ -12,17 +12,22 @@ import { PasswordGenerateService } from "@application/ports/services/PasswordGen
 import { TokenService } from "@application/ports/services/TokenService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { UserEntity } from "@domain/entities/UserEntity";
+import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
+import {
+  InvalidFirstnameError,
+  InvalidLastnameError,
+} from "@domain/errors/user";
 import { Email } from "@domain/values/Email";
 
 type Props = {
   email: string;
   confirmationUrl: string;
   directorId: UserEntity["id"];
+  role: string;
 } & Pick<UserEntity, "firstname" | "lastname">;
-
-export class RegisterAdvisorStatus {
+// Register for advisro or director create par director
+export class RegisterAdvisorUsecase {
   public constructor(
     private readonly userRepository: UserRepository,
     private readonly encryptionService: EncryptionService,
@@ -39,13 +44,16 @@ export class RegisterAdvisorStatus {
     email,
     confirmationUrl,
     directorId,
+    role,
   }: Props): Promise<
+    | UserToDTO
     | UserNotFoundError
     | UserNotActiveError
     | EmailInvalidFormatError
     | EmailAlreadyExistsError
     | UserRoleMismatchError
-    | UserEntity
+    | InvalidFirstnameError
+    | InvalidLastnameError
   > {
     const actor = await findActiveUser(this.userRepository, directorId);
     if (actor instanceof Error) return actor;
@@ -65,18 +73,18 @@ export class RegisterAdvisorStatus {
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
 
-    const user = UserEntity.from({
+    // TODO : vérification du rôle
+    const user = UserEntity.create({
       id,
       email: emailVO,
       firstname,
       lastname,
       passwordHash,
       createdAt,
-      role: "conseiller",
-      isActiveField: false,
-      updatedAt: createdAt,
+      role: role as UserEntity["role"],
     });
-
+    console.log(user);
+    if (user instanceof Error) return user;
     await this.userRepository.save(user);
 
     const token = await this.tokenService.generateConfirmationToken({
@@ -94,6 +102,6 @@ export class RegisterAdvisorStatus {
       Pense à changer de mot de passe lors de ta première connexion.
       `,
     });
-    return user;
+    return user.toDTO();
   }
 }

@@ -16,7 +16,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { endpoints } from "@/utils/endpoint";
 import { CreditId } from "@infrastructure/types/credit";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 import {
@@ -47,6 +47,7 @@ import {
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { use, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserId } from "@infrastructure/types/user";
 
 const statusConfig = {
     PENDING: {
@@ -115,10 +116,12 @@ export default function AdminCreditDetailPage({
         setDialogOpen(true);
     };
 
-    const confirmAction = () => {
+    const confirmAction = (userId: UserId) => {
         grantMutation.mutate({
-            accept: dialogAction === "accept",
-            reason: reason.trim() || null
+            payload: {
+                accept: dialogAction === "accept",
+                reason: reason.trim() || null
+            }, userId
         }, {
             onSuccess: () => {
                 setDialogOpen(false);
@@ -156,6 +159,8 @@ export default function AdminCreditDetailPage({
                     const isPending = credit.status === "PENDING";
 
                     return (
+
+
                         <div className="space-y-6">
                             {/* Card principale - Statut */}
                             <Card className={`${config.bgColor} border-2 ${config.borderColor}`}>
@@ -223,99 +228,81 @@ export default function AdminCreditDetailPage({
                                         </div>
                                     )}
 
-                                    {credit.status === "REFUSED" && credit.reason && (
-                                        <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg">
-                                            <p className="text-sm text-red-800 font-medium mb-1">
-                                                ❌ Refus
-                                            </p>
-                                            <p className="text-sm text-red-700">{credit.reason}</p>
-                                        </div>
-                                    )}
+                                    {
+                                        credit.status === "REFUSED" && credit.reason && (
+                                            <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg">
+                                                <p className="text-sm text-red-800 font-medium mb-1">
+                                                    ❌ Refus
+                                                </p>
+                                                <p className="text-sm text-red-700">{credit.reason}</p>
+                                            </div>
+                                        )
+                                    }
+                                    {
+                                        credit.status === "COMPLETED" && (
+                                            <div className="mt-4 p-4 bg-green-100 border border-green-300 rounded-lg">
+                                                <p className="text-sm text-green-800">
+                                                    ✅ Ce crédit est entièrement remboursé.
+                                                </p>
+                                            </div>
+                                        )
+                                    }
+                                </CardContent >
+                            </Card >
 
-                                    {credit.status === "COMPLETED" && (
-                                        <div className="mt-4 p-4 bg-green-100 border border-green-300 rounded-lg">
-                                            <p className="text-sm text-green-800">
-                                                ✅ Ce crédit est entièrement remboursé.
-                                            </p>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
+
 
                             {/* Informations du client */}
-                            {/* <Button
+                            <Button
                                 variant="secondary"
                                 className="w-full"
-                                onClick={() => router.push(`/admin/users/${credit.userId}`)}
+                                onClick={() => router.push(`/admin/users/${credit.account.userId}`)}
                             >
                                 <User className="w-5 h-5" /> Voir le profil client
-                            </Button> */}
+                            </Button>
+                            {
+                                (credit.status === "ACCEPTED" && !isFuture) && (
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center gap-2">
+                                                <TrendingUp className="w-5 h-5" />
+                                                Progression du remboursement
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div>
+                                                <div className="flex justify-between mb-2">
+                                                    <span className="text-sm text-gray-600">
+                                                        {progressPercentage}% remboursé
+                                                    </span>
+                                                    <span className="text-sm font-medium">
+                                                        {paidAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.initialAmount.currency,
+                                                        })}{" "}
+                                                        / {totalAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.initialAmount.currency,
+                                                        })}
+                                                    </span>
+                                                </div>
+                                                <Progress value={progressPercentage} className="h-3" />
+                                            </div>
 
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                                                <div className="p-4 bg-green-50 rounded-lg">
+                                                    <p className="text-xs text-gray-600 mb-1">Montant payé</p>
+                                                    <p className="text-xl font-bold text-green-600">
+                                                        {paidAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.initialAmount.currency,
+                                                        })}</p>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>)}
                             {/* Progression du remboursement */}
-                            {(credit.status === "ACCEPTED" && !isFuture) || credit.status === "COMPLETED" ? (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <TrendingUp className="w-5 h-5" />
-                                            Progression du remboursement
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        <div>
-                                            <div className="flex justify-between mb-2">
-                                                <span className="text-sm text-gray-600">
-                                                    {progressPercentage}% remboursé
-                                                </span>
-                                                <span className="text-sm font-medium">
-                                                    {paidAmount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.initialAmount.currency,
-                                                    })}{" "}
-                                                    / {totalAmount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.initialAmount.currency,
-                                                    })}
-                                                </span>
-                                            </div>
-                                            <Progress value={progressPercentage} className="h-3" />
-                                        </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                                            <div className="p-4 bg-green-50 rounded-lg">
-                                                <p className="text-xs text-gray-600 mb-1">Montant payé</p>
-                                                <p className="text-xl font-bold text-green-600">
-                                                    {paidAmount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.initialAmount.currency,
-                                                    })}
-                                                </p>
-                                            </div>
-
-                                            <div className="p-4 bg-orange-50 rounded-lg">
-                                                <p className="text-xs text-gray-600 mb-1">Reste à payer</p>
-                                                <p className="text-xl font-bold text-orange-600">
-                                                    {remainingAmount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.remainingBalance.currency,
-                                                    })}
-                                                </p>
-                                            </div>
-
-                                            <div className="p-4 bg-blue-50 rounded-lg">
-                                                <p className="text-xs text-gray-600 mb-1">Mensualité</p>
-                                                <p className="text-xl font-bold text-blue-600">
-                                                    {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
-                                                        style: "currency",
-                                                        currency: credit.monthlyPayment.currency,
-                                                    })}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ) : null}
-
-                            {/* Détails de la formule du crédit */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
@@ -337,11 +324,11 @@ export default function AdminCreditDetailPage({
                                             </div>
 
                                             <div className="flex items-start gap-3">
-                                                <Tag  className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <Tag className="w-5 h-5 text-gray-400 mt-0.5" />
                                                 <div>
                                                     <p className="text-sm text-gray-600">Label du crédit</p>
                                                     <p className="text-lg font-semibold">
-                                                        {credit.formule.label} 
+                                                        {credit.formule.label}
                                                     </p>
                                                 </div>
                                             </div>
@@ -393,6 +380,69 @@ export default function AdminCreditDetailPage({
                                     </div>
                                 </CardContent>
                             </Card>
+                            {/* Détails du crédit */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Building2 className="w-5 h-5" />
+                                        Caractéristiques du crédit
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Montant emprunté</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.initialAmount.amount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.initialAmount.currency,
+                                                        })}
+                                                    </p>
+                                                </div>
+
+                                                <div className="p-4 bg-orange-50 rounded-lg">
+                                                    <p className="text-xs text-gray-600 mb-1">Reste à payer</p>
+                                                    <p className="text-xl font-bold text-orange-600">
+                                                        {remainingAmount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.remainingBalance.currency,
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div >
+                                        </div >
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <CalendarClock className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Date de début</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {formatDateFrench(credit.startDate)}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Mensualité</p>
+                                                    <p className="text-lg font-semibold">
+                                                        {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
+                                                            style: "currency",
+                                                            currency: credit.monthlyPayment.currency,
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
 
                             {/* Détails du crédit */}
                             <Card>
@@ -428,9 +478,25 @@ export default function AdminCreditDetailPage({
                                                     </p>
                                                 </div>
                                             </div>
+
+                                            <div className="flex items-start gap-3">
+                                                <Percent className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Taux d'intérêt</p>
+                                                    <p className="text-lg font-semibold">{credit.formule.interestRate}%</p>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div className="space-y-4">
+                                            <div className="flex items-start gap-3">
+                                                <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm text-gray-600">Taux d'assurance</p>
+                                                    <p className="text-lg font-semibold">{credit.formule.insuranceRate}%</p>
+                                                </div>
+                                            </div>
+
                                             <div className="flex items-start gap-3">
                                                 <CalendarClock className="w-5 h-5 text-gray-400 mt-0.5" />
                                                 <div>
@@ -455,11 +521,11 @@ export default function AdminCreditDetailPage({
                                             </div>
                                         </div>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </CardContent >
+                            </Card >
 
                             {/* Détails de l'utilisateur */}
-                            <Card>
+                            < Card >
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <UserCog className="w-5 h-5" />
@@ -492,7 +558,7 @@ export default function AdminCreditDetailPage({
 
                                         <div className="space-y-4">
                                             <div className="flex items-start gap-3">
-                                                <User  className="w-5 h-5 text-gray-400 mt-0.5" />
+                                                <User className="w-5 h-5 text-gray-400 mt-0.5" />
                                                 <div>
                                                     <p className="text-sm text-gray-600">Prénom</p>
                                                     <p className="text-lg font-semibold">
@@ -515,10 +581,10 @@ export default function AdminCreditDetailPage({
                                         </div>
                                     </div>
                                 </CardContent>
-                            </Card>
+                            </Card >
 
                             {/* Détails du compte */}
-                            <Card>
+                            < Card >
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <WalletMinimal className="w-5 h-5" />
@@ -575,64 +641,67 @@ export default function AdminCreditDetailPage({
                                         </div>
                                     </div>
                                 </CardContent>
-                            </Card>
-                        </div>
-                    );
+                            </Card >
+
+                            {/* Dialog de confirmation */}
+                            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            {dialogAction === "accept"
+                                                ? "Accepter la demande de crédit"
+                                                : "Refuser la demande de crédit"}
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            {dialogAction === "accept"
+                                                ? "Êtes-vous sûr de vouloir accepter cette demande ? Le client sera notifié et le crédit sera activé."
+                                                : "Veuillez indiquer la raison du refus. Le client recevra cette information."}
+                                        </DialogDescription>
+                                    </DialogHeader>
+
+                                    {dialogAction === "refuse" && (
+                                        <Textarea
+                                            placeholder="Raison du refus (ex: revenus insuffisants, taux d'endettement trop élevé...)"
+                                            value={reason}
+                                            onChange={(e) => setReason(e.target.value)}
+                                            className="min-h-[100px]"
+                                        />
+                                    )}
+
+                                    <DialogFooter>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                setDialogOpen(false);
+                                                setReason("");
+                                            }}
+                                        >
+                                            Annuler
+                                        </Button>
+                                        <Button
+                                            variant={dialogAction === "accept" ? "default" : "destructive"}
+                                            onClick={() => confirmAction(credit.account.userId)}
+                                            disabled={
+                                                grantMutation.isPending ||
+                                                (dialogAction === "refuse" && !reason.trim())
+                                            }
+                                        >
+                                            {grantMutation.isPending
+                                                ? "En cours..."
+                                                : dialogAction === "accept"
+                                                    ? "Confirmer l'acceptation"
+                                                    : "Confirmer le refus"}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </div >
+                    )
+
+
                 })
                 .exhaustive()}
 
-            {/* Dialog de confirmation */}
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>
-                            {dialogAction === "accept"
-                                ? "Accepter la demande de crédit"
-                                : "Refuser la demande de crédit"}
-                        </DialogTitle>
-                        <DialogDescription>
-                            {dialogAction === "accept"
-                                ? "Êtes-vous sûr de vouloir accepter cette demande ? Le client sera notifié et le crédit sera activé."
-                                : "Veuillez indiquer la raison du refus. Le client recevra cette information."}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    {dialogAction === "refuse" && (
-                        <Textarea
-                            placeholder="Raison du refus (ex: revenus insuffisants, taux d'endettement trop élevé...)"
-                            value={reason}
-                            onChange={(e) => setReason(e.target.value)}
-                            className="min-h-[100px]"
-                        />
-                    )}
-
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                setDialogOpen(false);
-                                setReason("");
-                            }}
-                        >
-                            Annuler
-                        </Button>
-                        <Button
-                            variant={dialogAction === "accept" ? "default" : "destructive"}
-                            onClick={confirmAction}
-                            disabled={
-                                grantMutation.isPending ||
-                                (dialogAction === "refuse" && !reason.trim())
-                            }
-                        >
-                            {grantMutation.isPending
-                                ? "En cours..."
-                                : dialogAction === "accept"
-                                    ? "Confirmer l'acceptation"
-                                    : "Confirmer le refus"}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </>
     );
 }

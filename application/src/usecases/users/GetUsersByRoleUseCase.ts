@@ -5,7 +5,7 @@ import {
 } from "@application/errors/users";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { UserEntity, UserToFront } from "@domain/entities/UserEntity";
+import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 
 type Props = { userId: UserEntity["id"]; role?: UserEntity["role"] };
 
@@ -16,10 +16,7 @@ export class GetUsersByRoleUseCase {
     userId,
     role,
   }: Props): Promise<
-    | UserToFront[]
-    | UserNotFoundError
-    | UserNotActiveError
-    | UserRoleMismatchError
+    UserToDTO[] | UserNotFoundError | UserNotActiveError | UserRoleMismatchError
   > {
     const advisor = await findActiveUser(this.userRepository, userId);
     if (advisor instanceof Error) return advisor;
@@ -29,6 +26,6 @@ export class GetUsersByRoleUseCase {
         advisor.role
       );
     const users = await this.userRepository.findAllByRoleAndIsActif(role);
-    return users.map((user) => user.toFront());
+    return users.map((user) => user.toDTO());
   }
 }

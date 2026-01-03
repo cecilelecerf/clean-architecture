@@ -1,9 +1,11 @@
+import { InvalidTagLabelError } from "@domain/errors/tag";
 import { Color } from "@domain/values/Color";
 
-export type TagDTO = { color: string } & Pick<
-  TagEntity,
-  "id" | "label" | "updatedAt" | "createdAt"
->;
+export type TagDTO = {
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+} & Pick<TagEntity, "id" | "label">;
 
 export type TagClientDTO = Pick<TagDTO, "id" | "color" | "label">;
 export class TagEntity {
@@ -14,6 +16,30 @@ export class TagEntity {
     public createdAt: Date,
     public updatedAt: Date
   ) {}
+
+  private static validateLabel(label: string): string | InvalidTagLabelError {
+    const trimmed = label.trim();
+
+    if (trimmed.length < 2 || trimmed.length > 50) {
+      return new InvalidTagLabelError(label, trimmed.length);
+    }
+
+    return trimmed;
+  }
+
+  public static create({
+    id,
+    label,
+    color,
+    createdAt,
+  }: Pick<TagEntity, "id" | "label" | "color" | "createdAt">):
+    | TagEntity
+    | InvalidTagLabelError {
+    const validatedLabel = this.validateLabel(label);
+    if (validatedLabel instanceof Error) return validatedLabel;
+
+    return new TagEntity(id, validatedLabel, color, createdAt, createdAt);
+  }
 
   public static from({
     id,
@@ -48,8 +74,8 @@ export class TagEntity {
       id: this.id,
       label: this.label,
       color: this.color.getValue(),
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
     };
   }
 }

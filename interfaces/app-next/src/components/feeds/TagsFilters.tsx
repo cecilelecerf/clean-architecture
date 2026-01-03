@@ -3,45 +3,41 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { bgColorClasses, borderColorClasses, textColorClasses } from "@/utils/color";
-import { feedsEndpoint, PostFiltersProps } from "@/utils/endpoint/feedsEndpoint";
+import { feedsEndpoint } from "@/utils/endpoint/feedsEndpoint";
 import { TagId } from "@infrastructure/types/feed";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
 import { match } from "ts-pattern";
+
 type Props = {
-    localFilters: PostFiltersProps
-    setLocalFilters: Dispatch<SetStateAction<PostFiltersProps>>
+    selectedTagsId: TagId[];
+    setSelectedTagsId: Dispatch<SetStateAction<TagId[]>>;
 }
-export const TagsFilters = ({ localFilters, setLocalFilters }: Props) => {
+
+export const TagsFilters = ({ selectedTagsId, setSelectedTagsId }: Props) => {
     const tagsQuery = useQuery(feedsEndpoint.tags.getAll());
 
     const toggleTag = (tagId: TagId) => {
-        setLocalFilters((prev) => {
-            const currentTags = prev.tagsId || [];
+        setSelectedTagsId((prev) => {
+            const currentTags = prev || [];
             const isSelected = currentTags.includes(tagId);
 
-            return {
-                ...prev,
-                tagsId: isSelected
-                    ? currentTags.filter((id) => id !== tagId)
-                    : [...currentTags, tagId],
-            };
+            return isSelected
+                ? currentTags.filter((id) => id !== tagId)
+                : [...currentTags, tagId];
         });
     };
 
     const clearAllTags = () => {
-        setLocalFilters((prev) => ({
-            ...prev,
-            tagsId: [],
-        }));
+        setSelectedTagsId([]);
     };
 
     return (
         <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
                 <Label>Tags</Label>
-                {localFilters.tagsId && localFilters.tagsId.length > 0 && (
+                {selectedTagsId && selectedTagsId.length > 0 && (
                     <Button
                         variant="ghost"
                         size="sm"
@@ -66,15 +62,20 @@ export const TagsFilters = ({ localFilters, setLocalFilters }: Props) => {
                             <div className="text-sm text-muted-foreground">Aucun tag disponible</div>
                         ) : (
                             tags.map((tag) => {
-                                const isSelected = localFilters.tagsId?.includes(tag.id);
+                                const isSelected = selectedTagsId?.includes(tag.id);
                                 return (
                                     <Badge
                                         key={tag.id}
                                         variant={isSelected ? "default" : "outline"}
                                         className={cn(
-                                            `cursor-pointer transition-all hover:scale-105 ${borderColorClasses[400][tag.color]}`,
-                                            isSelected && `ring-2 ring-offset-1 ${bgColorClasses[400][tag.color]} `,
-                                            isSelected ? "white " : textColorClasses[400][tag.color]
+                                            "cursor-pointer transition-all hover:scale-105",
+                                            borderColorClasses[400][tag.color],
+                                            isSelected && [
+                                                "ring-2 ring-offset-1",
+                                                bgColorClasses[400][tag.color],
+                                                "text-white"
+                                            ],
+                                            !isSelected && textColorClasses[400][tag.color]
                                         )}
                                         onClick={() => toggleTag(tag.id)}
                                     >

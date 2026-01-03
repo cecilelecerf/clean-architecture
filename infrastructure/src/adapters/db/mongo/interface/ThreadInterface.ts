@@ -7,6 +7,6 @@ export interface ThreadInterface {
   createdAt: Date;
   isClose: boolean;
   type: "external" | "internal";
-  administratorId: Types.UUID;
+  administratorId?: Types.UUID;
   updatedAt: Date;
 }

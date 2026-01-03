@@ -1,5 +1,5 @@
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
-import { UserToFront, UserEntity } from "@domain/entities/UserEntity";
+import { UserToDTO, UserEntity } from "@domain/entities/UserEntity";
 
 export type ThreadEntityWithUsers = ThreadEntity & {
   administrator: UserEntity | null;

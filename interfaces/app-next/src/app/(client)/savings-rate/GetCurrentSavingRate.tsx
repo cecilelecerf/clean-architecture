@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function SavingsRateHeroBanner() {
     const query = useQuery(endpoints.savingsRates.getCurrent());
@@ -24,7 +25,7 @@ export function SavingsRateHeroBanner() {
             if (!currentRate) return null;
 
             return (
-                <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-500 via-green-600 to-teal-700">
+                <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-cyan-700 via-blue-600 to-indigo-700">
                     {/* Motif de fond animé */}
                     <div className="absolute inset-0">
                         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
@@ -33,7 +34,7 @@ export function SavingsRateHeroBanner() {
                     </div>
 
                     {/* Contenu */}
-                    <div className="relative px-6 py-8 md:px-10 md:py-12 lg:px-16 lg:py-16">
+                    <div className="relative p-6 ">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                             {/* Gauche : Taux principal */}
                             <div className="space-y-6">
@@ -89,15 +90,15 @@ export function SavingsRateHeroBanner() {
                                     <GainCard amount={50000} rate={currentRate.rate} />
                                 </div>
 
-                                <div className="pt-4">
+                                <Link href="/accounts/new?type=epargne">
                                     <Button
                                         size="lg"
-                                        className="bg-white text-green-700 hover:bg-white/90 font-semibold shadow-xl"
+                                        className="bg-white text-blue-700 hover:bg-white/90 font-semibold shadow-xl"
                                     >
                                         Ouvrir un compte épargne
                                         <ArrowRight className="w-5 h-5 ml-2" />
                                     </Button>
-                                </div>
+                                </Link>
                             </div>
                         </div>
                     </div>

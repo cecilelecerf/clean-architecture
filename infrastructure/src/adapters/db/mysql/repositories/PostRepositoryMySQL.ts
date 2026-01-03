@@ -1,13 +1,13 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import {
   PostRepository,
+  PostWithTags,
   PostWithTagsAndUser,
 } from "@application/ports/repositories/PostRepository";
 import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
-import { Email } from "@domain/values/Email";
 import { Color } from "@domain/values/Color";
 import { UserMapper } from "../../mappers/UserMapper";
 
@@ -144,6 +144,24 @@ export class PostRepositoryMySQL implements PostRepository {
     const readsId = await this.getPostReaders(id);
 
     return this.mapRowToPost(rows[0], tagsId, readsId);
+  }
+
+  /** 🔍 Post avec tags par post ID */
+  async findByIdWithTags(id: PostEntity["id"]): Promise<PostWithTags | null> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT * FROM posts WHERE id = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) return null;
+
+    const row = rows[0];
+    const { tags, tagsId } = await this.getPostTags(id);
+    const readsId = await this.getPostReaders(id);
+
+    const post = this.mapRowToPost(row, tagsId, readsId);
+
+    return Object.assign(post, { tags });
   }
 
   /** 🔍 Tous les posts d'un advisor */

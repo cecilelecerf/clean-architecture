@@ -21,10 +21,12 @@ import {
   IBANTooLongError,
   IBANTooShortError,
 } from "@domain/errors/IBAN";
+import { IBAN } from "@domain/values/IBAN";
 
 interface Props {
   transactionId: string;
   userId: string;
+  requestUserId?: string;
 }
 
 export class GetTransactionByIdUseCase {
@@ -36,6 +38,7 @@ export class GetTransactionByIdUseCase {
   public async execute({
     transactionId,
     userId,
+    requestUserId,
   }: Props): Promise<
     | TransactionEntityWithAccountDTO
     | UserNotFoundError
@@ -44,6 +47,16 @@ export class GetTransactionByIdUseCase {
     | UnauthorizedTransactionAccessError
     | TransactionNotFoundError
   > {
+    if (requestUserId) {
+      const admin = await findActiveUser(this.userRepository, requestUserId);
+      if (admin instanceof Error) return admin;
+      if (admin.hasRole({ role: "client" }))
+        return new UserRoleMismatchError(
+          ["conseiller", "directeur"],
+          admin.role
+        );
+    }
+
     const client = await findActiveUser(this.userRepository, userId);
     if (client instanceof Error) return client;
 
@@ -53,15 +66,19 @@ export class GetTransactionByIdUseCase {
       );
     if (!transaction) return new TransactionNotFoundError(transactionId);
 
-    if (client.hasRole({ role: "client" })) {
-      if (
-        !transaction.fromAccount?.isClientAccount(client) &&
-        !transaction.toAccount?.isClientAccount(client)
-      )
-        return new UnauthorizedTransactionAccessError(
-          client.id,
-          transaction.id
-        );
+    let contextIban: IBAN | undefined;
+
+    const isFromAccount = transaction.fromAccount?.isClientAccount(client);
+    const isToAccount = transaction.toAccount?.isClientAccount(client);
+
+    if (!isFromAccount && !isToAccount && client.hasRole({ role: "client" })) {
+      return new UnauthorizedTransactionAccessError(client.id, transaction.id);
+    }
+
+    if (isFromAccount) {
+      contextIban = transaction.fromAccountId;
+    } else if (isToAccount) {
+      contextIban = transaction.toAccountId;
     }
 
     return TransactionDTOMapper.withUserMap(transaction);

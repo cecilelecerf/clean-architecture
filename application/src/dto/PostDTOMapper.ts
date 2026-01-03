@@ -1,21 +1,38 @@
-import { PostWithTagsAndUser } from "@application/ports/repositories/PostRepository";
-import { PostEntity } from "@domain/entities/PostEntity";
+import {
+  PostWithTags,
+  PostWithTagsAndUser,
+} from "@application/ports/repositories/PostRepository";
+import { PostDTO } from "@domain/entities/PostEntity";
 import { TagDTO } from "@domain/entities/TagEntity";
-import { UserToFront } from "@domain/entities/UserEntity";
+import { UserToDTO } from "@domain/entities/UserEntity";
 
-export type PostWithTagsAndUsersDTO = PostEntity & {
-  advisor: UserToFront;
+export type PostWithTagsAndUsersDTO = PostDTO & {
+  advisor: UserToDTO;
+  tags: TagDTO[];
+};
+
+export type PostWithTagsDTO = PostDTO & {
   tags: TagDTO[];
 };
 
 export class PostDTOMapper {
-  static map(post: PostWithTagsAndUser): PostWithTagsAndUsersDTO {
-    return Object.assign(post, {
-      advisor: post.advisor.toFront(),
+  static tagsAndUserMap(post: PostWithTagsAndUser): PostWithTagsAndUsersDTO {
+    return Object.assign(post.toDTO(), {
+      advisor: post.advisor.toDTO(),
       tags: post.tags.map((t) => t.toDTO()),
     });
   }
-  static maps(posts: PostWithTagsAndUser[]): PostWithTagsAndUsersDTO[] {
-    return posts.map((post) => this.map(post));
+  static tagsAndUserMaps(
+    posts: PostWithTagsAndUser[]
+  ): PostWithTagsAndUsersDTO[] {
+    return posts.map((post) => this.tagsAndUserMap(post));
+  }
+  static tagsMap(post: PostWithTags): PostWithTagsDTO {
+    return Object.assign(post.toDTO(), {
+      tags: post.tags.map((t) => t.toDTO()),
+    });
+  }
+  static tagsMaps(posts: PostWithTags[]): PostWithTagsDTO[] {
+    return posts.map((post) => this.tagsMap(post));
   }
 }

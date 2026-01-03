@@ -7,7 +7,7 @@ import z from 'zod';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { NewThread } from '@/app/api/threads/route';
+import { NewExternalThread, NewThread } from '@/app/api/threads/route';
 import { AddParticipant } from '@/app/api/threads/[threadId]/transfer/route';
 
 // ============================================================================
@@ -93,11 +93,11 @@ export const threadsEndpoint = createEndpointsNodes({
   // Créer un nouveau thread (externe ou interne)
   create: ({ type }: { type: Thread['type'] }) =>
     mutationOptions({
-      mutationFn: (data: NewThread) => {
+      mutationFn: async (data: NewExternalThread | NewThread) => {
         const params = new URLSearchParams();
-        if (type) params.set('type', type);
+        params.set('type', type);
 
-        return post(`/threads?${params.toString()}`, data).then((data) =>
+        return await post(`/threads?${params.toString()}`, data).then((data) =>
           safeParseWithLog(threadSchema, data),
         );
       },
@@ -146,7 +146,6 @@ export const threadsEndpoint = createEndpointsNodes({
       mutationFn: ({ newAdministratorId }: AddParticipant) =>
         post(`/threads/${threadId}/transfer`, { newAdministratorId }),
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['threads', threadId] });
         queryClient.invalidateQueries({ queryKey: ['threads', 'list'] });
       },
     }),

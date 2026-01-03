@@ -8,8 +8,8 @@ import z from 'zod';
 export async function PATCH(
   req: NextRequest,
   ctx: RouteContext<'/api/accounts/[accountIban]/rename'>,
-){
-  try{
+) {
+  try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -19,7 +19,11 @@ export async function PATCH(
     const body = await req.json();
     const payload = accountSchema.pick({ name: true }).partial().parse(body);
 
-    const account = await accountFactory().client.renameAccount.execute(accountIban,session.user.id, payload.name);
+    const account = await accountFactory().renameAccount.execute(
+      accountIban,
+      session.user.id,
+      payload.name,
+    );
 
     if (account instanceof Error) {
       return NextResponse.json(
@@ -28,15 +32,7 @@ export async function PATCH(
       );
     }
 
-    return NextResponse.json(
-      accountSchema
-        .omit({ createdAt: true, updatedAt: true })
-        .extend({
-          createdAt: z.date(),
-          updatedAt: z.date().optional(),
-        })
-        .parse(account),
-    );
+    return NextResponse.json(accountSchema.safeParse(account));
   } catch (err) {
     console.error(err);
     return NextResponse.json(

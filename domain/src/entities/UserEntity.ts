@@ -1,3 +1,12 @@
+import {
+  InvalidLastnameError,
+  UserAlreadyBannedError,
+  UserCannotBanDirectorError,
+  UserCannotBanSelfError,
+  UserNotBannedError,
+} from "@domain/errors/user";
+import { InvalidFirstnameError } from "@domain/errors/user/InvalidFirstnameError";
+import { UserCannotUnbanDirectorError } from "@domain/errors/user/UserCannotUnbanDirectorError";
 import { Email } from "@domain/values/Email";
 
 export class UserEntity {
@@ -52,32 +61,117 @@ export class UserEntity {
     );
   }
 
+  public static create({
+    id,
+    firstname,
+    lastname,
+    email,
+    passwordHash,
+    role,
+    createdAt,
+  }: Pick<
+    UserEntity,
+    | "id"
+    | "email"
+    | "firstname"
+    | "lastname"
+    | "passwordHash"
+    | "role"
+    | "confirmedAt"
+    | "createdAt"
+  >): UserEntity | InvalidFirstnameError | InvalidLastnameError {
+    const firstnameStr = this.validateFirstname(firstname);
+    if (firstnameStr instanceof Error) return firstnameStr;
+    const lastnameStr = this.validateLastname(lastname);
+    if (lastnameStr instanceof Error) return lastnameStr;
+    return new UserEntity(
+      id,
+      firstnameStr,
+      lastnameStr,
+      email,
+      passwordHash,
+      role,
+      true,
+      createdAt,
+      createdAt
+    );
+  }
+
+  private static validateFirstname(
+    firstname: string
+  ): string | InvalidFirstnameError {
+    const trimmed = firstname.trim();
+    if (trimmed.length < 2 || trimmed.length > 50) {
+      return new InvalidFirstnameError(firstname);
+    }
+    return trimmed;
+  }
+
+  private static validateLastname(
+    lastname: string
+  ): string | InvalidLastnameError {
+    const trimmed = lastname.trim();
+    if (trimmed.length < 2 || trimmed.length > 50) {
+      return new InvalidLastnameError(lastname);
+    }
+    return trimmed;
+  }
   public isActive(): boolean {
     return this.isActiveField && !!this.confirmedAt;
   }
 
-  public ban(): void {
+  public ban(
+    actorId: UserEntity["id"],
+    now: Date
+  ):
+    | void
+    | UserCannotBanDirectorError
+    | UserAlreadyBannedError
+    | UserCannotBanSelfError {
+    if (actorId === this.id) {
+      return new UserCannotBanSelfError();
+    }
+    if (!this.isActiveField) {
+      return new UserAlreadyBannedError(this.id);
+    }
+    if (this.hasRole({ role: "directeur" })) {
+      return new UserCannotBanDirectorError();
+    }
+    this.updatedAt = now;
     this.isActiveField = false;
+  }
+
+  public unban(
+    now: Date
+  ): void | UserNotBannedError | UserCannotUnbanDirectorError {
+    if (this.isActiveField) {
+      return new UserNotBannedError(this.id);
+    }
+    if (this.hasRole({ role: "directeur" })) {
+      return new UserCannotUnbanDirectorError();
+    }
+    this.updatedAt = now;
+    this.isActiveField = true;
   }
 
   public hasRole({ role }: Pick<UserEntity, "role">): boolean {
     return role === this.role;
   }
 
-  public toFront(): UserToFront {
+  public toDTO(): UserToDTO {
     return {
       id: this.id,
       email: this.email.value,
       firstname: this.firstname,
       lastname: this.lastname,
       role: this.role,
-      confirmedAt: this.confirmedAt,
+      confirmedAt: this.confirmedAt?.toISOString(),
       isActiveField: this.isActiveField,
     };
   }
 }
 
-export type UserToFront = { email: string } & Pick<
+export type UserToDTO = { email: string; confirmedAt?: string } & Pick<
   UserEntity,
-  "id" | "firstname" | "lastname" | "role" | "isActiveField" | "confirmedAt"
+  "id" | "firstname" | "lastname" | "role" | "isActiveField"
 >;

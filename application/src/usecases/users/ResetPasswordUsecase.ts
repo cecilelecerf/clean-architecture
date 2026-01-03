@@ -1,9 +1,7 @@
-// packages/application/src/usecases/auth/ResetPasswordUsecase.ts
-
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
-import { UserEntity, UserToFront } from "@domain/entities/UserEntity";
+import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { UserNotFoundError } from "@application/errors/users";
 import { ClockService } from "@application/ports/services/ClockService";
 
@@ -23,7 +21,7 @@ export class ResetPasswordUsecase {
   async execute({
     token,
     newPassword,
-  }: Props): Promise<UserToFront | UserNotFoundError | Error> {
+  }: Props): Promise<UserToDTO | UserNotFoundError | Error> {
     try {
       const payload = await this.tokenService.validateToken(
         token,
@@ -42,7 +40,7 @@ export class ResetPasswordUsecase {
       user.passwordHash = passwordHash;
       user.updatedAt = this.clockService.now();
       await this.userRepository.update(user);
-      return user.toFront();
+      return user.toDTO();
     } catch (error) {
       return new Error("Token invalide ou expiré");
     }

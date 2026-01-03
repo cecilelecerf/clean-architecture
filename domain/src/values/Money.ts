@@ -1,18 +1,21 @@
-import { FactorNegativeError, MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import {
+  FactorNegativeError,
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMismatchError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
 
 export class Money {
   private static readonly SCALE = 2;
 
-  private constructor(
-    public amount: number,
-    public currency: string
-  ) {}
+  private constructor(public amount: number, public currency: string) {}
 
   public static from({
     amount,
     currency,
   }: Pick<Money, "amount" | "currency">): Money {
-    return new Money(amount, currency);
+    return new Money(Number(amount), currency);
   }
 
   /**

@@ -43,7 +43,7 @@ export class CreditEntity {
     public status: CreditStatus,
     public createdAt: Date,
     public updatedAt: Date,
-    public advisorId?: UserEntity["id"] | null,
+    public advisorId: UserEntity["id"] | null,
     // Raison du refus ou acceptation du conseiller
     public reason?: string | null
   ) {}
@@ -265,9 +265,10 @@ export class CreditEntity {
   }: {
     advisorId: string;
     now: Date;
-  }): void {
+  }): CreditEntity {
     this.advisorId = advisorId;
     this.updatedAt = now;
+    return this;
   }
 
   public accept({
@@ -276,13 +277,14 @@ export class CreditEntity {
   }: {
     now: Date;
     reason?: string;
-  }): void | CreditStatusMismatchError {
+  }): CreditEntity | CreditStatusMismatchError {
     if (this.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(this.status);
     }
     this.status = CreditStatus.ACCEPTED;
     if (reason) this.reason = reason;
     this.updatedAt = now;
+    return this;
   }
 
   public refuse({
@@ -291,13 +293,14 @@ export class CreditEntity {
   }: {
     now: Date;
     reason?: string;
-  }): void | CreditStatusMismatchError {
+  }): CreditEntity | CreditStatusMismatchError {
     if (this.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(this.status);
     }
     this.status = CreditStatus.REFUSED;
     if (reason) this.reason = reason;
     this.updatedAt = now;
+    return this;
   }
 
   public toDTO(): CreditDTO {

@@ -2,6 +2,7 @@ import {
   InvalidThreadAccessError,
   ThreadNotFoundError,
   ParticipantNotFoundError,
+  InvalidThreadTypeError,
 } from "@application/errors/threads";
 import {
   UserNotActiveError,
@@ -42,6 +43,7 @@ export class RemoveParticipantUsecase {
     | UserRoleMismatchError
     | ThreadClosedError
     | ParticipantNotFoundError
+    | InvalidThreadTypeError
   > {
     const participant = await findActiveUser(
       this.userRepository,
@@ -54,18 +56,24 @@ export class RemoveParticipantUsecase {
       administratorId
     );
     if (administrator instanceof Error) return administrator;
-
+    if (administrator.hasRole({ role: "client" })) {
+      return new UserRoleMismatchError(
+        ["conseiller", "directeur"],
+        administrator.role
+      );
+    }
     const thread = await this.threadRepository.findById(threadId);
     if (!thread) return new ThreadNotFoundError();
 
+    if (thread.type === "external")
+      return new InvalidThreadTypeError(
+        thread.id,
+        thread.type,
+        "remove participant"
+      );
+
     if (!thread.isAdministrator(administrator.id)) {
       return new InvalidThreadAccessError(administrator.id, thread.id);
-    }
-
-    const expectedRole =
-      thread.type === "external" ? "conseiller" : "directeur";
-    if (!administrator.hasRole({ role: expectedRole })) {
-      return new UserRoleMismatchError([expectedRole], administrator.role);
     }
 
     const updatedThread = thread.removeParticipant(
