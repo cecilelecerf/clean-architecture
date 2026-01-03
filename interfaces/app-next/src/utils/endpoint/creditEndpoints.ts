@@ -2,7 +2,9 @@ import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import {
   creditDTOSchema,
-  creditDTOWithUserSchema,
+  creditDTOWithFormuleAndAccountSchema,
+  creditDTOWithFormuleAndAdvisorSchema,
+  creditDTOWithFormuleSchema,
   CreditId,
   CreditResponse,
   creditSchema,
@@ -18,14 +20,13 @@ import { UserId } from '@infrastructure/types/user';
 // SCHEMAS
 // ============================================================================
 
-export const requestCreditSchema = creditSchema
-  .pick({
-    insuranceRate: true,
-    interestRate: true,
-    durationMonths: true,
-    startDate: true,
-  })
-  .extend({ amount: moneySchema.shape.amount, currency: moneySchema.shape.currency });
+export const requestCreditSchema = creditSchema.pick({
+  accountId: true,
+  formuleCreditId: true,
+  durationMonths: true,
+  startDate: true,
+  initialAmount: true,
+});
 export type RequestCredit = z.infer<typeof requestCreditSchema>;
 
 // ============================================================================
@@ -40,7 +41,7 @@ export const creditsEndpoint = createEndpointsNodes({
       queryKey: ['credits', 'list'],
       queryFn: () =>
         get('/credits').then((data) => {
-          return safeParseWithLog(creditDTOSchema.array(), data);
+          return safeParseWithLog(creditDTOWithFormuleSchema.array(), data);
         }),
     }),
 
@@ -50,7 +51,31 @@ export const creditsEndpoint = createEndpointsNodes({
     queryOptions({
       queryKey: ['credits', creditId],
       queryFn: () =>
-        get(`/credits/${creditId}`).then((data) => safeParseWithLog(creditDTOSchema, data)),
+        get(`/credits/${creditId}`).then((data) =>
+          safeParseWithLog(creditDTOWithFormuleAndAccountSchema, data),
+        ),
+    }),
+
+  // GET /api/credits/pending
+  // Liste des crédits des clients en cours de traitement
+  getAllPending: () =>
+    queryOptions({
+      queryKey: ['credits', 'list'],
+      queryFn: () =>
+        get('/credits/admin').then((data) => {
+          return safeParseWithLog(creditDTOWithFormuleSchema.array(), data);
+        }),
+    }),
+
+  // GET /api/credits/active
+  // Liste des crédits actifs des clients
+  getAllActive: () =>
+    queryOptions({
+      queryKey: ['credits', 'list'],
+      queryFn: () =>
+        get('/credits/active').then((data) => {
+          return safeParseWithLog(creditDTOWithFormuleSchema.array(), data);
+        }),
     }),
 
   // POST /api/credits
@@ -97,7 +122,7 @@ export const creditsEndpoint = createEndpointsNodes({
       queryKey: ['credits', 'list', 'users', userId],
       queryFn: () =>
         get(`/credits/users/${userId}`).then((data) => {
-          return safeParseWithLog(creditDTOSchema.array(), data);
+          return safeParseWithLog(creditDTOWithFormuleSchema.array(), data);
         }),
     }),
 

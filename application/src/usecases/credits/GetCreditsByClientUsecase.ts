@@ -1,12 +1,13 @@
+import { CreditDTOMapper } from "@application/dto/CreditDTOMapper";
 import {
   UserNotActiveError,
   UserNotFoundError,
   UserRoleMismatchError,
 } from "@application/errors/users";
+import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { CreditDTO } from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 
 type Props = {
@@ -24,7 +25,10 @@ export class GetCreditsByClientUsecase {
     clientId,
     adminId,
   }: Props): Promise<
-    CreditDTO[] | UserNotFoundError | UserNotActiveError | UserRoleMismatchError
+    | CreditDTOMapper[]
+    | UserNotFoundError
+    | UserNotActiveError
+    | UserRoleMismatchError
   > {
     const client = await findActiveUser(this.userRepository, clientId);
     if (client instanceof Error) return client;
@@ -39,7 +43,12 @@ export class GetCreditsByClientUsecase {
           admin.role
         );
     }
+
     const credits = await this.creditRepository.findAllByUserId(client.id);
-    return credits.map((credit) => credit.toDTO());
+    const creditsMapper = credits.map((credit) =>
+      CreditDTOMapper.mapWthFormule(credit)
+    );
+
+    return creditsMapper;
   }
 }

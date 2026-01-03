@@ -36,8 +36,6 @@ export class LoginUsecase {
     if (emailVo instanceof Error) return emailVo;
     const user = await this.userRepository.findByEmail(emailVo);
     if (!user) return new UserNotFoundError();
-    console.log(user.isActive());
-    console.log(user.isActiveField);
     if (!user.isActive()) return new UserNotActiveError(user.id);
     const isValidPassword = await this.encryptionService.compare(
       plainedPassword,

@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credit';
 import { creditSchema } from '@infrastructure/types/credit';
-import z from 'zod';
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,9 +36,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const payload = creditSchema
       .pick({
+        accountId: true,
+        formuleCreditId: true,
         initialAmount: true,
-        insuranceRate: true,
-        interestRate: true,
         durationMonths: true,
         startDate: true,
       })
@@ -48,12 +47,12 @@ export async function POST(req: NextRequest) {
 
     const result = await creditFactory().requestCredit.execute({
       clientId: session.user.id,
+      accountId: payload.accountId,
+      formuleCreditId: payload.formuleCreditId,
       amount: payload.initialAmount.amount,
       currency: payload.initialAmount.currency,
-      interestRate: payload.interestRate,
-      insuranceRate: payload.insuranceRate,
       durationMonths: payload.durationMonths,
-      startDate: new Date(payload.startDate),
+      startDate: payload.startDate,
     });
 
     if (result instanceof Error) {

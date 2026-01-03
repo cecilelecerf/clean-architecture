@@ -4,6 +4,8 @@ import { Email } from "@domain/values/Email";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { UserMapper } from "../../mappers/UserMapper";
+import { IBAN } from "@domain/values/IBAN";
+import { AccountEntity } from "@domain/entities/AccountEntity";
 
 export class UserRepositoryMySQL implements UserRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -25,6 +27,18 @@ export class UserRepositoryMySQL implements UserRepository {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM users WHERE email = ?",
       [email.value]
+    );
+
+    if (rows.length === 0) return null;
+
+    return UserMapper.mapRowToUser(rows[0]);
+  }
+
+  /** Trouver un utilisateur par iban */
+  async findByIban(iban: AccountEntity["iban"]): Promise<UserEntity | null> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      "SELECT * FROM users u LEFT JOIN accounts a ON u.id = a.user_id WHERE a.iban = ? ",
+      [iban]
     );
 
     if (rows.length === 0) return null;

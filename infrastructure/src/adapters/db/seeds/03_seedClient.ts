@@ -10,13 +10,15 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { SeedUserUseCase } from "@application/usecases/seeds/SeedUserRequest";
 import { seedTransactions } from "./utils/seedTransactions";
 import { seedCredits } from "./utils/seedCredits";
+import { FormuleCreditEntity } from "@domain/entities/FormuleCreditEntity";
 
 export async function seedClient(
   seedUserUseCase: SeedUserUseCase,
   seedAccountUseCase: SeedAccountUseCase,
   seedTransactionUseCase: SeedTransactionUseCase,
   seedCreditUseCase: SeedCreditUseCase,
-  clockService: ClockService
+  clockService: ClockService,
+  formulesCredit: FormuleCreditEntity[]
 ): Promise<UserEntity[]> {
   console.log("-- Création des comptes Clients --");
 
@@ -33,7 +35,6 @@ export async function seedClient(
         password: raw.password,
         firstName: raw.firstname,
         lastName: raw.lastname,
-        // phoneNumber: raw.phoneNumber,
         role: "client",
         createdAt: now,
         confirmedAt: isConfirmed ? now : undefined,
@@ -82,8 +83,79 @@ export async function seedClient(
         );
       }
 
-      // 4. Créer les crédits
-      await seedCredits(seedCreditUseCase, user.id, raw.credits ?? []);
+      if (raw.credits && raw.credits.length > 0) {
+        if (isFirstUser) {
+          console.log(
+            `  🎯 Premier client détecté - Création de tous les types de crédits`
+          );
+        }
+
+        await seedCredits(
+          seedCreditUseCase,
+          user.id,
+          formulesCredit,
+          raw.credits,
+          isFirstUser
+        );
+      } else if (isFirstUser) {
+        console.log(
+          `  ⚠️  Premier client sans crédits définis - Création de crédits par défaut`
+        );
+
+        const defaultCredits = [
+          {
+            initialAmount: 250000,
+            currency: "EUR",
+            durationMonths: 240,
+            formuleCreditType: "immobilier",
+          },
+          {
+            initialAmount: 15000,
+            currency: "EUR",
+            durationMonths: 60,
+            formuleCreditType: "consommation",
+          },
+          {
+            initialAmount: 50000,
+            currency: "EUR",
+            durationMonths: 72,
+            formuleCreditType: "professionnel",
+          },
+          {
+            initialAmount: 12000,
+            currency: "EUR",
+            durationMonths: 48,
+            formuleCreditType: "special",
+          },
+          {
+            initialAmount: 180000,
+            currency: "EUR",
+            durationMonths: 300,
+            formuleCreditType: "immobilier",
+          },
+        ];
+
+        await seedCredits(
+          seedCreditUseCase,
+          user.id,
+          formulesCredit,
+          defaultCredits,
+          true
+        );
+      } else if (Math.random() < 0.7) {
+        console.log(`  💳 Création de crédits aléatoires pour ce client`);
+
+        const randomCreditsCount = Math.floor(Math.random() * 3) + 1;
+        const randomCredits = generateRandomCredits(randomCreditsCount);
+
+        await seedCredits(
+          seedCreditUseCase,
+          user.id,
+          formulesCredit,
+          randomCredits,
+          false
+        );
+      }
     } catch (err) {
       console.error(`❌ Failed to create client ${raw.email}:`, err);
     }
@@ -91,4 +163,52 @@ export async function seedClient(
 
   console.log(`✅ Clients seed completed: ${clients.length} created\n`);
   return clients;
+}
+
+function generateRandomCredits(count: number) {
+  const creditTypes = [
+    "immobilier",
+    "consommation",
+    "professionnel",
+    "special",
+  ];
+  const credits = [];
+
+  for (let i = 0; i < count; i++) {
+    const type = creditTypes[Math.floor(Math.random() * creditTypes.length)];
+
+    let amount: number;
+    let duration: number;
+
+    switch (type) {
+      case "immobilier":
+        amount = Math.floor(Math.random() * 450000) + 50000;
+        duration = Math.floor(Math.random() * 180) + 120;
+        break;
+      case "consommation":
+        amount = Math.floor(Math.random() * 40000) + 5000;
+        duration = Math.floor(Math.random() * 48) + 24;
+        break;
+      case "professionnel":
+        amount = Math.floor(Math.random() * 150000) + 10000;
+        duration = Math.floor(Math.random() * 60) + 36;
+        break;
+      case "special":
+        amount = Math.floor(Math.random() * 35000) + 5000;
+        duration = Math.floor(Math.random() * 84) + 36;
+        break;
+      default:
+        amount = 10000;
+        duration = 48;
+    }
+
+    credits.push({
+      initialAmount: amount,
+      currency: "EUR",
+      durationMonths: duration,
+      formuleCreditType: type,
+    });
+  }
+
+  return credits;
 }

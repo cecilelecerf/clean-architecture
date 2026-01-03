@@ -83,7 +83,6 @@ export class RegisterAdvisorUsecase {
       createdAt,
       role: role as UserEntity["role"],
     });
-    console.log(user);
     if (user instanceof Error) return user;
     await this.userRepository.save(user);
 

@@ -8,8 +8,6 @@ import { UserAccounts } from "./UserAccounts";
 import { AdminUserCredits } from "./UserCredit";
 import { Flex } from "@radix-ui/themes";
 
-
-
 export default function ClientPage() {
     const { userId } = useParams<{ userId: UserId }>();
     return (

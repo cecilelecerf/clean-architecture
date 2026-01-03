@@ -3,16 +3,15 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credit';
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/credits/admin'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    // TODO : créer un usecase pour récupérer tous les crédits en status PENDING
-    const result = await creditFactory().getCreditsByUser.execute({
-      clientId: session.user.id,
+    const result = await creditFactory().getPending.execute({
+      advisorId: session.user.id,
     });
     if (result instanceof Error) {
       return NextResponse.json(

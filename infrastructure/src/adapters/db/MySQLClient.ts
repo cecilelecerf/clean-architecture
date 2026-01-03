@@ -80,6 +80,19 @@ export class MySQLClient {
     return rows;
   }
 
+  async queryRows<T extends RowDataPacket[]>(
+    sql: string,
+    params: any[] = []
+  ): Promise<T> {
+    const [rows] = await this.pool.execute<T>(sql, params);
+    return rows;
+  }
+
+  async queryResult(sql: string, params: any[] = []): Promise<ResultSetHeader> {
+    const [result] = await this.pool.execute<ResultSetHeader>(sql, params);
+    return result;
+  }
+
   /**
    * Ferme proprement la connexion (utile pour les tests ou les scripts courts)
    */

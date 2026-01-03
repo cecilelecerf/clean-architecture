@@ -53,4 +53,14 @@ export class SystemClockService implements ClockService {
   toDate(date: string): Date {
     return new Date(date);
   }
+  addMonths(date: Date, months: number): Date {
+    const result = new Date(date);
+    const day = result.getDate();
+    result.setMonth(result.getMonth() + months);
+    if (result.getDate() !== day) {
+      result.setDate(0);
+    }
+
+    return result;
+  }
 }

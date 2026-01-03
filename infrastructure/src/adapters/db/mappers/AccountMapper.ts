@@ -9,6 +9,7 @@ export class AccountMapper {
     row: RowDataPacket,
     prefix: string = ""
   ): AccountEntity {
+    console.log(row);
     const iban = IBAN.from(row[`${prefix}iban`]);
 
     const balance = Money.from({
@@ -30,6 +31,7 @@ export class AccountMapper {
       updatedAt: row[`${prefix}updated_at`],
     });
   }
+
   static mapDocToAccount(doc: any): AccountEntity {
     const iban = IBAN.from(doc.iban);
     const balance = Money.from({

@@ -12,6 +12,8 @@ import {
   CreditStatusMismatchError,
   InvalidCreditDurationError,
 } from "@domain/errors/credit";
+import { AccountEntity } from "./AccountEntity";
+import { FormuleCreditEntity } from "./FormuleCreditEntity";
 
 export type MonthlySchedule = {
   capitalPaid: Money;
@@ -22,21 +24,18 @@ export type MonthlySchedule = {
 
 export enum CreditStatus {
   PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED",
+  ACCEPTED = "ACCEPTED", // Crédit en cours de paiement
   REFUSED = "REFUSED",
-  COMPLETED = "COMPLETED",
+  COMPLETED = "COMPLETED", // Crédit avec remboursement terminé
 }
 
 export class CreditEntity {
   private constructor(
     public id: string,
-    // TODO : remplacer userId par accountId
-    public userId: UserEntity["id"],
+    public accountId: AccountEntity["iban"],
+    // La formule du prêt choisie par le client et créé par le directeur de la banque
+    public formuleCreditId: FormuleCreditEntity["id"],
     public initialAmount: Money,
-    // taux d'interet annuel
-    public interestRate: Percentage,
-    // taux assurance;
-    public insuranceRate: Percentage,
     public durationMonths: number,
     public startDate: Date,
     public monthlyPayment: Money,
@@ -44,45 +43,46 @@ export class CreditEntity {
     public status: CreditStatus,
     public createdAt: Date,
     public updatedAt: Date,
-    public advisorId?: UserEntity["id"] | null
+    public advisorId: UserEntity["id"] | null,
+    // Raison du refus ou acceptation du conseiller
+    public reason?: string | null
   ) {}
 
   public static from({
     id,
-    userId,
+    accountId,
+    formuleCreditId,
     initialAmount,
-    insuranceRate,
-    interestRate,
     startDate,
     monthlyPayment,
     durationMonths,
     remainingBalance,
     status,
     createdAt,
-    advisorId,
     updatedAt,
+    advisorId,
+    reason,
   }: Pick<
     CreditEntity,
     | "id"
-    | "userId"
+    | "accountId"
+    | "formuleCreditId"
     | "initialAmount"
-    | "insuranceRate"
-    | "interestRate"
     | "startDate"
     | "monthlyPayment"
     | "durationMonths"
     | "remainingBalance"
     | "status"
     | "createdAt"
-    | "advisorId"
     | "updatedAt"
+    | "advisorId"
+    | "reason"
   >) {
     return new CreditEntity(
       id,
-      userId,
+      accountId,
+      formuleCreditId,
       initialAmount,
-      interestRate,
-      insuranceRate,
       durationMonths,
       startDate,
       monthlyPayment,
@@ -90,36 +90,39 @@ export class CreditEntity {
       status,
       createdAt,
       updatedAt,
-      advisorId
+      advisorId,
+      reason
     );
   }
 
-  public static create({
-    id,
-    advisorId,
-    userId,
-    initialAmount,
-    insuranceRate,
-    interestRate,
-    durationMonths,
-    startDate,
-    status,
-    updatedAt,
-    createdAt,
-  }: Pick<
-    CreditEntity,
-    | "id"
-    | "advisorId"
-    | "userId"
-    | "initialAmount"
-    | "insuranceRate"
-    | "interestRate"
-    | "durationMonths"
-    | "startDate"
-    | "status"
-    | "updatedAt"
-    | "createdAt"
-  >):
+  public static create(
+    {
+      id,
+      advisorId,
+      accountId,
+      formuleCreditId,
+      initialAmount,
+      durationMonths,
+      startDate,
+      status,
+      createdAt,
+      reason,
+    }: Pick<
+      CreditEntity,
+      | "id"
+      | "advisorId"
+      | "accountId"
+      | "formuleCreditId"
+      | "initialAmount"
+      | "durationMonths"
+      | "startDate"
+      | "status"
+      | "createdAt"
+      | "reason"
+    >,
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | CreditEntity
     | InvalidCreditDurationError
     | MoneyCurrencyMissingError
@@ -136,21 +139,24 @@ export class CreditEntity {
 
     const temp = new CreditEntity(
       id,
-      userId,
+      accountId,
+      formuleCreditId,
       initialAmount,
-      insuranceRate,
-      interestRate,
       durationMonths,
       startDate,
       initialAmount,
       initialAmount,
       status,
       createdAt,
-      updatedAt,
-      advisorId
+      createdAt,
+      advisorId,
+      reason
     );
 
-    const monthlyPayment = temp.calculateMonthlyPayment();
+    const monthlyPayment = temp.calculateMonthlyPayment(
+      interestRate,
+      insuranceRate
+    );
     if (monthlyPayment instanceof Error) return monthlyPayment;
 
     temp.monthlyPayment = monthlyPayment;
@@ -158,16 +164,19 @@ export class CreditEntity {
   }
 
   /** Calcule la mensualité */
-  public calculateMonthlyPayment():
+  public calculateMonthlyPayment(
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | Money
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError {
     const P = this.initialAmount.amount;
     const n = this.durationMonths;
-    const r = this.interestRate.value / 12 / 100;
+    const r = interestRate.value / 12 / 100;
     const basePayment = (P * r) / (1 - Math.pow(1 + r, -n));
-    const insurance = ((this.insuranceRate.value / 100) * P) / n;
+    const insurance = ((insuranceRate.value / 100) * P) / n;
 
     const paymentOrError = Money.create({
       amount: basePayment + insurance,
@@ -183,7 +192,10 @@ export class CreditEntity {
    * 💸 Effectue le paiement d’une mensualité.
    * Retourne soit le crédit mis à jour, soit une erreur métier.
    */
-  public payMonthly():
+  public payMonthly(
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | CreditEntity
     | CreditAlreadyPaidError
     | MoneyCurrencyMissingError
@@ -194,7 +206,7 @@ export class CreditEntity {
       return new CreditAlreadyPaidError(this.id);
     }
 
-    const payment = this.calculateMonthlyPayment();
+    const payment = this.calculateMonthlyPayment(interestRate, insuranceRate);
     if (payment instanceof Error) {
       return payment;
     }
@@ -218,7 +230,10 @@ export class CreditEntity {
   }
 
   /** Calcule le plan d’amortissement complet */
-  public calculateAmortizationSchedule():
+  public calculateAmortizationSchedule(
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | MonthlySchedule[]
     | MoneyCurrencyMissingError
     | CreditAlreadyPaidError
@@ -231,7 +246,7 @@ export class CreditEntity {
 
     for (let month = 1; month <= simulated.durationMonths; month++) {
       const before = simulated.getRemainingBalance();
-      const payResult = simulated.payMonthly();
+      const payResult = simulated.payMonthly(interestRate, insuranceRate);
       if (payResult instanceof Error) return payResult;
       const after = simulated.getRemainingBalance();
 
@@ -250,25 +265,42 @@ export class CreditEntity {
   }: {
     advisorId: string;
     now: Date;
-  }): void {
+  }): CreditEntity {
     this.advisorId = advisorId;
     this.updatedAt = now;
+    return this;
   }
 
-  public accept({ now }: { now: Date }): void | CreditStatusMismatchError {
+  public accept({
+    now,
+    reason,
+  }: {
+    now: Date;
+    reason?: string;
+  }): CreditEntity | CreditStatusMismatchError {
     if (this.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(this.status);
     }
     this.status = CreditStatus.ACCEPTED;
+    if (reason) this.reason = reason;
     this.updatedAt = now;
+    return this;
   }
 
-  public refuse({ now }: { now: Date }): void | CreditStatusMismatchError {
+  public refuse({
+    now,
+    reason,
+  }: {
+    now: Date;
+    reason?: string;
+  }): CreditEntity | CreditStatusMismatchError {
     if (this.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(this.status);
     }
     this.status = CreditStatus.REFUSED;
+    if (reason) this.reason = reason;
     this.updatedAt = now;
+    return this;
   }
 
   public toDTO(): CreditDTO {
@@ -281,19 +313,18 @@ export class CreditEntity {
       monthlyPayment: this.monthlyPayment,
       remainingBalance: this.remainingBalance,
       initialAmount: this.initialAmount,
-      userId: this.userId,
-      interestRate: this.interestRate.value,
-      insuranceRate: this.insuranceRate.value,
+      accountId: this.accountId.value,
+      formuleCreditId: this.formuleCreditId,
       updatedAt: this.updatedAt.toISOString(),
+      advisorId: this.advisorId,
     };
   }
 }
 
 export type CreditDTO = {
-  interestRate: number;
-  insuranceRate: number;
-  updatedAt: string;
+  accountId: string;
   createdAt: string;
+  updatedAt: string;
   startDate: string;
 } & Pick<
   CreditEntity,
@@ -303,5 +334,6 @@ export type CreditDTO = {
   | "monthlyPayment"
   | "remainingBalance"
   | "initialAmount"
-  | "userId"
+  | "formuleCreditId"
+  | "advisorId"
 >;

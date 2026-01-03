@@ -11,7 +11,6 @@ import { match } from "ts-pattern";
 import {
     AlertCircle,
     Calendar,
-    Percent,
     TrendingUp,
     CalendarClock
 } from "lucide-react";
@@ -46,8 +45,8 @@ export default function ClientCreditsPage() {
                                             Vous n'avez pas encore de demande de crédit
                                         </p>
                                     </div>
-                                    <Button onClick={() => router.push("/credits/new")}>
-                                        Faire une demande
+                                    <Button onClick={() => router.push("/formules")}>
+                                        Voir les formules de crédits
                                     </Button>
                                 </CardContent>
                             </Card>
@@ -100,14 +99,6 @@ export default function ClientCreditsPage() {
                                                                         Durée
                                                                     </p>
                                                                     <p className="font-semibold">{credit.durationMonths} mois</p>
-                                                                </div>
-
-                                                                <div className="space-y-1">
-                                                                    <p className="text-xs text-gray-500 flex items-center gap-1">
-                                                                        <Percent className="w-3 h-3" />
-                                                                        Taux d'intérêt
-                                                                    </p>
-                                                                    <p className="font-semibold">{credit.interestRate}%</p>
                                                                 </div>
                                                             </div>
 

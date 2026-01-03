@@ -33,7 +33,7 @@ import { SeedBankAccountUseCase } from "@application/usecases/seeds/SeedBankAcco
 // Seed functions
 import { seedAdvisor } from "../../seeds/02_seedAdvisor";
 import { seedClient } from "../../seeds/03_seedClient";
-import { seedDirector } from "../../seeds/01_seedDirector";
+import { seedDirector } from "../../seeds/01A_seedDirector";
 import { generateExternalThreads } from "../../seeds/04_generateExternalThreads";
 import { generateInternalThreads } from "../../seeds/05_generateInternalThreads";
 import { generateTags } from "../../seeds/06_generateTags";
@@ -42,7 +42,7 @@ import { generateActions } from "../../seeds/08_generateActions";
 import { generateSavingsRate } from "../../seeds/09_generateSavingsRate";
 import { generateOrders } from "../../seeds/10_generateOrders";
 import { generateNotifications } from "../../seeds/11_generateNotifications";
-import { generateBankAccounts } from "../../seeds/12_generateBankAccounts";
+import { generateBankAccounts } from "../../seeds/01B_generateBankAccounts";
 
 const all = async () => {
   console.log("🌱 Starting MongoDB seed...\n");

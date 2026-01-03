@@ -10,7 +10,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { endpoints } from "@/utils/endpoint";
-import { CreditDTO } from "@infrastructure/types/credit";
+import { CreditDTOWithFormule } from "@infrastructure/types/credit";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
@@ -23,7 +23,7 @@ import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { statusConfig } from "./constant";
 
-type Props = { credit: CreditDTO, isAdmin?: boolean, basePath: string }
+type Props = { credit: CreditDTOWithFormule, isAdmin?: boolean, basePath: string }
 
 export const CreditRow = ({ credit, isAdmin, basePath }: Props) => {
     const router = useRouter();
@@ -74,7 +74,7 @@ export const CreditRow = ({ credit, isAdmin, basePath }: Props) => {
                     })}
                 </td>
                 <td className="p-4 text-gray-600">{credit.durationMonths} mois</td>
-                <td className="p-4 text-gray-600">{credit.interestRate}%</td>
+                <td className="p-4 text-gray-600">{credit.formule.interestRate}%</td>
                 <td className="p-4 font-medium">
                     {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
                         style: "currency",

@@ -2,7 +2,7 @@ import { AccountEntity } from "@domain/entities/AccountEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { IBAN } from "@domain/values/IBAN";
 
-export type AccountEntityWithUser = AccountEntity & { user: UserEntity | null };
+export type AccountEntityWithUser = AccountEntity & { user: UserEntity };
 
 export interface AccountRepository {
   findByUserId(userId: UserEntity["id"] | null): Promise<AccountEntity[]>;

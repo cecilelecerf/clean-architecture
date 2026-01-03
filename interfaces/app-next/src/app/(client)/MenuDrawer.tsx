@@ -9,19 +9,20 @@ import {
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
-    DrawerTrigger,
+    DrawerTrigger
 } from '@/components/ui/drawer';
 import { Separator } from '@/components/ui/separator';
 import { MenuLink } from './MenuLink';
 import { SignOutButton } from '@/components/SignOutButton';
-import { CircleX, Home, Menu, MessageSquare, TrendingUp, CreditCard } from 'lucide-react';
+import { CircleX, Home, Menu, MessageSquare, CreditCard, ClockFading, Newspaper, LucideIcon } from 'lucide-react';
 
-const menuItems = [
-    { icon: Home, label: "Comptes", href: "/accounts" },
+const menuItems: { icon: LucideIcon, label: string, href: string }[] = [
+    { icon: Home, label: "Mes comptes", href: "/accounts" },
     { icon: MessageSquare, label: "Conversations", href: "/threads" },
-    { icon: TrendingUp, label: "Actualités", href: "/feeds" },
-    { icon: CreditCard, label: "Crédits", href: "/credits" },
-] as const;
+    { icon: Newspaper, label: "Actualités", href: "/feeds" },
+    { icon: ClockFading, label: "Demandes de crédits", href: "/credits" },
+    { icon: CreditCard, label: "Formule de crédits", href: "/formules" },
+];
 
 export const MenuDrawer = () => (
     <Drawer direction="right">

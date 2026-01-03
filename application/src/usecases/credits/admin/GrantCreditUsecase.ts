@@ -6,11 +6,7 @@ import {
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import {
-  CreditDTO,
-  CreditEntity,
-  CreditStatus,
-} from "@domain/entities/CreditEntity";
+import { CreditDTO } from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { CreditNotFoundError } from "@application/errors/credits";
 import { CreditStatusMismatchError } from "@application/errors/credits/CreditStatusMismatchError";
@@ -20,6 +16,7 @@ type Props = {
   advisorId: UserEntity["id"];
   creditId: string;
   accept: boolean;
+  reason: string;
 };
 
 export class GrantCreditUsecase {
@@ -33,6 +30,7 @@ export class GrantCreditUsecase {
     advisorId,
     creditId,
     accept,
+    reason,
   }: Props): Promise<
     | CreditDTO
     | UserNotFoundError
@@ -41,25 +39,22 @@ export class GrantCreditUsecase {
     | CreditNotFoundError
     | CreditStatusMismatchError
   > {
-    // Conseiller qui accepte ou non le credit
     const advisor = await findActiveUser(this.userRepository, advisorId);
     if (advisor instanceof Error) return advisor;
     if (!advisor.hasRole({ role: "conseiller" }))
       return new UserRoleMismatchError(["conseiller"], advisor.role);
-    console.log(advisor);
     const credit = await this.creditRepository.findById(creditId);
     if (!credit) return new CreditNotFoundError();
-    console.log(credit);
-    if (credit.status !== CreditStatus.PENDING) {
-      return new CreditStatusMismatchError(credit.status);
-    }
-    console.log("test---");
     const now = this.clockService.now();
-    credit.assignAdvisor({ advisorId, now });
-    accept ? credit.accept({ now }) : credit.refuse({ now });
-    if (credit instanceof Error) return credit.toDTO();
 
-    await this.creditRepository.update(credit);
-    return credit.toDTO();
+    credit.assignAdvisor({ advisorId: advisor.id, now });
+
+    const actionCredit = accept
+      ? credit.accept({ now, reason })
+      : credit.refuse({ now, reason });
+    if (actionCredit instanceof Error) return actionCredit;
+
+    await this.creditRepository.update(actionCredit);
+    return actionCredit.toDTO();
   }
 }

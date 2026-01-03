@@ -12,7 +12,6 @@ import { SkeletonThread, WrapperThread } from '@/components/threads/WrapperThrea
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
-    console.log(threadId)
     const queries = useQueries({
         queries: [
             endpoints.threads.get({ threadId }),

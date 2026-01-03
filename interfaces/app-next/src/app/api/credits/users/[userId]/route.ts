@@ -10,7 +10,6 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/credits/user
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     const { userId } = await ctx.params;
-
     const result = await creditFactory().getCreditsByUser.execute({
       clientId: userId,
       adminId: session.user.id,

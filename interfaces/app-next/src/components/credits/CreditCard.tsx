@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { endpoints } from "@/utils/endpoint";
 import { UserId } from "@infrastructure/types/user";
-import { CreditDTO } from "@infrastructure/types/credit";
+import { CreditDTOWithFormule } from "@infrastructure/types/credit";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
@@ -20,16 +20,19 @@ import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { useState } from "react";
 import { statusConfig } from "@/components/credits/constant";
 import { CreditDialog } from "@/components/credits/CreditRow";
+import { useSession } from "next-auth/react";
 
 
 
-export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditDTO; userId: UserId, basePath: string }) => {
+export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditDTOWithFormule; userId: UserId, basePath: string }) => {
     const router = useRouter();
     const queryClient = useQueryClient();
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogAction, setDialogAction] = useState<"accept" | "refuse">("accept");
     const [refusalReason, setRefusalReason] = useState("");
 
+    const { data: session } = useSession();
+    if (!session?.user?.id) return <div>Unauthorized</div>;
     const config = statusConfig[credit.status];
     const StatusIcon = config.icon;
     const isPending = credit.status === "PENDING";
@@ -66,7 +69,6 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
         <>
             <Card >
                 <CardContent className="p-4 space-y-3 py-0">
-                    {/* Header: Status + Montant */}
                     <div className="flex justify-between items-start">
                         <div>
                             <Badge variant={config.variant} className="flex items-center gap-1 w-fit mb-2">
@@ -90,7 +92,7 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
                         </div>
                         <div className="flex items-center gap-2">
                             <Percent className="w-4 h-4 text-gray-400" />
-                            <span className="text-gray-600">{credit.interestRate}%</span>
+                            <span className="text-gray-600">{credit.formule.interestRate}%</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <DollarSign className="w-4 h-4 text-gray-400" />
@@ -117,7 +119,7 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
                             <Eye className="w-4 h-4 mr-1" />
                             Détails
                         </Button>
-                        {isPending && (
+                        {isPending && session.user.role !== "client" && (
                             <>
                                 <Button
                                     variant="default"

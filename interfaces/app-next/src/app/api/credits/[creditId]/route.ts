@@ -14,7 +14,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/credits/[cre
     const { creditId } = await ctx.params;
     const result = await creditFactory().getCredit.execute({
       creditId: creditId,
-      userId: session.user.id,
+      actorId: session.user.id,
     });
 
     if (result instanceof Error) {

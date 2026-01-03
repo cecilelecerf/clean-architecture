@@ -1,3 +1,7 @@
+import {
+  CreditDTOMapper,
+  CreditDTOWithFormuleAndAccount,
+} from "@application/dto/CreditDTOMapper";
 import { CreditNotFoundError } from "@application/errors/credits";
 import {
   UserNotActiveError,
@@ -7,12 +11,12 @@ import {
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { CreditDTO, CreditEntity } from "@domain/entities/CreditEntity";
+import { CreditEntity } from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 
 type Props = {
+  actorId: UserEntity["id"];
   creditId: CreditEntity["id"];
-  userId: UserEntity["id"];
 };
 
 export class GetCreditUsecase {
@@ -22,21 +26,26 @@ export class GetCreditUsecase {
   ) {}
 
   public async execute({
+    actorId,
     creditId,
-    userId,
   }: Props): Promise<
-    | CreditDTO
+    | CreditDTOWithFormuleAndAccount
     | UserNotFoundError
     | UserNotActiveError
-    | UserRoleMismatchError
     | CreditNotFoundError
   > {
-    const user = await findActiveUser(this.userRepository, userId);
-    if (user instanceof Error) return user;
-    const credit = await this.creditRepository.findById(creditId);
+    console.log("enter");
+    const actor = await findActiveUser(this.userRepository, actorId);
+    if (actor instanceof Error) return actor;
+    const credit = await this.creditRepository.findByIdWithDetails(creditId);
     if (!credit) return new CreditNotFoundError();
-    if (user.hasRole({ role: "client" }) && credit.userId !== user.id)
-      return new UserRoleMismatchError(["client"], user.role);
-    return credit.toDTO();
+    console.log(credit.account.userId, actor.id);
+    if (
+      actor.hasRole({ role: "client" }) &&
+      credit.account.user.id !== actor.id
+    )
+      return new CreditNotFoundError();
+
+    return CreditDTOMapper.map(credit);
   }
 }
