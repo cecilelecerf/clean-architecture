@@ -7,7 +7,6 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import {
   AccountNotFoundError,
-  SameAccountTransactionError,
   UnauthorizedAccessAccountError,
 } from "@application/errors/accounts";
 import {
@@ -31,6 +30,7 @@ import {
 import {
   InvalidTransactionAmountError,
   InvalidTransactionLabelError,
+  SameAccountTransactionError,
 } from "@domain/errors/transaction";
 
 interface Props {

@@ -169,10 +169,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
       account = baseAccount as AccountEntityWithUser;
     }
 
-    const formule = row.form_id
-      ? FormuleMapper.mapRowToFormule(row, "form_")
-      : null;
-
+    const formule = FormuleMapper.mapRowToFormule(row, "form_");
     return Object.assign(credit, {
       account,
       formule,
@@ -379,5 +376,84 @@ export class CreditRepositoryMySQL implements CreditRepository {
       [advisorId]
     );
     return rows[0].count;
+  }
+
+  async countByFormule(formuleId: string): Promise<number> {
+    const result = await this.client.query<RowDataPacket[]>(
+      `SELECT COUNT(*) as count 
+       FROM credits 
+       WHERE formule_id = ?`,
+      [formuleId]
+    );
+    return result[0]?.count || 0;
+  }
+
+  async countByFormuleAndStatus(
+    formuleId: string,
+    status: CreditEntity["status"]
+  ): Promise<number> {
+    const result = await this.client.query<RowDataPacket[]>(
+      `SELECT COUNT(*) as count 
+       FROM credits 
+       WHERE formule_id = ? AND status = ?`,
+      [formuleId, status]
+    );
+    return result[0]?.count || 0;
+  }
+
+  async countClientsByFormule(formuleId: string): Promise<number> {
+    const result = await this.client.query<RowDataPacket[]>(
+      `SELECT COUNT(DISTINCT account_id) as count 
+       FROM credits 
+       WHERE formule_id = ?`,
+      [formuleId]
+    );
+    return result[0]?.count || 0;
+  }
+
+  async getFinancialStatsByFormule(formuleId: string): Promise<{
+    totalLoanedAmount: number;
+    totalInterestEarned: number;
+    totalInsuranceEarned: number;
+    totalRevenue: number;
+  }> {
+    const result = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+        COALESCE(SUM(c.remaining_amount), 0) as totalLoanedAmount,
+        COALESCE(SUM(
+          c.remaining_amount * (f.interest_rate / 100 / 12) * c.duration_months
+        ), 0) as totalInterestEarned,
+        COALESCE(SUM(
+          c.remaining_amount * (f.insurance_rate / 100 / 12) * c.duration_months
+        ), 0) as totalInsuranceEarned
+      FROM credits c
+      INNER JOIN formules f ON c.formule_id = f.id
+      WHERE c.formule_id = ?
+        AND c.status IN ('COMPLETED', 'ACCEPTED')`,
+      [formuleId]
+    );
+
+    if (!result || result.length === 0) {
+      return {
+        totalLoanedAmount: 0,
+        totalInterestEarned: 0,
+        totalInsuranceEarned: 0,
+        totalRevenue: 0,
+      };
+    }
+
+    const stats = result[0];
+    const totalRevenue =
+      Number(stats.totalInterestEarned) + Number(stats.totalInsuranceEarned);
+
+    return {
+      totalLoanedAmount:
+        Math.round(Number(stats.totalLoanedAmount) * 100) / 100,
+      totalInterestEarned:
+        Math.round(Number(stats.totalInterestEarned) * 100) / 100,
+      totalInsuranceEarned:
+        Math.round(Number(stats.totalInsuranceEarned) * 100) / 100,
+      totalRevenue: Math.round(totalRevenue * 100) / 100,
+    };
   }
 }

@@ -43,3 +43,19 @@ export const formuleTypesSchema = z.object({
 });
 
 export type FormuleTypes = z.infer<typeof formuleTypesSchema>;
+
+export const formuleStatSchema = z.object({
+  activeCreditsCount: z.number(),
+  totalClients: z.number(),
+  acceptanceRate: z.number(),
+  pendingCreditsCount: z.number(),
+
+  totalLoanedAmount: z.number(),
+  totalInterestEarned: z.number(),
+  totalInsuranceEarned: z.number(),
+  totalRevenue: z.number(),
+
+  totalCreditsCount: z.number(),
+  acceptedCreditsCount: z.number(),
+  refusedCreditsCount: z.number(),
+});

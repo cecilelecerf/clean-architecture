@@ -11,11 +11,14 @@ import { GetFormuleUsecase } from "@application/usecases/formules-credit/GetForm
 import { GetAllActiveFormulesUsecase } from "@application/usecases/formules-credit/GetAllActiveFormulesUseCase";
 import { GetFormuleCreditTypesUseCase } from "@application/usecases/formules-credit/GetFormuleCreditTypesUseCase";
 import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
+import { GetFormuleStatisticsUsecase } from "@application/usecases/formules-credit/GetFormuleStatisticsUsecase";
+import { CreditRepositoryMySQL } from "../repositories/CreditRepositoryMySQL";
 
 export const formuleFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);
   const formuleRepository = new FormuleCreditRepositoryMySQL(client);
+  const creditRepository = new CreditRepositoryMySQL(client);
   const accountRepository = new AccountRepositoryMySQL(client);
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
@@ -51,6 +54,10 @@ export const formuleFactory = () => {
   const getFormule = new GetFormuleUsecase(formuleRepository, userRepository);
 
   const getTypes = new GetFormuleCreditTypesUseCase(userRepository);
+  const stats = new GetFormuleStatisticsUsecase(
+    formuleRepository,
+    creditRepository
+  );
 
   return {
     createFormule,
@@ -60,5 +67,6 @@ export const formuleFactory = () => {
     getAllActive,
     getFormule,
     getTypes,
+    stats,
   };
 };

@@ -39,39 +39,13 @@ export const CreditByFormule = ({ formuleId }: { formuleId: FormuleId }) => {
             }
 
             return (
-                <>
-                    {/* En-tête avec statistiques */}
-                    <Card className="my-12">
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <CardTitle>Crédits associés à cette formule</CardTitle>
-                                <Badge variant="outline">
-                                    {credits.length} crédit{credits.length > 1 ? 's' : ''}
-                                </Badge>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {(['PENDING', 'ACCEPTED', 'REFUSED', 'COMPLETED'] as const).map((status) => {
-                                    const count = credits.filter(c => c.status === status).length;
-                                    return (
-                                        <div key={status} className="text-center">
-                                            <p className="text-2xl font-bold">{count}</p>
-                                            <StatusBadge status={status} />
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Liste des crédits */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        {credits.map((credit) => (
+                < div className="grid grid-cols-1 sm:grid-cols-2 gap-5" >
+                    {
+                        credits.map((credit) => (
                             <CreditCard key={credit.id} credit={credit} />
-                        ))}
-                    </div>
-                </>
+                        ))
+                    }
+                </div >
             );
         })
         .exhaustive()

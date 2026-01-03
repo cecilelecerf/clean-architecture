@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 
-export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext}: { selectedAccountId?: string, onSelect: (accountId: string, currency: string) => void, onNext: () => void}) => {
+export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext }: { selectedAccountId?: string, onSelect: (accountId: string, currency: string) => void, onNext: () => void }) => {
   const query = useQuery(endpoints.accounts.getAllByMe());
 
   if (query.isLoading) return <p>Chargement des comptes...</p>;
@@ -23,11 +23,10 @@ export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext}: { sele
             <Card
               key={account.IBAN}
               onClick={() => onSelect(account.IBAN, account.currency)}
-              className={`cursor-pointer transition-all ${
-                selected
+              className={`cursor-pointer transition-all ${selected
                   ? "border-blue-500 ring-2 ring-blue-500"
                   : "hover:shadow-md"
-              }`}
+                }`}
             >
               <CardContent className="flex items-center justify-between p-4">
                 <div>

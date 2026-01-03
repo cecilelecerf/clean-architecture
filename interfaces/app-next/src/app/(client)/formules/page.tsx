@@ -1,19 +1,24 @@
 "use client";
 
 import { endpoints } from "@/utils/endpoint";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-    AlertCircle
+    Percent,
 } from "lucide-react";
 import { match } from "ts-pattern";
+import { Badge } from "@/components/ui/badge";
 
 export default function ClientFormulesPage() {
-    const query = useQuery(endpoints.formules.getAllActive());
-    const router = useRouter();
+    const queries = useQueries({
+        queries: [
+            endpoints.formules.getAllActive(),
+            endpoints.formules.getTypes()
+        ]
+    }); const router = useRouter();
 
     return (
         <div className="space-y-6">
@@ -22,57 +27,143 @@ export default function ClientFormulesPage() {
                 <p className="text-gray-500">Retrouvez toutes les formules de prêts que nous vous proposons</p>
             </div>
 
-            {match(query)
-                .with({ status: "error" }, () => "error")
-                .with({ status: "pending" }, () => <FormuleSkeleton />)
-                .with({ status: "success" }, ({ data: formules }) => {
-                    if (formules.length === 0) {
-                        return (
-                            <Card className="text-center p-12">
-                                <CardContent className="space-y-4">
-                                    <AlertCircle className="w-16 h-16 mx-auto text-gray-400" />
-                                    <div>
-                                        <h3 className="text-lg font-semibold">Aucune formule</h3>
-                                        <p className="text-gray-500 mt-2">
-                                            Aucune formule de prêt disponible
-                                        </p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        );
-                    }
+            {
+                match(queries)
+                    .when(
+                        (queries) => queries.some((q) => q.status === "error"),
+                        () => "errors"
+                    )
+                    .when(
+                        (queries) => queries.every((q) => q.status === "success"),
+                        ([{ data: formules }, { data: types }],) => {
 
-                    const formulesByType = formules.reduce((acc: Record<string, typeof formules>, formule) => {
-                        if (!acc[formule.type]) acc[formule.type] = [];
-                        acc[formule.type].push(formule);
-                        return acc;
-                    }, {});
+                            if (formules.length === 0) {
+                                return (
+                                    <Card>
+                                        <CardContent className="py-12 text-center">
+                                            <Percent className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                                            <p className="text-lg font-medium mb-2">
+                                                Aucune formule disponible
+                                            </p>
+                                            <p className="text-sm text-muted-foreground mb-6">
+                                                Créez votre première formule de prêt
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                );
+                            }
 
-                    const sortedTypes = Object.keys(formulesByType).sort();
-                    return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {sortedTypes.map((type) => (
-                            <div key={type}>
-                                <h2 className="text-xl font-bold my-4">{type}</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {formulesByType[type].map((formule) => (
-                                        <Card key={formule.id} className="flex items-center gap-4 p-4">
-                                            <div className="flex-1">
-                                                <p className="font-semibold text-center">{formule.label}</p>
-                                                <p className="text-sm text-center text-gray-500">{formule.interestRate}%</p>
+                            const formulesByType = formules.reduce(
+                                (acc: Record<string, typeof formules>, formule) => {
+                                    if (!acc[formule.type]) acc[formule.type] = [];
+                                    acc[formule.type].push(formule);
+                                    return acc;
+                                },
+                                {}
+                            );
+
+
+                            const typeOrder = ["CONSOMMATION", "PROFESSIONNEL", "IMMOBILIER", "AUTO", "AUTRE"];
+
+                            const availableTypes = types
+                                .filter((type) => formulesByType[type.value]?.length > 0)
+                                .sort((a, b) => {
+                                    const indexA = typeOrder.indexOf(a.value);
+                                    const indexB = typeOrder.indexOf(b.value);
+
+                                    if (indexA !== -1 && indexB !== -1) {
+                                        return indexA - indexB;
+                                    }
+
+                                    if (indexA !== -1) return -1;
+                                    if (indexB !== -1) return 1;
+
+                                    return a.label.localeCompare(b.label);
+                                });
+                            return (
+                                <>
+
+                                    {availableTypes.map((type) => (
+                                        <div key={type.value} className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <h2 className="text-xl font-bold">{type.label}</h2>
+                                                <Badge variant="outline">
+                                                    {formulesByType[type.value].length} formule
+                                                    {formulesByType[type.value].length > 1 ? "s" : ""}
+                                                </Badge>
                                             </div>
-                                            <div>
-                                                <Button onClick={() => router.push(`formules/${formule.id}`)}>
-                                                    + d&apos;info
-                                                </Button>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {formulesByType[type.value].map((formule) => (
+                                                    <Card
+                                                        key={formule.id}
+                                                        className="hover:shadow-md transition-shadow cursor-pointer"
+                                                        onClick={() => router.push(`/formules/${formule.id}`)}
+                                                    >
+                                                        <CardContent className="p-4 space-y-3">
+                                                            {/* En-tête */}
+                                                            <div className="flex items-start justify-between gap-2">
+                                                                <h3 className="font-semibold text-lg line-clamp-1 flex-1">
+                                                                    {formule.label}
+                                                                </h3>
+                                                                <Badge
+                                                                    variant={formule.isActive ? "default" : "secondary"}
+                                                                    className="shrink-0"
+                                                                >
+                                                                    {formule.isActive ? "Active" : "Inactive"}
+                                                                </Badge>
+                                                            </div>
+
+                                                            {/* Description */}
+                                                            <p className="text-sm text-muted-foreground line-clamp-2">
+                                                                {formule.description}
+                                                            </p>
+
+                                                            {/* Taux */}
+                                                            <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t">
+                                                                <div className="space-y-1">
+                                                                    <p className="text-xs text-muted-foreground">Intérêt</p>
+                                                                    <p className="font-semibold">{formule.interestRate}%</p>
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <p className="text-xs text-muted-foreground">Assurance</p>
+                                                                    <p className="font-semibold">{formule.insuranceRate}%</p>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Montants */}
+                                                            {formule.minAmount !== undefined &&
+                                                                formule.maxAmount !== undefined && (
+                                                                    <div className="text-sm text-muted-foreground pt-2 border-t">
+                                                                        {formule.minAmount.toLocaleString('fr-FR')}€ - {formule.maxAmount.toLocaleString('fr-FR')}€
+                                                                    </div>
+                                                                )}
+
+                                                            {/* Bouton */}
+                                                            <Button
+                                                                variant="outline"
+                                                                className="w-full"
+                                                                size="sm"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    router.push(`/formules/${formule.id}`);
+                                                                }}
+                                                            >
+                                                                Voir détails
+                                                            </Button>
+                                                        </CardContent>
+                                                    </Card>
+                                                ))}
                                             </div>
-                                        </Card>
+                                        </div>
                                     ))}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                })
-                .exhaustive()}
+                                </>
+                            );
+                        }
+                    )
+                    .otherwise(() => <FormuleSkeleton />
+                    )
+            }
         </div>
     )
 }

@@ -37,4 +37,16 @@ export interface CreditRepository {
   ): Promise<CreditEntity[]>;
   countAcceptedByAdvisor(advisorId: string): Promise<number>;
   countRefusedByAdvisor(advisorId: string): Promise<number>;
+  countByFormule(formuleId: string): Promise<number>;
+  countByFormuleAndStatus(
+    formuleId: string,
+    status: CreditEntity["status"]
+  ): Promise<number>;
+  countClientsByFormule(formuleId: string): Promise<number>;
+  getFinancialStatsByFormule(formuleId: string): Promise<{
+    totalLoanedAmount: number;
+    totalInterestEarned: number;
+    totalInsuranceEarned: number;
+    totalRevenue: number;
+  }>;
 }

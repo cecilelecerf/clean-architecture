@@ -2,6 +2,7 @@ import {
   formuleDTOSchema,
   FormuleId,
   formuleSchema,
+  formuleStatSchema,
   formuleTypesSchema,
 } from '@infrastructure/types/formule';
 import z from 'zod';
@@ -94,5 +95,12 @@ export const formuleEndpoint = createEndpointsNodes({
         queryClient.invalidateQueries({ queryKey: ['formules', formuleId] });
         queryClient.invalidateQueries({ queryKey: ['formules', 'list'] });
       },
+    }),
+
+  stats: ({ id }: { id: FormuleId }) =>
+    queryOptions({
+      queryKey: ['formules', id, 'stats'],
+      queryFn: async () =>
+        get(`/formules/${id}/stats`).then((data) => safeParseWithLog(formuleStatSchema, data)),
     }),
 });

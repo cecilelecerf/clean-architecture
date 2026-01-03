@@ -1,3 +1,4 @@
+// @infrastructure/repositories/mongo/AccountRepositoryMongo.ts
 import {
   AccountEntityWithUser,
   AccountRepository,
@@ -13,7 +14,6 @@ import { UserMapper } from "../../mappers/UserMapper";
 export class AccountRepositoryMongo implements AccountRepository {
   constructor(private readonly client: MongoClient) {}
 
-  /** 🔍 Trouver tous les comptes d'un user */
   async findByUserId(
     userId: UserEntity["id"] | null
   ): Promise<AccountEntity[]> {
@@ -26,7 +26,6 @@ export class AccountRepositoryMongo implements AccountRepository {
     return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
   }
 
-  /** 🔍 Trouver un compte par IBAN */
   async findByIBAN(iban: IBAN): Promise<AccountEntity | null> {
     await this.client.connect();
 
@@ -36,7 +35,6 @@ export class AccountRepositoryMongo implements AccountRepository {
     return AccountMapper.mapDocToAccount(doc);
   }
 
-  /** 🔍 Tous les comptes épargne */
   async findAllSavingsAccounts(): Promise<AccountEntity[]> {
     await this.client.connect();
 
@@ -47,13 +45,12 @@ export class AccountRepositoryMongo implements AccountRepository {
     return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
   }
 
-  /** 🔍 Compte d'intérêts de la banque */
   async findBankInterestAccount(): Promise<AccountEntity | null> {
     await this.client.connect();
 
     const doc = await AccountModel.findOne({
       type: "epargne",
-      "owner.role": "bank", // ✅ Query sur owner.role au lieu de owner_type
+      userId: null,
     }).lean();
 
     if (!doc) return null;
@@ -61,7 +58,6 @@ export class AccountRepositoryMongo implements AccountRepository {
     return AccountMapper.mapDocToAccount(doc);
   }
 
-  /** 🔍 Trouver une liste de compte par type */
   async findByType(type: string): Promise<AccountEntity[]> {
     await this.client.connect();
 
@@ -72,7 +68,6 @@ export class AccountRepositoryMongo implements AccountRepository {
     return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
   }
 
-  /** Trouver une liste de compte par type */
   async findByTypeSection(type: "client" | "bank"): Promise<AccountEntity[]> {
     await this.client.connect();
 
@@ -86,7 +81,6 @@ export class AccountRepositoryMongo implements AccountRepository {
     return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
   }
 
-  /** 🔍 Trouver une liste de compte par type avec les users */
   async findByTypeSectionWithUser(
     type: "client" | "bank"
   ): Promise<AccountEntityWithUser[]> {
@@ -96,7 +90,10 @@ export class AccountRepositoryMongo implements AccountRepository {
       type === "client" ? { userId: { $ne: null } } : { userId: null };
 
     const docs = await AccountModel.find(condition)
-      .populate("userId") // Populate la référence userId
+      .populate({
+        path: "userId",
+        model: "User",
+      })
       .sort({ createdAt: -1 })
       .lean();
 
@@ -106,13 +103,14 @@ export class AccountRepositoryMongo implements AccountRepository {
         doc.userId && typeof doc.userId === "object"
           ? UserMapper.mapDocToUser(doc.userId)
           : null;
-      return Object.assign(account, { user });
+
+      return Object.assign(account, { user }) as AccountEntityWithUser;
     });
   }
 
-  /** 📬 Sauvegarder un compte */
   async save(account: AccountEntity): Promise<void> {
     await this.client.connect();
+
     await AccountModel.create({
       iban: account.iban.value,
       userId: account.userId,
@@ -129,7 +127,6 @@ export class AccountRepositoryMongo implements AccountRepository {
     });
   }
 
-  /** 🔄 Mettre à jour un compte */
   async update(account: AccountEntity): Promise<void> {
     await this.client.connect();
 
@@ -152,7 +149,6 @@ export class AccountRepositoryMongo implements AccountRepository {
     );
   }
 
-  /** ❌ Supprimer un compte */
   async delete(iban: IBAN): Promise<void> {
     await this.client.connect();
 
