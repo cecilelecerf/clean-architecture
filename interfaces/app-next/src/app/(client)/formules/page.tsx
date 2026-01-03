@@ -4,7 +4,7 @@ import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
     AlertCircle
@@ -52,22 +52,22 @@ export default function ClientFormulesPage() {
                     return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {sortedTypes.map((type) => (
                             <div key={type}>
-                            <h2 className="text-xl font-bold my-4">{type}</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {formulesByType[type].map((formule) => (
-                                <Card key={formule.id} className="flex items-center gap-4 p-4">
-                                    <div className="flex-1">
-                                    <p className="font-semibold text-center">{formule.label}</p>
-                                    <p className="text-sm text-center text-gray-500">{formule.interestRate}%</p>
-                                    </div>
-                                    <div>
-                                    <Button onClick={() => router.push(`formules/${formule.id}`)}>
-                                        + d&apos;info
-                                    </Button>
-                                    </div>
-                                </Card>
-                                ))}
-                            </div>
+                                <h2 className="text-xl font-bold my-4">{type}</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {formulesByType[type].map((formule) => (
+                                        <Card key={formule.id} className="flex items-center gap-4 p-4">
+                                            <div className="flex-1">
+                                                <p className="font-semibold text-center">{formule.label}</p>
+                                                <p className="text-sm text-center text-gray-500">{formule.interestRate}%</p>
+                                            </div>
+                                            <div>
+                                                <Button onClick={() => router.push(`formules/${formule.id}`)}>
+                                                    + d&apos;info
+                                                </Button>
+                                            </div>
+                                        </Card>
+                                    ))}
+                                </div>
                             </div>
                         ))}
                     </div>

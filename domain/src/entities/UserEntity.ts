@@ -96,6 +96,36 @@ export class UserEntity {
       createdAt
     );
   }
+  public update({
+    firstname,
+    lastname,
+    email,
+    now,
+  }: {
+    firstname?: string;
+    lastname?: string;
+    email?: Email;
+    now: Date;
+  }): UserEntity | InvalidFirstnameError | InvalidLastnameError {
+    if (firstname) {
+      const firstnameStr = UserEntity.validateFirstname(firstname);
+      if (firstnameStr instanceof Error) return firstnameStr;
+      this.firstname = firstnameStr;
+    }
+
+    if (lastname) {
+      const lastnameStr = UserEntity.validateLastname(lastname);
+      if (lastnameStr instanceof Error) return lastnameStr;
+      this.lastname = lastnameStr;
+    }
+
+    if (email !== undefined) {
+      this.email = email;
+    }
+
+    this.updatedAt = now;
+    return this;
+  }
 
   private static validateFirstname(
     firstname: string
@@ -169,9 +199,18 @@ export class UserEntity {
       isActiveField: this.isActiveField,
     };
   }
+  public toMe(): UserToMe {
+    return {
+      ...this.toDTO(),
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+    };
+  }
 }
 
 export type UserToDTO = { email: string; confirmedAt?: string } & Pick<
   UserEntity,
   "id" | "firstname" | "lastname" | "role" | "isActiveField"
 >;
+
+export type UserToMe = UserToDTO & { createdAt: string; updatedAt: string };

@@ -12,7 +12,6 @@ import { bgColorClasses, textColorClasses } from '@/utils/color';
 import { Check } from 'lucide-react';
 
 export default function NewAccountPage() {
-  const router = useRouter();
 
   const [field, setField] = useState<NewAccount>({
     color: null,

@@ -114,7 +114,6 @@ export class UpdateFormuleCreditUseCase {
     }
 
     let insuranceRateVO: Percentage | undefined;
-    console.log(interestRateVO, insuranceRateVO);
 
     if (insuranceRate !== undefined) {
       if (insuranceRate < 0) return new NegativeInterestRateError();

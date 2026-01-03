@@ -129,4 +129,14 @@ export class UserRepositoryMySQL implements UserRepository {
       id,
     ]);
   }
+
+  /** Utilisateurs actifs par rôle */
+  async countUserByRole(role: UserEntity["role"]): Promise<number> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      "SELECT COUNT(*) as count FROM users WHERE is_active = 1 AND confirmed_at IS NOT NULL AND role = ?",
+      [role]
+    );
+
+    return rows[0].count;
+  }
 }

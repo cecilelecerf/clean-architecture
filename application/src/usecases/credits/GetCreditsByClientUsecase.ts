@@ -4,7 +4,6 @@ import {
   UserNotFoundError,
   UserRoleMismatchError,
 } from "@application/errors/users";
-import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
@@ -37,7 +36,7 @@ export class GetCreditsByClientUsecase {
     if (adminId) {
       const admin = await findActiveUser(this.userRepository, adminId);
       if (admin instanceof Error) return admin;
-      if (admin.hasRole({ role: "client" }))
+      if (admin.hasRole({ role: "client" }) && admin.id !== client.id)
         return new UserRoleMismatchError(
           ["conseiller", "directeur"],
           admin.role

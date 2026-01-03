@@ -17,11 +17,17 @@ import { RegisterAdminUsecase } from "@application/usecases/users/RegisterAdminU
 import { NodePasswordGenerateService } from "@infrastructure/adapters/services/NodePasswordGenerateService";
 import { BanUserUsecase } from "@application/usecases/users/BanUserUsecase";
 import { UnbanUserUsecase } from "@application/usecases/users/UnBanUserUsecase";
+import { UpdateUserUsecase } from "@application/usecases/users/UpdateUserUsecase";
+import { UserStatisticsUsecase } from "@application/usecases/users/UserStatisticsUsecase";
+import { CreditRepositoryMySQL } from "../repositories/CreditRepositoryMySQL";
+import { ThreadRepositoryMySQL } from "../repositories/ThreadRepositoryMySQL";
 
 export const usersFactory = () => {
   const client = new MySQLClient();
 
   const userRepository = new UserRepositoryMySQL(client);
+  const creditRepository = new CreditRepositoryMySQL(client);
+  const threadRepository = new ThreadRepositoryMySQL(client);
   const encryptionService = new BcryptEncryptionService();
   const tokenService = new JwtTokenService();
   const uuidSerivce = new NodeUuidService();
@@ -72,6 +78,12 @@ export const usersFactory = () => {
     passwordGenerateService
   );
   const unbanUser = new UnbanUserUsecase(userRepository, clockService);
+  const updateUser = new UpdateUserUsecase(userRepository, clockService);
+  const stats = new UserStatisticsUsecase(
+    userRepository,
+    creditRepository,
+    threadRepository
+  );
 
   return {
     register,
@@ -85,5 +97,7 @@ export const usersFactory = () => {
     getUsersByRole,
     createUser,
     unbanUser,
+    updateUser,
+    stats,
   };
 };

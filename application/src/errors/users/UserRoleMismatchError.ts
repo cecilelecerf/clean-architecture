@@ -5,7 +5,7 @@ export class UserRoleMismatchError extends Error {
   public readonly statusCode = 403;
 
   constructor(
-    public readonly expectedRoles: UserEntity["role"][],
+    public readonly expectedRoles: (UserEntity["role"] | "self")[],
     public readonly actualRole: UserEntity["role"]
   ) {
     super(

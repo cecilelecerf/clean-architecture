@@ -28,7 +28,6 @@ export type TransactionFilters = z.infer<typeof querySchema>;
 
 function buildTransactionsQueryParams(filters?: TransactionFilters): URLSearchParams {
   const params = new URLSearchParams();
-  console.log(filters);
   if (!filters) return params;
 
   if (filters.label) params.set('label', filters.label);

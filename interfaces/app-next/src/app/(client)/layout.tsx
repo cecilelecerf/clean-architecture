@@ -4,8 +4,8 @@ import { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
-import { MenuDrawer } from './MenuDrawer';
-import { MenuPopover } from './MenuPopover';
+import { MenuDrawer } from './_components/MenuDrawer';
+import { MenuPopover } from './_components/MenuPopover';
 
 export const metadata: Metadata = {
   title: 'Create Next App',

@@ -359,4 +359,25 @@ export class CreditRepositoryMySQL implements CreditRepository {
     );
     return rows.map((row: RowDataPacket) => CreditMapper.mapRowToCredit(row));
   }
+
+  async countAcceptedByAdvisor(advisorId: string): Promise<number> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+      COUNT(id) as count
+      FROM credits 
+      WHERE advisor_id = ? AND status IN ('ACCEPTED', 'COMPLETED')`,
+      [advisorId]
+    );
+    return rows[0].count;
+  }
+  async countRefusedByAdvisor(advisorId: string): Promise<number> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+      COUNT(id) as count
+      FROM credits 
+      WHERE advisor_id = ? AND status = 'REFUSED'`,
+      [advisorId]
+    );
+    return rows[0].count;
+  }
 }

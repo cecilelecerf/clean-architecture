@@ -1,5 +1,5 @@
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
-import { UserToDTO, UserEntity } from "@domain/entities/UserEntity";
+import { UserEntity } from "@domain/entities/UserEntity";
 
 export type ThreadEntityWithUsers = ThreadEntity & {
   administrator: UserEntity | null;
@@ -15,6 +15,7 @@ export interface ThreadRepository {
   findAllByAdministratorId(
     administratorId: UserEntity["id"]
   ): Promise<ThreadEntity[]>;
+  countByAdvisor(advisorId: UserEntity["id"]): Promise<number>;
 
   // With user
   findWithUserById(

@@ -35,4 +35,6 @@ export interface CreditRepository {
   findAllByFormuleId(
     formuleId: FormuleCreditEntity["id"]
   ): Promise<CreditEntity[]>;
+  countAcceptedByAdvisor(advisorId: string): Promise<number>;
+  countRefusedByAdvisor(advisorId: string): Promise<number>;
 }
