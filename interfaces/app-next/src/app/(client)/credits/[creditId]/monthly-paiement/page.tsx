@@ -46,63 +46,60 @@ export default function CreditMobthlyPage({
                     );
                     return (
                         <Card>
-                        <CardHeader>
-                            <CardTitle>Échéancier</CardTitle>
-                        </CardHeader>
+                            <CardHeader>
+                                <CardTitle>Échéancier</CardTitle>
+                            </CardHeader>
 
-                        <CardContent className="p-0">
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-gray-50 border-b">
-                                        <tr>
-                                        <th className="text-left p-4 text-sm font-semibold text-gray-600">Mois</th>
-                                        <th className="text-left p-4 text-sm font-semibold text-gray-600">Date</th>
-                                        <th className="text-left p-4 text-sm font-semibold text-gray-600">Montant</th>
-                                        <th className="text-left p-4 text-sm font-semibold text-gray-600">Statut</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody className="divide-y">
-                                        {months.map((monthDate, index) => {
-                                        const paid = isMonthPaid(
-                                            monthDate,
-                                            credit.transactions
-                                        );
-
-                                        return (
-                                            <tr className={`transition-colors ${
-                                                paid
-                                                ? "bg-green-50 text-green-900"
-                                                : "hover:bg-gray-50"
-                                            }`} key={index}>
-                                                <td className="p-4 font-semibold">{index + 1}</td>
-                                                <td className="p-4 text-sm text-gray-500">{formatMonthYear(monthDate)}
-    </td>
-                                                <td className="p-4 text-sm text-gray-500">{credit.monthlyPayment.amount} €</td>
-                                                <td className="p-4 text-sm text-gray-500">
-                                                    <Badge
-                                                        variant={paid ? "secondary" : "destructive"}
-                                                        className="flex items-center gap-1 w-fit"
-                                                    >
-                                                        {paid ? (
-                                                        <Check className="w-3 h-3" />
-                                                        ) : (
-                                                        <X className="w-3 h-3" />
-                                                        )}
-                                                        {paid ? "Payé" : "Non payé"}
-                                                    </Badge>
-                                                </td>
+                            <CardContent className="p-0">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead className="bg-gray-50 border-b">
+                                            <tr>
+                                                <th className="text-left p-4 text-sm font-semibold text-gray-600">Mois</th>
+                                                <th className="text-left p-4 text-sm font-semibold text-gray-600">Date</th>
+                                                <th className="text-left p-4 text-sm font-semibold text-gray-600">Montant</th>
+                                                <th className="text-left p-4 text-sm font-semibold text-gray-600">Statut</th>
                                             </tr>
-                                        );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </CardContent>
+                                        </thead>
+
+                                        <tbody className="divide-y">
+                                            {months.map((monthDate, index) => {
+                                                const paid = isMonthPaid(
+                                                    monthDate,
+                                                    credit.transactions
+                                                );
+
+                                                return (
+                                                    <tr className={`transition-colors ${paid
+                                                            ? "bg-green-50 text-green-900"
+                                                            : "hover:bg-gray-50"
+                                                        }`} key={index}>
+                                                        <td className="p-4 font-semibold">{index + 1}</td>
+                                                        <td className="p-4 text-sm text-gray-500">{formatMonthYear(monthDate)}
+                                                        </td>
+                                                        <td className="p-4 text-sm text-gray-500">{credit.monthlyPayment.amount} €</td>
+                                                        <td className="p-4 text-sm text-gray-500">
+                                                            <Badge
+                                                                variant={paid ? "secondary" : "destructive"}
+                                                                className="flex items-center gap-1 w-fit"
+                                                            >
+                                                                {paid ? (
+                                                                    <Check className="w-3 h-3" />
+                                                                ) : (
+                                                                    <X className="w-3 h-3" />
+                                                                )}
+                                                                {paid ? "Payé" : "Non payé"}
+                                                            </Badge>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </CardContent>
                         </Card>
                     );
-                    console.log(months);
-                    console.log('credit', credit)
                 })
                 .exhaustive()}
         </>

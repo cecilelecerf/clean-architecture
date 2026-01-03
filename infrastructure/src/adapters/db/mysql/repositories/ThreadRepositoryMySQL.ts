@@ -325,8 +325,6 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     }
 
     const whereClause = conditions.join(" AND ");
-    console.log(conditions);
-    console.log(params);
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
         t.*, 

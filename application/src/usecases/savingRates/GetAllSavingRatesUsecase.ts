@@ -35,7 +35,6 @@ export class GetAllSavingRatesUsecase {
     if (!user.hasRole({ role: "directeur" }))
       return new UserRoleMismatchError(["directeur"], user.role);
     const savingsRate = await this.savingRateRepository.findAll();
-    console.log(savingsRate);
     return savingsRate.map((savingRate) => savingRate.toDTO());
   }
 }

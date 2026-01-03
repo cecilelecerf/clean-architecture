@@ -15,9 +15,6 @@ import { TransactionRepositoryMySQL } from "@infrastructure/adapters/db/mysql/re
 import { generateFrenchIBAN } from "@infrastructure/adapters/db/seeds/utils";
 import { Color } from "@domain/values/Color";
 import { rand } from "./utils";
-import { CreditRepositoryMySQL } from "../repositories/CreditRepositoryMySQL";
-import { Percentage } from "@domain/values/Percentage";
-import { CreditEntity, CreditStatus } from "@domain/entities/CreditEntity";
 
 export async function seedSQLClient(
   mysqlClient: MySQLClient
@@ -27,7 +24,6 @@ export async function seedSQLClient(
   const userRepository = new UserRepositoryMySQL(mysqlClient);
   const accountRepository = new AccountRepositoryMySQL(mysqlClient);
   const transactionRepository = new TransactionRepositoryMySQL(mysqlClient);
-  const creditRepository = new CreditRepositoryMySQL(mysqlClient);
   const hasher = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
@@ -227,93 +223,93 @@ export async function seedSQLClient(
       //       // REFUSED (20%)
       //       status = CreditStatus.REFUSED;
       //       creditType = "refused";
-        //     createdAt = clockService.nowMinusDays(rand(15, 90));
-        //     startDate = clockService.addDays(createdAt, rand(30, 60));
-        //   } else {
-        //     // COMPLETED (20%)
-        //     status = CreditStatus.COMPLETED;
-        //     creditType = "completed";
-        //     const totalMonths = rawCredit.durationMonths;
-        //     startDate = clockService.nowMinusMonths(totalMonths + rand(1, 12));
-        //     createdAt = clockService.addDays(startDate, -rand(30, 90));
-        //   }
-        // }
+      //     createdAt = clockService.nowMinusDays(rand(15, 90));
+      //     startDate = clockService.addDays(createdAt, rand(30, 60));
+      //   } else {
+      //     // COMPLETED (20%)
+      //     status = CreditStatus.COMPLETED;
+      //     creditType = "completed";
+      //     const totalMonths = rawCredit.durationMonths;
+      //     startDate = clockService.nowMinusMonths(totalMonths + rand(1, 12));
+      //     createdAt = clockService.addDays(startDate, -rand(30, 90));
+      //   }
+      // }
 
-        // const credit = CreditEntity.create({
-        //   id: uuidService.generate(),
-        //   advisorId: null,
-        //   userId: user.id,
-        //   initialAmount: initialAmount,
-        //   interestRate: interestRate,
-        //   insuranceRate: insuranceRate,
-        //   durationMonths: rawCredit.durationMonths,
-        //   startDate: startDate,
-        //   status: status,
-        //   updatedAt:
-        //     status === CreditStatus.PENDING ? createdAt : clockService.now(),
-        //   createdAt: createdAt,
-        // });
+      // const credit = CreditEntity.create({
+      //   id: uuidService.generate(),
+      //   advisorId: null,
+      //   userId: user.id,
+      //   initialAmount: initialAmount,
+      //   interestRate: interestRate,
+      //   insuranceRate: insuranceRate,
+      //   durationMonths: rawCredit.durationMonths,
+      //   startDate: startDate,
+      //   status: status,
+      //   updatedAt:
+      //     status === CreditStatus.PENDING ? createdAt : clockService.now(),
+      //   createdAt: createdAt,
+      // });
 
-        // if (credit instanceof Error) {
-        //   console.warn(credit);
-        //   continue;
-        // }
+      // if (credit instanceof Error) {
+      //   console.warn(credit);
+      //   continue;
+      // }
 
-        // // Calculer et mettre à jour le solde restant selon le type
-        // if (creditType === "active") {
-        //   // ACCEPTED ACTIF : Calculer le solde restant réel
-        //   const monthsElapsed = Math.floor(
-        //     (clockService.now().getTime() - startDate.getTime()) /
-        //       (1000 * 60 * 60 * 24 * 30)
-        //   );
-        //   const monthsRemaining = Math.max(
-        //     0,
-        //     rawCredit.durationMonths - monthsElapsed
-        //   );
+      // // Calculer et mettre à jour le solde restant selon le type
+      // if (creditType === "active") {
+      //   // ACCEPTED ACTIF : Calculer le solde restant réel
+      //   const monthsElapsed = Math.floor(
+      //     (clockService.now().getTime() - startDate.getTime()) /
+      //       (1000 * 60 * 60 * 24 * 30)
+      //   );
+      //   const monthsRemaining = Math.max(
+      //     0,
+      //     rawCredit.durationMonths - monthsElapsed
+      //   );
 
-        //   // Solde restant = mensualités restantes
-        //   const remainingAmount = Math.max(
-        //     0,
-        //     credit.monthlyPayment.amount * monthsRemaining
-        //   );
+      //   // Solde restant = mensualités restantes
+      //   const remainingAmount = Math.max(
+      //     0,
+      //     credit.monthlyPayment.amount * monthsRemaining
+      //   );
 
-        //   const remainingBalance = Money.create({
-        //     amount: remainingAmount,
-        //     currency: credit.initialAmount.currency,
-        //   });
-        //   if (remainingBalance instanceof Error) {
-        //     console.warn(remainingBalance);
-        //     continue;
-        //   }
-        //   // Mettre à jour le remainingBalance
-        //   credit.remainingBalance = remainingBalance;
-        // } else if (creditType === "future") {
-        //   // ACCEPTED FUTUR : Le solde reste le montant total (pas encore démarré)
-        //   // credit.updateRemainingBalance(credit.initialAmount);
-        // } else if (creditType === "completed") {
-        //   // COMPLETED : Solde à 0
-        //   // credit.updateRemainingBalance(Money.create({
-        //   //   amount: 0,
-        //   //   currency: credit.initialAmount.currency
-        //   // }));
-        // }
-        // // Pour PENDING et REFUSED, le remainingBalance reste égal au montant total par défaut
-        // console.log(credit);
-        // credits.push(credit);
-        // await creditRepository.save(credit);
+      //   const remainingBalance = Money.create({
+      //     amount: remainingAmount,
+      //     currency: credit.initialAmount.currency,
+      //   });
+      //   if (remainingBalance instanceof Error) {
+      //     console.warn(remainingBalance);
+      //     continue;
+      //   }
+      //   // Mettre à jour le remainingBalance
+      //   credit.remainingBalance = remainingBalance;
+      // } else if (creditType === "future") {
+      //   // ACCEPTED FUTUR : Le solde reste le montant total (pas encore démarré)
+      //   // credit.updateRemainingBalance(credit.initialAmount);
+      // } else if (creditType === "completed") {
+      //   // COMPLETED : Solde à 0
+      //   // credit.updateRemainingBalance(Money.create({
+      //   //   amount: 0,
+      //   //   currency: credit.initialAmount.currency
+      //   // }));
+      // }
+      // // Pour PENDING et REFUSED, le remainingBalance reste égal au montant total par défaut
+      // console.log(credit);
+      // credits.push(credit);
+      // await creditRepository.save(credit);
 
-        // const startDateStr = startDate.toISOString().split("T")[0];
-        // const createdAtStr = createdAt.toISOString().split("T")[0];
-        // const typeLabel =
-        //   creditType === "active"
-        //     ? "(ACTIF)"
-        //     : creditType === "future"
-        //     ? "(FUTUR)"
-        //     : `(${creditType.toUpperCase()})`;
+      // const startDateStr = startDate.toISOString().split("T")[0];
+      // const createdAtStr = createdAt.toISOString().split("T")[0];
+      // const typeLabel =
+      //   creditType === "active"
+      //     ? "(ACTIF)"
+      //     : creditType === "future"
+      //     ? "(FUTUR)"
+      //     : `(${creditType.toUpperCase()})`;
 
-        // console.log(
-        //   `${credit.id} - Status: ${status} ${typeLabel} - Start: ${startDateStr} - Created: ${createdAtStr}`
-        // );
+      // console.log(
+      //   `${credit.id} - Status: ${status} ${typeLabel} - Start: ${startDateStr} - Created: ${createdAtStr}`
+      // );
       // }
     } catch (err) {
       console.error(`Skipping user ${raw.email} – invalid email:`, err);

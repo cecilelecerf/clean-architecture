@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credit';
 import { creditSchema } from '@infrastructure/types/credit';
-import z from 'zod';
 
 export async function GET(req: NextRequest) {
   try {
@@ -53,7 +52,7 @@ export async function POST(req: NextRequest) {
       amount: payload.initialAmount.amount,
       currency: payload.initialAmount.currency,
       durationMonths: payload.durationMonths,
-      startDate: new Date(payload.startDate),
+      startDate: payload.startDate,
     });
 
     if (result instanceof Error) {
@@ -63,15 +62,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(
-      creditSchema
-        .omit({ createdAt: true, updatedAt: true })
-        .extend({
-          createdAt: z.date(),
-          updatedAt: z.date().optional(),
-        })
-        .parse(result),
-    );
+    return NextResponse.json(creditSchema.parse(result));
   } catch (err) {
     console.error(err);
     return NextResponse.json(

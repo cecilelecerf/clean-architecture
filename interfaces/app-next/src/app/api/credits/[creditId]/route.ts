@@ -16,7 +16,6 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/credits/[cre
       creditId: creditId,
       userId: session.user.id,
     });
-    console.log(result)
 
     if (result instanceof Error) {
       return NextResponse.json(

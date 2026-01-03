@@ -152,7 +152,6 @@ export class MessageRepositoryMySQL implements MessageRepository {
       const sender: UserEntity = UserMapper.mapRowToUser(row);
       return Object.assign(message, { sender });
     });
-    console.log(result);
     return result;
   }
 }

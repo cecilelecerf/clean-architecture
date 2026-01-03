@@ -44,7 +44,7 @@ export class CreditEntity {
     public createdAt: Date,
     public updatedAt: Date,
     public advisorId?: UserEntity["id"] | null,
-    // Raison du refus ou acceptation du conseiller 
+    // Raison du refus ou acceptation du conseiller
     public reason?: string | null
   ) {}
 
@@ -61,7 +61,7 @@ export class CreditEntity {
     createdAt,
     updatedAt,
     advisorId,
-    reason
+    reason,
   }: Pick<
     CreditEntity,
     | "id"
@@ -95,32 +95,34 @@ export class CreditEntity {
     );
   }
 
-  public static create({
-    id,
-    advisorId,
-    accountId,
-    formuleCreditId,
-    initialAmount,
-    durationMonths,
-    startDate,
-    status,
-    updatedAt,
-    createdAt,
-    reason
-  }: Pick<
-    CreditEntity,
-    | "id"
-    | "advisorId"
-    | "accountId"
-    | "formuleCreditId"
-    | "initialAmount"
-    | "durationMonths"
-    | "startDate"
-    | "status"
-    | "updatedAt"
-    | "createdAt"
-    | "reason"
-  >, interestRate: Percentage, insuranceRate: Percentage):
+  public static create(
+    {
+      id,
+      advisorId,
+      accountId,
+      formuleCreditId,
+      initialAmount,
+      durationMonths,
+      startDate,
+      status,
+      createdAt,
+      reason,
+    }: Pick<
+      CreditEntity,
+      | "id"
+      | "advisorId"
+      | "accountId"
+      | "formuleCreditId"
+      | "initialAmount"
+      | "durationMonths"
+      | "startDate"
+      | "status"
+      | "createdAt"
+      | "reason"
+    >,
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | CreditEntity
     | InvalidCreditDurationError
     | MoneyCurrencyMissingError
@@ -146,12 +148,15 @@ export class CreditEntity {
       initialAmount,
       status,
       createdAt,
-      updatedAt,
+      createdAt,
       advisorId,
       reason
     );
 
-    const monthlyPayment = temp.calculateMonthlyPayment(interestRate, insuranceRate);
+    const monthlyPayment = temp.calculateMonthlyPayment(
+      interestRate,
+      insuranceRate
+    );
     if (monthlyPayment instanceof Error) return monthlyPayment;
 
     temp.monthlyPayment = monthlyPayment;
@@ -159,7 +164,10 @@ export class CreditEntity {
   }
 
   /** Calcule la mensualité */
-  public calculateMonthlyPayment(interestRate: Percentage, insuranceRate: Percentage):
+  public calculateMonthlyPayment(
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | Money
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
@@ -168,7 +176,7 @@ export class CreditEntity {
     const n = this.durationMonths;
     const r = interestRate.value / 12 / 100;
     const basePayment = (P * r) / (1 - Math.pow(1 + r, -n));
-    const insurance = ((insuranceRate.value / 100) * P) / n; 
+    const insurance = ((insuranceRate.value / 100) * P) / n;
 
     const paymentOrError = Money.create({
       amount: basePayment + insurance,
@@ -184,7 +192,10 @@ export class CreditEntity {
    * 💸 Effectue le paiement d’une mensualité.
    * Retourne soit le crédit mis à jour, soit une erreur métier.
    */
-  public payMonthly(interestRate: Percentage, insuranceRate: Percentage):
+  public payMonthly(
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | CreditEntity
     | CreditAlreadyPaidError
     | MoneyCurrencyMissingError
@@ -219,7 +230,10 @@ export class CreditEntity {
   }
 
   /** Calcule le plan d’amortissement complet */
-  public calculateAmortizationSchedule(interestRate: Percentage, insuranceRate: Percentage):
+  public calculateAmortizationSchedule(
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | MonthlySchedule[]
     | MoneyCurrencyMissingError
     | CreditAlreadyPaidError
@@ -256,7 +270,13 @@ export class CreditEntity {
     this.updatedAt = now;
   }
 
-  public accept({ now, reason  }: { now: Date, reason?: string }): void | CreditStatusMismatchError {
+  public accept({
+    now,
+    reason,
+  }: {
+    now: Date;
+    reason?: string;
+  }): void | CreditStatusMismatchError {
     if (this.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(this.status);
     }
@@ -265,7 +285,13 @@ export class CreditEntity {
     this.updatedAt = now;
   }
 
-  public refuse({ now, reason }: { now: Date, reason?: string }): void | CreditStatusMismatchError {
+  public refuse({
+    now,
+    reason,
+  }: {
+    now: Date;
+    reason?: string;
+  }): void | CreditStatusMismatchError {
     if (this.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(this.status);
     }
@@ -277,32 +303,34 @@ export class CreditEntity {
   public toDTO(): CreditDTO {
     return {
       id: this.id,
-      createdAt: this.createdAt,
+      createdAt: this.createdAt.toISOString(),
       durationMonths: this.durationMonths,
       status: this.status,
-      startDate: this.startDate,
+      startDate: this.startDate.toISOString(),
       monthlyPayment: this.monthlyPayment,
       remainingBalance: this.remainingBalance,
       initialAmount: this.initialAmount,
       accountId: this.accountId.value,
       formuleCreditId: this.formuleCreditId,
-      updatedAt: this.updatedAt,
-      advisorId : this.advisorId
+      updatedAt: this.updatedAt.toISOString(),
+      advisorId: this.advisorId,
     };
   }
 }
 
-export type CreditDTO = { accountId: string } & Pick<
+export type CreditDTO = {
+  accountId: string;
+  createdAt: string;
+  updatedAt: string;
+  startDate: string;
+} & Pick<
   CreditEntity,
   | "id"
-  | "createdAt"
   | "durationMonths"
   | "status"
-  | "startDate"
   | "monthlyPayment"
   | "remainingBalance"
   | "initialAmount"
   | "formuleCreditId"
-  | "updatedAt"
   | "advisorId"
 >;

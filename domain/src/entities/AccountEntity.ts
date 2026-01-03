@@ -14,7 +14,7 @@ import { InvalidAccountTypeError } from "@domain/errors/account/InvalidAccountTy
 import { TransactionEntity } from "./TransactionEntity";
 
 // TODO: Ajouter le RIB, CVE etc... carte? -> boolean pour savoir si le compte est lié à une carte pareil pour cheque? -> boolean
-// TODO: Ajouter le sexe de l'utilisateur 
+// TODO: Ajouter le sexe de l'utilisateur
 // TODO: Ajouter adresse de l'utilisateur
 // TODO: Ajouter numéro de téléphone de l'utilisateur
 export class AccountEntity {

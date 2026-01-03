@@ -37,12 +37,10 @@ export class GetCreditUsecase {
     const credit = await this.creditRepository.findById(creditId);
     if (!credit) return new CreditNotFoundError();
 
-    const creditUser = await this.userRepository.findByIban(credit.accountId);
-    if (!creditUser) return new UserNotFoundError();
-    
-    if (user.hasRole({ role: "client" }) && creditUser.id !== user.id)
-    return new UserRoleMismatchError(["client"], user.role);
-
+    if (user.hasRole({ role: "client" }) && credit.account.userId !== user.id)
+      return new UserRoleMismatchError(["client"], user.role);
+    console.log(credit);
+    console.log(CreditDTOMapper.mapWithAdvisor(credit));
     return CreditDTOMapper.mapWithAdvisor(credit);
   }
 }

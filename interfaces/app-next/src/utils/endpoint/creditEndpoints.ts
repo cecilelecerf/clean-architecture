@@ -20,14 +20,13 @@ import { UserId } from '@infrastructure/types/user';
 // SCHEMAS
 // ============================================================================
 
-export const requestCreditSchema = creditSchema
-  .pick({
-    accountId: true,
-    formuleCreditId: true,
-    durationMonths: true,
-    startDate: true,
-    initialAmount: true
-  })
+export const requestCreditSchema = creditSchema.pick({
+  accountId: true,
+  formuleCreditId: true,
+  durationMonths: true,
+  startDate: true,
+  initialAmount: true,
+});
 export type RequestCredit = z.infer<typeof requestCreditSchema>;
 
 // ============================================================================
@@ -47,12 +46,14 @@ export const creditsEndpoint = createEndpointsNodes({
     }),
 
   // GET /api/credits/:creditId
-  // Détails d'un compte
+  // Détails d'un crédit
   get: ({ creditId }: { creditId: CreditId }) =>
     queryOptions({
       queryKey: ['credits', creditId],
       queryFn: () =>
-        get(`/credits/${creditId}`).then((data) => safeParseWithLog(creditDTOWithFormuleAndAdvisorSchema, data)),
+        get(`/credits/${creditId}`).then((data) =>
+          safeParseWithLog(creditDTOWithFormuleAndAdvisorSchema, data),
+        ),
     }),
 
   // GET /api/credits/:creditId/details
@@ -61,11 +62,13 @@ export const creditsEndpoint = createEndpointsNodes({
     queryOptions({
       queryKey: ['credits', creditId],
       queryFn: () =>
-        get(`/credits/${creditId}/details`).then((data) => safeParseWithLog(creditDTOWithFormuleAndAccountSchema, data)),
+        get(`/credits/${creditId}/details`).then((data) =>
+          safeParseWithLog(creditDTOWithFormuleAndAccountSchema, data),
+        ),
     }),
-  
+
   // GET /api/credits/pending
-  // Liste des crédits des clients en cours de traitement 
+  // Liste des crédits des clients en cours de traitement
   getAllPending: () =>
     queryOptions({
       queryKey: ['credits', 'list'],

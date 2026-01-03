@@ -8,7 +8,11 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { CreditDTO, CreditEntity, CreditStatus } from "@domain/entities/CreditEntity";
+import {
+  CreditDTO,
+  CreditEntity,
+  CreditStatus,
+} from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import {
   MoneyAmountInvalidError,
@@ -24,7 +28,12 @@ import { FormuleCreditEntity } from "@domain/entities/FormuleCreditEntity";
 import { FormuleCreditRepository } from "@application/ports/repositories/FormuleCreditRepository";
 import { FormuleCreditNotFoundError } from "@application/errors/formules-credit";
 import { IBAN } from "@domain/values/IBAN";
-import { IBANInvalidCheckDigitsError, IBANInvalidFormatError, IBANTooLongError, IBANTooShortError } from "@domain/errors/IBAN";
+import {
+  IBANInvalidCheckDigitsError,
+  IBANInvalidFormatError,
+  IBANTooLongError,
+  IBANTooShortError,
+} from "@domain/errors/IBAN";
 
 type Props = {
   clientId: UserEntity["id"];
@@ -32,7 +41,7 @@ type Props = {
   formuleCreditId: FormuleCreditEntity["id"];
   amount: number;
   currency: string;
-  startDate: Date;
+  startDate: string;
 } & Pick<CreditEntity, "durationMonths">;
 
 export class RequestCreditUsecase {
@@ -52,7 +61,7 @@ export class RequestCreditUsecase {
     amount,
     currency,
     durationMonths,
-    startDate,
+    startDate: startDateStr,
   }: Props): Promise<
     | CreditDTO
     | UserNotFoundError
@@ -65,9 +74,9 @@ export class RequestCreditUsecase {
     | InvalidCreditDurationError
     | AccountNotFoundError
     | FormuleCreditNotFoundError
-    | IBANTooShortError 
-    | IBANTooLongError 
-    | IBANInvalidFormatError 
+    | IBANTooShortError
+    | IBANTooLongError
+    | IBANInvalidFormatError
     | IBANInvalidCheckDigitsError
   > {
     const client = await findActiveUser(this.userRepository, clientId);
@@ -81,13 +90,18 @@ export class RequestCreditUsecase {
     const existingAccount = await this.accountRepository.findByIBAN(iban);
     if (!existingAccount) return new AccountNotFoundError();
 
-    const formuleCredit = await this.formuleRepository.findById(formuleCreditId);
+    const formuleCredit = await this.formuleRepository.findById(
+      formuleCreditId
+    );
     if (!formuleCredit) return new FormuleCreditNotFoundError();
 
     const initialAmountVO = Money.create({ amount: amount, currency });
     if (initialAmountVO instanceof Error) return initialAmountVO;
 
-    const credit = CreditEntity.create({
+    const startDate = new Date(startDateStr);
+
+    const credit = CreditEntity.create(
+      {
         id: this.uuidService.generate(),
         advisorId: null,
         accountId: iban,
@@ -96,7 +110,6 @@ export class RequestCreditUsecase {
         durationMonths,
         startDate,
         status: CreditStatus.PENDING,
-        updatedAt: this.clockService.now(),
         createdAt: this.clockService.now(),
         reason: null,
       },
@@ -107,7 +120,7 @@ export class RequestCreditUsecase {
     if (credit instanceof Error) return credit;
 
     await this.creditRepository.save(credit);
-    
+
     return credit.toDTO();
   }
 }

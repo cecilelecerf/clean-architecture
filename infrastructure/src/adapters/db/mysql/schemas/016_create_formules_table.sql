@@ -8,10 +8,10 @@ CREATE TABLE IF NOT EXISTS formules (
     is_active TINYINT(1) NOT NULL DEFAULT 1,
     account_id VARCHAR(34) NOT NULL,
     created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     min_amount INT NULL DEFAULT 0,
     max_amount INT NULL DEFAULT 0,
     currency CHAR(3) NULL,
-    updated_at DATETIME NULL,
 
     FOREIGN KEY (account_id) REFERENCES accounts(iban) ON DELETE CASCADE
 )

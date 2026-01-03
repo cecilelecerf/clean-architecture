@@ -1,5 +1,10 @@
-import { formuleDTOSchema, FormuleId, formuleSchema, formuleTypesSchema } from "@infrastructure/types/formule";
-import z from "zod";
+import {
+  formuleDTOSchema,
+  FormuleId,
+  formuleSchema,
+  formuleTypesSchema,
+} from '@infrastructure/types/formule';
+import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { get, patch, post } from '@/lib/apiClient';
@@ -19,7 +24,7 @@ export const newFormuleSchema = formuleSchema.pick({
   accountId: true,
   minAmount: true,
   maxAmount: true,
-  currency: true
+  currency: true,
 });
 export type NewFormule = z.infer<typeof newFormuleSchema>;
 
@@ -42,56 +47,56 @@ export type UpdateFormule = z.infer<typeof updateFormuleSchema>;
 // ============================================================================
 
 export const formuleEndpoint = createEndpointsNodes({
-    get: ({ formuleId }: { formuleId: FormuleId }) =>
-        queryOptions({
-          queryKey: ['formules', formuleId],
-          queryFn: () => get(`/formules/${formuleId}`).then((data) => formuleDTOSchema.parse(data)),
-        }),
+  get: ({ formuleId }: { formuleId: FormuleId }) =>
+    queryOptions({
+      queryKey: ['formules', formuleId],
+      queryFn: () => get(`/formules/${formuleId}`).then((data) => formuleDTOSchema.parse(data)),
+    }),
 
-    getAll: () =>
-        queryOptions({
-        queryKey: ['formules', 'list'],
-        queryFn: () =>
-            get(`/formules`).then((data) => safeParseWithLog(formuleDTOSchema.array(), data)),
-        }),
+  getAll: () =>
+    queryOptions({
+      queryKey: ['formules', 'list'],
+      queryFn: () =>
+        get(`/formules`).then((data) => safeParseWithLog(formuleDTOSchema.array(), data)),
+    }),
 
-    getAllActive: () =>
-        queryOptions({
-        queryKey: ['formules', 'list'],
-        queryFn: () =>
-            get(`/formules/active`).then((data) => safeParseWithLog(formuleDTOSchema.array(), data)),
-        }),
-    
-    getTypes: () =>
-        queryOptions({
-        queryKey: ['formules', 'list'],
-        queryFn: async () => {
-            const data = await get(`/formules/type`);
-            const parsed = safeParseWithLog(formuleTypesSchema.array(), data);
-            return parsed || [];
-        }
-        }),
-    
-    // POST /api/formules
-    // Créer un nouveau taux d'interet
-    create: () =>
-        mutationOptions({
-          mutationFn: async (payload: NewFormule) => {
-            const data = await post('/formules', payload);
-            return formuleSchema.parse(data);
-          },
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['formules', 'list'] });
-          },
-        }),
-    
-    // PATCH /api/formules/:formuleId
-    update: ({ formuleId }: { formuleId: FormuleId }) =>
-        mutationOptions({
-          mutationFn: (payload: UpdateFormule) => patch(`/formules/${formuleId}`, payload),
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['formules', formuleId] });
-            queryClient.invalidateQueries({ queryKey: ['formules', 'list'] });
-          },
-        }),
-})
+  getAllActive: () =>
+    queryOptions({
+      queryKey: ['formules', 'list', 'active'],
+      queryFn: () =>
+        get(`/formules/active`).then((data) => safeParseWithLog(formuleDTOSchema.array(), data)),
+    }),
+
+  getTypes: () =>
+    queryOptions({
+      queryKey: ['formules', 'list'],
+      queryFn: async () => {
+        const data = await get(`/formules/type`);
+        const parsed = safeParseWithLog(formuleTypesSchema.array(), data);
+        return parsed || [];
+      },
+    }),
+
+  // POST /api/formules
+  // Créer un nouveau taux d'interet
+  create: () =>
+    mutationOptions({
+      mutationFn: async (payload: NewFormule) => {
+        const data = await post('/formules', payload);
+        return formuleSchema.parse(data);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['formules', 'list'] });
+      },
+    }),
+
+  // PATCH /api/formules/:formuleId
+  update: ({ formuleId }: { formuleId: FormuleId }) =>
+    mutationOptions({
+      mutationFn: (payload: UpdateFormule) => patch(`/formules/${formuleId}`, payload),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['formules', formuleId] });
+        queryClient.invalidateQueries({ queryKey: ['formules', 'list'] });
+      },
+    }),
+});

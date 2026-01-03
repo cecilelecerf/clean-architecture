@@ -18,15 +18,17 @@ type Props = {
 export class GetCreditsByClientUsecase {
   constructor(
     private readonly creditRepository: CreditRepository,
-    private readonly userRepository: UserRepository,
-    private readonly accountRepository: AccountRepository
+    private readonly userRepository: UserRepository
   ) {}
 
   public async execute({
     clientId,
     adminId,
   }: Props): Promise<
-    CreditDTOMapper[] | UserNotFoundError | UserNotActiveError | UserRoleMismatchError
+    | CreditDTOMapper[]
+    | UserNotFoundError
+    | UserNotActiveError
+    | UserRoleMismatchError
   > {
     const client = await findActiveUser(this.userRepository, clientId);
     if (client instanceof Error) return client;
@@ -42,14 +44,11 @@ export class GetCreditsByClientUsecase {
         );
     }
 
-    const accounts = await this.accountRepository.findByUserId(clientId);
+    const credits = await this.creditRepository.findAllByUserId(client.id);
+    const creditsMapper = credits.map((credit) =>
+      CreditDTOMapper.mapWthFormule(credit)
+    );
 
-    const allCredits: CreditDTOMapper[] = [];
-    for (const account of accounts) {
-      const credits = await this.creditRepository.findAllByAccountIban(account.iban);
-      allCredits.push(...credits.map(c => CreditDTOMapper.mapWthFormule(c)));
-    }
-
-    return allCredits;
+    return creditsMapper;
   }
 }

@@ -1,9 +1,12 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
-import { CreditEntityWithFormule, CreditEntityWithFormuleAndAccount, CreditEntityWithFormuleAndAdvisor, CreditRepository } from "@application/ports/repositories/CreditRepository";
+import {
+  CreditEntityWithFormule,
+  CreditEntityWithFormuleAndAccount,
+  CreditEntityWithFormuleAndAdvisor,
+  CreditRepository,
+} from "@application/ports/repositories/CreditRepository";
 import { CreditEntity } from "@domain/entities/CreditEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
-import { Money } from "@domain/values/Money";
-import { AccountEntity } from "@domain/entities/AccountEntity";
 import { AccountMapper } from "../../mappers/AccountMapper";
 import { UserMapper } from "../../mappers/UserMapper";
 import { FormuleMapper } from "../../mappers/FormuleMapper";
@@ -11,12 +14,15 @@ import { CreditMapper } from "../../mappers/CreditMapper";
 import { AccountEntityWithUser } from "@application/ports/repositories/AccountRepository";
 import { IBAN } from "@domain/values/IBAN";
 import { TransactionMapper } from "../../mappers/TransactionMapper";
+import { UserEntity } from "@domain/entities/UserEntity";
 
 export class CreditRepositoryMySQL implements CreditRepository {
   constructor(private readonly client: MySQLClient) {}
 
   /** Trouver un crédit par ID */
-  async findById(id: CreditEntity["id"]): Promise<CreditEntityWithFormuleAndAdvisor | null> {
+  async findById(
+    id: CreditEntity["id"]
+  ): Promise<CreditEntityWithFormuleAndAdvisor | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
         c.*,
@@ -54,6 +60,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
         a.currency as account_currency,
         a.created_at as account_created_at,
         a.updated_at as account_updated_at,
+        a.user_id as account_user_id,
 
         t.id as transaction_id,
         t.label as transaction_label,
@@ -79,26 +86,29 @@ export class CreditRepositoryMySQL implements CreditRepository {
     if (rows.length === 0) return null;
 
     const row = rows[0];
-
     const credit = CreditMapper.mapRowToCredit(row);
 
-    const formule = row.form_id ? FormuleMapper.mapRowToFormule(row, "form_") : null;
+    const formule = FormuleMapper.mapRowToFormule(row, "form_");
 
     const advisor = row.user_id ? UserMapper.mapRowToUser(row, "user_") : null;
 
-    const account = row.account_iban ? AccountMapper.mapRowToAccount(row, "account_"): null;
-
+    const account = AccountMapper.mapRowToAccount(row, "account_");
     const transactions = rows
-      .filter(row => row.transaction_id !== null)
-      .map(row =>
-        TransactionMapper.mapRowToTransaction(row, "transaction_")
-      );
+      .filter((row) => row.transaction_id !== null)
+      .map((row) => TransactionMapper.mapRowToTransaction(row, "transaction_"));
 
-    return Object.assign(credit, { advisor, account, formule, transactions }) as CreditEntityWithFormuleAndAdvisor;
+    return Object.assign(credit, {
+      advisor,
+      account,
+      formule,
+      transactions,
+    }) as CreditEntityWithFormuleAndAdvisor;
   }
 
   /** Trouver un crédit par ID avec les détails du comptes, de l'utilisateur du compte ainsi que de la formule du crédit*/
-  async findByIdWithDetails(id: CreditEntity["id"]): Promise<CreditEntityWithFormuleAndAccount | null> {
+  async findByIdWithDetails(
+    id: CreditEntity["id"]
+  ): Promise<CreditEntityWithFormuleAndAccount | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
         c.*,
@@ -159,13 +169,20 @@ export class CreditRepositoryMySQL implements CreditRepository {
       account = baseAccount as AccountEntityWithUser;
     }
 
-    const formule = row.form_id ? FormuleMapper.mapRowToFormule(row, "form_") : null;
+    const formule = row.form_id
+      ? FormuleMapper.mapRowToFormule(row, "form_")
+      : null;
 
-    return Object.assign(credit, { account, formule }) as CreditEntityWithFormuleAndAccount;
+    return Object.assign(credit, {
+      account,
+      formule,
+    }) as CreditEntityWithFormuleAndAccount;
   }
 
   /** Tous les crédits d'un compte */
-  async findAllByAccountIban(accountId: IBAN): Promise<CreditEntityWithFormule[]> {
+  async findAllByAccountIban(
+    accountId: IBAN
+  ): Promise<CreditEntityWithFormule[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
         c.*,
@@ -191,7 +208,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
 
     return rows.map((row: RowDataPacket) => {
       const credit = CreditMapper.mapRowToCredit(row);
-      const formule = row.form_id ? FormuleMapper.mapRowToFormule(row, "form_") : null;
+      const formule = FormuleMapper.mapRowToFormule(row, "form_");
       return Object.assign(credit, { formule });
     });
   }
@@ -225,7 +242,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
 
     return rows.map((row: RowDataPacket) => {
       const credit = CreditMapper.mapRowToCredit(row);
-      const formule = row.form_id ? FormuleMapper.mapRowToFormule(row, "form_") : null;
+      const formule = FormuleMapper.mapRowToFormule(row, "form_");
       return Object.assign(credit, { formule });
     });
   }
@@ -257,14 +274,13 @@ export class CreditRepositoryMySQL implements CreditRepository {
 
     return rows.map((row) => {
       const credit = CreditMapper.mapRowToCredit(row);
-      const formule = row.form_id ? FormuleMapper.mapRowToFormule(row, "form_") : null;
+      const formule = FormuleMapper.mapRowToFormule(row, "form_");
       return Object.assign(credit, { formule });
     });
   }
 
   /** Sauvegarder un crédit */
   async save(credit: CreditEntity): Promise<void> {
-    console.log(credit.status);
     await this.client.query<ResultSetHeader>(
       `INSERT INTO credits 
         (id, account_id, formule_id, initial_amount, initial_currency, 
@@ -287,7 +303,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
         credit.createdAt,
         credit.advisorId,
         credit.updatedAt,
-        credit.reason ?? null
+        credit.reason ?? null,
       ]
     );
   }
@@ -326,5 +342,39 @@ export class CreditRepositoryMySQL implements CreditRepository {
       "DELETE FROM credits WHERE id = ?",
       [id]
     );
+  }
+
+  async findAllByUserId(
+    userId: UserEntity["id"]
+  ): Promise<CreditEntityWithFormule[]> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+      c.*,
+      f.id as form_id,
+      f.interest_rate as form_interest_rate,
+      f.insurance_rate as form_insurance_rate,
+      f.type as form_type,
+      f.label as form_label,
+      f.description as form_description,
+      f.is_active as form_is_active,
+      f.account_id as form_account_id,
+      f.created_at as form_created_at,
+      f.min_amount as form_min_amount,
+      f.max_amount as form_max_amount,
+      f.currency as form_currency,
+      f.updated_at as form_updated_at
+    FROM credits c
+    LEFT JOIN formules f ON c.formule_id = f.id
+    INNER JOIN accounts a ON c.account_id = a.iban
+    WHERE a.user_id = ?
+    ORDER BY c.start_date DESC`,
+      [userId]
+    );
+
+    return rows.map((row: RowDataPacket) => {
+      const credit = CreditMapper.mapRowToCredit(row);
+      const formule = FormuleMapper.mapRowToFormule(row, "form_");
+      return Object.assign(credit, { formule });
+    });
   }
 }

@@ -1,7 +1,11 @@
 import z from "zod";
 import { userDtoSchema, userIdSchema } from "./user";
 import { moneySchema } from "./money";
-import { accountDTOSchema, accountIdSchema, accountWithUserSchemaDTO } from "./account";
+import {
+  accountDTOSchema,
+  accountIdSchema,
+  accountWithUserSchemaDTO,
+} from "./account";
 import { formuleDTOSchema, formuleIdSchema } from "./formule";
 import { transactionDTOWithIbanSchema } from "./transaction";
 
@@ -21,12 +25,12 @@ export const creditSchema = z.object({
   createdAt: z.iso.datetime(),
   advisorId: userIdSchema.nullable().optional(),
   updatedAt: z.iso.datetime(),
-  reason: z.string().optional()
+  reason: z.string().optional(),
 });
 
 export const creditResponseSchema = z.object({
   accept: z.boolean(),
-  reason: z.string().nullable().optional()
+  reason: z.string().nullable().optional(),
 });
 export type CreditResponse = z.infer<typeof creditResponseSchema>;
 
@@ -43,26 +47,30 @@ export const creditDTOSchema = creditSchema.pick({
   advisorId: true,
   accountId: true,
   formuleCreditId: true,
-  reason: true
+  reason: true,
 });
 
 export type CreditDTO = z.infer<typeof creditDTOSchema>;
 
 export const creditDTOWithFormuleAndAccountSchema = creditDTOSchema.extend({
   account: accountWithUserSchemaDTO,
-  formule: formuleDTOSchema
+  formule: formuleDTOSchema,
 });
-export type CreditDTOWithFormuleAndAccount = z.infer<typeof creditDTOWithFormuleAndAccountSchema>;
+export type CreditDTOWithFormuleAndAccount = z.infer<
+  typeof creditDTOWithFormuleAndAccountSchema
+>;
 
 export const creditDTOWithFormuleSchema = creditDTOSchema.extend({
-  formule: formuleDTOSchema
+  formule: formuleDTOSchema,
 });
 export type CreditDTOWithFormule = z.infer<typeof creditDTOWithFormuleSchema>;
 
 export const creditDTOWithFormuleAndAdvisorSchema = creditDTOSchema.extend({
-  advisor: userDtoSchema,
+  advisor: userDtoSchema.nullable(),
   formule: formuleDTOSchema,
   account: accountDTOSchema,
-  transactions: z.array(transactionDTOWithIbanSchema)
+  transactions: z.array(transactionDTOWithIbanSchema),
 });
-export type CreditDTOWithFormuleAndAdvisor = z.infer<typeof creditDTOWithFormuleAndAdvisorSchema>;
+export type CreditDTOWithFormuleAndAdvisor = z.infer<
+  typeof creditDTOWithFormuleAndAdvisorSchema
+>;
