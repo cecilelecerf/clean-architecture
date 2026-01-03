@@ -1,22 +1,7 @@
-import { EmailTemplateService } from "@application/ports/services/EmailTemplateService";
-export type EmailTemplateData = {
-  confirmationEmail: {
-    firstname: string;
-    confirmationLink: string;
-  };
-  passwordReset: {
-    firstname: string;
-    resetLink: string;
-  };
-  welcomeEmail: {
-    firstname: string;
-    loginLink: string;
-  };
-  accountActivated: {
-    firstname: string;
-    loginLink: string;
-  };
-};
+import {
+  EmailTemplateData,
+  EmailTemplateService,
+} from "@application/ports/services/EmailTemplateService";
 
 export class NodeEmailTemplateService implements EmailTemplateService {
   private readonly baseStyles = `
@@ -238,6 +223,76 @@ export class NodeEmailTemplateService implements EmailTemplateService {
       <div class="footer">
         <p><strong>Banking App</strong></p>
         <p>Merci de votre confiance !</p>
+        <p style="margin-top: 15px; font-size: 12px;">
+          © ${new Date().getFullYear()} Banking App. Tous droits réservés.
+        </p>
+      </div>
+    `;
+
+    return this.getBaseTemplate(content);
+  }
+  welcomeAdminEmail({
+    firstname,
+    lastname,
+    confirmationLink,
+    email,
+    temporaryPassword,
+  }: EmailTemplateData["welcomeAdminEmail"]): string {
+    const content = `
+          <div class="header">
+        <h1>🎉 Bienvenue dans l'équipe !</h1>
+      </div>
+      
+      <div class="content">
+        <h2>Bonjour ${firstname} ${lastname},</h2>
+        
+        <p>Votre compte conseiller a été créé avec succès sur Banking App. Pour commencer à utiliser la plateforme, vous devez d'abord activer votre compte.</p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${confirmationLink}" class="button">
+            ✅ Activer mon compte
+          </a>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <h3 style="color: #667eea;">🔐 Vos identifiants de connexion</h3>
+        
+        <div class="info-box" style="background-color: #f8f9ff; border-left: 4px solid #667eea;">
+          <p style="margin: 0 0 10px 0;"><strong>Email :</strong></p>
+          <p style="margin: 0 0 20px 0; font-family: 'Courier New', monospace; color: #2d3748;">${email}</p>
+          
+          <p style="margin: 0 0 10px 0;"><strong>Mot de passe temporaire :</strong></p>
+          <p style="margin: 0; font-family: 'Courier New', monospace; background-color: #fff; padding: 12px; border-radius: 6px; color: #667eea; font-size: 16px; font-weight: bold; letter-spacing: 1px;">${temporaryPassword}</p>
+        </div>
+        
+        <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 6px; margin: 25px 0;">
+          <p style="margin: 0; color: #856404;">
+            ⚠️ <strong>Important :</strong> Pour des raisons de sécurité, vous devrez changer ce mot de passe lors de votre première connexion.
+          </p>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <h3 style="color: #667eea;">🚀 Prochaines étapes</h3>
+        <ul style="line-height: 2;">
+          <li>Cliquez sur le bouton ci-dessus pour activer votre compte</li>
+          <li>Connectez-vous avec vos identifiants</li>
+          <li>Changez votre mot de passe temporaire</li>
+          <li>Complétez votre profil</li>
+          <li>Découvrez votre espace conseiller</li>
+        </ul>
+        
+        <div class="info-box">
+          💡 <strong>Besoin d'aide ?</strong><br>
+          Notre équipe support est disponible du lundi au vendredi de 9h à 18h.<br>
+          Le lien d'activation expire dans 24 heures.
+        </div>
+      </div>
+      
+      <div class="footer">
+        <p><strong>Banking App</strong></p>
+        <p>Votre espace conseiller vous attend !</p>
         <p style="margin-top: 15px; font-size: 12px;">
           © ${new Date().getFullYear()} Banking App. Tous droits réservés.
         </p>

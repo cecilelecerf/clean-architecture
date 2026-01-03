@@ -3,11 +3,9 @@ import {
   EmailService,
   SendEmailOptions,
 } from "@application/ports/services/EmailService";
-import {
-  EmailTemplateData,
-  NodeEmailTemplateService,
-} from "./NodeEmailTemplateService";
+import { NodeEmailTemplateService } from "./NodeEmailTemplateService";
 import { Email } from "@domain/values/Email";
+import { EmailTemplateData } from "@application/ports/services/EmailTemplateService";
 
 export class NodeEmailService implements EmailService {
   private transporter: nodemailer.Transporter;
@@ -51,7 +49,6 @@ export class NodeEmailService implements EmailService {
     }
   }
 
-  // Méthodes spécifiques pour chaque type d'email avec templates
   async sendConfirmationEmail(
     to: Email,
     data: EmailTemplateData["confirmationEmail"]
@@ -82,6 +79,16 @@ export class NodeEmailService implements EmailService {
       to,
       subject: "✨ Bienvenue sur Banking App !",
       text: this.templateService.welcomeEmail(data),
+    });
+  }
+  async sendAdminWelcomeEmail(
+    to: Email,
+    data: EmailTemplateData["welcomeAdminEmail"]
+  ): Promise<void> {
+    await this.sendEmail({
+      to,
+      subject: "✨ Bienvenue sur Banking App !",
+      text: this.templateService.welcomeAdminEmail({ ...data }),
     });
   }
 

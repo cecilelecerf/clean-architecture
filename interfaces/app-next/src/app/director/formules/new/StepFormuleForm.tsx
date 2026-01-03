@@ -3,22 +3,22 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 
 type FormuleFormData = {
-  interestRate: string;
-  insuranceRate: string;
-  type: string;
-  label: string;
-  description: string;
-  minAmount?: string;
-  maxAmount?: string;
-  currency: string;
+    interestRate: string;
+    insuranceRate: string;
+    type: string;
+    label: string;
+    description: string;
+    minAmount?: string;
+    maxAmount?: string;
+    currency: string;
 };
 
-export const StepFormuleForm = ({data, setData, onSubmit, loading}: {data: FormuleFormData, setData: (data: Partial<FormuleFormData>) => void, onSubmit: () => void, loading: boolean}) => {
+export const StepFormuleForm = ({ data, setData, onSubmit, loading }: { data: FormuleFormData, setData: (data: Partial<FormuleFormData>) => void, onSubmit: () => void, loading: boolean }) => {
     const query = useQuery(endpoints.formules.getTypes());
-    
+
     const typeOptions = (query.data || []).map((t) => ({
-        label: t.type,
-        value: t.type,
+        label: t.label,
+        value: t.value,
     }));
 
     const fields: TField[] = [
@@ -44,8 +44,8 @@ export const StepFormuleForm = ({data, setData, onSubmit, loading}: {data: Formu
         },
         {
             label: "Type de prêt",
-            type: "creatable-select",
-            placeholder: "Sélectionnez ou créez un type",
+            type: "select",
+            placeholder: "Sélectionnez un type",
             get: data.type,
             set: (value) => setData({ type: value as string }),
             options: typeOptions,
@@ -67,7 +67,7 @@ export const StepFormuleForm = ({data, setData, onSubmit, loading}: {data: Formu
             label: 'Montant minimum',
             type: 'number',
             get: data.minAmount.toString(),
-            set: (e) => setData({ minAmount: e === '' ? undefined : e as string}),
+            set: (e) => setData({ minAmount: e === '' ? undefined : e as string }),
             numberOptions: {
                 min: 0,
                 step: 1,
@@ -77,7 +77,7 @@ export const StepFormuleForm = ({data, setData, onSubmit, loading}: {data: Formu
             label: 'Montant maximum',
             type: 'number',
             get: data.maxAmount.toString(),
-            set: (e) => setData({ maxAmount: e === '' ? undefined : e as string}),
+            set: (e) => setData({ maxAmount: e === '' ? undefined : e as string }),
             numberOptions: {
                 min: 0,
                 step: 1,
@@ -100,10 +100,10 @@ export const StepFormuleForm = ({data, setData, onSubmit, loading}: {data: Formu
 
     return (
         <form
-        onSubmit={(e) => {
-            e.preventDefault();
-            onSubmit();
-        }}>
+            onSubmit={(e) => {
+                e.preventDefault();
+                onSubmit();
+            }}>
             <FormWrapper
                 title="Nouveau prêt"
                 description="Créer une formule d'un prêt"

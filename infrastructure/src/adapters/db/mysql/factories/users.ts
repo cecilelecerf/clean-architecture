@@ -13,7 +13,7 @@ import { ConfirmRegistrationUsecase } from "@application/usecases/users/ConfirmR
 import { GetUsersByRoleUseCase } from "@application/usecases/users/GetUsersByRoleUseCase";
 import { GetUserUsercase } from "@application/usecases/users/GetUserUsercase";
 import { ResetPasswordUsecase } from "@application/usecases/users/ResetPasswordUsecase";
-import { RegisterAdvisorUsecase } from "@application/usecases/users/RegisterAdvisorUsecase";
+import { RegisterAdminUsecase } from "@application/usecases/users/RegisterAdminUsecase";
 import { NodePasswordGenerateService } from "@infrastructure/adapters/services/NodePasswordGenerateService";
 import { BanUserUsecase } from "@application/usecases/users/BanUserUsecase";
 import { UnbanUserUsecase } from "@application/usecases/users/UnBanUserUsecase";
@@ -62,7 +62,7 @@ export const usersFactory = () => {
   const banUser = new BanUserUsecase(userRepository, clockService);
   const getUsersByRole = new GetUsersByRoleUseCase(userRepository);
   const getUser = new GetUserUsercase(userRepository);
-  const createUser = new RegisterAdvisorUsecase(
+  const createUser = new RegisterAdminUsecase(
     userRepository,
     encryptionService,
     uuidSerivce,

@@ -104,7 +104,6 @@ export class UpdateFormuleCreditUseCase {
     }
 
     let interestRateVO: Percentage | undefined;
-
     if (interestRate !== undefined) {
       if (interestRate < 0) return new NegativeInterestRateError();
 
@@ -115,6 +114,7 @@ export class UpdateFormuleCreditUseCase {
     }
 
     let insuranceRateVO: Percentage | undefined;
+    console.log(interestRateVO, insuranceRateVO);
 
     if (insuranceRate !== undefined) {
       if (insuranceRate < 0) return new NegativeInterestRateError();
@@ -160,6 +160,7 @@ export class UpdateFormuleCreditUseCase {
       maxAmount: maxAmountVO,
       accountId: account?.iban,
       currency: currency,
+
       now: this.clockService.now(),
     });
 

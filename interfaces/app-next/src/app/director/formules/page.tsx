@@ -37,7 +37,7 @@ export default function FormulesPage() {
             {match(queries)
                 .when(
                     (queries) => queries.some((q) => q.status === "error"),
-                    (queries) => "errors"
+                    () => "errors"
                 )
                 .when(
                     (queries) => queries.every((q) => q.status === "success"),

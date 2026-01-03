@@ -143,8 +143,9 @@ export class FormuleCreditEntity {
       if (formuleType instanceof Error) return formuleType;
       this.type = formuleType;
     }
+
     if (isActive !== undefined) {
-      isActive ? this.enable({ now }) : this.disable({ now });
+      this.isActive = isActive;
     }
     if (label) this.label = label;
     if (description) this.description = description;
