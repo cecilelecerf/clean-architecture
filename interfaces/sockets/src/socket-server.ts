@@ -33,7 +33,6 @@ io.on("connection", (socket) => {
   );
 
   socket.on("post:update", ({ post }: { post: PostWithTagsAndUser }) => {
-    console.log(post);
     console.log(`post:${post.id}:update`);
     io.emit(`post:${post.id}:update`, post);
   });

@@ -17,7 +17,6 @@ type Props = {
     baseHref: string
 }
 export const GetAllTransactions = ({ accountIban, filters, onPaginationChange, hiddePagination, baseHref }: Props) => {
-    console.log(filters)
     const query = useQuery(endpoints.accounts.transactions.getAll({ accountIban, filters }))
     return match(query)
         .with({ status: "pending" }, () => <TransactionsSkeleton />)

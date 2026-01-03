@@ -56,7 +56,6 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/posts/[pos
         { status: result.statusCode ?? 400 },
       );
     }
-    console.log(result);
     return NextResponse.json(postWithTagsSchema.parse(result));
   } catch (err) {
     console.error(err);

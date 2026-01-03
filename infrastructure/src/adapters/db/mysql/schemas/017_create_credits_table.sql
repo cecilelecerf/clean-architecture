@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS credits (
     status ENUM("PENDING", "ACCEPTED", "REFUSED", "COMPLETED") NOT NULL,
     created_at DATETIME NOT NULL,
     advisor_id VARCHAR(36) NULL,
-    updated_at DATETIME NULL,
+    updated_at DATETIME NOT NULL,
     reason VARCHAR(255) NULL,
 
     FOREIGN KEY (account_id) REFERENCES accounts(iban) ON DELETE CASCADE,

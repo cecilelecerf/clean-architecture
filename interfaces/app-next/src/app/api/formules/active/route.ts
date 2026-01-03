@@ -17,7 +17,6 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/formules/act
         { status: result.statusCode ?? 404 },
       );
     }
-    console.log(result);
     return NextResponse.json(result);
   } catch (err) {
     console.error(err);

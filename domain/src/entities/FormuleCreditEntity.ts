@@ -1,3 +1,4 @@
+import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 import { Percentage } from "@domain/values/Percentage";
 
@@ -10,7 +11,7 @@ export class FormuleCreditEntity {
     public label: string,
     public description: string,
     public isActive: boolean,
-    public accountId: string,
+    public accountId: IBAN,
     public createdAt: Date,
     public updatedAt: Date,
     public minAmount?: Money,
@@ -127,7 +128,7 @@ export class FormuleCreditEntity {
     isActive?: boolean;
     label?: string;
     description?: string;
-    accountId?: string;
+    accountId?: IBAN;
     minAmount?: Money;
     maxAmount?: Money;
     currency?: string;
@@ -169,7 +170,7 @@ export class FormuleCreditEntity {
       label: this.label,
       description: this.description,
       isActive: this.isActive,
-      accountId: this.accountId,
+      accountId: this.accountId.value,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
       minAmount: this.minAmount?.amount,
@@ -189,4 +190,5 @@ export type FormuleCreditDTO = {
   currency?: string;
   createdAt: string;
   updatedAt: string;
-} & Pick<FormuleCreditEntity, "id" | "type" | "isActive" | "accountId">;
+  accountId: string;
+} & Pick<FormuleCreditEntity, "id" | "type" | "isActive">;

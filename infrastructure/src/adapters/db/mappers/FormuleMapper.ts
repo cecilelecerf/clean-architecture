@@ -1,4 +1,5 @@
 import { FormuleCreditEntity } from "@domain/entities/FormuleCreditEntity";
+import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 import { Percentage } from "@domain/values/Percentage";
 import { RowDataPacket } from "mysql2";
@@ -31,6 +32,8 @@ export class FormuleMapper {
           })
         : undefined;
 
+    const iban = IBAN.from(row[`${prefix}account_id`]);
+
     return FormuleCreditEntity.from({
       id: row[`${prefix}id`],
       interestRate,
@@ -39,7 +42,7 @@ export class FormuleMapper {
       label: row[`${prefix}label`],
       description: row[`${prefix}description`],
       isActive: row[`${prefix}is_active`] === 1,
-      accountId: row[`${prefix}account_id`],
+      accountId: iban,
       createdAt: row[`${prefix}created_at`],
       minAmount,
       maxAmount,

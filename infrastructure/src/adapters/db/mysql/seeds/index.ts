@@ -29,11 +29,12 @@ import { SeedSavingsRateUseCase } from "@application/usecases/seeds/SeedSavingsR
 import { SeedOrderUseCase } from "@application/usecases/seeds/SeedOrderUseCase";
 import { SeedNotificationUseCase } from "@application/usecases/seeds/SeedNotificationUseCase";
 import { SeedBankAccountUseCase } from "@application/usecases/seeds/SeedBankAccountUseCase";
+import { SeedFormuleCreditUseCase } from "@application/usecases/seeds/SeedFormuleCreditUseCase";
 
 // Seed functions
 import { seedAdvisor } from "../../seeds/02_seedAdvisor";
 import { seedClient } from "../../seeds/03_seedClient";
-import { seedDirector } from "../../seeds/01_seedDirector";
+import { seedDirector } from "../../seeds/01A_seedDirector";
 import { generateExternalThreads } from "../../seeds/04_generateExternalThreads";
 import { generateInternalThreads } from "../../seeds/05_generateInternalThreads";
 import { generateTags } from "../../seeds/06_generateTags";
@@ -42,7 +43,9 @@ import { generateActions } from "../../seeds/08_generateActions";
 import { generateSavingsRate } from "../../seeds/09_generateSavingsRate";
 import { generateOrders } from "../../seeds/10_generateOrders";
 import { generateNotifications } from "../../seeds/11_generateNotifications";
-import { generateBankAccounts } from "../../seeds/12_generateBankAccounts";
+import { generateBankAccounts } from "../../seeds/01B_generateBankAccounts";
+import { generateFormuleCredits } from "../../seeds/01C_generateFormulesCredit";
+import { FormuleCreditRepositoryMySQL } from "../repositories/FormuleCreditRepositoryMySQL";
 
 const all = async () => {
   console.log("🌱 Starting database seed...\n");
@@ -63,6 +66,7 @@ const all = async () => {
   const savingsRateRepository = new SavingsRateRepositoryMySQL(mysqlClient);
   const orderRepository = new OrderRepositoryMySQL(mysqlClient);
   const notificationRepository = new NotificationRepositoryMySQL(mysqlClient);
+  const formuleRepository = new FormuleCreditRepositoryMySQL(mysqlClient);
 
   // 3. Initialiser les services
   const encryptionService = new BcryptEncryptionService();
@@ -90,6 +94,8 @@ const all = async () => {
 
   const seedCreditUseCase = new SeedCreditUseCase(
     creditRepository,
+    formuleRepository,
+    accountRepository,
     uuidService,
     clockService
   );
@@ -146,7 +152,20 @@ const all = async () => {
     clockService
   );
 
+  const seedFormuleCreditUseCase = new SeedFormuleCreditUseCase(
+    formuleRepository,
+    uuidService,
+    clockService
+  );
+
   // 5. Exécuter les seeds
+  const directors = await seedDirector(seedUserUseCase, clockService);
+
+  const bankAccounts = await generateBankAccounts(seedBankAccountUseCase);
+  const formuleCredits = await generateFormuleCredits(
+    bankAccounts.map(({ iban }) => iban),
+    seedFormuleCreditUseCase
+  );
   const advisors = await seedAdvisor(seedUserUseCase, clockService);
 
   const clients = await seedClient(
@@ -154,10 +173,9 @@ const all = async () => {
     seedAccountUseCase,
     seedTransactionUseCase,
     seedCreditUseCase,
-    clockService
+    clockService,
+    formuleCredits
   );
-
-  const directors = await seedDirector(seedUserUseCase, clockService);
 
   await generateExternalThreads(
     advisors,
@@ -205,8 +223,6 @@ const all = async () => {
     seedNotificationUseCase,
     clockService
   );
-
-  await generateBankAccounts(seedBankAccountUseCase);
 };
 
 all()

@@ -36,11 +36,11 @@ export const rawClients = [
             insuranceRate: 0.2,
             durationMonths: 24,
             startDate: new Date("2023-01-10"),
-            formule : {
-              interestRate : 3.0,
-              type: 'Consommation',
-              isActive: true
-            }
+            formule: {
+              interestRate: 3.0,
+              type: "Consommation",
+              isActive: true,
+            },
           },
           {
             initialAmount: 12000,
@@ -48,13 +48,13 @@ export const rawClients = [
             insuranceRate: 0.3,
             durationMonths: 36,
             startDate: new Date("2022-05-01"),
-            formule : {
-              interestRate : 3.0,
-              type: 'Consommation',
-              isActive: true
-            }
-          },  
-        ] 
+            formule: {
+              interestRate: 3.0,
+              type: "Consommation",
+              isActive: true,
+            },
+          },
+        ],
       },
       {
         name: "Compte épargne",
@@ -72,18 +72,18 @@ export const rawClients = [
             icon: "🏆",
           },
         ],
-        credits : [
+        credits: [
           {
             initialAmount: 8000,
             currency: "EUR",
             insuranceRate: 0.25,
             durationMonths: 30,
             startDate: new Date("2024-06-15"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Automobile',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Automobile",
+              isActive: true,
+            },
           },
           {
             initialAmount: 15000,
@@ -91,13 +91,51 @@ export const rawClients = [
             insuranceRate: 0.28,
             durationMonths: 48,
             startDate: new Date("2023-09-20"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Étudiant',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Étudiant",
+              isActive: true,
+            },
           },
-        ]
+        ],
+      },
+    ],
+    credits: [
+      {
+        initialAmount: 250000,
+        currency: "EUR",
+        durationMonths: 240,
+        formuleCreditType: "immobilier",
+      },
+      {
+        initialAmount: 15000,
+        currency: "EUR",
+        durationMonths: 60,
+        formuleCreditType: "consommation",
+      },
+      {
+        initialAmount: 50000,
+        currency: "EUR",
+        durationMonths: 72,
+        formuleCreditType: "professionnel",
+      },
+      {
+        initialAmount: 12000,
+        currency: "EUR",
+        durationMonths: 48,
+        formuleCreditType: "special",
+      },
+      {
+        initialAmount: 180000,
+        currency: "EUR",
+        durationMonths: 300,
+        formuleCreditType: "immobilier",
+      },
+      {
+        initialAmount: 8000,
+        currency: "EUR",
+        durationMonths: 48,
+        formuleCreditType: "consommation",
       },
     ],
   },
@@ -131,18 +169,18 @@ export const rawClients = [
             icon: "🌐",
           },
         ],
-        credits : [
+        credits: [
           {
             initialAmount: 80000,
             currency: "EUR",
             insuranceRate: 0.4,
             durationMonths: 120,
             startDate: new Date("2021-09-20"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Immobilier',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Immobilier",
+              isActive: true,
+            },
           },
           {
             initialAmount: 20000,
@@ -150,11 +188,11 @@ export const rawClients = [
             insuranceRate: 0.22,
             durationMonths: 60,
             startDate: new Date("2023-03-10"),
-            formule : {
-              interestRate : 3.0,
-              type: 'Consommation',
-              isActive: true
-            }
+            formule: {
+              interestRate: 3.0,
+              type: "Consommation",
+              isActive: true,
+            },
           },
           {
             initialAmount: 10000,
@@ -162,13 +200,21 @@ export const rawClients = [
             insuranceRate: 0.3,
             durationMonths: 36,
             startDate: new Date("2024-08-01"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Étudiant',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Étudiant",
+              isActive: true,
+            },
           },
-        ]
+        ],
+      },
+    ],
+    credits: [
+      {
+        initialAmount: 20000,
+        currency: "EUR",
+        durationMonths: 60,
+        formuleCreditType: "consommation",
       },
     ],
   },
@@ -209,11 +255,11 @@ export const rawClients = [
             insuranceRate: 0.6,
             durationMonths: 300,
             startDate: new Date("2019-06-10"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Immobilier',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Immobilier",
+              isActive: true,
+            },
           },
           {
             initialAmount: 25000,
@@ -221,12 +267,12 @@ export const rawClients = [
             insuranceRate: 0.2,
             durationMonths: 48,
             startDate: new Date("2024-01-15"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Automobile',
-              isActive: true
-            }
-          }
+            formule: {
+              interestRate: 2.0,
+              type: "Automobile",
+              isActive: true,
+            },
+          },
         ],
       },
     ],
@@ -261,18 +307,18 @@ export const rawClients = [
             icon: "⛽",
           },
         ],
-        credits : [
+        credits: [
           {
             initialAmount: 7500,
             currency: "EUR",
             insuranceRate: 0.18,
             durationMonths: 24,
             startDate: new Date("2024-05-20"),
-            formule : {
-              interestRate : 3.0,
-              type: 'Consomation',
-              isActive: true
-            }
+            formule: {
+              interestRate: 3.0,
+              type: "Consomation",
+              isActive: true,
+            },
           },
           {
             initialAmount: 35000,
@@ -280,13 +326,13 @@ export const rawClients = [
             insuranceRate: 0.28,
             durationMonths: 84,
             startDate: new Date("2023-07-10"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Automobile',
-              isActive: true
-            }
-          }
-        ]
+            formule: {
+              interestRate: 2.0,
+              type: "Automobile",
+              isActive: true,
+            },
+          },
+        ],
       },
     ],
   },
@@ -320,18 +366,18 @@ export const rawClients = [
             icon: "🍽️",
           },
         ],
-        credits : [
+        credits: [
           {
             initialAmount: 40000,
             currency: "EUR",
             insuranceRate: 0.35,
             durationMonths: 84,
             startDate: new Date("2021-01-05"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Automobile',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Automobile",
+              isActive: true,
+            },
           },
           {
             initialAmount: 12500,
@@ -339,13 +385,13 @@ export const rawClients = [
             insuranceRate: 0.2,
             durationMonths: 36,
             startDate: new Date("2024-04-01"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Automobile',
-              isActive: true
-            }
-          }
-        ]
+            formule: {
+              interestRate: 2.0,
+              type: "Automobile",
+              isActive: true,
+            },
+          },
+        ],
       },
     ],
   },
@@ -379,18 +425,18 @@ export const rawClients = [
             icon: "🛒",
           },
         ],
-        credits : [
+        credits: [
           {
             initialAmount: 6000,
             currency: "EUR",
             insuranceRate: 0.1,
             durationMonths: 18,
             startDate: new Date("2023-08-01"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Automobile',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Automobile",
+              isActive: true,
+            },
           },
           {
             initialAmount: 90000,
@@ -398,11 +444,11 @@ export const rawClients = [
             insuranceRate: 0.3,
             durationMonths: 180,
             startDate: new Date("2020-12-25"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Immobilier',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Immobilier",
+              isActive: true,
+            },
           },
           {
             initialAmount: 28000,
@@ -410,13 +456,13 @@ export const rawClients = [
             insuranceRate: 0.27,
             durationMonths: 60,
             startDate: new Date("2023-02-15"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Consommation',
-              isActive: true
-            }
-          }
-        ]
+            formule: {
+              interestRate: 2.0,
+              type: "Consommation",
+              isActive: true,
+            },
+          },
+        ],
       },
     ],
   },
@@ -450,20 +496,20 @@ export const rawClients = [
             icon: "🛍️",
           },
         ],
-        credits : [
+        credits: [
           {
             initialAmount: 16000,
             currency: "EUR",
             insuranceRate: 0.23,
             durationMonths: 42,
             startDate: new Date("2023-12-10"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Automobile',
-              isActive: true
-            }
-          }
-        ]
+            formule: {
+              interestRate: 2.0,
+              type: "Automobile",
+              isActive: true,
+            },
+          },
+        ],
       },
     ],
   },
@@ -497,18 +543,18 @@ export const rawClients = [
             icon: "⛽",
           },
         ],
-        credits : [
+        credits: [
           {
             initialAmount: 25000,
             currency: "EUR",
             insuranceRate: 0.15,
             durationMonths: 48,
             startDate: new Date("2024-02-15"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Étudiant',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Étudiant",
+              isActive: true,
+            },
           },
           {
             initialAmount: 18000,
@@ -516,13 +562,13 @@ export const rawClients = [
             insuranceRate: 0.2,
             durationMonths: 36,
             startDate: new Date("2024-03-01"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Consomation',
-              isActive: true
-            }
-          }
-        ]
+            formule: {
+              interestRate: 2.0,
+              type: "Consomation",
+              isActive: true,
+            },
+          },
+        ],
       },
     ],
   },
@@ -556,18 +602,18 @@ export const rawClients = [
             icon: "🛒",
           },
         ],
-        credits : [
+        credits: [
           {
             initialAmount: 15000,
             currency: "EUR",
             insuranceRate: 0.25,
             durationMonths: 24,
             startDate: new Date("2024-04-10"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Étudiant',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Étudiant",
+              isActive: true,
+            },
           },
           {
             initialAmount: 65000,
@@ -575,13 +621,13 @@ export const rawClients = [
             insuranceRate: 0.33,
             durationMonths: 144,
             startDate: new Date("2021-06-01"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Immobilier',
-              isActive: true
-            }
-          }
-        ]
+            formule: {
+              interestRate: 2.0,
+              type: "Immobilier",
+              isActive: true,
+            },
+          },
+        ],
       },
     ],
   },
@@ -615,18 +661,18 @@ export const rawClients = [
             icon: "🍽️",
           },
         ],
-        credits : [
+        credits: [
           {
             initialAmount: 22000,
             currency: "EUR",
             insuranceRate: 0.15,
             durationMonths: 48,
             startDate: new Date("2024-02-28"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Automobile',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Automobile",
+              isActive: true,
+            },
           },
           {
             initialAmount: 110000,
@@ -634,11 +680,11 @@ export const rawClients = [
             insuranceRate: 0.45,
             durationMonths: 180,
             startDate: new Date("2021-04-12"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Immobilier',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Immobilier",
+              isActive: true,
+            },
           },
           {
             initialAmount: 32000,
@@ -646,13 +692,13 @@ export const rawClients = [
             insuranceRate: 0.29,
             durationMonths: 72,
             startDate: new Date("2022-09-05"),
-            formule : {
-              interestRate : 2.0,
-              type: 'Consommation',
-              isActive: true
-            }
+            formule: {
+              interestRate: 2.0,
+              type: "Consommation",
+              isActive: true,
+            },
           },
-        ]
+        ],
       },
     ],
   },

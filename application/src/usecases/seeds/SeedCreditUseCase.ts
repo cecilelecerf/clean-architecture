@@ -1,196 +1,158 @@
-// application/usecases/seeds/SeedCreditUseCase.ts
+import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
+import { FormuleCreditRepository } from "@application/ports/repositories/FormuleCreditRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { CreditEntity, CreditStatus } from "@domain/entities/CreditEntity";
 import { Money } from "@domain/values/Money";
-import { Percentage } from "@domain/values/Percentage";
 
 export type SeedCreditType =
   | "active"
-  | "future"
   | "pending"
+  | "future"
   | "refused"
   | "completed";
 
 export interface SeedCreditRequest {
   userId: string;
-  advisorId?: string | null;
+  advisorId: string | null;
+  formuleCreditId: string;
   initialAmount: number;
   currency: string;
-  interestRate: number;
-  insuranceRate: number;
   durationMonths: number;
   creditType: SeedCreditType;
-}
-
-interface CreditDates {
-  status: CreditStatus;
-  startDate: Date;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export class SeedCreditUseCase {
   constructor(
     private creditRepository: CreditRepository,
+    private formuleCreditRepository: FormuleCreditRepository,
+    private accountRepository: AccountRepository,
     private uuidService: UuidService,
     private clockService: ClockService
   ) {}
 
   async execute(request: SeedCreditRequest): Promise<CreditEntity> {
+    const formuleCredit = await this.formuleCreditRepository.findById(
+      request.formuleCreditId
+    );
+    if (!formuleCredit) {
+      throw new Error(`FormuleCredit not found: ${request.formuleCreditId}`);
+    }
+
+    if (!formuleCredit.isActive) {
+      throw new Error(`FormuleCredit is inactive: ${request.formuleCreditId}`);
+    }
+
+    const accounts = await this.accountRepository.findByUserId(request.userId);
+    if (!accounts || accounts.length === 0) {
+      throw new Error(`No account found for user: ${request.userId}`);
+    }
+    const account = accounts[0];
+
     const initialAmount = Money.create({
       amount: request.initialAmount,
       currency: request.currency,
     });
     if (initialAmount instanceof Error) {
-      throw new Error(`Invalid initial amount: ${request.initialAmount}`);
+      throw initialAmount;
     }
 
-    const interestRate = Percentage.create(request.interestRate);
-    if (interestRate instanceof Error) {
-      throw new Error(`Invalid interest rate: ${request.interestRate}`);
+    if (
+      formuleCredit.minAmount &&
+      initialAmount.amount < formuleCredit.minAmount.amount
+    ) {
+      throw new Error(
+        `Amount ${initialAmount.amount} is below minimum ${formuleCredit.minAmount.amount}`
+      );
+    }
+    if (
+      formuleCredit.maxAmount &&
+      initialAmount.amount > formuleCredit.maxAmount.amount
+    ) {
+      throw new Error(
+        `Amount ${initialAmount.amount} exceeds maximum ${formuleCredit.maxAmount.amount}`
+      );
     }
 
-    const insuranceRate = Percentage.create(request.insuranceRate);
-    if (insuranceRate instanceof Error) {
-      throw new Error(`Invalid insurance rate: ${request.insuranceRate}`);
+    const now = this.clockService.now();
+    let startDate: Date;
+    let status: CreditStatus;
+    let reason: string | null = null;
+
+    switch (request.creditType) {
+      case "active":
+        status = CreditStatus.ACCEPTED;
+        startDate = this.clockService.addMonths(now, -6);
+        break;
+      case "pending":
+        status = CreditStatus.PENDING;
+        startDate = this.clockService.addMonths(now, 1);
+        break;
+      case "future":
+        status = CreditStatus.ACCEPTED;
+        startDate = this.clockService.addMonths(now, 2);
+        break;
+      case "refused":
+        status = CreditStatus.REFUSED;
+        startDate = this.clockService.addMonths(now, 1);
+        reason = "Capacité d'endettement insuffisante";
+        break;
+      case "completed":
+        status = CreditStatus.COMPLETED;
+        startDate = this.clockService.addMonths(now, -request.durationMonths);
+        break;
+      default:
+        throw new Error(`Unknown credit type: ${request.creditType}`);
     }
 
-    // Génération des dates selon le type de crédit
-    const dates = this.generateCreditDates(
-      request.creditType,
-      request.durationMonths
+    const credit = CreditEntity.create(
+      {
+        id: this.uuidService.generate(),
+        advisorId: request.advisorId,
+        accountId: account.iban,
+        formuleCreditId: formuleCredit.id,
+        initialAmount,
+        durationMonths: request.durationMonths,
+        startDate,
+        status,
+        createdAt: now,
+        reason,
+      },
+      formuleCredit.interestRate,
+      formuleCredit.insuranceRate
     );
-
-    const credit = CreditEntity.create({
-      id: this.uuidService.generate(),
-      userId: request.userId,
-      advisorId: request.advisorId ?? null,
-      initialAmount,
-      interestRate,
-      insuranceRate,
-      durationMonths: request.durationMonths,
-      startDate: dates.startDate,
-      status: dates.status,
-      createdAt: dates.createdAt,
-      updatedAt: dates.updatedAt,
-    });
 
     if (credit instanceof Error) {
       throw credit;
     }
 
-    // Calcul du solde restant pour les crédits actifs
     if (request.creditType === "active") {
-      this.calculateRemainingBalance(
-        credit,
-        dates.startDate,
-        request.durationMonths
-      );
+      const monthsPaid = 6;
+      for (let i = 0; i < monthsPaid; i++) {
+        const payResult = credit.payMonthly(
+          formuleCredit.interestRate,
+          formuleCredit.insuranceRate
+        );
+        if (payResult instanceof Error) {
+          throw payResult;
+        }
+      }
+    }
+
+    if (request.creditType === "completed") {
+      for (let i = 0; i < request.durationMonths; i++) {
+        const payResult = credit.payMonthly(
+          formuleCredit.interestRate,
+          formuleCredit.insuranceRate
+        );
+        if (payResult instanceof Error) {
+          throw payResult;
+        }
+      }
     }
 
     await this.creditRepository.save(credit);
     return credit;
-  }
-
-  private generateCreditDates(
-    creditType: SeedCreditType,
-    durationMonths: number
-  ): CreditDates {
-    const rand = (min: number, max: number) =>
-      Math.floor(Math.random() * (max - min + 1)) + min;
-
-    const now = this.clockService.now();
-
-    switch (creditType) {
-      case "active": {
-        const monthsElapsed = rand(3, 12);
-        const startDate = this.clockService.nowMinusMonths(monthsElapsed);
-        const createdAt = this.clockService.addDays(startDate, -rand(30, 90));
-        return {
-          status: CreditStatus.ACCEPTED,
-          startDate,
-          createdAt,
-          updatedAt: now,
-        };
-      }
-
-      case "pending": {
-        const createdAt = this.clockService.nowMinusDays(rand(1, 15));
-        const startDate = this.clockService.addDays(now, rand(30, 60));
-        return {
-          status: CreditStatus.PENDING,
-          startDate,
-          createdAt,
-          updatedAt: createdAt,
-        };
-      }
-
-      case "future": {
-        const createdAt = this.clockService.nowMinusDays(rand(15, 45));
-        const startDate = this.clockService.addDays(now, rand(60, 180));
-        return {
-          status: CreditStatus.ACCEPTED,
-          startDate,
-          createdAt,
-          updatedAt: now,
-        };
-      }
-
-      case "refused": {
-        const createdAt = this.clockService.nowMinusDays(rand(20, 60));
-        const startDate = this.clockService.addDays(createdAt, rand(30, 60));
-        return {
-          status: CreditStatus.REFUSED,
-          startDate,
-          createdAt,
-          updatedAt: now,
-        };
-      }
-
-      case "completed": {
-        const startDate = this.clockService.nowMinusMonths(
-          durationMonths + rand(1, 6)
-        );
-        const createdAt = this.clockService.addDays(startDate, -rand(30, 90));
-        return {
-          status: CreditStatus.COMPLETED,
-          startDate,
-          createdAt,
-          updatedAt: now,
-        };
-      }
-
-      default:
-        throw new Error(`Unknown credit type: ${creditType}`);
-    }
-  }
-
-  private calculateRemainingBalance(
-    credit: CreditEntity,
-    startDate: Date,
-    durationMonths: number
-  ): void {
-    const now = this.clockService.now();
-    const monthsElapsed = Math.floor(
-      (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30)
-    );
-    const monthsRemaining = Math.max(0, durationMonths - monthsElapsed);
-    const remainingAmount = Math.max(
-      0,
-      credit.monthlyPayment.amount * monthsRemaining
-    );
-
-    const remainingBalance = Money.create({
-      amount: remainingAmount,
-      currency: credit.initialAmount.currency,
-    });
-
-    if (remainingBalance instanceof Error) {
-      throw remainingBalance;
-    }
-
-    credit.remainingBalance = remainingBalance;
   }
 }
