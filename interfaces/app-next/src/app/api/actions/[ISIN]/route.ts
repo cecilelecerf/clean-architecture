@@ -4,28 +4,28 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { actionSchema } from '@infrastructure/types/action';
 import { actionFactory } from '@infrastructure/adapters/db/mysql/factories/action';
 
-export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/actions/[actionIsin]'>) {
+export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/actions/[ISIN]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { actionIsin } = await ctx.params;
+    const { ISIN } = await ctx.params;
 
     const body = await req.json();
     const payload = actionSchema.parse(body);
 
     const result = await actionFactory().admin.updateAction.execute({
       userId: session.user.id,
-      ISIN: actionIsin,
+      ISIN,
       name: payload.name,
       totalNb: payload.totalNb,
       symbol: payload.symbol,
       market: payload.market,
       activitySector: payload.activitySector,
-      priceAmount: payload.priceAmount,
-      priceCurrency: payload.priceCurrency,
+      priceAmount: payload.currentPrice.amount,
+      priceCurrency: payload.currentPrice.currency,
       isAvailable: payload.isAvailable,
     });
 
@@ -43,5 +43,31 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/actions/[a
       { message: err instanceof Error ? err.message : 'Erreur serveur' },
       { status: 500 },
     );
+  }
+}
+
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/actions/[ISIN]'>) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    const { ISIN } = await ctx.params;
+
+    const result = await actionFactory().getAction.execute({
+      userId: session.user.id,
+      ISIN,
+    });
+
+    if (result instanceof Error) {
+      return NextResponse.json(
+        { name: result.name, message: result.message },
+        { status: result.statusCode ?? 404 },
+      );
+    }
+    return NextResponse.json(result);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ message: err.message || 'Erreur serveur' }, { status: 500 });
   }
 }

@@ -6,10 +6,17 @@ import { CreateActionUsecase } from "@application/usecases/actions/CreateActionU
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/actions/GetAllActionsByAvailabilityUseCase";
 import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
+import { GetActionUsecase } from "@application/usecases/actions/GetActionUsecase";
+import { GetActionStatisticsUsecase } from "@application/usecases/actions/GetActionStatisticsUsecase";
+import { GetActionPriceHistoryUsecase } from "@application/usecases/actions/GetActionPriceHistoryUsecase";
+import { ActionPriceHistoryRepositoryMySQL } from "../repositories/ActionPriceHistoryRepositoryMySQL";
 
 export const actionFactory = () => {
   const client = new MySQLClient();
   const actionRepository = new ActionRepositoryMySQL(client);
+  const actionPriceHistoryRepository = new ActionPriceHistoryRepositoryMySQL(
+    client
+  );
   const userRepository = new UserRepositoryMySQL(client);
   const clockService = new SystemClockService();
 
@@ -29,6 +36,16 @@ export const actionFactory = () => {
     actionRepository,
     userRepository
   );
+  const getAction = new GetActionUsecase(actionRepository, userRepository);
+  const getActionStat = new GetActionStatisticsUsecase(
+    actionRepository,
+    clockService
+  );
+  const getActionHistory = new GetActionPriceHistoryUsecase(
+    actionRepository,
+    actionPriceHistoryRepository,
+    clockService
+  );
 
   return {
     admin: {
@@ -36,5 +53,8 @@ export const actionFactory = () => {
       updateAction,
     },
     getAllActionsByAvailability,
+    getAction,
+    getActionStat,
+    getActionHistory,
   };
 };

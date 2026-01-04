@@ -40,12 +40,15 @@ import { generateInternalThreads } from "../../seeds/05_generateInternalThreads"
 import { generateTags } from "../../seeds/06_generateTags";
 import { generatePosts } from "../../seeds/07_generatePosts";
 import { generateActions } from "../../seeds/08_generateActions";
-import { generateSavingsRate } from "../../seeds/09_generateSavingsRate";
-import { generateOrders } from "../../seeds/10_generateOrders";
-import { generateNotifications } from "../../seeds/11_generateNotifications";
+import { generateSavingsRate } from "../../seeds/10_generateSavingsRate";
+import { generateOrders } from "../../seeds/11_generateOrders";
+import { generateNotifications } from "../../seeds/12_generateNotifications";
 import { generateBankAccounts } from "../../seeds/01B_generateBankAccounts";
 import { generateFormuleCredits } from "../../seeds/01C_generateFormulesCredit";
 import { FormuleCreditRepositoryMySQL } from "../repositories/FormuleCreditRepositoryMySQL";
+import { seedPriceHistory } from "../../seeds/09_generateActionHistories";
+import { SeedActionPriceHistoryUseCase } from "@application/usecases/seeds/SeedActionPriceHistoryUseCase";
+import { ActionPriceHistoryRepositoryMySQL } from "../repositories/ActionPriceHistoryRepositoryMySQL";
 
 const all = async () => {
   console.log("🌱 Starting database seed...\n");
@@ -67,6 +70,9 @@ const all = async () => {
   const orderRepository = new OrderRepositoryMySQL(mysqlClient);
   const notificationRepository = new NotificationRepositoryMySQL(mysqlClient);
   const formuleRepository = new FormuleCreditRepositoryMySQL(mysqlClient);
+  const actionPriceRepository = new ActionPriceHistoryRepositoryMySQL(
+    mysqlClient
+  );
 
   // 3. Initialiser les services
   const encryptionService = new BcryptEncryptionService();
@@ -158,6 +164,13 @@ const all = async () => {
     clockService
   );
 
+  const seedActionPriceHistoryUsecase = new SeedActionPriceHistoryUseCase(
+    actionRepository,
+    actionPriceRepository,
+    uuidService,
+    clockService
+  );
+
   // 5. Exécuter les seeds
   const directors = await seedDirector(seedUserUseCase, clockService);
 
@@ -212,7 +225,7 @@ const all = async () => {
   );
 
   const actions = await generateActions(seedActionUseCase);
-
+  await seedPriceHistory(actions, clockService, seedActionPriceHistoryUsecase);
   await generateSavingsRate(seedSavingsRateUseCase);
 
   await generateOrders(clients, actions, seedOrderUseCase, clockService);

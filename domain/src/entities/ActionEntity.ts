@@ -17,7 +17,7 @@ export class ActionEntity {
     public currentPrice: Money,
     public isAvailable: boolean,
     public createdAt: Date,
-    public updatedAt?: Date
+    public updatedAt: Date
   ) {}
 
   private static validateISIN(isin: string): string | InvalidISINError {

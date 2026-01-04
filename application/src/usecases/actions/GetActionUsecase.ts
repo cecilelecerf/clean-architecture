@@ -1,3 +1,4 @@
+import { ActionNotFoundError } from "@application/errors/actions";
 import {
   UserNotActiveError,
   UserNotFoundError,
@@ -9,10 +10,10 @@ import { ActionEntity } from "@domain/entities/ActionEntity";
 
 interface Props {
   userId: string;
-  isAvailable: boolean;
+  ISIN: string;
 }
 
-export class GetAllActionsByAvailabilityUsecase {
+export class GetActionUsecase {
   constructor(
     private readonly actionRepository: ActionRepository,
     private readonly userRepository: UserRepository
@@ -20,11 +21,14 @@ export class GetAllActionsByAvailabilityUsecase {
 
   public async execute({
     userId,
-    isAvailable,
-  }: Props): Promise<ActionEntity[] | UserNotFoundError | UserNotActiveError> {
+    ISIN,
+  }: Props): Promise<
+    ActionEntity | ActionNotFoundError | UserNotFoundError | UserNotActiveError
+  > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-
-    return this.actionRepository.findAllAvailable(isAvailable);
+    const action = await this.actionRepository.findByISIN(ISIN);
+    if (!action) return new ActionNotFoundError();
+    return action;
   }
 }

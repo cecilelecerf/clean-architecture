@@ -39,9 +39,9 @@ import { generateInternalThreads } from "../../seeds/05_generateInternalThreads"
 import { generateTags } from "../../seeds/06_generateTags";
 import { generatePosts } from "../../seeds/07_generatePosts";
 import { generateActions } from "../../seeds/08_generateActions";
-import { generateSavingsRate } from "../../seeds/09_generateSavingsRate";
-import { generateOrders } from "../../seeds/10_generateOrders";
-import { generateNotifications } from "../../seeds/11_generateNotifications";
+import { generateSavingsRate } from "../../seeds/10_generateSavingsRate";
+import { generateOrders } from "../../seeds/11_generateOrders";
+import { generateNotifications } from "../../seeds/12_generateNotifications";
 import { generateBankAccounts } from "../../seeds/01B_generateBankAccounts";
 import { FormuleCreditRepositoryMongo } from "../repositories/FormuleCreditRepositoryMongo";
 import { generateFormuleCredits } from "../../seeds/01C_generateFormulesCredit";

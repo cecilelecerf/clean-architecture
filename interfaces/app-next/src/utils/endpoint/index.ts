@@ -7,9 +7,11 @@ import { authEndpoint } from './authEndpoint';
 import { creditsEndpoint } from './creditEndpoints';
 import { savingsrateEndpoint } from './savingsrateEndpoints';
 import { formuleEndpoint } from './formuleEndpoints';
+import { actionsEndpoint } from './actionsEndpoints';
 
 export const endpoints = createEndpointsNodes({
   accounts: accountsEndpoint,
+  actions: actionsEndpoint,
   threads: threadsEndpoint,
   feeds: feedsEndpoint,
   users: usersEndpoint,

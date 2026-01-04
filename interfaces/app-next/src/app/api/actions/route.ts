@@ -15,11 +15,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const isAvailableParam = searchParams.get('isAvailable');
 
-    if (isAvailableParam === null) {
-      return NextResponse.json({ message: 'Missing query param: isAvailable' }, { status: 400 });
-    }
-
-    const isAvailable = isAvailableParam === 'true';
+    const isAvailable: boolean | undefined =
+      isAvailableParam !== null ? isAvailableParam === 'true' : true;
 
     const result = await actionFactory().getAllActionsByAvailability.execute({
       userId: session.user.id,
@@ -57,8 +54,8 @@ export async function POST(req: NextRequest) {
       symbol: payload.symbol,
       market: payload.market,
       activitySector: payload.activitySector,
-      priceAmount: payload.priceAmount,
-      priceCurrency: payload.priceCurrency,
+      priceAmount: payload.currentPrice.amount,
+      priceCurrency: payload.currentPrice.currency,
       isAvailable: payload.isAvailable,
     });
 

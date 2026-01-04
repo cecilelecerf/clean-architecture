@@ -1,6 +1,12 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { get, patch, post } from '@/lib/apiClient';
-import { Action, ActionId, actionSchema } from '@infrastructure/types/action';
+import {
+  Action,
+  ActionId,
+  actionPriceHistorySchema,
+  actionSchema,
+  actionStatsSchema,
+} from '@infrastructure/types/action';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { queryClient } from '@/lib/queryClient';
@@ -8,7 +14,7 @@ import { queryClient } from '@/lib/queryClient';
 // ============================================================================
 // ACTION ENDPOINTS
 // ============================================================================
-export const actionEndpoint = createEndpointsNodes({
+export const actionsEndpoint = createEndpointsNodes({
   // GET /api/actions
   // Liste des actions (selon l'utilisateur (client ou banque))
   getAll: () =>
@@ -17,6 +23,17 @@ export const actionEndpoint = createEndpointsNodes({
       queryFn: () =>
         get('/actions').then((data) => {
           return safeParseWithLog(actionSchema.array(), data);
+        }),
+    }),
+
+  // GET /api/actions
+  // Liste des actions (selon l'utilisateur (client ou banque))
+  get: ({ isin }: { isin: ActionId }) =>
+    queryOptions({
+      queryKey: ['actions', isin],
+      queryFn: () =>
+        get(`/actions/${isin}`).then((data) => {
+          return safeParseWithLog(actionSchema, data);
         }),
     }),
 
@@ -37,7 +54,7 @@ export const actionEndpoint = createEndpointsNodes({
   // Modifier une action
   update: ({ actionIsin }: { actionIsin: ActionId }) =>
     mutationOptions({
-      mutationFn: async (payload: Action) => {
+      mutationFn: async ({ payload }: { payload: Action }) => {
         const data = await patch(`/actions/${actionIsin}`, payload);
         return actionSchema.parse(data);
       },
@@ -45,5 +62,26 @@ export const actionEndpoint = createEndpointsNodes({
         queryClient.invalidateQueries({ queryKey: ['actions', actionIsin] });
         queryClient.invalidateQueries({ queryKey: ['actions', 'list'] });
       },
+    }),
+
+  // GET /api/actions
+  // Liste des actions (selon l'utilisateur (client ou banque))
+  getHistory: ({ isin }: { isin: ActionId }) =>
+    queryOptions({
+      queryKey: ['actions', isin, 'history'],
+      queryFn: () =>
+        get(`/actions/${isin}/history`).then((data) => {
+          return safeParseWithLog(actionPriceHistorySchema.array(), data);
+        }),
+    }),
+  // GET /api/actions
+  // Liste des actions (selon l'utilisateur (client ou banque))
+  getStats: ({ isin }: { isin: ActionId }) =>
+    queryOptions({
+      queryKey: ['actions', isin, 'stats'],
+      queryFn: () =>
+        get(`/actions/${isin}/stats`).then((data) => {
+          return safeParseWithLog(actionStatsSchema, data);
+        }),
     }),
 });
