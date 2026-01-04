@@ -24,8 +24,8 @@ export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext }: { sel
               key={account.IBAN}
               onClick={() => onSelect(account.IBAN, account.currency)}
               className={`cursor-pointer transition-all ${selected
-                  ? "border-blue-500 ring-2 ring-blue-500"
-                  : "hover:shadow-md"
+                ? "border-blue-500 ring-2 ring-blue-500"
+                : "hover:shadow-md"
                 }`}
             >
               <CardContent className="flex items-center justify-between p-4">

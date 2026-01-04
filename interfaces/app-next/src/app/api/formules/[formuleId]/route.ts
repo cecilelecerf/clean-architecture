@@ -3,9 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { formuleFactory } from '@infrastructure/adapters/db/mysql/factories/formules';
 import { formuleSchema } from '@infrastructure/types/formule';
-import z from 'zod';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/formules/[formuleId]'>) {
+export async function GET(_req: NextRequest, ctx: RouteContext<'/api/formules/[formuleId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

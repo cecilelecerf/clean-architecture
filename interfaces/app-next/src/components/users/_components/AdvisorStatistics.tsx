@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { endpoints } from "@/utils/endpoint";
 import { AdvisorStat } from "@infrastructure/types/stat";
-import { UserDto, UserId } from "@infrastructure/types/user";
+import { UserId } from "@infrastructure/types/user";
 import { useQuery } from "@tanstack/react-query";
 import {
     Briefcase,
@@ -9,8 +9,8 @@ import {
     FileText,
 } from "lucide-react";
 import { match } from "ts-pattern";
-export const AdvisorStatistics = ({ userId, role }: { userId: UserId, role: UserDto["role"] }) => {
-    const query = useQuery(endpoints.users.stats({ id: userId, role }));
+export const AdvisorStatistics = ({ userId }: { userId: UserId }) => {
+    const query = useQuery(endpoints.users.stats({ id: userId }));
 
     return (
         <Card className="p-4 md:p-6">

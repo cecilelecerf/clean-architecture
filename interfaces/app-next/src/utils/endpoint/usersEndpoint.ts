@@ -1,7 +1,6 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { get, patch, post } from '@/lib/apiClient';
 import {
-  advisorStat,
   PayloadUserUpdateSchema,
   User,
   userDtoSchema,
@@ -13,8 +12,6 @@ import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { RegisterAdminPayload } from '@/app/api/users/new/route';
 import { ReqBanUser } from '@/app/api/users/[userId]/ban/route';
 import { queryClient } from '@/lib/queryClient';
-import { UserEntity } from '@domain/entities/UserEntity';
-import { match } from 'ts-pattern';
 import { userStatsSchema } from '@infrastructure/types/stat';
 export const usersEndpoint = createEndpointsNodes({
   // ============================================================================
@@ -46,7 +43,7 @@ export const usersEndpoint = createEndpointsNodes({
           safeParseWithLog(userSchema.omit({ passwordHash: true }), data),
         ),
     }),
-  stats: ({ id, role }: { id: UserId; role: UserEntity['role'] }) =>
+  stats: ({ id }: { id: UserId }) =>
     queryOptions({
       queryKey: ['users', id, 'stats'],
       queryFn: () =>

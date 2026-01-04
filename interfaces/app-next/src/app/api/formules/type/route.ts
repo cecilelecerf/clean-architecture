@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { formuleFactory } from '@infrastructure/adapters/db/mysql/factories/formules';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/formules/type'>) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

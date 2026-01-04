@@ -96,8 +96,6 @@ export const StepFormuleForm = ({ data, setData, onSubmit, loading }: { data: Fo
         },
     ]
 
-    const mutation = useMutation(endpoints.formules.create());
-
     return (
         <form
             onSubmit={(e) => {

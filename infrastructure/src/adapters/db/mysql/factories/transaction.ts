@@ -4,17 +4,20 @@ import { TransactionRepositoryMySQL } from "../repositories/TransactionRepositor
 import { UserRepositoryMySQL } from "../repositories/UserRepositoryMySQL";
 import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
 import { GetTransactionByIdUseCase } from "@application/usecases/transactions/GetTransactionByIdUsecase";
+import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 
 export const transactionFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);
   const transactionRepository = new TransactionRepositoryMySQL(client);
   const accountRepository = new AccountRepositoryMySQL(client);
+  const clockService = new SystemClockService();
 
   const getAllByAccount = new GetAllTransactionsByAccountUsecase(
     userRepository,
     transactionRepository,
-    accountRepository
+    accountRepository,
+    clockService
   );
   const getById = new GetTransactionByIdUseCase(
     userRepository,

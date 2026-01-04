@@ -3,7 +3,6 @@ import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts'
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { postSchema } from '@infrastructure/types/feed';
-import z from 'zod';
 import { newPostSchema, querySchema } from '@/utils/endpoint/feedsEndpoint';
 
 export async function GET(req: NextRequest) {

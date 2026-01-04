@@ -4,8 +4,8 @@ import { IBAN } from "@domain/values/IBAN";
 import {
   InvalidTransactionAmountError,
   InvalidTransactionLabelError,
-  SameAccountTransactionError,
 } from "@domain/errors/transaction";
+import { SameAccountTransactionError } from "@domain/errors/transaction/SameAccountTransactionError";
 
 export class TransactionEntity {
   private constructor(
@@ -45,7 +45,7 @@ export class TransactionEntity {
     toAccountId: IBAN
   ): void | SameAccountTransactionError {
     if (fromAccountId.is(toAccountId)) {
-      return new SameAccountTransactionError(fromAccountId);
+      return new SameAccountTransactionError(fromAccountId.value);
     }
   }
 

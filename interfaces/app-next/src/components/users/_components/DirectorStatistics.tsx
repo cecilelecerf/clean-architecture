@@ -1,5 +1,5 @@
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 import { Card } from "@/components/ui/card";
 import {
@@ -7,15 +7,12 @@ import {
     Users,
     TrendingUp,
 } from "lucide-react";
-import { UserDto, UserId } from "@infrastructure/types/user";
+import { UserId } from "@infrastructure/types/user";
 import { match } from "ts-pattern";
 import { DirectorStat } from "@infrastructure/types/stat";
 
-export const DirectorStatistics = ({ userId, role }: { userId: UserId, role: UserDto["role"] }) => {
-    const query = useQuery(endpoints.users.stats({ id: userId, role }));
-
-    // const totalActions = actions?.length || 0;
-    // const activeActions = actions?.filter(a => a.isAvailable).length || 0;
+export const DirectorStatistics = ({ userId }: { userId: UserId, }) => {
+    const query = useQuery(endpoints.users.stats({ id: userId }));
 
     return (
         <Card className="p-4 md:p-6">

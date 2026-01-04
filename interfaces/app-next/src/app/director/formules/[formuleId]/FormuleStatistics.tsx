@@ -1,4 +1,3 @@
-// app/(protected)/admin/formules/[formuleId]/FormuleStatistics.tsx
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -30,7 +29,6 @@ export function FormuleStatistics({ formuleId }: FormuleStatisticsProps) {
         .with({ status: "error" }, () => ("error"))
         .with({ status: "success" }, ({ data: stats }) => (
             <div className="space-y-6 my-12">
-                {/* Vue d'ensemble */}
                 <Card className="p-6">
                     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                         <TrendingUp className="h-5 w-5" />
@@ -64,7 +62,6 @@ export function FormuleStatistics({ formuleId }: FormuleStatisticsProps) {
                     </div>
                 </Card>
 
-                {/* Statistiques financières */}
                 <Card className="p-6">
                     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                         <DollarSign className="h-5 w-5" />

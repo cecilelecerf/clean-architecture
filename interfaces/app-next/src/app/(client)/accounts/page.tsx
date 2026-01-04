@@ -1,7 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { fromColorClasses, textColorClasses, toColorClasses } from '@/utils/color';
+import { Card } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { match } from 'ts-pattern';

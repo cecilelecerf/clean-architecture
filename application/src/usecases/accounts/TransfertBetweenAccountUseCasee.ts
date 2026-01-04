@@ -30,7 +30,6 @@ import {
 import {
   InvalidTransactionAmountError,
   InvalidTransactionLabelError,
-  SameAccountTransactionError,
 } from "@domain/errors/transaction";
 
 interface Props {
@@ -72,7 +71,6 @@ export class TransfertBetweenAccountUseCase {
     | MoneyCurrencyMismatchError
     | UserNotFoundError
     | UserNotActiveError
-    | SameAccountTransactionError
     | InvalidTransactionLabelError
     | InvalidTransactionAmountError
     | void

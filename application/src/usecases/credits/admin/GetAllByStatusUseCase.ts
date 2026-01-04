@@ -32,13 +32,11 @@ export class GetAllByStatusUseCase {
     | UserRoleMismatchError
     | InvalidCreditStatusError
   > {
-    let creditStatus:
-      | CreditEntity["status"]
-      | undefined
-      | InvalidCreditStatusError = undefined;
+    let creditStatus: CreditEntity["status"] | undefined = undefined;
     if (statusStr) {
-      creditStatus = CreditEntity.validateCreditStatus(statusStr);
-      if (creditStatus instanceof Error) return creditStatus;
+      const creditVo = CreditEntity.validateCreditStatus(statusStr);
+      if (creditVo instanceof Error) return creditVo;
+      creditStatus = creditVo;
     }
     const advisor = await findActiveUser(this.userRepository, actorId);
     if (advisor instanceof Error) return advisor;

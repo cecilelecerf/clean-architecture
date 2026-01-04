@@ -97,9 +97,7 @@ export class RequestCreditUsecase {
 
     const initialAmountVO = Money.create({ amount: amount, currency });
     if (initialAmountVO instanceof Error) return initialAmountVO;
-
-    const startDate = new Date(startDateStr);
-
+    const startDate = this.clockService.toDate(startDateStr);
     const credit = CreditEntity.create(
       {
         id: this.uuidService.generate(),

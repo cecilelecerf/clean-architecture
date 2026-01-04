@@ -12,7 +12,6 @@ import {
 } from '@infrastructure/types/transaction';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { paginationSchema } from '@infrastructure/types/pagination';
-import { UserId } from '@infrastructure/types/user';
 
 export const querySchema = paginationSchema.extend({
   type: transactionSchema.shape.type.optional(),

@@ -1,7 +1,6 @@
 "use client"
 import { TitleAdminPage } from "@/components/TitleAdminPage";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { endpoints } from "@/utils/endpoint";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { useQueries } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 import Link from "next/link";
-import { Plus, AlertCircle, Percent } from "lucide-react";
+import { Plus, Percent } from "lucide-react";
 
 export default function FormulesPage() {
     const router = useRouter();

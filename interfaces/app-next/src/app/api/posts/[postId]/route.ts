@@ -3,10 +3,9 @@ import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts'
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { newPostSchema } from '@/utils/endpoint/feedsEndpoint';
-import { postSchema, postWithTagsSchema } from '@infrastructure/types/feed';
-import z from 'zod';
+import { postWithTagsSchema } from '@infrastructure/types/feed';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/posts/[postId]'>) {
+export async function GET(_req: NextRequest, ctx: RouteContext<'/api/posts/[postId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -66,7 +65,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/posts/[pos
   }
 }
 
-export async function DELETE(req: NextRequest, ctx: RouteContext<'/api/posts/[postId]'>) {
+export async function DELETE(_req: NextRequest, ctx: RouteContext<'/api/posts/[postId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

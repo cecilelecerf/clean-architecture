@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { accountSchema } from '@infrastructure/types/account';
 import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
-import z from 'zod';
 
 export async function PATCH(
   req: NextRequest,

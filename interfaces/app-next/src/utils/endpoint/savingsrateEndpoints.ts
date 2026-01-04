@@ -1,8 +1,8 @@
-import { SavingRate, SavingRateId, savingRateSchema } from '@infrastructure/types/savingsrate';
+import { savingRateSchema } from '@infrastructure/types/savingsrate';
 import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
-import { deleteEntity, get, patch, post } from '@/lib/apiClient';
+import { get, post } from '@/lib/apiClient';
 import { queryClient } from '@/lib/queryClient';
 import { safeParseWithLog } from '@/lib/zodUtils';
 

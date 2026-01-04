@@ -269,7 +269,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                     {/* Statistiques selon le rôle */}
                     {match(user.role)
                         .with("client", () => <ClientStatistics userId={user.id} />)
-                        .with("conseiller", () => <AdvisorStatistics userId={user.id} role={user.role} />)
+                        .with("conseiller", () => <AdvisorStatistics userId={user.id} />)
                         .with("directeur", () => <DirectorStatistics userId={user.id} />)
                         .exhaustive()}
 

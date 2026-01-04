@@ -4,7 +4,6 @@ import { Email } from "@domain/values/Email";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { UserMapper } from "../../mappers/UserMapper";
-import { IBAN } from "@domain/values/IBAN";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 
 export class UserRepositoryMySQL implements UserRepository {

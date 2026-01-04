@@ -4,7 +4,6 @@ import {
   CreditDTO,
   creditDTOSchema,
   creditDTOWithFormuleAndAccountSchema,
-  creditDTOWithFormuleAndAdvisorSchema,
   creditDTOWithFormuleSchema,
   CreditId,
   CreditResponse,
@@ -14,9 +13,8 @@ import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
-import { moneySchema } from '@infrastructure/types/money';
 import { UserId } from '@infrastructure/types/user';
-import { FormuleDTO, FormuleId } from '@infrastructure/types/formule';
+import { FormuleId } from '@infrastructure/types/formule';
 
 // ============================================================================
 // SCHEMAS
@@ -132,22 +130,18 @@ export const creditsEndpoint = createEndpointsNodes({
   // Acceptation ou refus du crédit de la part d'un conseiller
   grant: ({ creditId }: { creditId: CreditId }) =>
     mutationOptions({
-      mutationFn: ({ payload, userId }: { payload: CreditResponse; userId: UserId }) =>
+      mutationFn: ({ payload }: { payload: CreditResponse }) =>
         patch(`/credits/${creditId}/grant`, payload),
       onSuccess: (data, variables) => {
         // Invalide le crédit spécifique
         queryClient.invalidateQueries({ queryKey: ['credits', creditId] });
         // Invalide toutes les listes de crédits
         queryClient.invalidateQueries({ queryKey: ['credits', 'list'] });
-        // Invalide les listes par utilisateur
-        queryClient.invalidateQueries({ queryKey: ['credits', 'list', 'users', variables.userId] });
         // Si le crédit est accepté, invalide les comptes car le montant sera débloqué
         if (variables.payload.accept) {
           queryClient.invalidateQueries({ queryKey: ['accounts'] });
           queryClient.invalidateQueries({ queryKey: ['transactions'] });
         }
-        // Invalide les notifications non lues (nouveau statut de crédit)
-        queryClient.invalidateQueries({ queryKey: ['feeds', 'posts', 'unread'] });
       },
     }),
 

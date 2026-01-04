@@ -4,7 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { transactionFactory } from '@infrastructure/adapters/db/mysql/factories/transaction';
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   ctx: RouteContext<'/api/accounts/[accountIban]/transactions/[transactionId]'>,
 ) {
   try {

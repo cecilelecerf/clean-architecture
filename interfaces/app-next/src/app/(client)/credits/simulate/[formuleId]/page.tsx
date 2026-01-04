@@ -59,7 +59,6 @@ export default function SimulateCreditPage() {
         const monthlyInterestRate = formule.interestRate / 100 / 12;
         const monthlyInsuranceRate = formule.insuranceRate / 100 / 12;
 
-        // Calcul de la mensualité (formule d'amortissement)
         const monthlyPaymentPrincipal =
             (amount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, duration)) /
             (Math.pow(1 + monthlyInterestRate, duration) - 1);
@@ -67,7 +66,6 @@ export default function SimulateCreditPage() {
         const monthlyInsurance = amount * monthlyInsuranceRate;
         const monthlyPayment = monthlyPaymentPrincipal + monthlyInsurance;
 
-        // Calcul du tableau d'amortissement
         const schedule: PaymentScheduleItem[] = [];
         let remainingBalance = amount;
 
@@ -127,21 +125,13 @@ export default function SimulateCreditPage() {
                 <div className="container mx-auto py-8 px-4 max-w-7xl">
                     <div className="space-y-8">
                         {/* Header */}
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                            <div>
-                                <h1 className="text-3xl font-bold text-gray-900">
-                                    Simulateur de crédit
-                                </h1>
-                                <p className="text-gray-600 mt-2">
-                                    Formule : <span className="font-semibold">{formule.label}</span>
-                                </p>
-                            </div>
-                            <Button
-                                variant="outline"
-                                onClick={() => router.back()}
-                            >
-                                Retour
-                            </Button>
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">
+                                Simulateur de crédit
+                            </h1>
+                            <p className="text-gray-600 mt-2">
+                                Formule : <span className="font-semibold">{formule.label}</span>
+                            </p>
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

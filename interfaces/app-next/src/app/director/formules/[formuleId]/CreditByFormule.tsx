@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { match } from "ts-pattern";
-import { Calendar, Clock, CreditCardIcon, Euro, Pencil, Percent, User } from 'lucide-react';
+import { Calendar, Clock, CreditCardIcon, Euro, User } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreditDTO } from "@infrastructure/types/credit";
@@ -87,87 +87,84 @@ const StatusBadge = ({ status }: { status: CreditDTO["status"] }) => {
 };
 
 
-const CreditCard = ({ credit }: { credit: CreditDTO }) => {
-    const router = useRouter();
+const CreditCard = ({ credit }: { credit: CreditDTO }) => (
+    <Card className="hover:shadow-md transition-shadow">
+        <CardHeader>
+            <div className="flex items-start justify-between">
+                <CardTitle className="text-lg font-semibold">
+                    Crédit #{credit.id.slice(0, 8)}
+                </CardTitle>
+                <StatusBadge status={credit.status} />
+            </div>
+        </CardHeader>
 
-    return (
-        <Card className="hover:shadow-md transition-shadow">
-            <CardHeader>
-                <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg font-semibold">
-                        Crédit #{credit.id.slice(0, 8)}
-                    </CardTitle>
-                    <StatusBadge status={credit.status} />
-                </div>
-            </CardHeader>
-
-            <CardContent className="space-y-4">
-                {/* Informations principales */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2 text-sm">
-                        <Euro className="h-4 w-4 text-muted-foreground" />
-                        <div>
-                            <p className="text-muted-foreground">Montant initial</p>
-                            <p className="font-semibold">
-                                {credit.initialAmount.amount.toLocaleString('fr-FR')}€
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm">
-                        <CreditCardIcon className="h-4 w-4 text-muted-foreground" />
-                        <div>
-                            <p className="text-muted-foreground">Mensualité</p>
-                            <p className="font-semibold">
-                                {credit.monthlyPayment.amount.toLocaleString('fr-FR')}€
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <div>
-                            <p className="text-muted-foreground">Durée</p>
-                            <p className="font-semibold">{credit.durationMonths} mois</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm">
-                        <Euro className="h-4 w-4 text-muted-foreground" />
-                        <div>
-                            <p className="text-muted-foreground">Solde restant</p>
-                            <p className="font-semibold">
-                                {credit.remainingBalance.amount.toLocaleString('fr-FR')}€
-                            </p>
-                        </div>
+        <CardContent className="space-y-4">
+            {/* Informations principales */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="flex items-center gap-2 text-sm">
+                    <Euro className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                        <p className="text-muted-foreground">Montant initial</p>
+                        <p className="font-semibold">
+                            {credit.initialAmount.amount.toLocaleString('fr-FR')}€
+                        </p>
                     </div>
                 </div>
 
-                {/* Dates */}
-                <div className="pt-3 border-t space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                    <CreditCardIcon className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                        <p className="text-muted-foreground">Mensualité</p>
+                        <p className="font-semibold">
+                            {credit.monthlyPayment.amount.toLocaleString('fr-FR')}€
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                        <p className="text-muted-foreground">Durée</p>
+                        <p className="font-semibold">{credit.durationMonths} mois</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm">
+                    <Euro className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                        <p className="text-muted-foreground">Solde restant</p>
+                        <p className="font-semibold">
+                            {credit.remainingBalance.amount.toLocaleString('fr-FR')}€
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Dates */}
+            <div className="pt-3 border-t space-y-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    <span>
+                        Début : {new Date(credit.startDate).toLocaleDateString('fr-FR')}
+                    </span>
+                </div>
+
+                {credit.advisorId && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        <span>
-                            Début : {new Date(credit.startDate).toLocaleDateString('fr-FR')}
-                        </span>
+                        <User className="h-4 w-4" />
+                        <span>Conseiller : {credit.advisorId.slice(0, 8)}</span>
                     </div>
+                )}
 
-                    {credit.advisorId && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <User className="h-4 w-4" />
-                            <span>Conseiller : {credit.advisorId.slice(0, 8)}</span>
-                        </div>
-                    )}
+                {credit.reason && (
+                    <div className="text-sm text-muted-foreground">
+                        <p className="font-medium">Motif :</p>
+                        <p className="italic">{credit.reason}</p>
+                    </div>
+                )}
+            </div>
 
-                    {credit.reason && (
-                        <div className="text-sm text-muted-foreground">
-                            <p className="font-medium">Motif :</p>
-                            <p className="italic">{credit.reason}</p>
-                        </div>
-                    )}
-                </div>
+        </CardContent>
+    </Card>
+);
 
-            </CardContent>
-        </Card>
-    );
-};

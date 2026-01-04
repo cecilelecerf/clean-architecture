@@ -4,7 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credit';
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   ctx: RouteContext<'/api/credits/formules/[formuleId]'>,
 ) {
   try {

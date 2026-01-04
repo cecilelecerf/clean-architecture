@@ -6,7 +6,6 @@ import { CreditNotFoundError } from "@application/errors/credits";
 import {
   UserNotActiveError,
   UserNotFoundError,
-  UserRoleMismatchError,
 } from "@application/errors/users";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";

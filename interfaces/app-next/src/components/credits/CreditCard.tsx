@@ -37,10 +37,9 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
     const StatusIcon = config.icon;
     const isPending = credit.status === "PENDING";
 
-    const grantMutation = useMutation({
-        ...endpoints.credits.grant({ creditId: credit.id }),
+    const grantMutation = useMutation(endpoints.credits.grant({ creditId: credit.id }),
 
-    });
+    );
 
     const handleAccept = () => {
         setDialogAction("accept");
@@ -55,7 +54,6 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
     const confirmAction = () => {
         grantMutation.mutate({
             payload: { accept: dialogAction === "accept" },
-            userId
         }, {
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ["credits", userId] });

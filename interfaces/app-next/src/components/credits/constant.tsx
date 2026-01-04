@@ -1,4 +1,3 @@
-import { formatDateFrench } from '@/utils/date/formatDateFrench';
 import { CalendarClock, CheckCircle, Clock, LucideIcon, XCircle } from 'lucide-react';
 
 type Status = Record<string, {

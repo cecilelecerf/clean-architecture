@@ -129,7 +129,6 @@ export class CreditEntity {
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError {
-    // Validation de la durée
     if (
       !Number.isInteger(durationMonths) ||
       durationMonths <= 0 ||

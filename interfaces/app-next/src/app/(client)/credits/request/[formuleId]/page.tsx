@@ -29,6 +29,8 @@ export default function RequestCreditPage() {
 
   const submit = () => {
     const effectiveDateISO = new Date(formData.startDate).toISOString();
+    console.log(formData.startDate)
+    console.log(effectiveDateISO)
 
     mutation.mutate(
       {

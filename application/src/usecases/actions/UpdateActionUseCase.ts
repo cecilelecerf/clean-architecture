@@ -8,6 +8,7 @@ import { ActionRepository } from "@application/ports/repositories/ActionReposito
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
+import { ActionEntity } from "@domain/entities/ActionEntity";
 import {
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
@@ -47,7 +48,7 @@ export class UpdateActionUsecase {
     priceCurrency,
     isAvailable,
   }: Props): Promise<
-    | void
+    | ActionEntity
     | ActionNotFoundError
     | UserRoleMismatchError
     | UserNotFoundError
@@ -68,10 +69,18 @@ export class UpdateActionUsecase {
     const action = await this.actionRepository.findByISIN(ISIN);
     if (!action) return new ActionNotFoundError();
 
-    let price;
+    let price: Money | undefined;
     if (priceAmount && priceCurrency) {
-      price = Money.create({ amount: priceAmount, currency: priceCurrency });
-      if (price instanceof Error) return price;
+      const priceVO:
+        | Money
+        | MoneyCurrencyMissingError
+        | MoneyAmountInvalidError
+        | MoneyAmountNegativeError = Money.create({
+        amount: priceAmount,
+        currency: priceCurrency,
+      });
+      if (priceVO instanceof Error) return priceVO;
+      else price = priceVO;
     }
 
     action.update({
@@ -84,5 +93,7 @@ export class UpdateActionUsecase {
       isAvailable,
       now: this.clockService.now(),
     });
+    await this.actionRepository.update(action);
+    return action;
   }
 }

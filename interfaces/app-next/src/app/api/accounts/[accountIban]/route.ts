@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
-import { accountDTOSchema, accountSchema } from '@infrastructure/types/account';
-import z from 'zod';
+import { accountDTOSchema } from '@infrastructure/types/account';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/accounts/[accountIban]'>) {
+export async function GET(_req: NextRequest, ctx: RouteContext<'/api/accounts/[accountIban]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -29,7 +28,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/accounts/[ac
   }
 }
 
-export async function DELETE(req: NextRequest, ctx: RouteContext<'/api/accounts/[accountIban]'>) {
+export async function DELETE(_req: NextRequest, ctx: RouteContext<'/api/accounts/[accountIban]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

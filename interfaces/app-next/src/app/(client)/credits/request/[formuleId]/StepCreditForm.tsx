@@ -44,9 +44,9 @@ export const StepCreditForm = ({ data, setData, onSubmit, loading, minAmount, ma
     },
     {
       label: `Durée (mois)${data.durationMonths && Number(data.durationMonths) > 0
-          ? ` (${Math.floor(Number(data.durationMonths) / 12)} an${Number(data.durationMonths) >= 24 ? "s" : ""
-          })`
-          : ""
+        ? ` (${Math.floor(Number(data.durationMonths) / 12)} an${Number(data.durationMonths) >= 24 ? "s" : ""
+        })`
+        : ""
         }`,
       type: "number",
       get: data.durationMonths,
