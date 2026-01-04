@@ -1,11 +1,10 @@
-import { orderDTOSchema, orderSchema } from '@infrastructure/types/order';
+import { orderDTOSchema, orderSchema, portfolioSchema } from '@infrastructure/types/order';
 import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { mutationOptions, queryOptions } from '@tanstack/react-query';
-import { get, post } from '@/lib/apiClient';
-import { queryClient } from '@/lib/queryClient';
+import { queryOptions } from '@tanstack/react-query';
+import { get } from '@/lib/apiClient';
 import { safeParseWithLog } from '@/lib/zodUtils';
-import { ActionId } from '@infrastructure/types/action';
+import { ActionId, actionSchema } from '@infrastructure/types/action';
 
 // ============================================================================
 // SCHEMAS
@@ -30,7 +29,7 @@ export const ordersEndpoint = createEndpointsNodes({
       queryKey: ['orders', 'list'],
       queryFn: () =>
         get('/orders').then((data) => {
-          return safeParseWithLog(orderDTOSchema.array(), data);
+          return safeParseWithLog(orderDTOSchema.extend({ action: actionSchema }).array(), data);
         }),
     }),
 
@@ -44,16 +43,21 @@ export const ordersEndpoint = createEndpointsNodes({
           return safeParseWithLog(orderDTOSchema.array(), data);
         }),
     }),
-  // POST /api/orders
-  // Créer un nouveau ordre d'achat ou de vente
-  create: () =>
-    mutationOptions({
-      mutationFn: async (payload: placeOrder) => {
-        const data = await post('/orders', payload);
-        return orderSchema.parse(data);
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['orders', 'list'] });
-      },
+
+  getAllWithAction: () =>
+    queryOptions({
+      queryKey: ['orders', 'list', 'actions'],
+      queryFn: () =>
+        get(`/orders/actions`).then((data) => {
+          return safeParseWithLog(orderDTOSchema.array(), data);
+        }),
+    }),
+  getPortfolio: () =>
+    queryOptions({
+      queryKey: ['orders', 'portfolio'],
+      queryFn: () =>
+        get(`/orders/portfolio`).then((data) => {
+          return safeParseWithLog(portfolioSchema, data);
+        }),
     }),
 });

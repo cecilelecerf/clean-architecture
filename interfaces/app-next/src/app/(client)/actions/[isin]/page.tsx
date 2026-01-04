@@ -1,10 +1,9 @@
-"use client";
-
-import { useParams } from "next/navigation";
+"use client"
 import { ActionId } from "@infrastructure/types/action";
 import ActionDetail from "@/components/actions/ActionDetail";
+import { useParams } from "next/navigation";
 
 export default function ActionDetailsPage() {
     const { isin } = useParams<{ isin: ActionId }>();
-    return <ActionDetail isin={isin} isAdmin baseHref="/director" />
+    return <ActionDetail baseHref="" isin={isin} />
 }

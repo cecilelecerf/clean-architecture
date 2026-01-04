@@ -8,6 +8,7 @@ import { creditsEndpoint } from './creditEndpoints';
 import { savingsrateEndpoint } from './savingsrateEndpoints';
 import { formuleEndpoint } from './formuleEndpoints';
 import { actionsEndpoint } from './actionsEndpoints';
+import { ordersEndpoint } from './orderEndpoints';
 
 export const endpoints = createEndpointsNodes({
   accounts: accountsEndpoint,
@@ -19,4 +20,5 @@ export const endpoints = createEndpointsNodes({
   credits: creditsEndpoint,
   savingsRates: savingsrateEndpoint,
   formules: formuleEndpoint,
+  orders: ordersEndpoint,
 });

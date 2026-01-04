@@ -68,16 +68,13 @@ export function TransactionDetail({
                         </Card>
 
                         <div className="flex flex-col md:flex-row items-center gap-4 my-6">
-                            {/* Compte source */}
                             <AccountCard clickable={clickable} account={transaction.fromAccount} />
 
-                            {/* Flèche responsive */}
                             <div className="shrink-0">
                                 <ArrowDown className="w-6 h-6 text-gray-400 md:hidden" />
                                 <ArrowRight className="w-6 h-6 text-gray-400 hidden md:block" />
                             </div>
 
-                            {/* Compte destination */}
                             <AccountCard clickable={clickable} account={transaction.toAccount} />
                         </div>
                     </>
@@ -95,42 +92,47 @@ const AccountCard = ({ clickable, account }: { clickable?: boolean, account: Acc
 
         <Card className="w-full md:flex-1 rounded-xl shadow-md border-2">
             <CardContent className="p-4">
-                <div
-                    className={cn(
-                        "flex items-center gap-3 mb-3",
-                        clickable && "cursor-pointer hover:bg-gray-50  p-2 rounded-lg transition-colors"
-                    )}
-                    onClick={() => clickable && router.push(`/admin/users/${account.user.id}`)}
-                >
-                    <Avatar className="h-10 w-10">
-                        <AvatarFallback className="bg-gray-100">
-                            {account.user.firstname?.[0]}
-                            {account.user.lastname?.[0]}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">
-                            {account.user.firstname} {account.user.lastname}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                            {account.user.email}
-                        </p>
-                    </div>
-                </div>
-                <div
-                    className={cn(
-                        `rounded-lg p-3 border-l-4 border-${account.color}-500 bg-gray-50`,
-                        clickable && "cursor-pointer hover:bg-gray-100 transition-colors"
-                    )}
-                    onClick={() => clickable && router.push(`/admin/accounts/${account.IBAN}`)}
 
-                >
-                    <p className="text-xs text-gray-500 mb-1">Compte bénéficiaire</p>
-                    <p className="font-medium text-sm">{account.name}</p>
-                    <p className="text-xs text-gray-400 mt-1">
-                        {account.type === "courant" ? "Compte courant" : "Compte épargne"}
-                    </p>
-                </div>
+                {account.user ? (
+                    <>
+                        <div
+                            className={cn(
+                                "flex items-center gap-3 mb-3",
+                                clickable && "cursor-pointer hover:bg-gray-50  p-2 rounded-lg transition-colors"
+                            )}
+                            onClick={() => clickable && router.push(`/admin/users/${account.user.id}`)}
+                        >
+                            <Avatar className="h-10 w-10">
+                                <AvatarFallback className="bg-gray-100">
+                                    {account.user.firstname?.[0]}
+                                    {account.user.lastname?.[0]}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm truncate">
+                                    {account.user.firstname} {account.user.lastname}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                    {account.user.email}
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            className={cn(
+                                `rounded-lg p-3 border-l-4 border-${account.color}-500 bg-gray-50`,
+                                clickable && "cursor-pointer hover:bg-gray-100 transition-colors"
+                            )}
+                            onClick={() => clickable && router.push(`/admin/accounts/${account.IBAN}`)}
+
+                        >
+                            <p className="text-xs text-gray-500 mb-1">Compte bénéficiaire</p>
+                            <p className="font-medium text-sm">{account.name}</p>
+                            <p className="text-xs text-gray-400 mt-1">
+                                {account.type === "courant" ? "Compte courant" : "Compte épargne"}
+                            </p>
+                        </div></>
+                ) : <p>Banque</p>}
+
             </CardContent>
         </Card>
     )

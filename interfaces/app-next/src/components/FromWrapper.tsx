@@ -22,14 +22,13 @@ import {
 } from '@/components/ui/select';
 import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
-import { Separator } from './ui/separator';
 
 export type FormField = {
   label: string;
   type?: "text" | "email" | "textarea" | "password" | "date" | "checkbox" | "radio" | "select" | "creatable-select" | "number" | "other" | "icon";
   placeholder?: string;
-  get: string | string[];
-  set: (e: string | string[]) => void;
+  get: string | string[] | number;
+  set: (e: string | string[] | number) => void;
   layout?: ReactNode;
   disabled?: boolean;
   options?: { label: string; value: string; icon?: string }[];
@@ -215,18 +214,22 @@ export default function FormWrapper({
             <Flex gap="5" className="flex-wrap">
               {field.options?.map((option, idx) => (
                 <div key={idx} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`${field.label}-${option.value}`}
-                    checked={Array.isArray(field.get) && field.get.includes(option.value)}
-                    onCheckedChange={() => handleCheckboxChange(field.set, field.get, option.value)}
-                    disabled={loading || field.disabled}
-                  />
-                  <Label
-                    htmlFor={`${field.label}-${option.value}`}
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    {option.label}
-                  </Label>
+                  {typeof (field.get) !== "number" && (
+                    <>
+                      <Checkbox
+                        id={`${field.label}-${option.value}`}
+                        checked={Array.isArray(field.get) && field.get.includes(option.value)}
+                        onCheckedChange={() => handleCheckboxChange(field.set, field.get as string[], option.value)}
+                        disabled={loading || field.disabled}
+                      />
+                      <Label
+                        htmlFor={`${field.label}-${option.value}`}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {option.label}
+                      </Label>
+                    </>
+                  )}
                 </div>
               ))}
             </Flex>

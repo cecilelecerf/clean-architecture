@@ -2,13 +2,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
     Building2,
-    Hash,
     DollarSign,
     FileText,
     Settings,
@@ -30,18 +29,16 @@ const actionSchema = {
 
 export const ActionForm = ({ isin }: { isin?: ActionId }) => {
     const router = useRouter();
-    const queryClient = useQueryClient();
     const isEditMode = !!isin;
 
     const [formData, setFormData] = useState({
-        ISIN: "",
+        ISIN: "" as ActionId,
         name: "",
         symbol: "",
         market: "",
         activitySector: "",
-        totalNb: "",
-        currentPrice: "",
-        currency: "EUR",
+        totalNb: 0,
+        currentPrice: { amount: 0, currency: "EUR" },
         isAvailable: "true",
     });
 
@@ -63,73 +60,16 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                 symbol: action.symbol,
                 market: action.market,
                 activitySector: action.activitySector,
-                totalNb: action.totalNb.toString(),
-                currentPrice: action.currentPrice.amount.toString(),
-                currency: action.currentPrice.currency,
-                isAvailable: action.isAvailable.toString(),
+                totalNb: action.totalNb,
+                currentPrice: { amount: action.currentPrice.amount, currency: action.currentPrice.currency, },
+                isAvailable: action.isAvailable ? "true" : "false",
             });
         }
     }, [isEditMode, query.status, query.data]);
 
-    const createMutation = useMutation({
-        mutationFn: async (data: typeof formData) => {
-            const response = await fetch("/api/actions", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...data,
-                    totalNb: parseInt(data.totalNb),
-                    currentPrice: parseFloat(data.currentPrice),
-                    isAvailable: data.isAvailable === "true",
-                }),
-            });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || "Erreur lors de la création");
-            }
-            return response.json();
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["actions"] });
-            toast.success("Action créée avec succès");
-            router.push("/admin/actions");
-        },
-        onError: (error: Error) => {
-            setMessage(error.message);
-            setMessageType("error");
-            toast.error("Erreur lors de la création");
-        },
-    });
+    const createMutation = useMutation(endpoints.actions.create());
 
-    const updateMutation = useMutation({
-        mutationFn: async (data: typeof formData) => {
-            const response = await fetch(`/api/actions/${isin}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...data,
-                    totalNb: parseInt(data.totalNb),
-                    currentPrice: parseFloat(data.currentPrice),
-                    isAvailable: data.isAvailable === "true",
-                }),
-            });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || "Erreur lors de la mise à jour");
-            }
-            return response.json();
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["actions"] });
-            toast.success("Action mise à jour avec succès");
-            router.push(`/admin/actions/${isin}`);
-        },
-        onError: (error: Error) => {
-            setMessage(error.message);
-            setMessageType("error");
-            toast.error("Erreur lors de la mise à jour");
-        },
-    });
+    const updateMutation = useMutation(endpoints.actions.update({ actionIsin: isin }));
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
@@ -157,12 +97,12 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
             newErrors.activitySector = "Le secteur d'activité est requis";
         }
 
-        const totalNb = parseInt(formData.totalNb);
+        const totalNb = formData.totalNb
         if (isNaN(totalNb) || totalNb < actionSchema.totalNb.min) {
             newErrors.totalNb = "Le nombre d'actions doit être un entier positif";
         }
 
-        const price = parseFloat(formData.currentPrice);
+        const price = formData.currentPrice.amount
         if (isNaN(price) || price < actionSchema.currentPrice.min) {
             newErrors.currentPrice = "Le prix doit être un nombre positif";
         }
@@ -182,9 +122,29 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
         }
 
         if (isEditMode) {
-            updateMutation.mutate(formData);
+            updateMutation.mutate({ payload: { ...formData, isAvailable: formData.isAvailable === "true" } }, {
+                onSuccess: () => {
+                    toast.success("Action mise à jour avec succès");
+                    router.push(`/director/actions/${isin}`);
+                },
+                onError: (error: Error) => {
+                    setMessage(error.message);
+                    setMessageType("error");
+                    toast.error("Erreur lors de la mise à jour");
+                },
+            });
         } else {
-            createMutation.mutate(formData);
+            createMutation.mutate({ payload: { ...formData, isAvailable: formData.isAvailable === "true" } }, {
+                onSuccess: (data) => {
+                    toast.success("Action créée avec succès");
+                    router.push(`/director/actions/${data.ISIN}`);
+                },
+                onError: (error: Error) => {
+                    setMessage(error.message);
+                    setMessageType("error");
+                    toast.error("Erreur lors de la création");
+                },
+            });
         }
     };
 
@@ -201,7 +161,7 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                     type: "text",
                     placeholder: "FR0000120271",
                     get: formData.ISIN,
-                    set: (value) => setFormData({ ...formData, ISIN: value as string }),
+                    set: (value) => setFormData({ ...formData, ISIN: value as ActionId }),
                     disabled: isEditMode,
                     required: true,
                     description: errors.ISIN || "Code ISIN à 12 caractères (ex: FR0000120271)",
@@ -281,7 +241,7 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                     type: "number",
                     placeholder: "1000000",
                     get: formData.totalNb,
-                    set: (value) => setFormData({ ...formData, totalNb: value as string }),
+                    set: (value) => setFormData({ ...formData, totalNb: Array.isArray(value) ? Number(value[0]) : Number(value) }),
                     required: true,
                     numberOptions: { min: 1, step: 1 },
                     description: errors.totalNb || "Nombre total d'actions disponibles",
@@ -290,9 +250,9 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                     label: "Prix actuel",
                     type: "number",
                     placeholder: "150.00",
-                    get: formData.currentPrice,
+                    get: formData.currentPrice.amount,
                     set: (value) =>
-                        setFormData({ ...formData, currentPrice: value as string }),
+                        setFormData({ ...formData, currentPrice: { ...formData.currentPrice, amount: value as number, } }),
                     required: true,
                     numberOptions: { min: 0.01, step: 0.01 },
                     description: errors.currentPrice || "Prix unitaire de l'action",
@@ -300,8 +260,14 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                 {
                     label: "Devise",
                     type: "select",
-                    get: formData.currency,
-                    set: (value) => setFormData({ ...formData, currency: value as string }),
+                    get: formData.currentPrice.currency,
+                    set: (value) =>
+                        setFormData({
+                            ...formData, currentPrice: {
+                                ...formData.currentPrice, currency
+                                    : value as string,
+                            }
+                        }),
                     required: true,
                     options: [
                         { label: "EUR (€)", value: "EUR" },

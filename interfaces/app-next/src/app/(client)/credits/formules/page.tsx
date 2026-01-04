@@ -45,9 +45,6 @@ export default function ClientFormulesPage() {
                                             <p className="text-lg font-medium mb-2">
                                                 Aucune formule disponible
                                             </p>
-                                            <p className="text-sm text-muted-foreground mb-6">
-                                                Créez votre première formule de prêt
-                                            </p>
                                         </CardContent>
                                     </Card>
                                 );

@@ -1,18 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { orderFactory } from '@infrastructure/adapters/db/mysql/factories/orders';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/orders/actions/[actionId]'>) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-
-    const { actionId } = await ctx.params;
-
-    const result = await orderFactory().getAllByAction.execute(session.user.id, actionId);
+    const result = await orderFactory().getPorfolio.execute({ userId: session.user.id });
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },

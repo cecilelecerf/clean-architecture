@@ -1,11 +1,13 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { get, patch, post } from '@/lib/apiClient';
 import {
-  Action,
   ActionId,
   actionPriceHistorySchema,
   actionSchema,
   actionStatsSchema,
+  BuyAction,
+  buyActionSchema,
+  NewAction,
 } from '@infrastructure/types/action';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
@@ -41,7 +43,7 @@ export const actionsEndpoint = createEndpointsNodes({
   // Créer une nouvelle action
   create: () =>
     mutationOptions({
-      mutationFn: async (payload: Action) => {
+      mutationFn: async ({ payload }: { payload: NewAction }) => {
         const data = await post('/actions', payload);
         return actionSchema.parse(data);
       },
@@ -54,7 +56,7 @@ export const actionsEndpoint = createEndpointsNodes({
   // Modifier une action
   update: ({ actionIsin }: { actionIsin: ActionId }) =>
     mutationOptions({
-      mutationFn: async ({ payload }: { payload: Action }) => {
+      mutationFn: async ({ payload }: { payload: NewAction }) => {
         const data = await patch(`/actions/${actionIsin}`, payload);
         return actionSchema.parse(data);
       },
@@ -83,5 +85,36 @@ export const actionsEndpoint = createEndpointsNodes({
         get(`/actions/${isin}/stats`).then((data) => {
           return safeParseWithLog(actionStatsSchema, data);
         }),
+    }),
+
+  buy: ({ isin }: { isin: ActionId }) =>
+    mutationOptions({
+      mutationFn: async ({ payload }: { payload: BuyAction }) => {
+        const data = await post(`/actions/${isin}/buy`, payload);
+        return buyActionSchema.parse(data);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['actions', 'list'] });
+        queryClient.invalidateQueries({ queryKey: ['actions', isin] });
+      },
+    }),
+
+  sell: ({ isin }: { isin: ActionId }) =>
+    mutationOptions({
+      mutationFn: async ({ payload }: { payload: BuyAction }) => {
+        const data = await post(`/actions/${isin}/sell`, payload);
+        return buyActionSchema.parse(data);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['actions', 'list'] });
+        queryClient.invalidateQueries({ queryKey: ['actions', isin] });
+      },
+    }),
+
+  getSuggestions: () =>
+    queryOptions({
+      queryKey: ['actions', 'suggestions'],
+      queryFn: async () =>
+        get('/actions/suggestions').then((data) => safeParseWithLog(actionSchema.array(), data)),
     }),
 });
