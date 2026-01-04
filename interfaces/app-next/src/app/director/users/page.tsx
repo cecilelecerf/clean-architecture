@@ -8,7 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { endpoints } from "@/utils/endpoint";
 import { User } from "@infrastructure/types/user";
 import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -41,7 +40,7 @@ function AdminUsersContent() {
         <>
             <TitleAdminPage title={title} />
             {match(query)
-                .with({ status: "error" }, ({ error }) => ("error"
+                .with({ status: "error" }, () => ("error"
                 ))
                 .with({ status: "pending" }, () => <UsersSkeleton />)
                 .with({ status: "success" }, ({ data: users }) => {

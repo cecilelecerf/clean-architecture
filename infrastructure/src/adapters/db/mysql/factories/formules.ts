@@ -11,63 +11,62 @@ import { GetFormuleUsecase } from "@application/usecases/formules-credit/GetForm
 import { GetAllActiveFormulesUsecase } from "@application/usecases/formules-credit/GetAllActiveFormulesUseCase";
 import { GetFormuleCreditTypesUseCase } from "@application/usecases/formules-credit/GetFormuleCreditTypesUseCase";
 import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
+import { GetFormuleStatisticsUsecase } from "@application/usecases/formules-credit/GetFormuleStatisticsUsecase";
+import { CreditRepositoryMySQL } from "../repositories/CreditRepositoryMySQL";
 
 export const formuleFactory = () => {
-    const client = new MySQLClient();
-    const userRepository = new UserRepositoryMySQL(client);
-    const formuleRepository = new FormuleCreditRepositoryMySQL(client);
-    const accountRepository = new AccountRepositoryMySQL(client);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
+  const client = new MySQLClient();
+  const userRepository = new UserRepositoryMySQL(client);
+  const formuleRepository = new FormuleCreditRepositoryMySQL(client);
+  const creditRepository = new CreditRepositoryMySQL(client);
+  const accountRepository = new AccountRepositoryMySQL(client);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
 
-    const createFormule = new CreateFormuleCreditUseCase(
-        formuleRepository,
-        userRepository,
-        accountRepository,
-        uuidService,
-        clockService
-    )
+  const createFormule = new CreateFormuleCreditUseCase(
+    formuleRepository,
+    userRepository,
+    accountRepository,
+    uuidService,
+    clockService
+  );
 
-    const activateFormule = new ActivationFormuleCreditUseCase(
-        formuleRepository,
-        userRepository,
-        clockService
-    )
+  const activateFormule = new ActivationFormuleCreditUseCase(
+    formuleRepository,
+    userRepository,
+    clockService
+  );
 
-    const updateFormule = new UpdateFormuleCreditUseCase(
-        formuleRepository,
-        userRepository,
-        accountRepository,
-        clockService
-    )
+  const updateFormule = new UpdateFormuleCreditUseCase(
+    formuleRepository,
+    userRepository,
+    accountRepository,
+    clockService
+  );
 
-    const getAll = new GetAllFormulesUsecase(
-        formuleRepository,
-        userRepository,
-    )
+  const getAll = new GetAllFormulesUsecase(formuleRepository, userRepository);
 
-    const getAllActive = new GetAllActiveFormulesUsecase(
-        formuleRepository,
-        userRepository,
-    )
+  const getAllActive = new GetAllActiveFormulesUsecase(
+    formuleRepository,
+    userRepository
+  );
 
-    const getFormule = new GetFormuleUsecase(
-        formuleRepository,
-        userRepository
-    )
+  const getFormule = new GetFormuleUsecase(formuleRepository, userRepository);
 
-    const getTypes = new GetFormuleCreditTypesUseCase(
-        formuleRepository,
-        userRepository
-    )
+  const getTypes = new GetFormuleCreditTypesUseCase(userRepository);
+  const stats = new GetFormuleStatisticsUsecase(
+    formuleRepository,
+    creditRepository
+  );
 
-    return {
-        createFormule,
-        activateFormule,
-        updateFormule,
-        getAll,
-        getAllActive,
-        getFormule,
-        getTypes
-    };
-}
+  return {
+    createFormule,
+    activateFormule,
+    updateFormule,
+    getAll,
+    getAllActive,
+    getFormule,
+    getTypes,
+    stats,
+  };
+};

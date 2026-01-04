@@ -6,7 +6,7 @@ import { endpoints } from "@/utils/endpoint";
 import { StepSelectAccount } from "./StepSelectAccount";
 import { StepCreditForm } from "./StepCreditForm";
 import { FormuleId } from "@infrastructure/types/formule";
-import { $brand } from "zod";
+import { AccountId } from "@infrastructure/types/account";
 
 export default function RequestCreditPage() {
   const { formuleId } = useParams<{ formuleId: FormuleId }>();
@@ -29,20 +29,21 @@ export default function RequestCreditPage() {
 
   const submit = () => {
     const effectiveDateISO = new Date(formData.startDate).toISOString();
+    console.log(formData.startDate)
+    console.log(effectiveDateISO)
 
     mutation.mutate(
       {
-        accountId: formData.accountId as string & $brand<"account">,
-        formuleCreditId: formuleId as string & $brand<"formule">,
+        accountId: formData.accountId as AccountId,
+        formuleCreditId: formuleId as FormuleId,
         initialAmount: {
-            amount: parseFloat(formData.amount),
-            currency: formData.currency,
+          amount: parseFloat(formData.amount),
+          currency: formData.currency,
         },
         durationMonths: parseFloat(formData.durationMonths),
         startDate: effectiveDateISO
       },
       {
-        // TODO: Fix error lors de l'enregistrement d'une nouvelle demande de crédit -> enregistrement dans la db mais un problème avec le type de retour de startDate
         onSuccess: (data) => {
           router.push(`/credits/${data.id}`);
         },
@@ -59,9 +60,9 @@ export default function RequestCreditPage() {
           selectedAccountId={formData.accountId}
           onSelect={(accountId, currency) =>
             setFormData((prev) => ({
-                ...prev,
-                accountId,
-                currency
+              ...prev,
+              accountId,
+              currency
             }))
           }
           onNext={() => setStep(2)}

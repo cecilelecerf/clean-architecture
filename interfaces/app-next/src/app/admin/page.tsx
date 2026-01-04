@@ -1,4 +1,4 @@
-import { menuItems, menuItemsClients, menuItemsCredit } from "./menu-item";
+import { menuItems, menuItemsClients } from "./menu-item";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -35,26 +35,6 @@ export default function AdminHomePage() {
                 <h2 className="text-xl font-semibold mb-4 text-gray-700">Relation Client</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {menuItemsClients.map((item) => (
-                        <Link href={item.href} key={item.label}>
-                            <Card className="hover:shadow-lg transition-all hover:scale-105 cursor-pointer h-full">
-                                <CardContent className="flex flex-col items-center justify-center gap-3 p-6 text-center">
-                                    <div className="text-gray-700">
-                                        {item.icon}
-                                    </div>
-
-                                    <p className="font-semibold text-lg">{item.label}</p>
-                                </CardContent>
-                            </Card>
-                        </Link>
-                    ))}
-                </div>
-            </section>
-
-            {/* Section Crédit */}
-            <section>
-                <h2 className="text-xl font-semibold mb-4 text-gray-700">Crédit</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {menuItemsCredit.map((item) => (
                         <Link href={item.href} key={item.label}>
                             <Card className="hover:shadow-lg transition-all hover:scale-105 cursor-pointer h-full">
                                 <CardContent className="flex flex-col items-center justify-center gap-3 p-6 text-center">

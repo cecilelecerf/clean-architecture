@@ -3,7 +3,6 @@ import { Skeleton } from "../ui/skeleton";
 
 export const CreditsSkeleton = () => (
     <>
-        {/* Mobile Skeleton */}
         <div className="md:hidden space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
                 <Card key={i}>
@@ -27,7 +26,6 @@ export const CreditsSkeleton = () => (
             ))}
         </div>
 
-        {/* Desktop Skeleton */}
         <Card className="hidden md:block">
             <CardHeader>
                 <Skeleton className="h-6 w-48" />

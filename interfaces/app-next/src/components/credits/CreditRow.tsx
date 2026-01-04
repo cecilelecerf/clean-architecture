@@ -50,7 +50,6 @@ export const CreditRow = ({ credit, isAdmin, basePath }: Props) => {
     const confirmAction = () => {
         grantMutation.mutate({
             payload: { accept: dialogAction === "accept" },
-            userId: credit.userId
         }, {
             onSuccess: () => {
                 setDialogOpen(false);

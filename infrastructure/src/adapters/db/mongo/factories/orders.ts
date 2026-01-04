@@ -8,37 +8,34 @@ import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
 import { GetAllByUserUseCase } from "@application/usecases/orders/GetAllByUserUseCase";
 import { GetAllByActionUseCase } from "@application/usecases/orders/GetAllByActionUseCase";
 
-export const orderFactory = () => { 
-    const client = new MongoClient();
-    const userRepository = new UserRepositoryMongo(client);
-    const orderRepository = new OrderRepositoryMongo(client);
-    const actionRepository = new ActionRepositoryMongo(client);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
+export const orderFactory = () => {
+  const client = new MongoClient();
+  const userRepository = new UserRepositoryMongo(client);
+  const orderRepository = new OrderRepositoryMongo(client);
+  const actionRepository = new ActionRepositoryMongo(client);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
 
-    const placeOrder = new PlaceOrderUseCase(
-        orderRepository,
-        actionRepository,
-        uuidService,
-        clockService
-    );
+  const placeOrder = new PlaceOrderUseCase(
+    orderRepository,
+    actionRepository,
+    uuidService,
+    clockService
+  );
 
-    const getAllByUser = new GetAllByUserUseCase(
-        userRepository,
-        orderRepository
-    );
-    
-    const getAllByAction = new GetAllByActionUseCase(
-        userRepository,
-        orderRepository,
-        actionRepository
-    )
+  const getAllByUser = new GetAllByUserUseCase(userRepository, orderRepository);
 
-    return {
-        client: {
-            placeOrder,
-            getAllByUser,
-            getAllByAction
-        }
-    }
-}
+  const getAllByAction = new GetAllByActionUseCase(
+    userRepository,
+    orderRepository,
+    actionRepository
+  );
+
+  return {
+    client: {
+      placeOrder,
+      getAllByUser,
+      getAllByAction,
+    },
+  };
+};

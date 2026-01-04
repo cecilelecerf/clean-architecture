@@ -1,9 +1,9 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import {
+  CreditDTO,
   creditDTOSchema,
   creditDTOWithFormuleAndAccountSchema,
-  creditDTOWithFormuleAndAdvisorSchema,
   creditDTOWithFormuleSchema,
   CreditId,
   CreditResponse,
@@ -13,8 +13,8 @@ import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
-import { moneySchema } from '@infrastructure/types/money';
 import { UserId } from '@infrastructure/types/user';
+import { FormuleId } from '@infrastructure/types/formule';
 
 // ============================================================================
 // SCHEMAS
@@ -45,6 +45,17 @@ export const creditsEndpoint = createEndpointsNodes({
         }),
     }),
 
+  // GET /api/credits
+  // Liste des crédits par rapport à la formule
+  getAllByFormuleId: ({ formuleId }: { formuleId: FormuleId }) =>
+    queryOptions({
+      queryKey: ['credits', 'list', formuleId],
+      queryFn: () =>
+        get(`/credits/formules/${formuleId}`).then((data) => {
+          return safeParseWithLog(creditDTOSchema.array(), data);
+        }),
+    }),
+
   // GET /api/credits/:creditId
   // Détails d'un crédit
   get: ({ creditId }: { creditId: CreditId }) =>
@@ -56,24 +67,13 @@ export const creditsEndpoint = createEndpointsNodes({
         ),
     }),
 
-  // GET /api/credits/pending
+  // GET /api/credits/status?label='status'
   // Liste des crédits des clients en cours de traitement
-  getAllPending: () =>
+  getAllByStatus: ({ status }: { status?: CreditDTO['status'] }) =>
     queryOptions({
-      queryKey: ['credits', 'list'],
+      queryKey: ['credits', 'list', status],
       queryFn: () =>
-        get('/credits/admin').then((data) => {
-          return safeParseWithLog(creditDTOWithFormuleSchema.array(), data);
-        }),
-    }),
-
-  // GET /api/credits/active
-  // Liste des crédits actifs des clients
-  getAllActive: () =>
-    queryOptions({
-      queryKey: ['credits', 'list'],
-      queryFn: () =>
-        get('/credits/active').then((data) => {
+        get(`/credits/status?${status !== undefined ? `label=${status}` : ''}`).then((data) => {
           return safeParseWithLog(creditDTOWithFormuleSchema.array(), data);
         }),
     }),
@@ -130,22 +130,18 @@ export const creditsEndpoint = createEndpointsNodes({
   // Acceptation ou refus du crédit de la part d'un conseiller
   grant: ({ creditId }: { creditId: CreditId }) =>
     mutationOptions({
-      mutationFn: ({ payload, userId }: { payload: CreditResponse; userId: UserId }) =>
+      mutationFn: ({ payload }: { payload: CreditResponse }) =>
         patch(`/credits/${creditId}/grant`, payload),
       onSuccess: (data, variables) => {
         // Invalide le crédit spécifique
         queryClient.invalidateQueries({ queryKey: ['credits', creditId] });
         // Invalide toutes les listes de crédits
         queryClient.invalidateQueries({ queryKey: ['credits', 'list'] });
-        // Invalide les listes par utilisateur
-        queryClient.invalidateQueries({ queryKey: ['credits', 'list', 'users', variables.userId] });
         // Si le crédit est accepté, invalide les comptes car le montant sera débloqué
         if (variables.payload.accept) {
           queryClient.invalidateQueries({ queryKey: ['accounts'] });
           queryClient.invalidateQueries({ queryKey: ['transactions'] });
         }
-        // Invalide les notifications non lues (nouveau statut de crédit)
-        queryClient.invalidateQueries({ queryKey: ['feeds', 'posts', 'unread'] });
       },
     }),
 

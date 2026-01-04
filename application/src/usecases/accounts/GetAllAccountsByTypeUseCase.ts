@@ -7,10 +7,7 @@ import {
   UserNotFoundError,
   UserRoleMismatchError,
 } from "@application/errors/users";
-import {
-  AccountEntityWithUser,
-  AccountRepository,
-} from "@application/ports/repositories/AccountRepository";
+import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { InvalidAccountTypeError } from "@domain/errors/account/InvalidAccountType";

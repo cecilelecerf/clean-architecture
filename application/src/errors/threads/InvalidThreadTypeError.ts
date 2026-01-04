@@ -1,6 +1,8 @@
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 
 export class InvalidThreadTypeError extends Error {
+  public readonly statusCode = 400;
+
   constructor(
     public readonly threadId: ThreadEntity["id"],
     public readonly threadType: ThreadEntity["type"],

@@ -5,6 +5,7 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { FormuleCreditRepository } from "@application/ports/repositories/FormuleCreditRepository";
 import { IBAN } from "@domain/values/IBAN";
+import { FormuleType } from "@domain/values/FormuleType";
 
 export interface SeedFormuleCreditRequest {
   type: string;
@@ -65,11 +66,20 @@ export class SeedFormuleCreditUseCase {
       throw new Error(`Invalid max amount: ${request.maxAmount}`);
     }
 
+    const type = FormuleType.create(request.type);
+    if (type instanceof Error) {
+      throw new Error(` ${request.type}`);
+    }
+
+    if (maxAmount instanceof Error) {
+      throw new Error(`Invalid max amount: ${request.maxAmount}`);
+    }
+
     const now = this.clockService.now();
 
     const formuleCredit = FormuleCreditEntity.from({
       id: this.uuidService.generate(),
-      type: request.type,
+      type,
       label: request.label,
       description: request.description,
       interestRate,

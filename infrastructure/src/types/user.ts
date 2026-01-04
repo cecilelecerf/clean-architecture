@@ -16,6 +16,13 @@ export const userSchema = z.object({
 });
 export type User = z.infer<typeof userSchema>;
 
+export const payloadUserUpdateSchema = userSchema.pick({
+  firstname: true,
+  lastname: true,
+  email: true,
+});
+export type PayloadUserUpdateSchema = z.infer<typeof payloadUserUpdateSchema>;
+
 export const userDtoSchema = userSchema.pick({
   id: true,
   firstname: true,
@@ -26,3 +33,9 @@ export const userDtoSchema = userSchema.pick({
   confirmedAt: true,
 });
 export type UserDto = z.infer<typeof userDtoSchema>;
+
+export const advisorStat = z.object({
+  acceptedCreditsCount: z.number(),
+  refusedCreditsCount: z.number(),
+  activeThreadsCount: z.number(),
+});

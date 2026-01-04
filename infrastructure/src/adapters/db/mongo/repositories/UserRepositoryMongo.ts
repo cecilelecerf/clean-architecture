@@ -4,52 +4,53 @@ import { UserEntity } from "@domain/entities/UserEntity";
 import { Email } from "@domain/values/Email";
 import { UserModel } from "../models/UserModel";
 import { UserMapper } from "../../mappers/UserMapper";
-import { IBAN } from "@domain/values/IBAN";
 import { AccountEntity } from "@domain/entities/AccountEntity";
+import { AccountModel } from "../models/AccountModel";
 
 export class UserRepositoryMongo implements UserRepository {
   constructor(private readonly client: MongoClient) {}
 
-  /** Trouver un utilisateur par ID */
   async findById(id: UserEntity["id"]): Promise<UserEntity | null> {
     await this.client.connect();
 
     const doc = await UserModel.findById(id).lean();
     if (!doc) return null;
 
-    return UserMapper.mapRowToUser(doc);
+    return UserMapper.mapDocToUser(doc);
   }
 
-  /** Trouver un utilisateur par email */
   async findByEmail(email: Email): Promise<UserEntity | null> {
     await this.client.connect();
 
     const doc = await UserModel.findOne({ email: email.value }).lean();
     if (!doc) return null;
 
-    return UserMapper.mapRowToUser(doc);
+    return UserMapper.mapDocToUser(doc);
   }
 
-  /** Tous les utilisateurs */
+  async findByIban(iban: AccountEntity["iban"]): Promise<UserEntity | null> {
+    await this.client.connect();
+
+    const account = await AccountModel.findOne({ iban: iban.value })
+      .populate({
+        path: "userId",
+        model: "User",
+      })
+      .lean();
+
+    if (!account || !account.userId) return null;
+
+    return UserMapper.mapDocToUser(account.userId);
+  }
+
   async findAll(): Promise<UserEntity[]> {
     await this.client.connect();
 
     const docs = await UserModel.find().sort({ createdAt: -1 }).lean();
 
-    return docs.map((doc) => UserMapper.mapRowToUser(doc));
+    return docs.map((doc) => UserMapper.mapDocToUser(doc));
   }
 
-  /** Trouver un utilisateur par iban */
-  async findByIban(iban: AccountEntity["iban"]): Promise<UserEntity | null> {
-    await this.client.connect();
-
-    const doc = await UserModel.findOne({ iban: iban }).lean();
-    if (!doc) return null;
-
-    return UserMapper.mapRowToUser(doc);
-  }
-
-  /** Utilisateurs actifs par rôle */
   async findAllByRoleAndIsActif(
     role?: UserEntity["role"]
   ): Promise<UserEntity[]> {
@@ -68,10 +69,9 @@ export class UserRepositoryMongo implements UserRepository {
       .sort({ lastname: 1, firstname: 1 })
       .lean();
 
-    return docs.map((doc) => UserMapper.mapRowToUser(doc));
+    return docs.map((doc) => UserMapper.mapDocToUser(doc));
   }
 
-  /** Sauvegarder un utilisateur */
   async save(user: UserEntity): Promise<void> {
     await this.client.connect();
 
@@ -89,7 +89,6 @@ export class UserRepositoryMongo implements UserRepository {
     });
   }
 
-  /** Mettre à jour un utilisateur */
   async update(user: UserEntity): Promise<void> {
     await this.client.connect();
 
@@ -110,10 +109,19 @@ export class UserRepositoryMongo implements UserRepository {
     );
   }
 
-  /** Supprimer un utilisateur */
   async delete(id: UserEntity["id"]): Promise<void> {
     await this.client.connect();
 
     await UserModel.deleteOne({ _id: id });
+  }
+
+  async countUserByRole(role: UserEntity["role"]): Promise<number> {
+    await this.client.connect();
+
+    return await UserModel.countDocuments({
+      isActive: true,
+      confirmedAt: { $ne: null },
+      role,
+    });
   }
 }

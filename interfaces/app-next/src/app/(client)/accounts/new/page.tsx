@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Color, colorSchema } from '@infrastructure/types/color';
 import { Account, NewAccount } from '@infrastructure/types/account';
@@ -12,7 +11,6 @@ import { bgColorClasses, textColorClasses } from '@/utils/color';
 import { Check } from 'lucide-react';
 
 export default function NewAccountPage() {
-  const router = useRouter();
 
   const [field, setField] = useState<NewAccount>({
     color: null,

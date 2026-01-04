@@ -5,7 +5,7 @@ import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credi
 import { creditSchema } from '@infrastructure/types/credit';
 import z from 'zod';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/credits/[creditId]'>) {
+export async function GET(_req: NextRequest, ctx: RouteContext<'/api/credits/[creditId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/credits/[cre
   }
 }
 
-export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/credits/[creditId]'>) {
+export async function PATCH(_req: NextRequest, ctx: RouteContext<'/api/credits/[creditId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

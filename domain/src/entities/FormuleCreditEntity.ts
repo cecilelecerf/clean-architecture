@@ -1,3 +1,5 @@
+import { InvalidFormuleTypeError } from "@domain/errors/formuleType";
+import { FormuleType } from "@domain/values/FormuleType";
 import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 import { Percentage } from "@domain/values/Percentage";
@@ -7,7 +9,7 @@ export class FormuleCreditEntity {
     public id: string,
     public interestRate: Percentage,
     public insuranceRate: Percentage,
-    public type: string,
+    public type: FormuleType,
     public label: string,
     public description: string,
     public isActive: boolean,
@@ -112,7 +114,7 @@ export class FormuleCreditEntity {
   update({
     interestRate,
     insuranceRate,
-    type,
+    type: typeStr,
     isActive,
     label,
     description,
@@ -133,12 +135,17 @@ export class FormuleCreditEntity {
     maxAmount?: Money;
     currency?: string;
     now: Date;
-  }) {
+  }): FormuleCreditEntity | InvalidFormuleTypeError {
     if (interestRate) this.interestRate = interestRate;
     if (insuranceRate) this.insuranceRate = insuranceRate;
-    if (type) this.type = type;
+    if (typeStr) {
+      const formuleType = FormuleType.create(typeStr);
+      if (formuleType instanceof Error) return formuleType;
+      this.type = formuleType;
+    }
+
     if (isActive !== undefined) {
-      isActive ? this.enable({ now }) : this.disable({ now });
+      this.isActive = isActive;
     }
     if (label) this.label = label;
     if (description) this.description = description;
@@ -147,6 +154,7 @@ export class FormuleCreditEntity {
     if (maxAmount) this.maxAmount = maxAmount;
     if (currency) this.currency = currency;
     this.updatedAt = now;
+    return this;
   }
 
   public enable({ now }: { now: Date }): this {
@@ -166,7 +174,7 @@ export class FormuleCreditEntity {
       id: this.id,
       interestRate: this.interestRate.value,
       insuranceRate: this.insuranceRate.value,
-      type: this.type,
+      type: this.type.value,
       label: this.label,
       description: this.description,
       isActive: this.isActive,
@@ -183,12 +191,13 @@ export class FormuleCreditEntity {
 export type FormuleCreditDTO = {
   interestRate: number;
   insuranceRate: number;
-  label: string;
-  description: string;
   minAmount?: number;
   maxAmount?: number;
-  currency?: string;
   createdAt: string;
   updatedAt: string;
   accountId: string;
-} & Pick<FormuleCreditEntity, "id" | "type" | "isActive">;
+  type: string;
+} & Pick<
+  FormuleCreditEntity,
+  "id" | "label" | "isActive" | "description" | "currency"
+>;

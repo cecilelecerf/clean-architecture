@@ -14,11 +14,10 @@ import { TransactionFilters as TTransactionFilters } from "@/utils/endpoint/tran
 
 type TransactionFiltersProps = {
     filters: TTransactionFilters;
-    isAdmin?: boolean
     onChange: (filters: TTransactionFilters) => void;
 };
 
-export const TransactionFilters = ({ filters, onChange, isAdmin }: TransactionFiltersProps) => {
+export const TransactionFilters = ({ filters, onChange }: TransactionFiltersProps) => {
     const [localFilters, setLocalFilters] = useState<TTransactionFilters>(filters);
 
     useEffect(() => {

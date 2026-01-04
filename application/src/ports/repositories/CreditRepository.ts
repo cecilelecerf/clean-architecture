@@ -26,9 +26,27 @@ export interface CreditRepository {
   ): Promise<CreditEntityWithFormuleAndAccount | null>;
   findAllByAccountIban(accountId: IBAN): Promise<CreditEntityWithFormule[]>;
   findAllByUserId(userId: UserEntity["id"]): Promise<CreditEntityWithFormule[]>;
-  findActiveCredits(today: Date): Promise<CreditEntityWithFormule[]>;
-  findPendingCredits(): Promise<CreditEntityWithFormule[]>;
+  findAllByStatus(
+    status?: CreditEntity["status"]
+  ): Promise<CreditEntityWithFormule[]>;
   save(credit: CreditEntity): Promise<void>;
   update(credit: CreditEntity): Promise<void>;
   delete(id: CreditEntity["id"]): Promise<void>;
+  findAllByFormuleId(
+    formuleId: FormuleCreditEntity["id"]
+  ): Promise<CreditEntity[]>;
+  countAcceptedByAdvisor(advisorId: string): Promise<number>;
+  countRefusedByAdvisor(advisorId: string): Promise<number>;
+  countByFormule(formuleId: string): Promise<number>;
+  countByFormuleAndStatus(
+    formuleId: string,
+    status: CreditEntity["status"]
+  ): Promise<number>;
+  countClientsByFormule(formuleId: string): Promise<number>;
+  getFinancialStatsByFormule(formuleId: string): Promise<{
+    totalLoanedAmount: number;
+    totalInterestEarned: number;
+    totalInsuranceEarned: number;
+    totalRevenue: number;
+  }>;
 }

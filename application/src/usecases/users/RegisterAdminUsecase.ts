@@ -3,6 +3,7 @@ import {
   UserNotFoundError,
   UserRoleMismatchError,
   EmailAlreadyExistsError,
+  InvalidRoleError,
 } from "@application/errors/users";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
@@ -26,8 +27,7 @@ type Props = {
   directorId: UserEntity["id"];
   role: string;
 } & Pick<UserEntity, "firstname" | "lastname">;
-// Register for advisro or director create par director
-export class RegisterAdvisorUsecase {
+export class RegisterAdminUsecase {
   public constructor(
     private readonly userRepository: UserRepository,
     private readonly encryptionService: EncryptionService,
@@ -54,12 +54,17 @@ export class RegisterAdvisorUsecase {
     | UserRoleMismatchError
     | InvalidFirstnameError
     | InvalidLastnameError
+    | InvalidRoleError
   > {
     const actor = await findActiveUser(this.userRepository, directorId);
     if (actor instanceof Error) return actor;
 
     if (!actor.hasRole({ role: "directeur" }))
       return new UserRoleMismatchError(["directeur"], actor.role);
+
+    if (!(role === "conseiller" || role === "directeur")) {
+      return new InvalidRoleError(role, ["conseiller", "directeur"]);
+    }
 
     const emailVO = Email.create(email);
     if (emailVO instanceof Error) return emailVO;
@@ -73,7 +78,6 @@ export class RegisterAdvisorUsecase {
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
 
-    // TODO : vérification du rôle
     const user = UserEntity.create({
       id,
       email: emailVO,
@@ -89,17 +93,13 @@ export class RegisterAdvisorUsecase {
     const token = await this.tokenService.generateConfirmationToken({
       userId: user.id,
     });
-    const confirmationLink = `${confirmationUrl}?token=${token}`;
+    const confirmationLink = `${confirmationUrl}/confirm-email?token=${token}`;
 
-    this.emailService.sendEmail({
-      to: user.email,
-      subject: "Conseiller - Bienvenue sur notre plateform",
-      text: `Clique ici pour valider ton inscription : ${confirmationLink}
-      Information de connexion :
-      - email : ${user.email},
-      - mot de passe : ${plainedPassword}
-      Pense à changer de mot de passe lors de ta première connexion.
-      `,
+    this.emailService.sendAdminWelcomeEmail(user.email, {
+      ...user,
+      confirmationLink,
+      temporaryPassword: plainedPassword,
+      email: user.email.value,
     });
     return user.toDTO();
   }

@@ -47,7 +47,6 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     return Object.assign(thread, { administrator, participants });
   }
 
-  /** Sauvegarder un thread */
   async save(thread: ThreadEntity): Promise<void> {
     await this.client.connect();
 
@@ -63,7 +62,6 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     });
   }
 
-  /** Mettre à jour un thread */
   async update(thread: ThreadEntity): Promise<void> {
     await this.client.connect();
 
@@ -76,20 +74,19 @@ export class ThreadRepositoryMongo implements ThreadRepository {
           isClose: thread.isClose,
           type: thread.type,
           updatedAt: thread.updatedAt,
+          administratorId: thread.administratorId,
         },
       },
       { new: false, runValidators: true }
     );
   }
 
-  /** Supprimer un thread */
   async delete(threadId: ThreadEntity["id"]): Promise<void> {
     await this.client.connect();
 
     await ThreadModel.deleteOne({ _id: threadId });
   }
 
-  /** Trouver un thread par ID */
   async findById(id: ThreadEntity["id"]): Promise<ThreadEntity | null> {
     await this.client.connect();
 
@@ -99,7 +96,6 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     return this.mapDocToThread(doc);
   }
 
-  /** Tous les threads d'un participant */
   async findAllByParticipantId(
     userId: UserEntity["id"]
   ): Promise<ThreadEntity[]> {
@@ -112,7 +108,6 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     return docs.map((doc) => this.mapDocToThread(doc));
   }
 
-  /** Tous les threads d'un administrateur */
   async findAllByAdministratorId(
     advisorId: UserEntity["id"]
   ): Promise<ThreadEntity[]> {
@@ -125,15 +120,21 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     return docs.map((doc) => this.mapDocToThread(doc));
   }
 
-  /** Threads avec users par participant */
   async findAllWithUserByParticipantIdAndType(
-    participantId: string
+    participantId: string,
+    type?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]> {
     await this.client.connect();
 
-    const threadsDocs = await ThreadModel.find({
+    const query: Record<string, any> = {
       participantsId: participantId,
-    })
+    };
+
+    if (type) {
+      query.type = type;
+    }
+
+    const threadsDocs = await ThreadModel.find(query)
       .populate("participantsId")
       .populate("administratorId")
       .sort({ updatedAt: -1, createdAt: -1 })
@@ -142,7 +143,6 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     return threadsDocs.map((doc) => this.mapThreadWithUsers(doc));
   }
 
-  /** Thread avec users par ID */
   async findWithUserById(
     threadId: string
   ): Promise<ThreadEntityWithUsers | null> {
@@ -161,14 +161,19 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     return this.mapThreadWithUsers(doc);
   }
 
-  /** Threads avec users par administrateur et type */
   async findAllWithUserByAdministratorIdAndType(
     administratorId: UserEntity["id"],
-    type: ThreadEntity["type"]
+    type?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]> {
     await this.client.connect();
 
-    const threadsDocs = await ThreadModel.find({ administratorId, type })
+    const query: Record<string, any> = { administratorId };
+
+    if (type) {
+      query.type = type;
+    }
+
+    const threadsDocs = await ThreadModel.find(query)
       .populate({ path: "administratorId" })
       .populate({
         path: "participantsId",
@@ -180,7 +185,6 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     return threadsDocs.map((doc) => this.mapThreadWithUsers(doc));
   }
 
-  /** Threads sans administrateur avec users */
   async findAllWithUserByAdministratorNullable(): Promise<
     ThreadEntityWithUsers[]
   > {
@@ -195,5 +199,13 @@ export class ThreadRepositoryMongo implements ThreadRepository {
       .lean<any[]>();
 
     return threadsDocs.map((doc) => this.mapThreadWithUsers(doc));
+  }
+
+  async countByAdvisor(advisorId: UserEntity["id"]): Promise<number> {
+    await this.client.connect();
+
+    return await ThreadModel.countDocuments({
+      administratorId: advisorId,
+    });
   }
 }

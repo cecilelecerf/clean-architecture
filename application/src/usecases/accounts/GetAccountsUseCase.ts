@@ -36,7 +36,7 @@ export class GetAccountsUseCase {
       if (requester instanceof Error) {
         return requester;
       }
-      if (requester.hasRole({ role: "client" }))
+      if (requester.hasRole({ role: "client" }) && requester.id !== client.id)
         return new UserRoleMismatchError(
           ["conseiller", "directeur"],
           requester.role

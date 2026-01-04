@@ -13,61 +13,52 @@ import { GetFormuleCreditTypesUseCase } from "@application/usecases/formules-cre
 import { AccountRepositoryMongo } from "../repositories/AccountRepositoryMongo";
 
 export const formuleFactory = () => {
-    const client = new MongoClient();
-    const userRepository = new UserRepositoryMongo(client);
-    const formuleRepository = new FormuleCreditRepositoryMongo(client);
-    const accountRepository = new AccountRepositoryMongo(client);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
+  const client = new MongoClient();
+  const userRepository = new UserRepositoryMongo(client);
+  const formuleRepository = new FormuleCreditRepositoryMongo(client);
+  const accountRepository = new AccountRepositoryMongo(client);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
 
-    const createFormule = new CreateFormuleCreditUseCase(
-        formuleRepository,
-        userRepository,
-        accountRepository,
-        uuidService,
-        clockService
-    )
-    
-    const activateFormule = new ActivationFormuleCreditUseCase(
-        formuleRepository,
-        userRepository,
-        clockService
-    )
-    
-    const updateFormule = new UpdateFormuleCreditUseCase(
-        formuleRepository,
-        userRepository,
-        accountRepository,
-        clockService
-    )
+  const createFormule = new CreateFormuleCreditUseCase(
+    formuleRepository,
+    userRepository,
+    accountRepository,
+    uuidService,
+    clockService
+  );
 
-    const getAll = new GetAllFormulesUsecase(
-        formuleRepository,
-        userRepository
-    )
+  const activateFormule = new ActivationFormuleCreditUseCase(
+    formuleRepository,
+    userRepository,
+    clockService
+  );
 
-    const getAllActive = new GetAllActiveFormulesUsecase(
-        formuleRepository,
-        userRepository,
-    )
+  const updateFormule = new UpdateFormuleCreditUseCase(
+    formuleRepository,
+    userRepository,
+    accountRepository,
+    clockService
+  );
 
-    const getFormule = new GetFormuleUsecase(
-        formuleRepository,
-        userRepository
-    )
+  const getAll = new GetAllFormulesUsecase(formuleRepository, userRepository);
 
-    const getTypes = new GetFormuleCreditTypesUseCase(
-        formuleRepository,
-        userRepository
-    )
-    
-    return {
-        createFormule,
-        activateFormule,
-        updateFormule,
-        getAll,
-        getAllActive,
-        getFormule,
-        getTypes
-    };
-}
+  const getAllActive = new GetAllActiveFormulesUsecase(
+    formuleRepository,
+    userRepository
+  );
+
+  const getFormule = new GetFormuleUsecase(formuleRepository, userRepository);
+
+  const getTypes = new GetFormuleCreditTypesUseCase(userRepository);
+
+  return {
+    createFormule,
+    activateFormule,
+    updateFormule,
+    getAll,
+    getAllActive,
+    getFormule,
+    getTypes,
+  };
+};

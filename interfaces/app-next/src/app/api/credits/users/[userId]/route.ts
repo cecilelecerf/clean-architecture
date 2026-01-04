@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { creditFactory } from '@infrastructure/adapters/db/mysql/factories/credit';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/credits/users/[userId]'>) {
+export async function GET(_req: NextRequest, ctx: RouteContext<'/api/credits/users/[userId]'>) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

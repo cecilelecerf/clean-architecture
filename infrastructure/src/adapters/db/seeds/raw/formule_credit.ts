@@ -1,8 +1,6 @@
-// infrastructure/adapters/db/seeds/formuleCredits.ts
 export const rawFormuleCredits = [
-  // Crédits immobiliers
   {
-    type: "immobilier",
+    type: "IMMOBILIER",
     label: "Prêt Immobilier Classique",
     description:
       "Crédit immobilier standard pour l'achat de votre résidence principale",
@@ -14,7 +12,7 @@ export const rawFormuleCredits = [
     isActive: true,
   },
   {
-    type: "immobilier",
+    type: "IMMOBILIER",
     label: "Prêt Primo-Accédant",
     description:
       "Offre spéciale pour les premiers acheteurs avec taux préférentiel",
@@ -26,7 +24,7 @@ export const rawFormuleCredits = [
     isActive: true,
   },
   {
-    type: "immobilier",
+    type: "IMMOBILIER",
     label: "Prêt Investissement Locatif",
     description: "Crédit pour l'acquisition d'un bien destiné à la location",
     interestRate: 4.0,
@@ -37,7 +35,7 @@ export const rawFormuleCredits = [
     isActive: true,
   },
   {
-    type: "immobilier",
+    type: "IMMOBILIER",
     label: "Prêt Travaux",
     description: "Financement pour vos travaux de rénovation et d'amélioration",
     interestRate: 4.5,
@@ -48,9 +46,8 @@ export const rawFormuleCredits = [
     isActive: true,
   },
 
-  // Crédits à la consommation
   {
-    type: "consommation",
+    type: "CONSOMMATION",
     label: "Crédit Personnel",
     description: "Prêt personnel pour tous vos projets",
     interestRate: 5.0,
@@ -61,19 +58,7 @@ export const rawFormuleCredits = [
     isActive: true,
   },
   {
-    type: "consommation",
-    label: "Crédit Auto",
-    description:
-      "Financement pour l'achat de votre véhicule neuf ou d'occasion",
-    interestRate: 4.5,
-    insuranceRate: 0.35,
-    minAmount: 3000,
-    maxAmount: 75000,
-    currency: "EUR",
-    isActive: true,
-  },
-  {
-    type: "consommation",
+    type: "CONSOMMATION",
     label: "Crédit Renouvelable",
     description: "Réserve d'argent disponible à tout moment",
     interestRate: 8.0,
@@ -84,9 +69,8 @@ export const rawFormuleCredits = [
     isActive: true,
   },
 
-  // Crédits professionnels
   {
-    type: "professionnel",
+    type: "PROFESSIONNEL",
     label: "Crédit Professionnel Équipement",
     description: "Financement pour l'achat de matériel professionnel",
     interestRate: 3.8,
@@ -97,7 +81,7 @@ export const rawFormuleCredits = [
     isActive: true,
   },
   {
-    type: "professionnel",
+    type: "PROFESSIONNEL",
     label: "Crédit Trésorerie Entreprise",
     description: "Solution pour gérer votre trésorerie d'entreprise",
     interestRate: 5.5,
@@ -108,9 +92,31 @@ export const rawFormuleCredits = [
     isActive: true,
   },
 
-  // Offres spéciales
   {
-    type: "special",
+    type: "AUTO",
+    label: "Crédit Auto Neuf",
+    description: "Financement pour l'achat de votre véhicule neuf",
+    interestRate: 4.0,
+    insuranceRate: 0.3,
+    minAmount: 5000,
+    maxAmount: 75000,
+    currency: "EUR",
+    isActive: true,
+  },
+  {
+    type: "AUTO",
+    label: "Crédit Auto Occasion",
+    description: "Financement pour l'achat de votre véhicule d'occasion",
+    interestRate: 4.5,
+    insuranceRate: 0.35,
+    minAmount: 3000,
+    maxAmount: 50000,
+    currency: "EUR",
+    isActive: true,
+  },
+
+  {
+    type: "AUTRE",
     label: "Prêt Étudiant",
     description: "Crédit à taux préférentiel pour financer vos études",
     interestRate: 1.5,
@@ -121,7 +127,7 @@ export const rawFormuleCredits = [
     isActive: true,
   },
   {
-    type: "special",
+    type: "AUTRE",
     label: "Prêt Écologique",
     description: "Financement pour vos projets de transition énergétique",
     interestRate: 2.0,
@@ -132,9 +138,8 @@ export const rawFormuleCredits = [
     isActive: true,
   },
 
-  // Formules désactivées (anciennes offres)
   {
-    type: "consommation",
+    type: "CONSOMMATION",
     label: "Crédit Loisirs (Ancienne formule)",
     description: "Ancienne offre crédit loisirs - Non disponible",
     interestRate: 6.0,
@@ -144,4 +149,4 @@ export const rawFormuleCredits = [
     currency: "EUR",
     isActive: false,
   },
-];
+] as const;

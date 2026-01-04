@@ -20,18 +20,7 @@ export async function generateFormuleCredits(
   for (const [index, raw] of rawFormuleCredits.entries()) {
     try {
       const accountId = bankAccountsIbans[index % bankAccountsIbans.length];
-      console.log({
-        type: raw.type,
-        label: raw.label,
-        description: raw.description,
-        interestRate: raw.interestRate,
-        insuranceRate: raw.insuranceRate,
-        minAmount: raw.minAmount,
-        maxAmount: raw.maxAmount,
-        currency: raw.currency,
-        isActive: raw.isActive,
-        accountId,
-      });
+      console.log(raw);
       const formuleCredit = await seedFormuleCreditUseCase.execute({
         type: raw.type,
         label: raw.label,

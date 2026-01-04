@@ -1,4 +1,5 @@
 import { FormuleCreditEntity } from "@domain/entities/FormuleCreditEntity";
+import { FormuleType } from "@domain/values/FormuleType";
 import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 import { Percentage } from "@domain/values/Percentage";
@@ -33,12 +34,12 @@ export class FormuleMapper {
         : undefined;
 
     const iban = IBAN.from(row[`${prefix}account_id`]);
-
+    const type = FormuleType.from(row[`${prefix}type`]);
     return FormuleCreditEntity.from({
       id: row[`${prefix}id`],
       interestRate,
       insuranceRate,
-      type: row[`${prefix}type`],
+      type,
       label: row[`${prefix}label`],
       description: row[`${prefix}description`],
       isActive: row[`${prefix}is_active`] === 1,

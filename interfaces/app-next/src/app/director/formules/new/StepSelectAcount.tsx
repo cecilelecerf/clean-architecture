@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 
-export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext}: { selectedAccountId?: string, onSelect: (accountId: string, currency: string) => void, onNext: () => void}) => {
+export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext }: { selectedAccountId?: string, onSelect: (accountId: string, currency: string) => void, onNext: () => void }) => {
     const query = useQuery(endpoints.accounts.getAll({ type: "bank" }));
 
     if (query.isLoading) return <p>Chargement des comptes...</p>;
@@ -18,32 +18,31 @@ export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext}: { sele
             <div className="grid gap-4">
                 {query.data.map((account) => {
                     const selected = account.IBAN === selectedAccountId;
-                    return(
+                    return (
                         <Card
                             key={account.IBAN}
                             onClick={() => onSelect(account.IBAN, account.currency)}
-                            className={`cursor-pointer transition-all ${
-                                selected
-                                ? "border-blue-500 ring-2 ring-blue-500"
-                                : "hover:shadow-md"
-                            }`}
-                            >
+                            className={`cursor-pointer transition-all ${selected
+                                    ? "border-blue-500 ring-2 ring-blue-500"
+                                    : "hover:shadow-md"
+                                }`}
+                        >
                             <CardContent className="flex items-center justify-between p-4">
                                 <div>
-                                <p className="font-medium">{account.name}</p>
-                                <p className="text-sm text-gray-500">
-                                    Solde : {account.amount} {account.currency}
-                                </p>
+                                    <p className="font-medium">{account.name}</p>
+                                    <p className="text-sm text-gray-500">
+                                        Solde : {account.amount} {account.currency}
+                                    </p>
                                 </div>
 
                                 {selected && (
-                                <CheckCircle className="text-blue-500 w-6 h-6" />
+                                    <CheckCircle className="text-blue-500 w-6 h-6" />
                                 )}
                             </CardContent>
                         </Card>
                     );
                 })}
-                
+
             </div>
             <Button
                 size="lg"

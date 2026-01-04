@@ -19,6 +19,7 @@ import {
   FormuleCreditEntity,
 } from "@domain/entities/FormuleCreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { InvalidFormuleTypeError } from "@domain/errors/formuleType";
 import {
   IBANInvalidCheckDigitsError,
   IBANInvalidFormatError,
@@ -31,6 +32,7 @@ import {
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import { InvalidPercentageError } from "@domain/errors/percentage";
+import { FormuleType } from "@domain/values/FormuleType";
 import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 import { Percentage } from "@domain/values/Percentage";
@@ -61,7 +63,7 @@ export class CreateFormuleCreditUseCase {
     interestRate,
     insuranceRate,
     label,
-    type,
+    type: typeStr,
     description,
     accountId,
     minAmount,
@@ -83,6 +85,7 @@ export class CreateFormuleCreditUseCase {
     | IBANTooLongError
     | IBANInvalidFormatError
     | IBANInvalidCheckDigitsError
+    | InvalidFormuleTypeError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -120,6 +123,8 @@ export class CreateFormuleCreditUseCase {
       maxAmountVO = tmp;
     }
 
+    const type = FormuleType.create(typeStr);
+    if (type instanceof Error) return type;
     const formuleCredit = FormuleCreditEntity.create({
       id: this.uuidService.generate(),
       interestRate: interestRateVO,

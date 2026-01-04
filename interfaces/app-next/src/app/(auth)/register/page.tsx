@@ -23,23 +23,23 @@ export default function RegisterPage() {
                 fields={[
                     {
                         get: register.email,
-                        set: (e) => setRegister((prev) => ({ ...prev, email: e })),
+                        set: (e) => setRegister((prev) => ({ ...prev, email: Array.isArray(e) ? e[0] : e })),
                         label: 'Email',
                         type: 'email',
                     },
                     {
                         get: register.firstname,
-                        set: (e) => setRegister((prev) => ({ ...prev, firstname: e })),
+                        set: (e) => setRegister((prev) => ({ ...prev, firstname: Array.isArray(e) ? e[0] : e })),
                         label: 'Prénom',
                     },
                     {
                         get: register.lastname,
-                        set: (e) => setRegister((prev) => ({ ...prev, lastname: e })),
+                        set: (e) => setRegister((prev) => ({ ...prev, lastname: Array.isArray(e) ? e[0] : e })),
                         label: 'Nom',
                     },
                     {
                         get: register.plainedPassword,
-                        set: (e) => setRegister((prev) => ({ ...prev, plainedPassword: e })),
+                        set: (e) => setRegister((prev) => ({ ...prev, plainedPassword: Array.isArray(e) ? e[0] : e })),
                         label: 'Mot de passe',
                         type: 'password',
                     },

@@ -12,9 +12,8 @@ import { FormuleCreditRepositoryMongo } from "../repositories/FormuleCreditRepos
 import { AccountRepositoryMongo } from "../repositories/AccountRepositoryMongo";
 import { GetCreditUsecase } from "@application/usecases/credits/GetCreditUsecase";
 import { GetCreditByAccountUseCase } from "@application/usecases/credits/GetCreditByAccountUseCase";
-import { GetPendingCreditsUseCase } from "@application/usecases/credits/admin/GetPendingCreditsUseCase";
-import { GetCreditsWithDetailsUseCase } from "@application/usecases/credits/admin/GetCreditsWithDetailUseCase";
-import { GetActiveCreditsUseCase } from "@application/usecases/credits/admin/GetActiveCreditsUseCase";
+import { GetAllByStatusUseCase } from "@application/usecases/credits/admin/GetAllByStatusUseCase";
+import { GetAllByFormuleUsecase } from "@application/usecases/credits/GetAllByFormuleIdUsecase";
 
 export const creditFactory = () => {
   const client = new MongoClient();
@@ -27,8 +26,7 @@ export const creditFactory = () => {
 
   const getCreditsByUser = new GetCreditsByClientUsecase(
     creditRepository,
-    userRepository,
-    accountRepository
+    userRepository
   );
 
   const getCredit = new GetCreditUsecase(creditRepository, userRepository);
@@ -37,7 +35,7 @@ export const creditFactory = () => {
     creditRepository,
     userRepository,
     accountRepository
-  )
+  );
 
   const creditSchedule = new CreditScheduleUsecase(
     creditRepository,
@@ -60,27 +58,21 @@ export const creditFactory = () => {
     formuleRepository
   );
 
-  const getPending = new GetPendingCreditsUseCase(
-    creditRepository,
-    userRepository,
-  );
-
-  const getActive = new GetActiveCreditsUseCase(
-    creditRepository,
-    userRepository,
-    clockService
-  );
-
   const grantCredit = new GrantCreditUsecase(
     creditRepository,
     userRepository,
     clockService
   );
+  const getAllByStatus = new GetAllByStatusUseCase(
+    creditRepository,
+    userRepository
+  );
 
-  const getOneWithDetails = new GetCreditsWithDetailsUseCase(
+  const getAllByFormule = new GetAllByFormuleUsecase(
     creditRepository,
     userRepository,
-  )
+    formuleRepository
+  );
 
   return {
     grantCredit,
@@ -90,8 +82,7 @@ export const creditFactory = () => {
     applyMonthlyPaiementCredit,
     getCredit,
     getCreditsByAccount,
-    getPending,
-    getActive,
-    getOneWithDetails
+    getAllByStatus,
+    getAllByFormule,
   };
 };

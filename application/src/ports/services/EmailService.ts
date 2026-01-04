@@ -24,5 +24,10 @@ export interface EmailService {
     data: EmailTemplateData["welcomeEmail"]
   ): Promise<void>;
 
+  sendAdminWelcomeEmail(
+    to: Email,
+    data: EmailTemplateData["welcomeAdminEmail"]
+  ): Promise<void>;
+
   verifyConnection?(): Promise<boolean>;
 }

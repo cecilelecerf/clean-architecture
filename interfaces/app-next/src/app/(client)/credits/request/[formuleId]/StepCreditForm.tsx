@@ -7,7 +7,7 @@ type CreditFormData = {
   durationMonths: string;
 };
 
-export const StepCreditForm = ({data, setData, onSubmit, loading, minAmount, maxAmount}: {data: CreditFormData, setData: (data: Partial<CreditFormData>) => void, onSubmit: () => void, loading: boolean, minAmount?: number, maxAmount?: number}) => {
+export const StepCreditForm = ({ data, setData, onSubmit, loading, minAmount, maxAmount }: { data: CreditFormData, setData: (data: Partial<CreditFormData>) => void, onSubmit: () => void, loading: boolean, minAmount?: number, maxAmount?: number }) => {
   const getMinStartDate = () => {
     const today = new Date();
     return today.toISOString().split("T")[0];
@@ -30,8 +30,8 @@ export const StepCreditForm = ({data, setData, onSubmit, loading, minAmount, max
       get: data.amount,
       set: (v) => setData({ amount: v as string }),
       numberOptions: {
-        min: minAmount ?? 100, 
-        max: maxAmount ?? undefined, 
+        min: minAmount ?? 100,
+        max: maxAmount ?? undefined,
         step: 100,
       },
     },
@@ -43,13 +43,11 @@ export const StepCreditForm = ({data, setData, onSubmit, loading, minAmount, max
       numberOptions: { min: getMinStartDate() },
     },
     {
-      label: `Durée (mois)${
-        data.durationMonths && Number(data.durationMonths) > 0
-          ? ` (${Math.floor(Number(data.durationMonths) / 12)} an${
-              Number(data.durationMonths) >= 24 ? "s" : ""
-            })`
-          : ""
-      }`,
+      label: `Durée (mois)${data.durationMonths && Number(data.durationMonths) > 0
+        ? ` (${Math.floor(Number(data.durationMonths) / 12)} an${Number(data.durationMonths) >= 24 ? "s" : ""
+        })`
+        : ""
+        }`,
       type: "number",
       get: data.durationMonths,
       set: (v) => setData({ durationMonths: v as string }),
@@ -64,7 +62,7 @@ export const StepCreditForm = ({data, setData, onSubmit, loading, minAmount, max
         if (!isAmountValid()) return;
         onSubmit();
       }}>
-        
+
       <FormWrapper
         title="Informations du crédit"
         description="Renseignez les détails de votre crédit"

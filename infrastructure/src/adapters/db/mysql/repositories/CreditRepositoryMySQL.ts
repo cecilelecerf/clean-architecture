@@ -15,6 +15,7 @@ import { AccountEntityWithUser } from "@application/ports/repositories/AccountRe
 import { IBAN } from "@domain/values/IBAN";
 import { TransactionMapper } from "../../mappers/TransactionMapper";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { FormuleCreditEntity } from "@domain/entities/FormuleCreditEntity";
 
 export class CreditRepositoryMySQL implements CreditRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -168,10 +169,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
       account = baseAccount as AccountEntityWithUser;
     }
 
-    const formule = row.form_id
-      ? FormuleMapper.mapRowToFormule(row, "form_")
-      : null;
-
+    const formule = FormuleMapper.mapRowToFormule(row, "form_");
     return Object.assign(credit, {
       account,
       formule,
@@ -212,63 +210,31 @@ export class CreditRepositoryMySQL implements CreditRepository {
     });
   }
 
-  /** Crédits actifs */
-  async findActiveCredits(today: Date): Promise<CreditEntityWithFormule[]> {
-    const rows = await this.client.queryRows<RowDataPacket[]>(
-      `SELECT 
-        c.*,
-        f.id as form_id,
-        f.interest_rate as form_interest_rate,
-        f.insurance_rate as form_insurance_rate,
-        f.type as form_type,
-        f.label as form_label,
-        f.description as form_description,
-        f.is_active as form_is_active,
-        f.account_id as form_account_id,
-        f.created_at as form_created_at,
-        f.min_amount as form_min_amount,
-        f.max_amount as form_max_amount,
-        f.currency as form_currency,
-        f.updated_at as form_updated_at
-      FROM credits c
-      LEFT JOIN formules f ON c.formule_id = f.id
-      WHERE c.status = 'ACCEPTED'
-        AND c.remaining_amount > 0
-        AND c.start_date <= ?
-      ORDER BY c.start_date DESC`,
-      [today]
-    );
-
-    return rows.map((row: RowDataPacket) => {
-      const credit = CreditMapper.mapRowToCredit(row);
-      const formule = FormuleMapper.mapRowToFormule(row, "form_");
-      return Object.assign(credit, { formule });
-    });
-  }
-
-  /** Crédits en cours de traitement */
-  async findPendingCredits(): Promise<CreditEntityWithFormule[]> {
+  /** Crédits par le status */
+  async findAllByStatus(
+    status?: CreditEntity["status"]
+  ): Promise<CreditEntityWithFormule[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
-        c.*,
-
-        f.id as form_id,
-        f.interest_rate as form_interest_rate,
-        f.insurance_rate as form_insurance_rate,
-        f.type as form_type,
-        f.label as form_label,
-        f.description as form_description,
-        f.is_active as form_is_active,
-        f.account_id as form_account_id,
-        f.created_at as form_created_at,
-        f.min_amount as form_min_amount,
-        f.max_amount as form_max_amount,
-        f.currency as form_currency,
-        f.updated_at as form_updated_at
-      FROM credits c
-      LEFT JOIN formules f ON c.formule_id = f.id
-      WHERE c.status = 'PENDING'
-      ORDER BY c.start_date DESC`
+      c.*,
+      f.id as form_id,
+      f.interest_rate as form_interest_rate,
+      f.insurance_rate as form_insurance_rate,
+      f.type as form_type,
+      f.label as form_label,
+      f.description as form_description,
+      f.is_active as form_is_active,
+      f.account_id as form_account_id,
+      f.created_at as form_created_at,
+      f.min_amount as form_min_amount,
+      f.max_amount as form_max_amount,
+      f.currency as form_currency,
+      f.updated_at as form_updated_at
+    FROM credits c
+    LEFT JOIN formules f ON c.formule_id = f.id
+    ${status ? "WHERE c.status = ?" : ""}
+    ORDER BY c.start_date DESC`,
+      status ? [status] : []
     );
 
     return rows.map((row) => {
@@ -375,5 +341,119 @@ export class CreditRepositoryMySQL implements CreditRepository {
       const formule = FormuleMapper.mapRowToFormule(row, "form_");
       return Object.assign(credit, { formule });
     });
+  }
+
+  async findAllByFormuleId(
+    formuleId: FormuleCreditEntity["id"]
+  ): Promise<CreditEntity[]> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+      c.*  FROM credits c
+      LEFT JOIN formules f ON c.formule_id = f.id 
+      WHERE f.id = ?
+      ORDER BY c.updated_at ASC`,
+      [formuleId]
+    );
+    return rows.map((row: RowDataPacket) => CreditMapper.mapRowToCredit(row));
+  }
+
+  async countAcceptedByAdvisor(advisorId: string): Promise<number> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+      COUNT(id) as count
+      FROM credits 
+      WHERE advisor_id = ? AND status IN ('ACCEPTED', 'COMPLETED')`,
+      [advisorId]
+    );
+    return rows[0].count;
+  }
+  async countRefusedByAdvisor(advisorId: string): Promise<number> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+      COUNT(id) as count
+      FROM credits 
+      WHERE advisor_id = ? AND status = 'REFUSED'`,
+      [advisorId]
+    );
+    return rows[0].count;
+  }
+
+  async countByFormule(formuleId: string): Promise<number> {
+    const result = await this.client.query<RowDataPacket[]>(
+      `SELECT COUNT(*) as count 
+       FROM credits 
+       WHERE formule_id = ?`,
+      [formuleId]
+    );
+    return result[0]?.count || 0;
+  }
+
+  async countByFormuleAndStatus(
+    formuleId: string,
+    status: CreditEntity["status"]
+  ): Promise<number> {
+    const result = await this.client.query<RowDataPacket[]>(
+      `SELECT COUNT(*) as count 
+       FROM credits 
+       WHERE formule_id = ? AND status = ?`,
+      [formuleId, status]
+    );
+    return result[0]?.count || 0;
+  }
+
+  async countClientsByFormule(formuleId: string): Promise<number> {
+    const result = await this.client.query<RowDataPacket[]>(
+      `SELECT COUNT(DISTINCT account_id) as count 
+       FROM credits 
+       WHERE formule_id = ?`,
+      [formuleId]
+    );
+    return result[0]?.count || 0;
+  }
+
+  async getFinancialStatsByFormule(formuleId: string): Promise<{
+    totalLoanedAmount: number;
+    totalInterestEarned: number;
+    totalInsuranceEarned: number;
+    totalRevenue: number;
+  }> {
+    const result = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+        COALESCE(SUM(c.remaining_amount), 0) as totalLoanedAmount,
+        COALESCE(SUM(
+          c.remaining_amount * (f.interest_rate / 100 / 12) * c.duration_months
+        ), 0) as totalInterestEarned,
+        COALESCE(SUM(
+          c.remaining_amount * (f.insurance_rate / 100 / 12) * c.duration_months
+        ), 0) as totalInsuranceEarned
+      FROM credits c
+      INNER JOIN formules f ON c.formule_id = f.id
+      WHERE c.formule_id = ?
+        AND c.status IN ('COMPLETED', 'ACCEPTED')`,
+      [formuleId]
+    );
+
+    if (!result || result.length === 0) {
+      return {
+        totalLoanedAmount: 0,
+        totalInterestEarned: 0,
+        totalInsuranceEarned: 0,
+        totalRevenue: 0,
+      };
+    }
+
+    const stats = result[0];
+    const totalRevenue =
+      Number(stats.totalInterestEarned) + Number(stats.totalInsuranceEarned);
+
+    return {
+      totalLoanedAmount:
+        Math.round(Number(stats.totalLoanedAmount) * 100) / 100,
+      totalInterestEarned:
+        Math.round(Number(stats.totalInterestEarned) * 100) / 100,
+      totalInsuranceEarned:
+        Math.round(Number(stats.totalInsuranceEarned) * 100) / 100,
+      totalRevenue: Math.round(totalRevenue * 100) / 100,
+    };
   }
 }

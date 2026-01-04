@@ -7,7 +7,6 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import {
   AccountNotFoundError,
-  SameAccountTransactionError,
   UnauthorizedAccessAccountError,
 } from "@application/errors/accounts";
 import {
@@ -72,7 +71,6 @@ export class TransfertBetweenAccountUseCase {
     | MoneyCurrencyMismatchError
     | UserNotFoundError
     | UserNotActiveError
-    | SameAccountTransactionError
     | InvalidTransactionLabelError
     | InvalidTransactionAmountError
     | void

@@ -1,56 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {  useRouter } from "next/navigation";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 
 import { endpoints } from "@/utils/endpoint";
 import { UpdateFormule } from "@/utils/endpoint/formuleEndpoints";
 import FormWrapper, { Field as TField } from "@/components/FromWrapper";
-import { FormuleId } from "@infrastructure/types/formule";
+import { FormuleDTO, FormuleTypes } from "@infrastructure/types/formule";
 
-export const UpdateFormuleForm = ({ formuleId }: { formuleId: FormuleId }) => {
+export const UpdateFormuleForm = ({ formule, types }: { formule: FormuleDTO, types: FormuleTypes[] }) => {
   const router = useRouter();
 
-  const query = useQuery(endpoints.formules.get({ formuleId }));
 
-  const queryTypeOptions = useQuery(endpoints.formules.getTypes());
-  
-  const typeOptions = (queryTypeOptions.data || []).map((t) => ({
-    label: t.type,
-    value: t.type,
+  const typeOptions = types.map((t) => ({
+    label: t.label,
+    value: t.value,
   }));
 
   const [field, setField] = useState<UpdateFormule>({
-    interestRate: 0,
-    insuranceRate: 0,
-    type: '',
-    label: '',
-    description: '',
-    minAmount: 0,
-    maxAmount: 0,
-    currency: '',
-    isActive: true,
+    interestRate: formule.interestRate,
+    insuranceRate: formule.insuranceRate,
+    type: formule.type,
+    label: formule.label,
+    description: formule.description,
+    minAmount: formule.minAmount,
+    maxAmount: formule.maxAmount,
+    currency: formule.currency,
+    isActive: formule.isActive,
   });
 
-  useEffect(() => {
-    if (query.data) {
-      setField({
-        interestRate: query.data.interestRate,
-        insuranceRate: query.data.insuranceRate,
-        type: query.data.type,
-        label: query.data.label,
-        description: query.data.description,
-        minAmount: query.data.minAmount,
-        maxAmount: query.data.maxAmount,
-        currency: query.data.currency,
-        isActive: query.data.isActive,
-      });
-    }
-  }, [query.data]);
-
   const mutation = useMutation(
-    endpoints.formules.update({ formuleId })
+    endpoints.formules.update({ formuleId: formule.id })
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,11 +39,9 @@ export const UpdateFormuleForm = ({ formuleId }: { formuleId: FormuleId }) => {
 
     if (!field.type || !field.interestRate) return;
 
-    mutation.mutate(field , { onSuccess: () => router.push(`/director/formules/${formuleId}`) });
+    mutation.mutate(field, { onSuccess: () => router.push(`/director/formules/${formule.id}`) });
   };
 
-  if (query.isLoading) return "Chargement...";
-  if (query.isError) return "Erreur";
 
   const fields: TField[] = [
     {
@@ -93,20 +72,11 @@ export const UpdateFormuleForm = ({ formuleId }: { formuleId: FormuleId }) => {
         step: 0.01,
       },
     },
-    // {
-    //   label: "Type de prêt",
-    //   type: "text",
-    //   get: field.type,
-    //   set: (e) =>
-    //     setField((prev) => ({
-    //       ...prev,
-    //       type: e as string,
-    //     })),
-    // },
     {
+
       label: "Type de prêt",
-      type: "creatable-select",
-      placeholder: "Sélectionnez ou créez un type",
+      type: "select",
+      placeholder: "Sélectionnez un type",
       get: field.type,
       set: (value) =>
         setField(prev => ({
@@ -114,7 +84,6 @@ export const UpdateFormuleForm = ({ formuleId }: { formuleId: FormuleId }) => {
           type: value as string,
         })),
       options: typeOptions,
-      disabled: query.isLoading,
     },
     {
       label: "Label",
@@ -167,7 +136,7 @@ export const UpdateFormuleForm = ({ formuleId }: { formuleId: FormuleId }) => {
     {
       label: "Devise",
       type: "select",
-      get: field.currency, // TODO: Pourquoi ma currency n'est pas séléctionné dans mon formulaire d'update ? 
+      get: field.currency,
       set: (e) =>
         setField((prev) => ({
           ...prev,

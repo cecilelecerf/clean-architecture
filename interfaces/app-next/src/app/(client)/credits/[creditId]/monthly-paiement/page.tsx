@@ -64,15 +64,16 @@ export default function CreditMobthlyPage({
 
                                         <tbody className="divide-y">
                                             {months.map((monthDate, index) => {
-                                                const paid = isMonthPaid(
-                                                    monthDate,
-                                                    credit.transactions
-                                                );
+                                                // const paid = isMonthPaid(
+                                                //     monthDate,
+                                                //     credit.transactions
+                                                // );
+                                                const paid = true
 
                                                 return (
                                                     <tr className={`transition-colors ${paid
-                                                            ? "bg-green-50 text-green-900"
-                                                            : "hover:bg-gray-50"
+                                                        ? "bg-green-50 text-green-900"
+                                                        : "hover:bg-gray-50"
                                                         }`} key={index}>
                                                         <td className="p-4 font-semibold">{index + 1}</td>
                                                         <td className="p-4 text-sm text-gray-500">{formatMonthYear(monthDate)}

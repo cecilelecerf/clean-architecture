@@ -5,9 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { match } from "ts-pattern";
-import { Pencil } from 'lucide-react';
+import { Euro, Pencil, Percent } from 'lucide-react';
 import { useRouter } from "next/navigation";
-import { TitleAdminPage } from "@/components/TitleAdminPage";
+type FormuleDetail = {
+    label: string;
+    value: string | number;
+    icon?: React.ReactNode;
+};
 
 export const FormuleInfo = ({ formuleId }: { formuleId: FormuleId }) => {
     const query = useQuery(endpoints.formules.get({ formuleId: formuleId }))
@@ -16,40 +20,83 @@ export const FormuleInfo = ({ formuleId }: { formuleId: FormuleId }) => {
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: 'pending' }, () => "pendign")
-        .with({ status: "success" }, ({ data: formule }) => (
-            <>
-                <TitleAdminPage title="Formules de prêt" />
+        .with({ status: "success" }, ({ data: formule }) => {
+            const details: FormuleDetail[] = [
+                { label: "Type", value: formule.type },
+                { label: "Description", value: formule.description },
+                {
+                    label: "Taux d'intérêt",
+                    value: `${formule.interestRate}%`,
+                    icon: <Percent className="h-4 w-4 text-muted-foreground" />
+                },
+                {
+                    label: "Taux d'assurance",
+                    value: `${formule.insuranceRate}%`,
+                    icon: <Percent className="h-4 w-4 text-muted-foreground" />
+                },
+            ];
 
-                <div className="p-2 space-y-4">
-                    {/* Card principale avec titre et statut */}
-                    <Card>
+            if (formule.minAmount !== undefined && formule.maxAmount !== undefined) {
+                details.push({
+                    label: "Montant",
+                    value: `${formule.minAmount.toLocaleString('fr-FR')}€ - ${formule.maxAmount.toLocaleString('fr-FR')}€`,
+                    icon: <Euro className="h-4 w-4 text-muted-foreground" />
+                });
+            }
+            return (<div className="p-2 space-y-4">
+                <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center justify-between">
-                        <span className="text-lg font-bold">{formule.label}</span>
-                        <Badge variant={formule.isActive ? "default" : "secondary"}>
-                            {formule.isActive ? "Actif" : "Inactif"}
-                        </Badge>
-                        </CardTitle>
+                        <div className="flex items-start justify-between">
+                            <div className="space-y-1">
+                                <CardTitle className="text-2xl font-bold">
+                                    {formule.label}
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground">
+                                    Créée le {new Date(formule.createdAt).toLocaleDateString('fr-FR')}
+                                </p>
+                            </div>
+                            <Badge
+                                variant={formule.isActive ? "default" : "secondary"}
+                                className="shrink-0"
+                            >
+                                {formule.isActive ? "Active" : "Inactive"}
+                            </Badge>
+                        </div>
                     </CardHeader>
-                    <CardContent className="space-y-2 text-sm text-gray-700">
-                        <p><strong>Type :</strong> {formule.type}</p>
-                        <p><strong>Description :</strong> {formule.description}</p>
-                        <p><strong>Taux d'intérêt :</strong> {formule.interestRate}%</p>
-                        <p><strong>Taux d'assurance :</strong> {formule.insuranceRate}%</p>
-                        {formule.minAmount !== undefined && formule.maxAmount !== undefined && (
-                        <p><strong>Montant :</strong> {formule.minAmount}€ - {formule.maxAmount}€</p>
-                        )}
-                    </CardContent>
-                    </Card>
 
-                    {/* Bouton pour modifier */}
-                    <div className="flex justify-end">
-                    <Button onClick={() => router.push(`/director/formules/${formule.id}/update`)}>
-                        <Pencil size={16} className="mr-2" /> Modifier la formule de prêt
+                    <CardContent className="space-y-4">
+                        <div className="grid gap-3">
+                            {details.map((detail) => (
+                                <div
+                                    key={detail.label}
+                                    className="flex items-start justify-between py-2 border-b last:border-0"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        {detail.icon}
+                                        <span className="text-sm font-medium text-muted-foreground">
+                                            {detail.label}
+                                        </span>
+                                    </div>
+                                    <span className="text-sm font-semibold text-right">
+                                        {detail.value}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <div className="flex justify-end gap-2">
+                    <Button
+                        onClick={() => router.push(`/director/formules/${formule.id}/update`)}
+                    >
+                        <Pencil size={16} className="mr-2" />
+                        Modifier
                     </Button>
-                    </div>
                 </div>
-            </>
-    ))
-    .exhaustive();
+            </div>
+            )
+        })
+        .exhaustive()
+
 }

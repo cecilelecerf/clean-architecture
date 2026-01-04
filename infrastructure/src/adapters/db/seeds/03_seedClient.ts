@@ -83,78 +83,12 @@ export async function seedClient(
         );
       }
 
-      if (raw.credits && raw.credits.length > 0) {
-        if (isFirstUser) {
-          console.log(
-            `  🎯 Premier client détecté - Création de tous les types de crédits`
-          );
-        }
-
-        await seedCredits(
-          seedCreditUseCase,
-          user.id,
-          formulesCredit,
-          raw.credits,
-          isFirstUser
-        );
-      } else if (isFirstUser) {
-        console.log(
-          `  ⚠️  Premier client sans crédits définis - Création de crédits par défaut`
-        );
-
-        const defaultCredits = [
-          {
-            initialAmount: 250000,
-            currency: "EUR",
-            durationMonths: 240,
-            formuleCreditType: "immobilier",
-          },
-          {
-            initialAmount: 15000,
-            currency: "EUR",
-            durationMonths: 60,
-            formuleCreditType: "consommation",
-          },
-          {
-            initialAmount: 50000,
-            currency: "EUR",
-            durationMonths: 72,
-            formuleCreditType: "professionnel",
-          },
-          {
-            initialAmount: 12000,
-            currency: "EUR",
-            durationMonths: 48,
-            formuleCreditType: "special",
-          },
-          {
-            initialAmount: 180000,
-            currency: "EUR",
-            durationMonths: 300,
-            formuleCreditType: "immobilier",
-          },
-        ];
-
-        await seedCredits(
-          seedCreditUseCase,
-          user.id,
-          formulesCredit,
-          defaultCredits,
-          true
-        );
-      } else if (Math.random() < 0.7) {
-        console.log(`  💳 Création de crédits aléatoires pour ce client`);
-
-        const randomCreditsCount = Math.floor(Math.random() * 3) + 1;
-        const randomCredits = generateRandomCredits(randomCreditsCount);
-
-        await seedCredits(
-          seedCreditUseCase,
-          user.id,
-          formulesCredit,
-          randomCredits,
-          false
-        );
+      if (isFirstUser) {
+        await seedCredits(seedCreditUseCase, user.id, formulesCredit, true);
+      } else if (Math.random() < 0.8) {
+        await seedCredits(seedCreditUseCase, user.id, formulesCredit, false);
+      } else {
+        console.log(`  ⏭️  Pas de crédits pour ce client`);
       }
     } catch (err) {
       console.error(`❌ Failed to create client ${raw.email}:`, err);

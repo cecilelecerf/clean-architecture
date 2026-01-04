@@ -9,19 +9,30 @@ import { LoginUsecase } from "@application/usecases/users/LoginUsecase";
 import { GetMeUsecase } from "@application/usecases/users/GetMeUsecase";
 import { ForgotPasswordUsecase } from "@application/usecases/users/ForgotPasswordUsecase";
 import { ConfirmRegistrationUsecase } from "@application/usecases/users/ConfirmRegistrationUsecase";
-import { BanClientUsecase } from "@application/usecases/users/BanClientUsecase";
 import { GetUsersByRoleUseCase } from "@application/usecases/users/GetUsersByRoleUseCase";
 import { GetUserUsercase } from "@application/usecases/users/GetUserUsercase";
 import { RegisterUsecase } from "@application/usecases/users/RegisterUsecase";
+import { BanUserUsecase } from "@application/usecases/users/BanUserUsecase";
+import { RegisterAdminUsecase } from "@application/usecases/users/RegisterAdminUsecase";
+import { UnbanUserUsecase } from "@application/usecases/users/UnBanUserUsecase";
+import { UpdateUserUsecase } from "@application/usecases/users/UpdateUserUsecase";
+import { UserStatisticsUsecase } from "@application/usecases/users/UserStatisticsUsecase";
+import { NodePasswordGenerateService } from "@infrastructure/adapters/services/NodePasswordGenerateService";
+import { ResetPasswordUsecase } from "@application/usecases/users/ResetPasswordUsecase";
+import { CreditRepositoryMongo } from "../repositories/CreditRepositoryMongo";
+import { ThreadRepositoryMongo } from "../repositories/ThreadRepositoryMongo";
 
 export const usersFactory = () => {
   const client = new MongoClient();
   const userRepository = new UserRepositoryMongo(client);
+  const creditRepository = new CreditRepositoryMongo(client);
+  const threadRepository = new ThreadRepositoryMongo(client);
   const encryptionService = new BcryptEncryptionService();
   const tokenService = new JwtTokenService();
   const uuidSerivce = new NodeUuidService();
   const emailService = new NodeEmailService();
   const clockService = new SystemClockService();
+  const passwordGenerateService = new NodePasswordGenerateService();
 
   const register = new RegisterUsecase(
     userRepository,
@@ -30,6 +41,12 @@ export const usersFactory = () => {
     clockService,
     emailService,
     tokenService
+  );
+  const resetPassword = new ResetPasswordUsecase(
+    userRepository,
+    tokenService,
+    encryptionService,
+    clockService
   );
   const login = new LoginUsecase(
     userRepository,
@@ -47,9 +64,25 @@ export const usersFactory = () => {
     clockService,
     tokenService
   );
-  const banClient = new BanClientUsecase(userRepository, clockService);
+  const banUser = new BanUserUsecase(userRepository, clockService);
   const getUsersByRole = new GetUsersByRoleUseCase(userRepository);
   const getUser = new GetUserUsercase(userRepository);
+  const createUser = new RegisterAdminUsecase(
+    userRepository,
+    encryptionService,
+    uuidSerivce,
+    clockService,
+    emailService,
+    tokenService,
+    passwordGenerateService
+  );
+  const unbanUser = new UnbanUserUsecase(userRepository, clockService);
+  const updateUser = new UpdateUserUsecase(userRepository, clockService);
+  const stats = new UserStatisticsUsecase(
+    userRepository,
+    creditRepository,
+    threadRepository
+  );
 
   return {
     register,
@@ -57,8 +90,13 @@ export const usersFactory = () => {
     getUser,
     getMe,
     forgotPassword,
+    resetPassword,
     confirmRegistration,
-    banClient,
+    banUser,
     getUsersByRole,
+    createUser,
+    unbanUser,
+    updateUser,
+    stats,
   };
 };

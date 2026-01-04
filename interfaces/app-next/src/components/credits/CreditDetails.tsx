@@ -15,27 +15,20 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { endpoints } from "@/utils/endpoint";
-import { CreditDTOWithFormule, CreditId } from "@infrastructure/types/credit";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { CreditDTOWithFormule } from "@infrastructure/types/credit";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { match } from "ts-pattern";
 import {
-    ArrowLeft,
-    Clock,
-    CheckCircle,
-    XCircle,
     Calendar,
     Percent,
     TrendingUp,
     CalendarClock,
     DollarSign,
-    FileText,
     User,
     Shield,
     Check,
     X,
     Building2,
-    NotebookPen,
     Tag,
     UserCog,
     AtSign,
@@ -45,11 +38,10 @@ import {
     Type
 } from "lucide-react";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
-import { use, useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useState } from "react";
 import { UserId } from "@infrastructure/types/user";
 import { statusConfig } from "./constant";
-import { Account, AccountWithUserDTO } from "@infrastructure/types/account";
+import { AccountWithUserDTO } from "@infrastructure/types/account";
 import { useSession } from "next-auth/react";
 
 
@@ -79,7 +71,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
             payload: {
                 accept: dialogAction === "accept",
                 reason: reason.trim() || null
-            }, userId
+            }
         }, {
             onSuccess: () => {
                 setDialogOpen(false);

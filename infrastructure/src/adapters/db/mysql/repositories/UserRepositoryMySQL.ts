@@ -4,7 +4,6 @@ import { Email } from "@domain/values/Email";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { UserMapper } from "../../mappers/UserMapper";
-import { IBAN } from "@domain/values/IBAN";
 import { AccountEntity } from "@domain/entities/AccountEntity";
 
 export class UserRepositoryMySQL implements UserRepository {
@@ -128,5 +127,15 @@ export class UserRepositoryMySQL implements UserRepository {
     await this.client.query<ResultSetHeader>("DELETE FROM users WHERE id = ?", [
       id,
     ]);
+  }
+
+  /** Utilisateurs actifs par rôle */
+  async countUserByRole(role: UserEntity["role"]): Promise<number> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      "SELECT COUNT(*) as count FROM users WHERE is_active = 1 AND confirmed_at IS NOT NULL AND role = ?",
+      [role]
+    );
+
+    return rows[0].count;
   }
 }

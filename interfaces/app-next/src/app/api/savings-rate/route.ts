@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { savingRateSchema } from '@infrastructure/types/savingsrate';
 import { savingsrateFactory } from '@infrastructure/adapters/db/mysql/factories/savingsrate';
 import { newSavingsrateSchema } from '@/utils/endpoint/savingsrateEndpoints';
 

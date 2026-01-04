@@ -2,6 +2,7 @@ import {
   formuleDTOSchema,
   FormuleId,
   formuleSchema,
+  formuleStatSchema,
   formuleTypesSchema,
 } from '@infrastructure/types/formule';
 import z from 'zod';
@@ -34,7 +35,6 @@ export const updateFormuleSchema = formuleSchema.pick({
   type: true,
   label: true,
   description: true,
-  accountId: true,
   minAmount: true,
   maxAmount: true,
   currency: true,
@@ -69,12 +69,9 @@ export const formuleEndpoint = createEndpointsNodes({
 
   getTypes: () =>
     queryOptions({
-      queryKey: ['formules', 'list'],
-      queryFn: async () => {
-        const data = await get(`/formules/type`);
-        const parsed = safeParseWithLog(formuleTypesSchema.array(), data);
-        return parsed || [];
-      },
+      queryKey: ['formules', 'types', 'list'],
+      queryFn: async () =>
+        get(`/formules/type`).then((data) => safeParseWithLog(formuleTypesSchema.array(), data)),
     }),
 
   // POST /api/formules
@@ -98,5 +95,12 @@ export const formuleEndpoint = createEndpointsNodes({
         queryClient.invalidateQueries({ queryKey: ['formules', formuleId] });
         queryClient.invalidateQueries({ queryKey: ['formules', 'list'] });
       },
+    }),
+
+  stats: ({ id }: { id: FormuleId }) =>
+    queryOptions({
+      queryKey: ['formules', id, 'stats'],
+      queryFn: async () =>
+        get(`/formules/${id}/stats`).then((data) => safeParseWithLog(formuleStatSchema, data)),
     }),
 });

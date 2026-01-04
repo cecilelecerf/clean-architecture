@@ -1,12 +1,18 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
-import { get, post } from '@/lib/apiClient';
-import { User, userDtoSchema, UserId } from '@infrastructure/types/user';
+import { get, patch, post } from '@/lib/apiClient';
+import {
+  PayloadUserUpdateSchema,
+  User,
+  userDtoSchema,
+  UserId,
+  userSchema,
+} from '@infrastructure/types/user';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { RegisterAdminPayload } from '@/app/api/users/new/route';
 import { ReqBanUser } from '@/app/api/users/[userId]/ban/route';
 import { queryClient } from '@/lib/queryClient';
-
+import { userStatsSchema } from '@infrastructure/types/stat';
 export const usersEndpoint = createEndpointsNodes({
   // ============================================================================
   // QUERIES
@@ -29,6 +35,21 @@ export const usersEndpoint = createEndpointsNodes({
       queryFn: () => get(`/users/${id}`).then((data) => userDtoSchema.parse(data)),
     }),
 
+  me: () =>
+    queryOptions({
+      queryKey: ['me'],
+      queryFn: () =>
+        get(`/users/me`).then((data) =>
+          safeParseWithLog(userSchema.omit({ passwordHash: true }), data),
+        ),
+    }),
+  stats: ({ id }: { id: UserId }) =>
+    queryOptions({
+      queryKey: ['users', id, 'stats'],
+      queryFn: () =>
+        get(`/users/${id}/stats`).then((data) => safeParseWithLog(userStatsSchema, data)),
+    }),
+
   // ============================================================================
   // MUTATIONS
   // ============================================================================
@@ -48,6 +69,16 @@ export const usersEndpoint = createEndpointsNodes({
         post(`/users/${id}/ban`, { status }).then((data) => userDtoSchema.parse(data)),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['users', id] });
+        queryClient.invalidateQueries({ queryKey: ['users', 'list'] });
+      },
+    }),
+  update: ({ id }: { id: UserId }) =>
+    mutationOptions({
+      mutationFn: ({ payload }: { payload: PayloadUserUpdateSchema }) =>
+        patch(`/users/me`, { ...payload }).then((data) => userDtoSchema.parse(data)),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['users', id] });
+        queryClient.invalidateQueries({ queryKey: ['me'] });
         queryClient.invalidateQueries({ queryKey: ['users', 'list'] });
       },
     }),

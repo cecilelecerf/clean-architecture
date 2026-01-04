@@ -96,7 +96,8 @@ export default function FormWrapper({
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          {title}</CardTitle>
+          {title}
+        </CardTitle>
         {description && (
           <CardDescription>{description}</CardDescription>
         )}
@@ -193,7 +194,7 @@ export default function FormWrapper({
 
                     const handleSelect = (val: string) => {
                       field.set(val);
-                      setIsOpen(false); 
+                      setIsOpen(false);
                     };
 
                     return (

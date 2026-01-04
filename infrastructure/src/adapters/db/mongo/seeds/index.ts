@@ -43,6 +43,9 @@ import { generateSavingsRate } from "../../seeds/09_generateSavingsRate";
 import { generateOrders } from "../../seeds/10_generateOrders";
 import { generateNotifications } from "../../seeds/11_generateNotifications";
 import { generateBankAccounts } from "../../seeds/01B_generateBankAccounts";
+import { FormuleCreditRepositoryMongo } from "../repositories/FormuleCreditRepositoryMongo";
+import { generateFormuleCredits } from "../../seeds/01C_generateFormulesCredit";
+import { SeedFormuleCreditUseCase } from "@application/usecases/seeds/SeedFormuleCreditUseCase";
 
 const all = async () => {
   console.log("🌱 Starting MongoDB seed...\n");
@@ -62,6 +65,7 @@ const all = async () => {
   const savingsRateRepository = new SavingsRateRepositoryMongo(mongoClient);
   const orderRepository = new OrderRepositoryMongo(mongoClient);
   const notificationRepository = new NotificationRepositoryMongo(mongoClient);
+  const formuleRepository = new FormuleCreditRepositoryMongo(mongoClient);
 
   const encryptionService = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
@@ -87,6 +91,8 @@ const all = async () => {
 
   const seedCreditUseCase = new SeedCreditUseCase(
     creditRepository,
+    formuleRepository,
+    accountRepository,
     uuidService,
     clockService
   );
@@ -143,7 +149,20 @@ const all = async () => {
     clockService
   );
 
+  const seedFormuleCreditUseCase = new SeedFormuleCreditUseCase(
+    formuleRepository,
+    uuidService,
+    clockService
+  );
+
   // 5. Exécuter les seeds
+  const directors = await seedDirector(seedUserUseCase, clockService);
+
+  const bankAccounts = await generateBankAccounts(seedBankAccountUseCase);
+  const formuleCredits = await generateFormuleCredits(
+    bankAccounts.map(({ iban }) => iban),
+    seedFormuleCreditUseCase
+  );
   const advisors = await seedAdvisor(seedUserUseCase, clockService);
 
   const clients = await seedClient(
@@ -151,10 +170,9 @@ const all = async () => {
     seedAccountUseCase,
     seedTransactionUseCase,
     seedCreditUseCase,
-    clockService
+    clockService,
+    formuleCredits
   );
-
-  const directors = await seedDirector(seedUserUseCase, clockService);
 
   await generateExternalThreads(
     clients,

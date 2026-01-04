@@ -388,4 +388,12 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
 
     return this.mapRowsToThreadsWithUsers(rows);
   }
+
+  async countByAdvisor(advisorId: UserEntity["id"]): Promise<number> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT COUNT(id) as count FROM threads WHERE administrator_id = ?`,
+      [advisorId]
+    );
+    return rows[0].count;
+  }
 }

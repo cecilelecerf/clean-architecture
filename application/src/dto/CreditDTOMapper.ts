@@ -6,16 +6,16 @@ import {
 import { CreditDTO } from "@domain/entities/CreditEntity";
 import { FormuleCreditDTO } from "@domain/entities/FormuleCreditEntity";
 import { AccountDTOMapper, AccountDTOWithUser } from "./AccountDTOMapper";
-import { UserToFront } from "@domain/entities/UserEntity";
 import { TransactionDTO } from "@domain/entities/TransactionEntity";
 import { AccountDTO } from "@domain/entities/AccountEntity";
+import { UserToDTO } from "@domain/entities/UserEntity";
 
 export type CreditDTOWithFormuleAndAccount = CreditDTO & {
   account: AccountDTOWithUser;
 } & { formule: FormuleCreditDTO };
 
 export type CreditDTOWithFormuleAndAdvisor = CreditDTO & {
-  advisor: UserToFront | null;
+  advisor: UserToDTO | null;
 } & { formule: FormuleCreditDTO } & { account: AccountDTO } & {
   transactions: TransactionDTO[];
 };
@@ -47,7 +47,7 @@ export class CreditDTOMapper {
     return Object.assign(
       credit.toDTO(),
       {
-        advisor: credit.advisor ? credit.advisor.toFront() : null,
+        advisor: credit.advisor ? credit.advisor.toDTO() : null,
       },
       {
         formule: credit.formule.toDTO(),

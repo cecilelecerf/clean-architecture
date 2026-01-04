@@ -17,7 +17,7 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
         formule.id,
         formule.interestRate.value,
         formule.insuranceRate.value,
-        formule.type,
+        formule.type.value,
         formule.label,
         formule.description,
         formule.isActive,
@@ -33,6 +33,7 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
 
   /** Mettre à jour une formule d'un crédit */
   async update(formule: FormuleCreditEntity): Promise<void> {
+    console.log(formule);
     await this.client.query<ResultSetHeader>(
       `UPDATE formules
            SET interest_rate = ?, insurance_rate = ?, type = ?, label = ?, description = ?, is_active = ?, account_id = ?, min_amount = ?, max_amount = ?, currency = ?, updated_at = ?
@@ -40,11 +41,11 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
       [
         formule.interestRate.value,
         formule.insuranceRate.value,
-        formule.type,
+        formule.type.value,
         formule.label,
         formule.description,
         formule.isActive,
-        formule.accountId,
+        formule.accountId.value,
         formule.minAmount?.amount,
         formule.maxAmount?.amount,
         formule.currency,

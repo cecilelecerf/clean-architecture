@@ -104,7 +104,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
 
     return rows.map((row) => {
       const account = AccountMapper.mapRowToAccount(row);
-      const user = row.user_id ? UserMapper.mapRowToUser(row, "user_") : null;
+      const user = UserMapper.mapRowToUser(row, "user_");
       return Object.assign(account, { user });
     });
   }
