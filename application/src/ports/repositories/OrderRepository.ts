@@ -10,4 +10,8 @@ export interface OrderRepository {
   save(order: OrderEntity): Promise<void>;
   update(order: OrderEntity): Promise<void>;
   delete(id: OrderEntity["id"]): Promise<void>;
+  findByUserIdAndStatus(
+    userId: UserEntity["id"],
+    status: OrderEntity["status"]
+  ): Promise<OrderEntity[]>;
 }

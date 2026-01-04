@@ -87,14 +87,14 @@ export class ApplyDailyInterestUseCase {
       }
 
       // Créditer le compte épargne
-      const depositResult = savingAccount.deposit(interest);
+      const depositResult = savingAccount.credit(interest);
       if (depositResult instanceof Error) return depositResult;
 
       // Débiter le compte de la banque
-      const withdrawResult = bankAccount.withdraw(interest);
+      const withdrawResult = bankAccount.debit(interest);
       if (withdrawResult instanceof Error) {
         // Rollback du dépôt si le retrait échoue
-        savingAccount.withdraw(interest);
+        savingAccount.debit(interest);
         return withdrawResult;
       }
 

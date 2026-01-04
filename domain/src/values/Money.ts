@@ -1,3 +1,4 @@
+import { InsufficientFundsError } from "@domain/errors/account";
 import {
   FactorNegativeError,
   MoneyAmountInvalidError,
@@ -54,17 +55,17 @@ export class Money {
 
   public subtract(
     other: Money
-  ):
-    | Money
-    | MoneyCurrencyMismatchError
-    | MoneyAmountNegativeError
-    | MoneyAmountInvalidError
-    | MoneyCurrencyMissingError {
+  ): Money | InsufficientFundsError | MoneyCurrencyMismatchError {
     const currencyError = this.ensureSameCurrency(other);
     if (currencyError instanceof Error) return currencyError;
     const result = this.amount - other.amount;
-    const money = Money.create({ amount: result, currency: this.currency });
-    return money;
+    if (result < 0)
+      return new InsufficientFundsError(this, {
+        amount: result,
+        currency: other.currency,
+      } as Money);
+    this.amount = result;
+    return this;
   }
 
   private ensureSameCurrency(other: Money): MoneyCurrencyMismatchError | void {

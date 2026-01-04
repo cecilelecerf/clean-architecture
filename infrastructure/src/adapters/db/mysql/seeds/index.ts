@@ -143,6 +143,8 @@ const all = async () => {
 
   const seedOrderUseCase = new SeedOrderUseCase(
     orderRepository,
+    accountRepository,
+    transactionRepository,
     uuidService,
     clockService
   );

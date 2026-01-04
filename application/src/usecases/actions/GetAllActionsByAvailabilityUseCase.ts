@@ -25,6 +25,8 @@ export class GetAllActionsByAvailabilityUsecase {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    return this.actionRepository.findAllAvailable(isAvailable);
+    return this.actionRepository.findAllAvailable(
+      user.hasRole({ role: "client" }) ? true : isAvailable
+    );
   }
 }

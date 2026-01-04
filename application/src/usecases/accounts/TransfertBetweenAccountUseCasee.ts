@@ -102,10 +102,10 @@ export class TransfertBetweenAccountUseCase {
       return new UnauthorizedAccessAccountError();
     }
 
-    const withdrawResult = fromAccount.withdraw(amount);
+    const withdrawResult = fromAccount.debit(amount);
     if (withdrawResult instanceof Error) return withdrawResult;
 
-    const depositResult = toAccount.deposit(amount);
+    const depositResult = toAccount.credit(amount);
     if (depositResult instanceof Error) return depositResult;
 
     const now = this.clockService.now();

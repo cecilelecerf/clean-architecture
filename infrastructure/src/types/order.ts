@@ -28,4 +28,31 @@ export const orderDTOSchema = orderSchema.pick({
   fee: true,
   date: true,
   status: true,
+  actionId: true,
 });
+
+export const portfolioPositionSchema = z.object({
+  isin: z.string(),
+  symbol: z.string(),
+  name: z.string(),
+  quantity: z.number().int().nonnegative(),
+  averagePrice: z.number().positive(),
+  currentPrice: z.number().positive(),
+  currency: z.string(),
+  totalInvested: z.number().nonnegative(),
+  currentValue: z.number().nonnegative(),
+  gainLoss: z.number(),
+  gainLossPercent: z.number(),
+});
+
+export const portfolioSchema = z.object({
+  positions: z.array(portfolioPositionSchema),
+  totalValue: z.number().nonnegative(),
+  totalInvested: z.number().nonnegative(),
+  totalGainLoss: z.number(),
+  totalGainLossPercent: z.number(),
+  currency: z.string(),
+});
+
+export type PortfolioPosition = z.infer<typeof portfolioPositionSchema>;
+export type Portfolio = z.infer<typeof portfolioSchema>;

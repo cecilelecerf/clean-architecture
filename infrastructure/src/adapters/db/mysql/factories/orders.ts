@@ -3,42 +3,34 @@ import { MySQLClient } from "../../MySQLClient";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { OrderRepositoryMySQL } from "../repositories/OrderRepositoryMySQL";
 import { ActionRepositoryMySQL } from "../repositories/ActionRepositoryMySQL";
-import { PlaceOrderUseCase } from "@application/usecases/orders/PlaceOrderUseCase";
 import { GetAllByUserUseCase } from "@application/usecases/orders/GetAllByUserUseCase";
 import { UserRepositoryMySQL } from "../repositories/UserRepositoryMySQL";
 import { GetAllByActionUseCase } from "@application/usecases/orders/GetAllByActionUseCase";
+import { GetPortfolioUseCase } from "@application/usecases/orders/GetPorfolioUseCase";
+export const orderFactory = () => {
+  const client = new MySQLClient();
+  const userRepository = new UserRepositoryMySQL(client);
+  const orderRepository = new OrderRepositoryMySQL(client);
+  const actionRepository = new ActionRepositoryMySQL(client);
+  const uuidService = new NodeUuidService();
+  const clockService = new SystemClockService();
 
-export const orderFactory = () => { 
-    const client = new MySQLClient();
-    const userRepository = new UserRepositoryMySQL(client);
-    const orderRepository = new OrderRepositoryMySQL(client);
-    const actionRepository = new ActionRepositoryMySQL(client);
-    const uuidService = new NodeUuidService();
-    const clockService = new SystemClockService();
+  const getAllByUser = new GetAllByUserUseCase(userRepository, orderRepository);
 
-    const placeOrder = new PlaceOrderUseCase(
-        orderRepository,
-        actionRepository,
-        uuidService,
-        clockService
-    );
+  const getAllByAction = new GetAllByActionUseCase(
+    userRepository,
+    orderRepository,
+    actionRepository
+  );
+  const getPorfolio = new GetPortfolioUseCase(
+    orderRepository,
+    actionRepository,
+    userRepository
+  );
 
-    const getAllByUser = new GetAllByUserUseCase(
-        userRepository,
-        orderRepository
-    );
-
-    const getAllByAction = new GetAllByActionUseCase(
-        userRepository,
-        orderRepository,
-        actionRepository
-    )
-
-    return {
-        client: {
-            placeOrder,
-            getAllByUser,
-            getAllByAction
-        }
-    }
-}
+  return {
+    getPorfolio,
+    getAllByUser,
+    getAllByAction,
+  };
+};

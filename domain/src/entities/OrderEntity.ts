@@ -13,11 +13,13 @@ import {
   InvalidOrderTypeError,
   InvalidQuantityError,
 } from "@domain/errors/order";
+import { TransactionEntity } from "./TransactionEntity";
+import { AccountEntity } from "./AccountEntity";
 
 export class OrderEntity {
   private constructor(
     public id: string,
-    public userId: UserEntity["id"],
+    public accountIban: AccountEntity["iban"],
     public actionId: ActionEntity["ISIN"],
     public type: "buy" | "sell",
     public quantity: number,
@@ -25,6 +27,7 @@ export class OrderEntity {
     public fee: Money,
     public date: Date,
     public status: "pending" | "executed" | "cancelled",
+    public transactionId: TransactionEntity["id"],
     public createdAt: Date,
     public updatedAt: Date
   ) {}
@@ -68,23 +71,25 @@ export class OrderEntity {
 
   public static create({
     id,
-    userId,
+    accountIban,
     actionId,
     type,
     quantity,
     price,
     date,
     createdAt,
+    transactionId,
   }: Pick<
     OrderEntity,
     | "id"
-    | "userId"
+    | "accountIban"
     | "actionId"
     | "type"
     | "quantity"
     | "price"
     | "date"
     | "createdAt"
+    | "transactionId"
   >):
     | OrderEntity
     | InvalidQuantityError
@@ -104,7 +109,7 @@ export class OrderEntity {
 
     return new OrderEntity(
       id,
-      userId,
+      accountIban,
       actionId,
       validatedType,
       validatedQuantity,
@@ -112,6 +117,7 @@ export class OrderEntity {
       fee,
       date,
       "pending",
+      transactionId,
       createdAt,
       createdAt
     );
@@ -119,7 +125,7 @@ export class OrderEntity {
 
   public static from({
     id,
-    userId,
+    accountIban,
     actionId,
     type,
     quantity,
@@ -129,10 +135,11 @@ export class OrderEntity {
     status,
     createdAt,
     updatedAt,
+    transactionId,
   }: Pick<
     OrderEntity,
     | "id"
-    | "userId"
+    | "accountIban"
     | "actionId"
     | "type"
     | "quantity"
@@ -142,10 +149,11 @@ export class OrderEntity {
     | "status"
     | "createdAt"
     | "updatedAt"
+    | "transactionId"
   >) {
     return new OrderEntity(
       id,
-      userId,
+      accountIban,
       actionId,
       type,
       quantity,
@@ -153,6 +161,7 @@ export class OrderEntity {
       fee,
       date,
       status,
+      transactionId,
       createdAt,
       updatedAt
     );

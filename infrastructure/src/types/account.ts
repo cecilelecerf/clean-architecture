@@ -41,7 +41,7 @@ export const accountResumeSchema = accountSchema.pick({
   type: true,
 });
 export const accountResumeWithUserSchema = accountResumeSchema.extend({
-  user: userDtoSchema.nullable(),
+  user: userDtoSchema.nullable().optional(),
 });
 export type AccountResumeWithUser = z.infer<typeof accountResumeWithUserSchema>;
 
