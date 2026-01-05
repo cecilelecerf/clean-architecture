@@ -49,6 +49,8 @@ import { FormuleCreditRepositoryMySQL } from "../repositories/FormuleCreditRepos
 import { seedPriceHistory } from "../../seeds/09_generateActionHistories";
 import { SeedActionPriceHistoryUseCase } from "@application/usecases/seeds/SeedActionPriceHistoryUseCase";
 import { ActionPriceHistoryRepositoryMySQL } from "../repositories/ActionPriceHistoryRepositoryMySQL";
+import { generateCurrencies } from "../../seeds/00_seedCurrency";
+import { CurrencyRepositoryMySQL } from "../repositories/CurrencyRepositoryMySQL";
 
 const all = async () => {
   console.log("🌱 Starting database seed...\n");
@@ -73,6 +75,7 @@ const all = async () => {
   const actionPriceRepository = new ActionPriceHistoryRepositoryMySQL(
     mysqlClient
   );
+  const currencyRepo = new CurrencyRepositoryMySQL(mysqlClient);
 
   // 3. Initialiser les services
   const encryptionService = new BcryptEncryptionService();
@@ -174,6 +177,7 @@ const all = async () => {
   );
 
   // 5. Exécuter les seeds
+  await generateCurrencies(currencyRepo, clockService);
   const directors = await seedDirector(seedUserUseCase, clockService);
 
   const bankAccounts = await generateBankAccounts(seedBankAccountUseCase);
