@@ -4,7 +4,6 @@ import {
   FactorNegativeError,
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
-  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import {
@@ -185,8 +184,7 @@ export class OrderEntity {
     | FactorNegativeError
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
-    | MoneyAmountNegativeError
-    | MoneyCurrencyMismatchError {
+    | MoneyAmountNegativeError {
     const totalPrice = this.price.multiply(this.quantity);
     if (totalPrice instanceof Error) {
       return totalPrice;

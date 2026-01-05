@@ -22,13 +22,14 @@ import Link from "next/link";
 import { useState } from "react";
 import { ActionBuy } from "./_components/ActionBuy";
 import { ActionTabs } from "./_components/ActionTabs";
+import { ActionSellContainer } from "./_components/AciontSell";
 
 export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: ActionId, baseHref: string, isAdmin?: boolean }) {
     const router = useRouter();
     const statsQuery = useQuery(endpoints.actions.getStats({ isin }));
 
     const actionQuery = useQuery(endpoints.actions.get({ isin }));
-    const [buyOpen, setBuyOpen] = useState(false)
+    const [open, setOpen] = useState<null | "buy" | "sell">(null)
 
     return (
         <div className="space-y-4 pb-20 md:pb-8">
@@ -62,6 +63,7 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                                 <div className="bg-linear-to-br from-blue-600 to-indigo-700 p-6 text-white">
                                     <div className="space-y-3">
                                         <div className="flex items-start justify-between">
+
                                             <div className="flex-1">
                                                 <div className="w-full flex justify-between">
 
@@ -81,16 +83,13 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                                                             </Badge>
                                                         )}
                                                     </div>
-                                                    {isAdmin ? (
+                                                    {isAdmin && (
                                                         <Link href={`${baseHref}/actions/${action.ISIN}/edit`}>
                                                             <Button variant="ghost" size="icon">
                                                                 <Pencil />
                                                             </Button>
                                                         </Link>
-                                                    ) :
-                                                        <Button className="bg-indigo-800/50 hover:bg-indigo-900/50 transition shadow" onClick={(() => setBuyOpen((prev) => !prev))}>
-                                                            <ShoppingCart className="w-5 h-5" /> Acheter des actions
-                                                        </Button>}
+                                                    )}
 
                                                 </div>
                                                 <p className="text-white/90 text-sm md:text-base">
@@ -100,6 +99,22 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                                                     ISIN: {action.ISIN}
                                                 </p>
                                             </div>
+                                            {!isAdmin && (
+                                                <div className="flex flex-col gap-3">
+                                                    <Button
+                                                        className="bg-indigo-800/50 hover:bg-indigo-900/50 transition shadow"
+                                                        onClick={(() => setOpen((prev) => prev === "buy" ? null : "buy"))}
+                                                    >
+                                                        <ShoppingCart className="w-5 h-5" /> Acheter des actions
+                                                    </Button>
+                                                    <Button
+                                                        className="bg-indigo-800/50 hover:bg-indigo-900/50 transition shadow"
+                                                        onClick={(() => setOpen((prev) => prev === "sell" ? null : "sell"))}
+                                                    >
+                                                        <ShoppingCart className="w-5 h-5" /> Vendre des actions
+                                                    </Button>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
@@ -134,8 +149,11 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                                     </div>
                                 </div>
                             </Card>
-                            {!isAdmin && action.isAvailable &&
-                                <ActionBuy action={action} buyOpen={buyOpen} setBuyOpen={setBuyOpen} />
+                            {!isAdmin && action.isAvailable && open === "buy" &&
+                                <ActionBuy action={action} buyOpen={open === "buy"} closeBuy={() => setOpen(null)} />
+                            }
+                            {!isAdmin && open === "sell" &&
+                                <ActionSellContainer action={action} sellOpen={open === 'sell'} closeSell={() => setOpen(null)} />
                             }
                         </>
                     ))

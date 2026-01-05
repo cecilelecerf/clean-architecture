@@ -17,6 +17,8 @@ import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidServi
 import { OrderRepositoryMySQL } from "../repositories/OrderRepositoryMySQL";
 import { SellActionUseCase } from "@application/usecases/actions/SellActionUseCase";
 import { GetActionSuggestionsUseCase } from "@application/usecases/actions/GetActionSuggestionsUseCase";
+import { MoneyConverterService } from "@infrastructure/adapters/services/MoneyConverterService";
+import { CurrencyRepositoryMySQL } from "../repositories/CurrencyRepositoryMySQL";
 
 export const actionFactory = () => {
   const client = new MySQLClient();
@@ -27,10 +29,11 @@ export const actionFactory = () => {
   const actionPriceHistoryRepository = new ActionPriceHistoryRepositoryMySQL(
     client
   );
-
+  const currencyRepo = new CurrencyRepositoryMySQL(client);
   const userRepository = new UserRepositoryMySQL(client);
   const clockService = new SystemClockService();
   const uuidService = new NodeUuidService();
+  const moneyConvertorService = new MoneyConverterService(currencyRepo);
 
   const createAction = new CreateActionUsecase(
     actionRepository,
@@ -45,7 +48,8 @@ export const actionFactory = () => {
     orderRepo,
     accountRepo,
     uuidService,
-    transactionRepo
+    transactionRepo,
+    moneyConvertorService
   );
 
   const getAllActionsByAvailability = new GetAllActionsByAvailabilityUsecase(
@@ -69,7 +73,8 @@ export const actionFactory = () => {
     transactionRepo,
     orderRepo,
     uuidService,
-    clockService
+    clockService,
+    moneyConvertorService
   );
 
   const sell = new SellActionUseCase(

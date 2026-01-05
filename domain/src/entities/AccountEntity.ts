@@ -6,7 +6,6 @@ import {
   FactorNegativeError,
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
-  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import {
@@ -108,9 +107,8 @@ export class AccountEntity {
     );
   }
 
-  public credit(amount: Money): AccountEntity | MoneyCurrencyMismatchError {
+  public credit(amount: Money): AccountEntity {
     const newBalence = this.balance.add(amount);
-    if (newBalence instanceof Error) return newBalence;
     this.balance = newBalence;
     return this;
   }
@@ -118,15 +116,12 @@ export class AccountEntity {
   public debit(
     amount: Money
   ):
-    | MoneyCurrencyMismatchError
     | AccountEntity
     | MoneyAmountNegativeError
     | MoneyAmountInvalidError
     | MoneyCurrencyMissingError
     | InsufficientFundsError {
-    console.log("debit");
     const newBalence = this.balance.subtract(amount);
-    console.log(newBalence);
     if (newBalence instanceof Error) return newBalence;
 
     this.balance = newBalence;

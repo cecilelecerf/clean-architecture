@@ -94,6 +94,8 @@ export const actionsEndpoint = createEndpointsNodes({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['actions', 'list'] });
         queryClient.invalidateQueries({ queryKey: ['actions', isin] });
+        queryClient.invalidateQueries({ queryKey: ['accounts'] });
+        queryClient.invalidateQueries({ queryKey: ['order', 'portfolio'] });
       },
     }),
 
@@ -106,6 +108,8 @@ export const actionsEndpoint = createEndpointsNodes({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['actions', 'list'] });
         queryClient.invalidateQueries({ queryKey: ['actions', isin] });
+        queryClient.invalidateQueries({ queryKey: ['accounts'] });
+        queryClient.invalidateQueries({ queryKey: ['order', 'portfolio'] });
       },
     }),
 

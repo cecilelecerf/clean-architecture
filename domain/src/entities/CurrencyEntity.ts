@@ -8,7 +8,7 @@ export class CurrencyEntity {
     public readonly code: string,
     public exchangeRate: number, // Taux par rapport à l'USD (USD = 1.0)
     public readonly createdAt: Date,
-    public updatedAt?: Date
+    public updatedAt: Date
   ) {}
 
   private static validateCode(code: string): string | InvalidCurrencyCodeError {
@@ -43,7 +43,12 @@ export class CurrencyEntity {
     const validatedRate = this.validateExchangeRate(exchangeRate);
     if (validatedRate instanceof Error) return validatedRate;
 
-    return new CurrencyEntity(validatedCode, validatedRate, createdAt);
+    return new CurrencyEntity(
+      validatedCode,
+      validatedRate,
+      createdAt,
+      createdAt
+    );
   }
 
   public static from({
@@ -55,7 +60,7 @@ export class CurrencyEntity {
     code: string;
     exchangeRate: number;
     createdAt: Date;
-    updatedAt?: Date;
+    updatedAt: Date;
   }): CurrencyEntity {
     return new CurrencyEntity(code, exchangeRate, createdAt, updatedAt);
   }
@@ -93,14 +98,14 @@ export class CurrencyEntity {
     return toCurrency.convertFromUSD(amountInUSD);
   }
 
-  public toDTO() {
+  public toDTO(): CurrencyToDTO {
     return {
       code: this.code,
       exchangeRate: this.exchangeRate,
       symbol: this.getSymbol(),
       name: this.getName(),
       createdAt: this.createdAt.toISOString(),
-      updatedAt: this.updatedAt?.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
     };
   }
 
@@ -132,3 +137,10 @@ export class CurrencyEntity {
     return names[this.code] || this.code;
   }
 }
+
+export type CurrencyToDTO = {
+  symbol: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+} & Pick<CurrencyEntity, "code" | "exchangeRate">;

@@ -22,6 +22,7 @@ import {
   MoneyAmountNegativeError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
+import { MoneyConverter } from "@domain/services/MoneyConverter";
 import { Money } from "@domain/values/Money";
 
 interface Props {
@@ -45,7 +46,8 @@ export class UpdateActionUsecase {
     private readonly orderRepositry: OrderRepository,
     private readonly accountRepository: AccountRepository,
     private readonly uuidService: UuidService,
-    private readonly transactionRepository: TransactionRepository
+    private readonly transactionRepository: TransactionRepository,
+    private readonly moneyConvertService: MoneyConverter
   ) {}
 
   public async execute({
@@ -139,12 +141,16 @@ export class UpdateActionUsecase {
     if (!bankAccount) {
       return new BankInterestAccountNotFoundError();
     }
-
+    const totalConvert = await this.moneyConvertService.convert(
+      total,
+      userAccount.currency
+    );
+    if (totalConvert instanceof Error) return totalConvert;
     const transaction = TransactionEntity.create({
       id: this.uuidService.generate(),
       fromAccountId: order.accountIban,
       toAccountId: bankAccount.iban,
-      amount: total,
+      amount: totalConvert,
       label: `Achat ${order.quantity} action(s) ${action.symbol}`,
       date: this.clockService.now(),
       icon: "",
@@ -159,7 +165,7 @@ export class UpdateActionUsecase {
     });
     if (newOrder instanceof Error) return newOrder;
 
-    userAccount.debit(total);
+    userAccount.debit(totalConvert);
     bankAccount.credit(total);
 
     await this.accountRepository.update(userAccount);

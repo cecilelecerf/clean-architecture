@@ -22,7 +22,7 @@ import { ActionsCarousel } from "./_components/ActionCarousel";
 
 export default function ClientActionsPage() {
     const router = useRouter();
-    const portfolioQuery = useQuery(endpoints.orders.getPortfolio());
+    const portfolioQuery = useQuery(endpoints.orders.portfolio.getMe());
     const suggestionsQuery = useQuery(endpoints.actions.getSuggestions());
 
     return (

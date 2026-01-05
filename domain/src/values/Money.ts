@@ -3,7 +3,6 @@ import {
   FactorNegativeError,
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
-  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 
@@ -43,162 +42,90 @@ export class Money {
     return new Money(scaledAmount, currency.toUpperCase());
   }
 
-  public add(other: Money): Money | MoneyCurrencyMismatchError {
-    const currencyError = this.ensureSameCurrency(other);
-    if (currencyError) return currencyError;
+  // Opérations simples (même devise uniquement)
+  public add(other: Money): Money {
     return new Money(
       Number((this.amount + other.amount).toFixed(Money.SCALE)),
       this.currency
     );
   }
 
-  public subtract(
-    other: Money
-  ): Money | InsufficientFundsError | MoneyCurrencyMismatchError {
-    const currencyError = this.ensureSameCurrency(other);
-    if (currencyError instanceof Error) return currencyError;
-
+  public subtract(other: Money): Money | InsufficientFundsError {
     const result = this.amount - other.amount;
-
     if (result < 0) {
       return new InsufficientFundsError(this, other);
     }
-
     return new Money(Number(result.toFixed(Money.SCALE)), this.currency);
   }
 
-  public multiply(
-    factor: number
-  ):
-    | Money
-    | FactorNegativeError
-    | MoneyCurrencyMissingError
-    | MoneyAmountInvalidError
-    | MoneyAmountNegativeError {
+  public multiply(factor: number): Money | FactorNegativeError {
     if (factor < 0) {
       return new FactorNegativeError();
     }
 
     const resultAmount = Number((this.amount * factor).toFixed(Money.SCALE));
-
-    const resultOrError = Money.create({
+    const result = Money.create({
       amount: resultAmount,
       currency: this.currency,
     });
-    if (resultOrError instanceof Error) return resultOrError;
-    return resultOrError;
+    if (result instanceof Error) throw result; // Ne devrait jamais arriver
+    return result;
   }
 
-  public divide(
-    divisor: number
-  ):
-    | Money
-    | FactorNegativeError
-    | MoneyCurrencyMissingError
-    | MoneyAmountInvalidError
-    | MoneyAmountNegativeError {
+  public divide(divisor: number): Money | FactorNegativeError {
     if (divisor <= 0) {
       return new FactorNegativeError();
     }
 
     const resultAmount = Number((this.amount / divisor).toFixed(Money.SCALE));
-
-    const resultOrError = Money.create({
+    const result = Money.create({
       amount: resultAmount,
       currency: this.currency,
     });
-    if (resultOrError instanceof Error) return resultOrError;
-    return resultOrError;
+    if (result instanceof Error) throw result;
+    return result;
   }
 
-  /**
-   * Convertit ce montant vers une autre devise en utilisant les taux de change fournis.
-   *
-   * @param targetCurrency - Le code de la devise cible (ex: "EUR")
-   * @param fromRate - Le taux de change de la devise source par rapport à USD
-   * @param toRate - Le taux de change de la devise cible par rapport à USD
-   *
-   * Exemple: Convertir 100 EUR vers GBP
-   * - fromRate (EUR): 0.91 (1 USD = 0.91 EUR)
-   * - toRate (GBP): 0.78 (1 USD = 0.78 GBP)
-   * - Calcul: 100 EUR → USD: 100 / 0.91 = 109.89 USD
-   *          109.89 USD → GBP: 109.89 * 0.78 = 85.71 GBP
-   */
+  // Conversion (avec taux explicites)
   public convertTo(
     targetCurrency: string,
     fromRate: number,
     toRate: number
-  ):
-    | Money
-    | MoneyCurrencyMissingError
-    | MoneyAmountInvalidError
-    | MoneyAmountNegativeError {
+  ): Money {
     if (this.currency === targetCurrency.toUpperCase()) {
       return this;
     }
 
     const amountInUSD = this.amount / fromRate;
-
     const convertedAmount = amountInUSD * toRate;
 
-    return Money.create({
+    const result = Money.create({
       amount: Number(convertedAmount.toFixed(Money.SCALE)),
       currency: targetCurrency.toUpperCase(),
     });
+
+    if (result instanceof Error) throw result;
+    return result;
   }
 
-  /**
-   * Version simplifiée de conversion si tu as accès aux CurrencyEntity directement
-   */
-  public static convert(
-    money: Money,
-    fromCurrency: { code: string; exchangeRate: number },
-    toCurrency: { code: string; exchangeRate: number }
-  ):
-    | Money
-    | MoneyCurrencyMissingError
-    | MoneyAmountInvalidError
-    | MoneyAmountNegativeError {
-    return money.convertTo(
-      toCurrency.code,
-      fromCurrency.exchangeRate,
-      toCurrency.exchangeRate
-    );
-  }
-
-  private ensureSameCurrency(other: Money): MoneyCurrencyMismatchError | void {
-    if (this.currency !== other.currency) {
-      return new MoneyCurrencyMismatchError();
-    }
-  }
-
+  // Comparaisons simples (même devise)
   public equals(other: Money): boolean {
     return this.currency === other.currency && this.amount === other.amount;
   }
 
-  public isGreaterThan(other: Money): boolean | MoneyCurrencyMismatchError {
-    const currencyError = this.ensureSameCurrency(other);
-    if (currencyError) return currencyError;
+  public isGreaterThan(other: Money): boolean {
     return this.amount > other.amount;
   }
 
-  public isLessThan(other: Money): boolean | MoneyCurrencyMismatchError {
-    const currencyError = this.ensureSameCurrency(other);
-    if (currencyError) return currencyError;
+  public isLessThan(other: Money): boolean {
     return this.amount < other.amount;
   }
 
-  public isGreaterThanOrEqual(
-    other: Money
-  ): boolean | MoneyCurrencyMismatchError {
-    const currencyError = this.ensureSameCurrency(other);
-    if (currencyError) return currencyError;
+  public isGreaterThanOrEqual(other: Money): boolean {
     return this.amount >= other.amount;
   }
 
-  public isLessThanOrEqual(other: Money): boolean | MoneyCurrencyMismatchError {
-    const currencyError = this.ensureSameCurrency(other);
-    if (currencyError) return currencyError;
+  public isLessThanOrEqual(other: Money): boolean {
     return this.amount <= other.amount;
   }
 
@@ -213,9 +140,6 @@ export class Money {
     };
   }
 
-  /**
-   * Formatte le montant avec le symbole de devise approprié
-   */
   public format(locale: string = "fr-FR"): string {
     const symbols: Record<string, string> = {
       USD: "$",

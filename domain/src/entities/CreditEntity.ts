@@ -4,7 +4,6 @@ import { Percentage } from "@domain/values/Percentage";
 import {
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
-  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import {
@@ -200,7 +199,6 @@ export class CreditEntity {
     | CreditEntity
     | CreditAlreadyPaidError
     | MoneyCurrencyMissingError
-    | MoneyCurrencyMismatchError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
     | InsufficientFundsError {
@@ -241,7 +239,6 @@ export class CreditEntity {
     | CreditAlreadyPaidError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | MoneyCurrencyMismatchError
     | InsufficientFundsError {
     const schedule: MonthlySchedule[] = [];
 

@@ -7,6 +7,7 @@ import { GetAllByUserUseCase } from "@application/usecases/orders/GetAllByUserUs
 import { UserRepositoryMySQL } from "../repositories/UserRepositoryMySQL";
 import { GetAllByActionUseCase } from "@application/usecases/orders/GetAllByActionUseCase";
 import { GetPortfolioUseCase } from "@application/usecases/orders/GetPorfolioUseCase";
+import { GetPortoflioByISINUseCase } from "@application/usecases/orders/GetPortoflioByISINUseCase";
 export const orderFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);
@@ -24,10 +25,15 @@ export const orderFactory = () => {
     actionRepository,
     userRepository
   );
-
+  const getPortoflioByISIN = new GetPortoflioByISINUseCase(
+    orderRepository,
+    actionRepository,
+    userRepository
+  );
   return {
     getPorfolio,
     getAllByUser,
     getAllByAction,
+    getPortoflioByISIN,
   };
 };

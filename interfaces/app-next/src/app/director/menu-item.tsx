@@ -14,4 +14,5 @@ export const menuItems = [
   { icon: <Percent size={18} />, label: "Taux d'interêt", href: "/director/savings-rate" },
   { icon: <FileChartLine size={18} />, label: "Formule des crédits", href: "/director/formules" },
   { icon: <FileChartLine size={18} />, label: "Actions", href: "/director/actions" },
+  { icon: <FileChartLine size={18} />, label: "Devises", href: "/director/currencies" },
 ];

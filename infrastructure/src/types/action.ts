@@ -28,6 +28,8 @@ export const actionPriceHistorySchema = z.object({
 export const buyActionSchema = z.object({
   quantity: z.number().int().positive(),
   accountId: accountIdSchema,
+  limitPrice: moneySchema.optional(),
+  scheduledFor: z.iso.datetime().optional(),
 });
 export type BuyAction = z.infer<typeof buyActionSchema>;
 

@@ -32,6 +32,7 @@ import { fr } from "date-fns/locale";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Action, } from "@infrastructure/types/action";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
+import { MyOrders } from "./Order";
 
 export const ActionTabs = ({ action }: { action: Action }) => {
     const statsQuery = useQuery(endpoints.actions.getStats({ isin: action.ISIN }));
@@ -39,10 +40,14 @@ export const ActionTabs = ({ action }: { action: Action }) => {
 
     return (
         <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsList className="grid w-full grid-cols-4 mb-4">
                 <TabsTrigger value="overview" className="text-xs sm:text-sm">
                     <Activity className="w-4 h-4 mr-1 hidden sm:inline" />
                     Vue d'ensemble
+                </TabsTrigger>
+                <TabsTrigger value="my-order" className="text-xs sm:text-sm">
+                    <LineChartIcon className="w-4 h-4 mr-1 hidden sm:inline" />
+                    Mes actions
                 </TabsTrigger>
                 <TabsTrigger value="chart" className="text-xs sm:text-sm">
                     <LineChartIcon className="w-4 h-4 mr-1 hidden sm:inline" />
@@ -118,6 +123,7 @@ export const ActionTabs = ({ action }: { action: Action }) => {
                 </Card>
             </TabsContent>
 
+            <TabsContent value="my-order" className="space-y-4"><MyOrders action={action} /></TabsContent>
             {/* Chart Tab */}
             <TabsContent value="chart" className="space-y-4">
                 {match(priceHistoryQuery)

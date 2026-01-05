@@ -8,17 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CurrencyCode } from "@infrastructure/types/currency";
 
 export default function CurrenciesPage() {
     const query = useQuery(endpoints.currencies.getAll());
-    const [editingCode, setEditingCode] = useState<string | null>(null);
+    const [editingCode, setEditingCode] = useState<CurrencyCode | null>(null);
     const [newRate, setNewRate] = useState("");
 
     const updateMutation = useMutation(
-        endpoints.currencies.update({ code: editingCode || "" })
+        endpoints.currencies.update({ currencyCode: editingCode })
     );
 
-    const handleUpdate = (code: string, currentRate: number) => {
+    const handleUpdate = (code: CurrencyCode, currentRate: number) => {
         setEditingCode(code);
         setNewRate(currentRate.toString());
     };
@@ -27,7 +28,7 @@ export default function CurrenciesPage() {
         if (!editingCode) return;
 
         updateMutation.mutate(
-            { payload: { exchangeRate: parseFloat(newRate) } },
+            { exchangeRate: parseFloat(newRate) },
             {
                 onSuccess: () => {
                     toast.success("Taux de change mis à jour");
@@ -50,9 +51,9 @@ export default function CurrenciesPage() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 {query.data?.map((currency) => (
-                    <Card key={currency.code}>
+                    <Card key={currency.code} className="justify-between">
                         <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">

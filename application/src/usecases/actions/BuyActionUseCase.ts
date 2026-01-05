@@ -28,7 +28,6 @@ import {
   FactorNegativeError,
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
-  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import { OrderRepository } from "@application/ports/repositories/OrderRepository";
@@ -46,6 +45,7 @@ import {
 import { BankInterestAccountNotFoundError } from "@application/errors/accounts/BankInterestAccountNotFoundError";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { AccountEntity } from "@domain/entities/AccountEntity";
+import { MoneyConverter } from "@domain/services/MoneyConverter";
 
 type Props = {
   userId: UserEntity["id"];
@@ -62,7 +62,8 @@ export class BuyActionUseCase {
     private readonly transactionRepository: TransactionRepository,
     private readonly orderRepository: OrderRepository,
     private readonly uuidService: UuidService,
-    private readonly clockService: ClockService
+    private readonly clockService: ClockService,
+    private readonly moneyService: MoneyConverter
   ) {}
 
   async execute({
@@ -95,7 +96,6 @@ export class BuyActionUseCase {
     | InvalidOrderTypeError
     | FactorNegativeError
     | BankInterestAccountNotFoundError
-    | MoneyCurrencyMismatchError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -140,7 +140,6 @@ export class BuyActionUseCase {
       | MoneyCurrencyMissingError
       | MoneyAmountInvalidError
       | MoneyAmountNegativeError
-      | MoneyCurrencyMismatchError
       | BankInterestAccountNotFoundError
       | undefined;
     if (order.canBeExecuted({ now: this.clockService.now(), action })) {
@@ -170,39 +169,39 @@ export class BuyActionUseCase {
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | MoneyCurrencyMismatchError
     | BankInterestAccountNotFoundError
   > {
     const total = order.getTotal();
     if (total instanceof Error) return total;
-
     const bankAccount = await this.accountRepository.findBankInterestAccount();
     if (!bankAccount) {
       return new BankInterestAccountNotFoundError();
     }
-
+    const totalConvert = await this.moneyService.convert(
+      total,
+      userAccount.currency
+    );
+    if (totalConvert instanceof Error) return totalConvert;
     const transaction = TransactionEntity.create({
       id: this.uuidService.generate(),
       fromAccountId: userAccount.iban,
       toAccountId: bankAccount.iban,
-      amount: total,
+      amount: totalConvert,
       label: `Achat ${order.quantity} action(s) ${action.symbol}`,
       date: this.clockService.now(),
       icon: "",
     });
 
     if (transaction instanceof Error) return transaction;
-    console.log(userAccount);
     const newOrder = order.markExecuted({
       now: this.clockService.now(),
       transactionId: transaction.id,
     });
     if (newOrder instanceof Error) return newOrder;
 
-    const debit = userAccount.debit(total);
+    const debit = userAccount.debit(totalConvert);
     if (debit instanceof Error) return debit;
-    const credit = bankAccount.credit(total);
-    if (credit instanceof Error) return credit;
+    bankAccount.credit(total);
     await this.accountRepository.update(userAccount);
     await this.accountRepository.update(bankAccount);
     await this.transactionRepository.save(transaction);

@@ -1,4 +1,9 @@
-import { orderDTOSchema, orderSchema, portfolioSchema } from '@infrastructure/types/order';
+import {
+  orderDTOSchema,
+  orderSchema,
+  portfolioPositionSchema,
+  portfolioSchema,
+} from '@infrastructure/types/order';
 import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import { queryOptions } from '@tanstack/react-query';
@@ -52,12 +57,23 @@ export const ordersEndpoint = createEndpointsNodes({
           return safeParseWithLog(orderDTOSchema.array(), data);
         }),
     }),
-  getPortfolio: () =>
-    queryOptions({
-      queryKey: ['orders', 'portfolio'],
-      queryFn: () =>
-        get(`/orders/portfolio`).then((data) => {
-          return safeParseWithLog(portfolioSchema, data);
-        }),
-    }),
+
+  portfolio: {
+    getMe: () =>
+      queryOptions({
+        queryKey: ['portfolio', 'me'],
+        queryFn: () =>
+          get(`/portfolio`).then((data) => {
+            return safeParseWithLog(portfolioSchema, data);
+          }),
+      }),
+    getByISIN: ({ ISIN }: { ISIN: ActionId }) =>
+      queryOptions({
+        queryKey: ['portfolio', ISIN],
+        queryFn: () =>
+          get(`/portfolio/${ISIN}`).then((data) => {
+            return safeParseWithLog(portfolioPositionSchema.or(z.null()), data);
+          }),
+      }),
+  },
 });
