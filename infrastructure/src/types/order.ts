@@ -32,7 +32,7 @@ export const orderDTOSchema = orderSchema.pick({
 });
 
 export const portfolioPositionSchema = z.object({
-  isin: z.string(),
+  ISIN: z.string(),
   symbol: z.string(),
   name: z.string(),
   quantity: z.number().int().nonnegative(),

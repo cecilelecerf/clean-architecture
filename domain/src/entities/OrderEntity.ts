@@ -1,6 +1,5 @@
 import { Money } from "@domain/values/Money";
 import { ActionEntity } from "./ActionEntity";
-import { UserEntity } from "./UserEntity";
 import {
   FactorNegativeError,
   MoneyAmountInvalidError,
@@ -25,11 +24,13 @@ export class OrderEntity {
     public quantity: number,
     public price: Money,
     public fee: Money,
-    public date: Date,
     public status: "pending" | "executed" | "cancelled",
-    public transactionId: TransactionEntity["id"],
     public createdAt: Date,
-    public updatedAt: Date
+    public updatedAt: Date,
+    public date?: Date,
+    public transactionId?: TransactionEntity["id"],
+    public limitPrice?: Money,
+    public scheduledFor?: Date
   ) {}
 
   private static validateQuantity(
@@ -79,6 +80,8 @@ export class OrderEntity {
     date,
     createdAt,
     transactionId,
+    limitPrice,
+    scheduledFor,
   }: Pick<
     OrderEntity,
     | "id"
@@ -90,6 +93,8 @@ export class OrderEntity {
     | "date"
     | "createdAt"
     | "transactionId"
+    | "limitPrice"
+    | "scheduledFor"
   >):
     | OrderEntity
     | InvalidQuantityError
@@ -115,11 +120,13 @@ export class OrderEntity {
       validatedQuantity,
       price,
       fee,
-      date,
       "pending",
-      transactionId,
       createdAt,
-      createdAt
+      createdAt,
+      date,
+      transactionId,
+      limitPrice,
+      scheduledFor
     );
   }
 
@@ -136,6 +143,8 @@ export class OrderEntity {
     createdAt,
     updatedAt,
     transactionId,
+    limitPrice,
+    scheduledFor,
   }: Pick<
     OrderEntity,
     | "id"
@@ -150,6 +159,8 @@ export class OrderEntity {
     | "createdAt"
     | "updatedAt"
     | "transactionId"
+    | "limitPrice"
+    | "scheduledFor"
   >) {
     return new OrderEntity(
       id,
@@ -159,11 +170,13 @@ export class OrderEntity {
       quantity,
       price,
       fee,
-      date,
       status,
-      transactionId,
       createdAt,
-      updatedAt
+      updatedAt,
+      date,
+      transactionId,
+      limitPrice,
+      scheduledFor
     );
   }
 
@@ -181,7 +194,37 @@ export class OrderEntity {
     return totalPrice.add(this.fee);
   }
 
-  public markExecuted(): OrderEntity | InvalidOrderStatusTransitionError {
+  public canBeExecuted({
+    now,
+    action,
+  }: {
+    action: ActionEntity;
+    now: Date;
+  }): boolean {
+    if (!action.isAvailable) return false;
+
+    if (this.scheduledFor && this.scheduledFor > now) {
+      return false;
+    }
+    if (this.limitPrice) {
+      if (this.type === "buy") {
+        return action.currentPrice.amount <= this.limitPrice.amount;
+      } else {
+        return action.currentPrice.amount >= this.limitPrice.amount;
+      }
+    }
+    return true;
+  }
+
+  public markExecuted({
+    transactionId,
+    now,
+    price,
+  }: {
+    transactionId: TransactionEntity["id"];
+    now: Date;
+    price?: Money;
+  }): OrderEntity | InvalidOrderStatusTransitionError {
     if (this.status !== "pending") {
       return new InvalidOrderStatusTransitionError(
         this.id,
@@ -189,11 +232,19 @@ export class OrderEntity {
         "pending"
       );
     }
+    this.date = now;
+    this.updatedAt = now;
+    this.transactionId = transactionId;
+    if (price) this.price = price;
     this.status = "executed";
     return this;
   }
 
-  public markCancelled(): OrderEntity | InvalidOrderStatusTransitionError {
+  public markCancelled({
+    now,
+  }: {
+    now: Date;
+  }): OrderEntity | InvalidOrderStatusTransitionError {
     if (this.status !== "pending") {
       return new InvalidOrderStatusTransitionError(
         this.id,
@@ -202,6 +253,8 @@ export class OrderEntity {
       );
     }
     this.status = "cancelled";
+    this.updatedAt = now;
+
     return this;
   }
 
@@ -216,4 +269,32 @@ export class OrderEntity {
   public static defaultFee(): Money {
     return Money.create({ amount: 1, currency: "EUR" }) as Money;
   }
+
+  public toDTO(): OrderToDTO {
+    return {
+      id: this.id,
+      IBAN: this.accountIban.value,
+      ISIN: this.actionId,
+      type: this.type,
+      price: this.price,
+      quantity: this.quantity,
+      fee: this.fee,
+      date: this.date ? this.date.toISOString() : undefined,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+      status: this.status,
+      transactionId: this.transactionId,
+    };
+  }
 }
+
+export type OrderToDTO = {
+  IBAN: string;
+  ISIN: string;
+  date?: string;
+  createdAt: string;
+  updatedAt: string;
+} & Pick<
+  OrderEntity,
+  "id" | "type" | "quantity" | "price" | "fee" | "status" | "transactionId"
+>;

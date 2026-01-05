@@ -75,7 +75,7 @@ export default function ClientActionsPage() {
                     }
 
                     return (
-                        <>
+                        < >
                             <Card className="overflow-hidden py-0">
                                 <div className="bg-linear-to-r from-blue-600 to-indigo-700 p-6 text-white">
                                     <div className="flex items-center gap-2 mb-2">
@@ -126,7 +126,6 @@ export default function ClientActionsPage() {
                                 </div>
                             </Card>
 
-                            {/* Mes actions */}
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-lg font-semibold text-gray-900">
@@ -137,12 +136,12 @@ export default function ClientActionsPage() {
                                     </Badge>
                                 </div>
 
-                                <div className="grid grid-cols-1 gap-3">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                                     {portfolio.positions.map((position) => (
                                         <Card
-                                            key={position.isin}
+                                            key={position.ISIN}
                                             className="cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
-                                            onClick={() => router.push(`/actions/${position.isin}`)}
+                                            onClick={() => router.push(`/actions/${position.ISIN}`)}
                                         >
                                             <CardContent className="p-4">
                                                 <div className="flex items-start justify-between gap-3">

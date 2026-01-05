@@ -12,9 +12,6 @@ export const orderFactory = () => {
   const userRepository = new UserRepositoryMySQL(client);
   const orderRepository = new OrderRepositoryMySQL(client);
   const actionRepository = new ActionRepositoryMySQL(client);
-  const uuidService = new NodeUuidService();
-  const clockService = new SystemClockService();
-
   const getAllByUser = new GetAllByUserUseCase(userRepository, orderRepository);
 
   const getAllByAction = new GetAllByActionUseCase(

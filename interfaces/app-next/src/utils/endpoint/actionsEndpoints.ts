@@ -89,10 +89,8 @@ export const actionsEndpoint = createEndpointsNodes({
 
   buy: ({ isin }: { isin: ActionId }) =>
     mutationOptions({
-      mutationFn: async ({ payload }: { payload: BuyAction }) => {
-        const data = await post(`/actions/${isin}/buy`, payload);
-        return buyActionSchema.parse(data);
-      },
+      mutationFn: async ({ payload }: { payload: BuyAction }) =>
+        post(`/actions/${isin}/buy`, payload),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['actions', 'list'] });
         queryClient.invalidateQueries({ queryKey: ['actions', isin] });

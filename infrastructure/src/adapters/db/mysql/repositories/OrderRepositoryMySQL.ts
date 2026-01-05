@@ -120,7 +120,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
     );
   }
 
-  async findByUserIdAndStatus(
+  async findAllByUserIdAndStatus(
     userId: UserEntity["id"],
     status: OrderEntity["status"]
   ): Promise<OrderEntity[]> {
@@ -132,6 +132,17 @@ export class OrderRepositoryMySQL implements OrderRepository {
       [status, userId]
     );
     console.log(rows);
+    return rows.map((row) => this.mapRowToOrder(row));
+  }
+  async findAllByActionIdAndStatus(
+    actionId: string,
+    status: "pending" | "executed" | "cancelled"
+  ): Promise<OrderEntity[]> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      "SELECT * FROM orders WHERE action_id = ? AND status = ? ORDER BY created_at ASC",
+      [actionId, status]
+    );
+
     return rows.map((row) => this.mapRowToOrder(row));
   }
 }

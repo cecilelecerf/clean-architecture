@@ -6,11 +6,15 @@ export interface OrderRepository {
   findById(id: OrderEntity["id"]): Promise<OrderEntity | null>;
   findAllByUserId(userId: UserEntity["id"]): Promise<OrderEntity[]>;
   findAllByActionId(actionISIN: ActionEntity["ISIN"]): Promise<OrderEntity[]>;
+  findAllByActionIdAndStatus(
+    actionISIN: ActionEntity["ISIN"],
+    status: OrderEntity["status"]
+  ): Promise<OrderEntity[]>;
   findAllOpen(): Promise<OrderEntity[]>;
   save(order: OrderEntity): Promise<void>;
   update(order: OrderEntity): Promise<void>;
   delete(id: OrderEntity["id"]): Promise<void>;
-  findByUserIdAndStatus(
+  findAllByUserIdAndStatus(
     userId: UserEntity["id"],
     status: OrderEntity["status"]
   ): Promise<OrderEntity[]>;

@@ -7,7 +7,6 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
-import { Money } from "@domain/values/Money";
 import { IBAN } from "@domain/values/IBAN";
 import {
   UserNotFoundError,
@@ -29,10 +28,11 @@ import {
   FactorNegativeError,
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
+  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import { OrderRepository } from "@application/ports/repositories/OrderRepository";
-import { OrderEntity } from "@domain/entities/OrderEntity";
+import { OrderEntity, OrderToDTO } from "@domain/entities/OrderEntity";
 import {
   InvalidOrderTypeError,
   InvalidQuantityError,
@@ -44,13 +44,15 @@ import {
   InvalidTransactionLabelError,
 } from "@domain/errors/transaction";
 import { BankInterestAccountNotFoundError } from "@application/errors/accounts/BankInterestAccountNotFoundError";
+import { ActionEntity } from "@domain/entities/ActionEntity";
+import { AccountEntity } from "@domain/entities/AccountEntity";
 
 type Props = {
   userId: UserEntity["id"];
   accountId: string;
-  isin: string;
-  quantity: number;
-};
+  ISIN: ActionEntity["ISIN"];
+  quantity: OrderEntity["quantity"];
+} & Pick<OrderEntity, "limitPrice" | "scheduledFor">;
 
 export class BuyActionUseCase {
   constructor(
@@ -63,11 +65,15 @@ export class BuyActionUseCase {
     private readonly clockService: ClockService
   ) {}
 
-  async execute({ userId, accountId, isin, quantity }: Props): Promise<
-    | {
-        order: OrderEntity;
-        transaction: TransactionEntity;
-      }
+  async execute({
+    userId,
+    accountId,
+    ISIN,
+    quantity,
+    limitPrice,
+    scheduledFor,
+  }: Props): Promise<
+    | OrderToDTO
     | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
@@ -89,15 +95,16 @@ export class BuyActionUseCase {
     | InvalidOrderTypeError
     | FactorNegativeError
     | BankInterestAccountNotFoundError
+    | MoneyCurrencyMismatchError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
     if (!user.hasRole({ role: "client" }))
       return new UserRoleMismatchError(["client"], user.role);
 
-    const action = await this.actionRepository.findByISIN(isin);
+    const action = await this.actionRepository.findByISIN(ISIN);
     if (!action) return new ActionNotFoundError();
-    if (!action.isAvailable) return new ActionNotAvailableError(isin);
+    if (!action.isAvailable) return new ActionNotAvailableError(ISIN);
 
     if (!Number.isInteger(quantity) || quantity <= 0) {
       return new InvalidQuantityError(quantity);
@@ -113,14 +120,61 @@ export class BuyActionUseCase {
       return new AccountNotFoundError();
     }
 
-    const unitPrice = action.currentPrice.amount;
-    const totalAmount = unitPrice * quantity;
-
-    const totalMoney = Money.create({
-      amount: totalAmount,
-      currency: action.currentPrice.currency,
+    const order = OrderEntity.create({
+      id: this.uuidService.generate(),
+      accountIban: accountIBAN,
+      actionId: ISIN,
+      quantity: quantity,
+      price: action.currentPrice,
+      createdAt: this.clockService.now(),
+      type: "buy",
+      date: this.clockService.now(),
+      limitPrice,
+      scheduledFor,
     });
-    if (totalMoney instanceof Error) return totalMoney;
+
+    if (order instanceof Error) return order;
+    let result:
+      | void
+      | FactorNegativeError
+      | MoneyCurrencyMissingError
+      | MoneyAmountInvalidError
+      | MoneyAmountNegativeError
+      | MoneyCurrencyMismatchError
+      | BankInterestAccountNotFoundError
+      | undefined;
+    if (order.canBeExecuted({ now: this.clockService.now(), action })) {
+      result = await this.executeImmediately({
+        order,
+        action,
+        userAccount,
+      });
+    }
+    if (result instanceof Error) return result;
+
+    await this.orderRepository.save(order);
+
+    return order.toDTO();
+  }
+  private async executeImmediately({
+    order,
+    action,
+    userAccount,
+  }: {
+    order: OrderEntity;
+    action: ActionEntity;
+    userAccount: AccountEntity;
+  }): Promise<
+    | void
+    | FactorNegativeError
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
+    | MoneyCurrencyMismatchError
+    | BankInterestAccountNotFoundError
+  > {
+    const total = order.getTotal();
+    if (total instanceof Error) return total;
 
     const bankAccount = await this.accountRepository.findBankInterestAccount();
     if (!bankAccount) {
@@ -129,38 +183,28 @@ export class BuyActionUseCase {
 
     const transaction = TransactionEntity.create({
       id: this.uuidService.generate(),
-      fromAccountId: accountIBAN,
+      fromAccountId: userAccount.iban,
       toAccountId: bankAccount.iban,
-      amount: totalMoney,
-      label: `Achat ${quantity} action(s) ${action.symbol}`,
+      amount: total,
+      label: `Achat ${order.quantity} action(s) ${action.symbol}`,
       date: this.clockService.now(),
       icon: "",
     });
 
     if (transaction instanceof Error) return transaction;
-
-    const order = OrderEntity.create({
-      id: this.uuidService.generate(),
-      userId: userId,
-      actionId: isin,
-      quantity: quantity,
-      price: action.currentPrice,
+    console.log(userAccount);
+    const newOrder = order.markExecuted({
+      now: this.clockService.now(),
       transactionId: transaction.id,
-      createdAt: this.clockService.now(),
-      type: "buy",
-      date: this.clockService.now(),
     });
+    if (newOrder instanceof Error) return newOrder;
 
-    if (order instanceof Error) return order;
-
-    userAccount.debit(totalMoney);
-    bankAccount.credit(totalMoney);
-
-    await this.transactionRepository.save(transaction);
-    await this.orderRepository.save(order);
+    const debit = userAccount.debit(total);
+    if (debit instanceof Error) return debit;
+    const credit = bankAccount.credit(total);
+    if (credit instanceof Error) return credit;
     await this.accountRepository.update(userAccount);
     await this.accountRepository.update(bankAccount);
-
-    return { order, transaction };
+    await this.transactionRepository.save(transaction);
   }
 }

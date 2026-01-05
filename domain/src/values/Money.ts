@@ -59,6 +59,8 @@ export class Money {
     const currencyError = this.ensureSameCurrency(other);
     if (currencyError instanceof Error) return currencyError;
     const result = this.amount - other.amount;
+    console.log(this.amount, other.amount);
+    console.log(result);
     if (result < 0)
       return new InsufficientFundsError(this, {
         amount: result,

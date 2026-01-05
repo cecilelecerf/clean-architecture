@@ -124,7 +124,9 @@ export class AccountEntity {
     | MoneyAmountInvalidError
     | MoneyCurrencyMissingError
     | InsufficientFundsError {
+    console.log("debit");
     const newBalence = this.balance.subtract(amount);
+    console.log(newBalence);
     if (newBalence instanceof Error) return newBalence;
 
     this.balance = newBalence;

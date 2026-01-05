@@ -1,4 +1,3 @@
-// @application/usecases/portfolio/GetUserPortfolioUseCase.ts
 import { OrderRepository } from "@application/ports/repositories/OrderRepository";
 import { ActionRepository } from "@application/ports/repositories/ActionRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
@@ -9,23 +8,10 @@ import {
   UserNotActiveError,
   UserRoleMismatchError,
 } from "@application/errors/users";
-
-type PortfolioPosition = {
-  isin: string;
-  symbol: string;
-  name: string;
-  quantity: number;
-  averagePrice: number;
-  currentPrice: number;
-  currency: string;
-  totalInvested: number;
-  currentValue: number;
-  gainLoss: number;
-  gainLossPercent: number;
-};
+import { PortfolioPositionEntity } from "@domain/entities/PortfolioEntity";
 
 type Portfolio = {
-  positions: PortfolioPosition[];
+  positions: PortfolioPositionEntity[];
   totalValue: number;
   totalInvested: number;
   totalGainLoss: number;
@@ -55,82 +41,49 @@ export class GetPortfolioUseCase {
     if (!user.hasRole({ role: "client" }))
       return new UserRoleMismatchError(["client"], user.role);
 
-    const executedOrders = await this.orderRepository.findByUserIdAndStatus(
+    const executedOrders = await this.orderRepository.findAllByUserIdAndStatus(
       userId,
       "executed"
     );
-    console.log(executedOrders);
 
-    const positionsMap = new Map<
-      string,
-      {
-        quantity: number;
-        totalInvested: number;
-        transactions: Array<{ quantity: number; price: number }>;
-      }
-    >();
-
-    for (const order of executedOrders) {
-      const existing = positionsMap.get(order.actionId) || {
-        quantity: 0,
+    if (executedOrders.length === 0) {
+      return {
+        positions: [],
+        totalValue: 0,
         totalInvested: 0,
-        transactions: [],
+        totalGainLoss: 0,
+        totalGainLossPercent: 0,
+        currency: "EUR",
       };
-
-      if (order.type === "buy") {
-        existing.quantity += order.quantity;
-        existing.totalInvested += order.price.amount * order.quantity;
-        existing.transactions.push({
-          quantity: order.quantity,
-          price: order.price.amount,
-        });
-      } else if (order.type === "sell") {
-        existing.quantity -= order.quantity;
-        const avgPrice =
-          existing.totalInvested / (existing.quantity + order.quantity);
-        existing.totalInvested -= avgPrice * order.quantity;
-      }
-
-      positionsMap.set(order.actionId, existing);
     }
 
-    for (const [isin, position] of positionsMap.entries()) {
-      if (position.quantity <= 0) {
-        positionsMap.delete(isin);
+    const ordersByISIN = executedOrders.reduce((acc, order) => {
+      if (!acc[order.actionId]) {
+        acc[order.actionId] = [];
       }
-    }
+      acc[order.actionId].push(order);
+      return acc;
+    }, {} as Record<string, typeof executedOrders>);
 
-    const positions: PortfolioPosition[] = [];
+    const positions: PortfolioPositionEntity[] = [];
     let defaultCurrency = "EUR";
 
-    for (const [isin, position] of positionsMap.entries()) {
+    for (const [isin, orders] of Object.entries(ordersByISIN)) {
       const action = await this.actionRepository.findByISIN(isin);
       if (!action) continue;
-      console.log(position);
-      const currentPrice = action.currentPrice.amount;
-      const averagePrice = position.totalInvested / position.quantity;
-      const currentValue = position.quantity * currentPrice;
-      const gainLoss = currentValue - position.totalInvested;
-      const gainLossPercent =
-        position.totalInvested > 0
-          ? (gainLoss / position.totalInvested) * 100
-          : 0;
 
-      defaultCurrency = action.currentPrice.currency;
-
-      positions.push({
-        isin: action.ISIN,
+      const position = PortfolioPositionEntity.create({
+        ISIN: action.ISIN,
         symbol: action.symbol,
         name: action.name,
-        quantity: position.quantity,
-        averagePrice: Math.round(averagePrice * 100) / 100,
-        currentPrice: Math.round(currentPrice * 100) / 100,
-        currency: action.currentPrice.currency,
-        totalInvested: Math.round(position.totalInvested * 100) / 100,
-        currentValue: Math.round(currentValue * 100) / 100,
-        gainLoss: Math.round(gainLoss * 100) / 100,
-        gainLossPercent: Math.round(gainLossPercent * 100) / 100,
+        currentPrice: action.currentPrice,
+        orders,
       });
+
+      if (position) {
+        positions.push(position);
+        defaultCurrency = position.currency;
+      }
     }
 
     const totalValue = positions.reduce((sum, p) => sum + p.currentValue, 0);

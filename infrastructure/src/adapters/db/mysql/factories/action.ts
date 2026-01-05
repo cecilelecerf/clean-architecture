@@ -41,7 +41,11 @@ export const actionFactory = () => {
   const updateAction = new UpdateActionUsecase(
     actionRepository,
     userRepository,
-    clockService
+    clockService,
+    orderRepo,
+    accountRepo,
+    uuidService,
+    transactionRepo
   );
 
   const getAllActionsByAvailability = new GetAllActionsByAvailabilityUsecase(

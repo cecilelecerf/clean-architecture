@@ -15,6 +15,7 @@ import {
 } from "@domain/errors/credit";
 import { AccountEntity } from "./AccountEntity";
 import { FormuleCreditEntity } from "./FormuleCreditEntity";
+import { InsufficientFundsError } from "@domain/errors/account";
 
 export type MonthlySchedule = {
   capitalPaid: Money;
@@ -201,7 +202,8 @@ export class CreditEntity {
     | MoneyCurrencyMissingError
     | MoneyCurrencyMismatchError
     | MoneyAmountInvalidError
-    | MoneyAmountNegativeError {
+    | MoneyAmountNegativeError
+    | InsufficientFundsError {
     if (this.isFullyPaid()) {
       return new CreditAlreadyPaidError(this.id);
     }
@@ -239,7 +241,8 @@ export class CreditEntity {
     | CreditAlreadyPaidError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | MoneyCurrencyMismatchError {
+    | MoneyCurrencyMismatchError
+    | InsufficientFundsError {
     const schedule: MonthlySchedule[] = [];
 
     const simulated = CreditEntity.from({ ...this });
