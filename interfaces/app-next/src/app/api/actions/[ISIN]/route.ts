@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { buyActionSchema, newActionSchema } from '@infrastructure/types/action';
+import { newActionSchema } from '@infrastructure/types/action';
 import { actionFactory } from '@infrastructure/adapters/db/mysql/factories/action';
 
 export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/actions/[ISIN]'>) {
@@ -15,13 +15,13 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/actions/[I
 
     const body = await req.json();
     const payload = newActionSchema.parse(body);
-
+    console.log(payload);
     const result = await actionFactory().admin.updateAction.execute({
       userId: session.user.id,
       ISIN,
       ...payload,
-      priceAmount: payload.currentPrice.amount,
-      priceCurrency: payload.currentPrice.currency,
+      priceAmount: payload.price.amount,
+      priceCurrency: payload.price.currency,
     });
 
     if (result instanceof Error) {

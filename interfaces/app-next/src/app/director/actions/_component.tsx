@@ -61,7 +61,7 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                 market: action.market,
                 activitySector: action.activitySector,
                 totalNb: action.totalNb,
-                currentPrice: { amount: action.currentPrice.amount, currency: action.currentPrice.currency, },
+                currentPrice: { amount: action.price.amount, currency: action.price.currency, },
                 isAvailable: action.isAvailable ? "true" : "false",
             });
         }
@@ -73,7 +73,6 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
-
         if (
             !formData.ISIN.match(actionSchema.ISIN.pattern) ||
             formData.ISIN.length !== 12
@@ -106,6 +105,7 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
         if (isNaN(price) || price < actionSchema.currentPrice.min) {
             newErrors.currentPrice = "Le prix doit être un nombre positif";
         }
+        console.log(newErrors)
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -114,8 +114,10 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setMessage("");
+        console.log(validateForm)
 
         if (!validateForm()) {
+            console.log(errors)
             setMessage("Veuillez corriger les erreurs dans le formulaire");
             setMessageType("error");
             return;
@@ -252,7 +254,7 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                     placeholder: "150.00",
                     get: formData.currentPrice.amount,
                     set: (value) =>
-                        setFormData({ ...formData, currentPrice: { ...formData.currentPrice, amount: value as number, } }),
+                        setFormData({ ...formData, currentPrice: { ...formData.currentPrice, amount: Number(value) } }),
                     required: true,
                     numberOptions: { min: 0.01, step: 0.01 },
                     description: errors.currentPrice || "Prix unitaire de l'action",

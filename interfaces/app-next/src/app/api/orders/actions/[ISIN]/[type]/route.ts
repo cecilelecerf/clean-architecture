@@ -1,31 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { buyActionSchema } from '@infrastructure/types/action';
-import { actionFactory } from '@infrastructure/adapters/db/mysql/factories/action';
+import { orderFactory } from '@infrastructure/adapters/db/mysql/factories/orders';
+import { buyActionSchema } from '@infrastructure/types/order';
 
-export async function POST(request: NextRequest, ctx: RouteContext<'/api/actions/[ISIN]/buy'>) {
+export async function POST(
+  request: NextRequest,
+  ctx: RouteContext<'/api/orders/actions/[ISIN]/[type]'>,
+) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
-    const { ISIN } = await ctx.params;
+    const { ISIN, type } = await ctx.params;
 
     const body = await request.json();
-    const { accountId, quantity } = buyActionSchema.parse(body);
+    const { IBAN, quantity, price } = buyActionSchema.parse(body);
 
-    const result = await actionFactory().buy.execute({
+    const result = await orderFactory().placeOrder.execute({
       userId: session.user.id,
-      accountId,
+      IBAN,
       ISIN,
+      type: type as 'buy' | 'sell',
       quantity,
+      price: price.amount,
     });
 
     if (result instanceof Error) {
       return NextResponse.json({ error: result.message }, { status: result.statusCode || 400 });
     }
+
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error buying action:', error);

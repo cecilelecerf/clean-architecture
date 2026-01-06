@@ -2,44 +2,21 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { TrendingUp, TrendingDown, ChevronRight, ChevronLeft } from "lucide-react";
-import { useRef } from "react";
-import { ActionCard } from "@/components/actions/ActionCard";
+import { ChevronRight } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import { Action } from "@infrastructure/types/action";
 
-interface Action {
-    ISIN: string;
-    symbol: string;
-    name: string;
-    currentPrice: {
-        amount: number;
-        currency: string;
-    };
-    market: string;
-    activitySector: string;
-    priceChange?: number;
-}
+
 
 export const ActionsCarousel = ({ actions }: { actions: Action[] }) => {
     const router = useRouter();
-    const scrollRef = useRef<HTMLDivElement>(null);
 
-    const scroll = (direction: "left" | "right") => {
-        if (scrollRef.current) {
-            const scrollAmount = 300;
-            scrollRef.current.scrollBy({
-                left: direction === "left" ? -scrollAmount : scrollAmount,
-                behavior: "smooth",
-            });
-        }
-    };
+
 
     return (
         <div className="relative group">
-            {/* Bouton précédent */}
             <Carousel
                 opts={{
                     align: "start",
@@ -77,16 +54,16 @@ export const ActionsCarousel = ({ actions }: { actions: Action[] }) => {
                                             <p className="text-xs text-gray-600 mb-1">Prix actuel</p>
                                             <div className="flex items-baseline gap-2">
                                                 <p className="text-2xl font-bold text-gray-900">
-                                                    {action.currentPrice.amount.toLocaleString("fr-FR", {
+                                                    {action.price.amount.toLocaleString("fr-FR", {
                                                         minimumFractionDigits: 2,
                                                         maximumFractionDigits: 2,
                                                     })}
                                                 </p>
                                                 <p className="text-sm text-gray-600">
-                                                    {action.currentPrice.currency}
+                                                    {action.price.currency}
                                                 </p>
                                             </div>
-                                            {action.priceChange !== undefined && (
+                                            {/* {action.priceChange !== undefined && (
                                                 <div
                                                     className={`flex items-center gap-1 mt-2 text-sm font-semibold ${action.priceChange >= 0
                                                         ? "text-green-600"
@@ -103,7 +80,7 @@ export const ActionsCarousel = ({ actions }: { actions: Action[] }) => {
                                                         {action.priceChange.toFixed(2)}%
                                                     </span>
                                                 </div>
-                                            )}
+                                            )} */}
                                         </div>
 
                                         {/* Tags */}

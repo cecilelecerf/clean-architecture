@@ -1,15 +1,17 @@
 import {
-  orderDTOSchema,
+  BuyAction,
   orderSchema,
   portfolioPositionSchema,
   portfolioSchema,
 } from '@infrastructure/types/order';
 import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { queryOptions } from '@tanstack/react-query';
-import { get } from '@/lib/apiClient';
+import { mutationOptions, queryOptions } from '@tanstack/react-query';
+import { get, post } from '@/lib/apiClient';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { ActionId, actionSchema } from '@infrastructure/types/action';
+import { queryClient } from '@/lib/queryClient';
+import { OrderEntity } from '@domain/entities/OrderEntity';
 
 // ============================================================================
 // SCHEMAS
@@ -34,29 +36,45 @@ export const ordersEndpoint = createEndpointsNodes({
       queryKey: ['orders', 'list'],
       queryFn: () =>
         get('/orders').then((data) => {
-          return safeParseWithLog(orderDTOSchema.extend({ action: actionSchema }).array(), data);
+          return safeParseWithLog(orderSchema.extend({ action: actionSchema }).array(), data);
         }),
     }),
 
   // GET /api/orders/actions/:actionId
   // Liste des ordre d'achat ou de vent d'action selon l'action
-  getAllByAction: ({ actionId }: { actionId: ActionId }) =>
-    queryOptions({
-      queryKey: ['orders', actionId],
-      queryFn: () =>
-        get(`/orders/actions/${actionId}`).then((data) => {
-          return safeParseWithLog(orderDTOSchema.array(), data);
-        }),
-    }),
 
-  getAllWithAction: () =>
-    queryOptions({
-      queryKey: ['orders', 'list', 'actions'],
-      queryFn: () =>
-        get(`/orders/actions`).then((data) => {
-          return safeParseWithLog(orderDTOSchema.array(), data);
-        }),
-    }),
+  actions: {
+    getAllByAction: ({ ISIN, status }: { ISIN: ActionId; status?: OrderEntity['status'] }) =>
+      queryOptions({
+        queryKey: ['orders', ISIN],
+        queryFn: () =>
+          get(`/orders/actions/${ISIN}?${status && `status=${status}`}`).then((data) => {
+            return safeParseWithLog(orderSchema.array(), data);
+          }),
+      }),
+
+    // getAllWithAction: () =>
+    //   queryOptions({
+    //     queryKey: ['orders', 'list', 'actions'],
+    //     queryFn: () =>
+    //       get(`/orders/actions`).then((data) => {
+    //         return safeParseWithLog(orderSchema.array(), data);
+    //       }),
+    //   }),
+    placeOrder: ({ ISIN, type }: { ISIN: ActionId; type: OrderEntity['type'] }) =>
+      mutationOptions({
+        mutationFn: async ({ payload }: { payload: BuyAction }) =>
+          post(`/orders/actions/${ISIN}/${type}`, payload).then((data) =>
+            safeParseWithLog(orderSchema, data),
+          ),
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['actions', 'list'] });
+          queryClient.invalidateQueries({ queryKey: ['actions', ISIN] });
+          queryClient.invalidateQueries({ queryKey: ['accounts'] });
+          queryClient.invalidateQueries({ queryKey: ['order', 'portfolio'] });
+        },
+      }),
+  },
 
   portfolio: {
     getMe: () =>

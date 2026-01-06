@@ -15,8 +15,6 @@ import {
     AlertCircle,
     Calculator,
     X,
-    Clock,
-    DollarSign,
 } from "lucide-react";
 import { Action } from "@infrastructure/types/action";
 import { useState } from "react";
@@ -26,18 +24,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ButtonLoading } from "@/components/buttons/ButtonLoading";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { PortfolioPosition } from "@infrastructure/types/order";
 
-type OrderMode = "immediate" | "scheduled" | "limit";
-
-type SellAction = {
-    quantity: number;
-    accountId: AccountId;
-    limitPrice?: { amount: number; currency: string };
-    scheduledFor?: string;
-};
+import { BuyAction, PortfolioPosition } from "@infrastructure/types/order";
 
 type Props = {
     action: Action;
@@ -59,21 +47,16 @@ const ActionSell = ({
     closeSell,
     portfolioPosition: position
 }: Props & { portfolioPosition: PortfolioPosition }) => {
-    const [orderMode, setOrderMode] = useState<OrderMode>("immediate");
-    const [sellAmount, setSellAmount] = useState<SellAction>({
+    const [sellAmount, setSellAmount] = useState<BuyAction>({
         quantity: 1,
-        accountId: "" as AccountId,
+        IBAN: "" as AccountId,
+        price: action.price
     });
-    const [limitPrice, setLimitPrice] = useState<string>("");
-    const [scheduledDate, setScheduledDate] = useState<string>("");
-    const [scheduledTime, setScheduledTime] = useState<string>("09:00");
 
     const accountsQuery = useQuery(endpoints.accounts.getAllByMe());
-    const sellMutation = useMutation(endpoints.actions.sell({ isin: action.ISIN }));
+    const sellMutation = useMutation(endpoints.orders.actions.placeOrder({ ISIN: action.ISIN, type: "sell" }));
 
-    const unitPrice = action.currentPrice.amount;
-    const effectivePrice = orderMode === "limit" && limitPrice ? parseFloat(limitPrice) : unitPrice;
-    const totalSaleValue = effectivePrice * sellAmount.quantity;
+    const totalSaleValue = sellAmount.price.amount * sellAmount.quantity;
 
     const costBasis = position.averagePrice * sellAmount.quantity;
     const estimatedGainLoss = totalSaleValue - costBasis;
@@ -85,66 +68,21 @@ const ActionSell = ({
             return;
         }
 
-        if (!sellAmount.accountId) {
+        if (!sellAmount.IBAN) {
             toast.error("Veuillez sélectionner un compte");
             return;
         }
 
-        if (orderMode === "limit" && !limitPrice) {
-            toast.error("Veuillez spécifier un prix limite");
-            return;
-        }
-
-        if (orderMode === "scheduled" && !scheduledDate) {
-            toast.error("Veuillez spécifier une date");
-            return;
-        }
-
-        const payload: SellAction = {
-            quantity: sellAmount.quantity,
-            accountId: sellAmount.accountId,
-        };
-
-        if (orderMode === "limit" && limitPrice) {
-            payload.limitPrice = {
-                amount: parseFloat(limitPrice),
-                currency: action.currentPrice.currency,
-            };
-        }
-
-        if (orderMode === "scheduled" && scheduledDate && scheduledTime) {
-            const scheduledDateTime = new Date(`${scheduledDate}T${scheduledTime}:00`);
-            payload.scheduledFor = scheduledDateTime.toISOString();
-        }
 
         sellMutation.mutate(
-            { payload },
+            { payload: sellAmount },
             {
-                onSuccess: () => {
-                    if (orderMode === "immediate") {
-                        toast.success(
-                            `Vous avez vendu ${sellAmount.quantity} action(s) de ${action.symbol}`
-                        );
-                    } else if (orderMode === "limit") {
-                        toast.success(
-                            `Ordre de vente à cours limité créé. Il sera exécuté si le prix atteint ${limitPrice} ${action.currentPrice.currency}`
-                        );
-                    } else {
-                        toast.success(
-                            `Ordre de vente programmé créé pour le ${new Date(
-                                `${scheduledDate}T${scheduledTime}`
-                            ).toLocaleDateString("fr-FR", {
-                                day: "numeric",
-                                month: "long",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                            })}`
-                        );
-                    }
-                    setSellAmount({ quantity: 1, accountId: "" as AccountId });
-                    setLimitPrice("");
-                    setScheduledDate("");
-                    setScheduledTime("09:00");
+                onSuccess: (data) => {
+                    toast.success(
+                        `Vous avez vendu ${sellAmount.quantity} action(s) de ${action.symbol}`
+                    );
+
+                    setSellAmount({ quantity: 1, IBAN: "" as AccountId, price: data.price });
                     closeSell();
                 },
                 onError: (error) => {
@@ -197,111 +135,37 @@ const ActionSell = ({
                     </CardHeader>
 
                     <CardContent className="space-y-5 p-4 md:p-6">
-                        <Tabs value={orderMode} onValueChange={(v) => setOrderMode(v as OrderMode)}>
-                            <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="immediate" className="text-xs sm:text-sm">
-                                    <TrendingDown className="w-4 h-4 mr-1 hidden sm:inline" />
-                                    Immédiat
-                                </TabsTrigger>
-                                <TabsTrigger value="limit" className="text-xs sm:text-sm">
-                                    <DollarSign className="w-4 h-4 mr-1 hidden sm:inline" />
-                                    Prix limite
-                                </TabsTrigger>
-                                <TabsTrigger value="scheduled" className="text-xs sm:text-sm">
-                                    <Clock className="w-4 h-4 mr-1 hidden sm:inline" />
-                                    Programmé
-                                </TabsTrigger>
-                            </TabsList>
-
-                            <TabsContent value="immediate" className="space-y-4 mt-4">
-                                <div className="bg-white rounded-lg p-4 border border-green-200">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <TrendingUp className="w-4 h-4" />
-                                            Prix de vente actuel
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-2xl font-bold text-green-600">
-                                                {unitPrice.toLocaleString("fr-FR", {
-                                                    minimumFractionDigits: 2,
-                                                    maximumFractionDigits: 2,
-                                                })}{" "}
-                                                {action.currentPrice.currency}
-                                            </p>
-                                        </div>
-                                    </div>
+                        <div className="bg-white rounded-lg p-4 border border-green-200">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <TrendingUp className="w-4 h-4" />
+                                    Prix de vente actuel
                                 </div>
-                                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                                    <p className="text-xs text-green-700">
-                                        ⚡ Votre ordre sera exécuté immédiatement au prix du marché
-                                    </p>
+                                <div className="relative">
+                                    <Input
+                                        id="price"
+                                        type="number"
+                                        min={0}
+                                        step="0.01"
+                                        onChange={(e) => {
+                                            setSellAmount((prev) => ({
+                                                ...prev,
+                                                price: {
+                                                    amount: Number(e.target.value),
+                                                    currency: prev.price.currency
+                                                }
+                                            }))
+                                        }}
+                                        className="w-full text-3xl font-bold text-green-600 bg-white border border-green-500 rounded-xl px-4 py-3 pr-16 text-right focus:ring-2 focus:ring-green-800 focus:border-green-800 transition-all"
+                                        placeholder="0.00"
+                                        value={sellAmount.price.amount}
+                                    />
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl font-semibold text-green-600 pointer-events-none">
+                                        {action.price.currency}
+                                    </span>
                                 </div>
-                            </TabsContent>
-
-                            <TabsContent value="limit" className="space-y-4 mt-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="limitPrice" className="text-sm font-medium">
-                                        Prix limite de vente
-                                    </Label>
-                                    <div className="flex items-center gap-2">
-                                        <Input
-                                            id="limitPrice"
-                                            type="number"
-                                            step="0.01"
-                                            value={limitPrice}
-                                            onChange={(e) => setLimitPrice(e.target.value)}
-                                            placeholder={`Ex: ${unitPrice.toFixed(2)}`}
-                                            className="text-lg font-semibold"
-                                        />
-                                        <Badge variant="outline">{action.currentPrice.currency}</Badge>
-                                    </div>
-                                    <p className="text-xs text-gray-500">
-                                        Prix actuel: {unitPrice.toFixed(2)} {action.currentPrice.currency}
-                                    </p>
-                                </div>
-                                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                                    <p className="text-xs text-orange-700">
-                                        📊 L'ordre sera exécuté uniquement si le prix atteint{" "}
-                                        {limitPrice || "___"} {action.currentPrice.currency} ou plus
-                                    </p>
-                                </div>
-                            </TabsContent>
-
-                            <TabsContent value="scheduled" className="space-y-4 mt-4">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="scheduledDate" className="text-sm font-medium">
-                                            Date
-                                        </Label>
-                                        <Input
-                                            id="scheduledDate"
-                                            type="date"
-                                            value={scheduledDate}
-                                            onChange={(e) => setScheduledDate(e.target.value)}
-                                            min={new Date().toISOString().split("T")[0]}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="scheduledTime" className="text-sm font-medium">
-                                            Heure
-                                        </Label>
-                                        <Input
-                                            id="scheduledTime"
-                                            type="time"
-                                            value={scheduledTime}
-                                            onChange={(e) => setScheduledTime(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                                    <p className="text-xs text-purple-700">
-                                        ⏰ L'ordre sera exécuté automatiquement à la date et l'heure spécifiées
-                                    </p>
-                                </div>
-                            </TabsContent>
-                        </Tabs>
-
-                        {/* Quantité */}
+                            </div>
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="quantity" className="text-sm font-medium">
                                 Quantité à vendre
@@ -358,7 +222,6 @@ const ActionSell = ({
                             </div>
                         </div>
 
-                        {/* Compte de crédit */}
                         <div className="space-y-2">
                             <Label htmlFor="account" className="text-sm font-medium flex items-center gap-2">
                                 <Wallet className="w-4 h-4" />
@@ -376,9 +239,9 @@ const ActionSell = ({
                                 ))
                                 .with({ status: "success" }, ({ data: accounts }) => (
                                     <Select
-                                        value={sellAmount.accountId}
+                                        value={sellAmount.IBAN}
                                         onValueChange={(value) =>
-                                            setSellAmount((prev) => ({ ...prev, accountId: value as AccountId }))
+                                            setSellAmount((prev) => ({ ...prev, IBAN: value as AccountId }))
                                         }
                                     >
                                         <SelectTrigger className="h-10">
@@ -406,7 +269,6 @@ const ActionSell = ({
 
                         <Separator />
 
-                        {/* Récapitulatif */}
                         <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                             <div className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
                                 <Calculator className="w-4 h-4" />
@@ -416,14 +278,14 @@ const ActionSell = ({
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">
-                                        {sellAmount.quantity} × {effectivePrice.toFixed(2)}{" "}
-                                        {action.currentPrice.currency}
+                                        {sellAmount.quantity} × {sellAmount.price.amount.toFixed(2)}{" "}
+                                        {action.price.currency}
                                     </span>
                                     <span className="font-medium">
                                         {totalSaleValue.toLocaleString("fr-FR", {
                                             minimumFractionDigits: 2,
                                         })}{" "}
-                                        {action.currentPrice.currency}
+                                        {action.price.currency}
                                     </span>
                                 </div>
 
@@ -435,7 +297,7 @@ const ActionSell = ({
                                         {totalSaleValue.toLocaleString("fr-FR", {
                                             minimumFractionDigits: 2,
                                         })}{" "}
-                                        {action.currentPrice.currency}
+                                        {action.price.currency}
                                     </span>
                                 </div>
 
@@ -458,7 +320,7 @@ const ActionSell = ({
                                                     {estimatedGainLoss.toLocaleString("fr-FR", {
                                                         minimumFractionDigits: 2,
                                                     })}{" "}
-                                                    {action.currentPrice.currency}
+                                                    {action.price.currency}
                                                 </span>
                                                 <span
                                                     className={`text-xs ml-2 ${estimatedGainLoss >= 0
@@ -476,48 +338,24 @@ const ActionSell = ({
                             </div>
                         </div>
 
-                        {/* Bouton de vente */}
                         <ButtonLoading
                             loading={sellMutation.isPending}
                             onClick={handleSell}
                             disabled={
-                                !sellAmount.accountId ||
+                                !sellAmount.IBAN ||
                                 sellAmount.quantity <= 0 ||
-                                sellAmount.quantity > position.quantity ||
-                                (orderMode === "limit" && !limitPrice) ||
-                                (orderMode === "scheduled" && !scheduledDate)
+                                sellAmount.quantity > position.quantity
                             }
                             className="w-full bg-linear-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 h-11 text-base font-semibold"
                         >
-                            {match(orderMode)
-                                .with("immediate", () => (
-                                    <>
-                                        <TrendingDown className="w-5 h-5 mr-2" />
-                                        Vendre maintenant
-                                    </>
-                                ))
-                                .with("limit", () => (
-                                    <>
-                                        <DollarSign className="w-5 h-5 mr-2" />
-                                        Créer l'ordre de vente à cours limité
-                                    </>
-                                ))
-                                .with("scheduled", () => (
-                                    <>
-                                        <Clock className="w-5 h-5 mr-2" />
-                                        Programmer la vente
-                                    </>
-                                ))
-                                .exhaustive()}
+
+                            <TrendingDown className="w-5 h-5 mr-2" />
+                            Vendre maintenant
+
                         </ButtonLoading>
 
                         <p className="text-xs text-center text-gray-500 mt-2">
-                            La vente sera exécutée{" "}
-                            {orderMode === "immediate"
-                                ? "immédiatement au prix du marché"
-                                : orderMode === "limit"
-                                    ? "si le prix atteint votre limite"
-                                    : "à la date et l'heure programmées"}
+                            La vente sera exécutée si le prix atteint votre limite
                         </p>
                     </CardContent>
                 </Card>

@@ -5,8 +5,6 @@ import {
   actionPriceHistorySchema,
   actionSchema,
   actionStatsSchema,
-  BuyAction,
-  buyActionSchema,
   NewAction,
 } from '@infrastructure/types/action';
 import { safeParseWithLog } from '@/lib/zodUtils';
@@ -85,32 +83,6 @@ export const actionsEndpoint = createEndpointsNodes({
         get(`/actions/${isin}/stats`).then((data) => {
           return safeParseWithLog(actionStatsSchema, data);
         }),
-    }),
-
-  buy: ({ isin }: { isin: ActionId }) =>
-    mutationOptions({
-      mutationFn: async ({ payload }: { payload: BuyAction }) =>
-        post(`/actions/${isin}/buy`, payload),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['actions', 'list'] });
-        queryClient.invalidateQueries({ queryKey: ['actions', isin] });
-        queryClient.invalidateQueries({ queryKey: ['accounts'] });
-        queryClient.invalidateQueries({ queryKey: ['order', 'portfolio'] });
-      },
-    }),
-
-  sell: ({ isin }: { isin: ActionId }) =>
-    mutationOptions({
-      mutationFn: async ({ payload }: { payload: BuyAction }) => {
-        const data = await post(`/actions/${isin}/sell`, payload);
-        return buyActionSchema.parse(data);
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['actions', 'list'] });
-        queryClient.invalidateQueries({ queryKey: ['actions', isin] });
-        queryClient.invalidateQueries({ queryKey: ['accounts'] });
-        queryClient.invalidateQueries({ queryKey: ['order', 'portfolio'] });
-      },
     }),
 
   getSuggestions: () =>

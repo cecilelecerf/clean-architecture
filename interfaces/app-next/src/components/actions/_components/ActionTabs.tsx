@@ -9,7 +9,6 @@ import { Separator } from "@/components/ui/separator";
 import {
     Building2,
     Layers,
-    Hash,
     TrendingUp,
     TrendingDown,
     Activity,
@@ -32,7 +31,7 @@ import { fr } from "date-fns/locale";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Action, } from "@infrastructure/types/action";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
-import { MyOrders } from "./Order";
+import { MyOrders } from "./MyOrder";
 
 export const ActionTabs = ({ action }: { action: Action }) => {
     const statsQuery = useQuery(endpoints.actions.getStats({ isin: action.ISIN }));
@@ -74,12 +73,6 @@ export const ActionTabs = ({ action }: { action: Action }) => {
                         value={action.activitySector}
                         color="purple"
                     />
-                    <MobileInfoCard
-                        icon={Hash}
-                        label="Total actions"
-                        value={action.totalNb}
-                        color="green"
-                    />
                 </div>
 
                 <Card>
@@ -95,16 +88,9 @@ export const ActionTabs = ({ action }: { action: Action }) => {
                         <Separator />
                         <MobileDetailRow
                             label="Prix unitaire"
-                            value={`${action.currentPrice.amount} ${action.currentPrice.currency}`}
+                            value={`${action.price.amount} ${action.price.currency}`}
                         />
                         <Separator />
-                        <MobileDetailRow
-                            label="Capitalisation"
-                            value={`${(
-                                action.currentPrice.amount * action.totalNb
-                            )} ${action.currentPrice.currency}`}
-                            highlight
-                        />
                         <Separator />
                         <MobileDetailRow
                             label="Créée le"
@@ -182,7 +168,7 @@ export const ActionTabs = ({ action }: { action: Action }) => {
                                                 domain={["auto", "auto"]}
                                             />
                                             <Tooltip
-                                                content={<CustomTooltip currency={action.currentPrice.currency} />}
+                                                content={<CustomTooltip currency={action.price.currency} />}
                                             />
                                             <Area
                                                 type="monotone"
@@ -276,13 +262,13 @@ export const ActionTabs = ({ action }: { action: Action }) => {
                             <div className="grid grid-cols-2 gap-3">
                                 <StatCard
                                     label="Prix min (30j)"
-                                    value={`${stats.minPrice} ${action.currentPrice.currency}`}
+                                    value={`${stats.minPrice} ${action.price.currency}`}
                                     icon={TrendingDown}
                                     color="red"
                                 />
                                 <StatCard
                                     label="Prix max (30j)"
-                                    value={`${stats.maxPrice} ${action.currentPrice.currency}`}
+                                    value={`${stats.maxPrice} ${action.price.currency}`}
                                     icon={TrendingUp}
                                     color="green"
                                 />
@@ -302,7 +288,7 @@ export const ActionTabs = ({ action }: { action: Action }) => {
                                     <Separator />
                                     <MobileDetailRow
                                         label="Prix moyen"
-                                        value={`${stats.averagePrice} ${action.currentPrice.currency}`}
+                                        value={`${stats.averagePrice} ${action.price.currency}`}
                                     />
                                     <Separator />
                                     <MobileDetailRow

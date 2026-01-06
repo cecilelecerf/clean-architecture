@@ -121,10 +121,10 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                                             <p className="text-white/70 text-xs mb-1">Prix actuel</p>
                                             <div className="flex items-baseline gap-3 flex-wrap">
                                                 <p className="text-3xl md:text-4xl font-bold">
-                                                    {action.currentPrice.amount}
+                                                    {action.price.amount}
                                                 </p>
                                                 <p className="text-white/90 text-sm">
-                                                    {action.currentPrice.currency}
+                                                    {action.price.currency}
                                                 </p>
                                                 {match(statsQuery)
                                                     .with({ status: "success" }, ({ data: stats }) => (
