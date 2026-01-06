@@ -1,18 +1,19 @@
+import { AccountNotFoundError } from "@application/errors/accounts";
 import {
   UserNotActiveError,
   UserNotFoundError,
   UserRoleMismatchError,
 } from "@application/errors/users";
+import { AccountRepository } from "@application/ports/repositories/AccountRepository";
 import { ActionRepository } from "@application/ports/repositories/ActionRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { ActionEntity } from "@domain/entities/ActionEntity";
+import { ActionDTO, ActionEntity } from "@domain/entities/ActionEntity";
 import {
   InvalidActionNameError,
-  InvalidISINError,
   InvalidSymbolError,
-  InvalidTotalNbError,
+  InvalidQuantityError,
 } from "@domain/errors/action";
 import {
   MoneyAmountInvalidError,
@@ -20,10 +21,8 @@ import {
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import { Money } from "@domain/values/Money";
-
 interface Props {
   userId: string;
-  ISIN: string;
   name: string;
   totalNb: number;
   symbol: string;
@@ -38,13 +37,13 @@ export class CreateActionUsecase {
   public constructor(
     private readonly actionRepository: ActionRepository,
     private readonly userRepository: UserRepository,
-    private readonly clockService: ClockService
+    private readonly clockService: ClockService,
+    private readonly accountRepository: AccountRepository
   ) {}
 
   // Création des actions que pour les user ayant le rôle de directeur
   public async execute({
     userId,
-    ISIN,
     name,
     totalNb,
     symbol,
@@ -54,17 +53,17 @@ export class CreateActionUsecase {
     priceCurrency,
     isAvailable,
   }: Props): Promise<
+    | ActionDTO
     | UserRoleMismatchError
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
     | UserNotFoundError
     | UserNotActiveError
-    | InvalidISINError
     | InvalidActionNameError
     | InvalidSymbolError
-    | InvalidTotalNbError
-    | void
+    | InvalidQuantityError
+    | AccountNotFoundError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -82,18 +81,21 @@ export class CreateActionUsecase {
     const today = this.clockService.now();
 
     const action = ActionEntity.create({
-      ISIN,
       name,
-      totalNb,
       symbol,
       market,
       activitySector,
-      currentPrice: price,
+      price,
       isAvailable,
       createdAt: today,
+      defaultQuantity: totalNb,
     });
     if (action instanceof Error) return action;
 
+    const bankAccount = await this.accountRepository.findBankInterestAccount();
+    if (!bankAccount) return new AccountNotFoundError();
+
     await this.actionRepository.save(action);
+    return action.toDTO();
   }
 }

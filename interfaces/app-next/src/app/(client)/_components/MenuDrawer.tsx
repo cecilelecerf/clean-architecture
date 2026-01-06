@@ -20,8 +20,8 @@ const menuItems: { icon: LucideIcon, label: string, href: string }[] = [
     { icon: Home, label: "Mes comptes", href: "/accounts" },
     { icon: MessageSquare, label: "Conversations", href: "/threads" },
     { icon: Newspaper, label: "Actualités", href: "/feeds" },
-    { icon: ClockFading, label: "Demandes de crédits", href: "/credits" },
-    { icon: CreditCard, label: "Formule de crédits", href: "/formules" },
+    { icon: ClockFading, label: "Crédits", href: "/credits" },
+    { icon: CreditCard, label: "Actions", href: "/actions" },
 ];
 
 export const MenuDrawer = () => (

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { actionSchema } from '@infrastructure/types/action';
+import { actionSchema, newActionSchema } from '@infrastructure/types/action';
 import { actionFactory } from '@infrastructure/adapters/db/mysql/factories/action';
 import z from 'zod';
 
@@ -15,11 +15,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const isAvailableParam = searchParams.get('isAvailable');
 
-    if (isAvailableParam === null) {
-      return NextResponse.json({ message: 'Missing query param: isAvailable' }, { status: 400 });
-    }
-
-    const isAvailable = isAvailableParam === 'true';
+    const isAvailable: boolean | undefined =
+      isAvailableParam !== null ? isAvailableParam === 'true' : true;
 
     const result = await actionFactory().getAllActionsByAvailability.execute({
       userId: session.user.id,
@@ -47,19 +44,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const payload = actionSchema.parse(body);
+    const payload = newActionSchema.parse(body);
 
     const result = await actionFactory().admin.createAction.execute({
       userId: session.user.id,
-      ISIN: payload.ISIN,
-      name: payload.name,
-      totalNb: payload.totalNb,
-      symbol: payload.symbol,
-      market: payload.market,
-      activitySector: payload.activitySector,
-      priceAmount: payload.priceAmount,
-      priceCurrency: payload.priceCurrency,
-      isAvailable: payload.isAvailable,
+      ...payload,
+      priceAmount: payload.price.amount,
+      priceCurrency: payload.price.currency,
+      totalNb: payload.quantity,
     });
 
     if (result instanceof Error) {
@@ -68,16 +60,9 @@ export async function POST(req: NextRequest) {
         { status: result.statusCode ?? 400 },
       );
     }
+    console.log(result);
 
-    return NextResponse.json(
-      actionSchema
-        .omit({ createdAt: true, updatedAt: true })
-        .extend({
-          createdAt: z.date(),
-          updatedAt: z.date().optional(),
-        })
-        .parse(result),
-    );
+    return NextResponse.json(actionSchema.parse(result));
   } catch (err) {
     console.error(err);
     return NextResponse.json(

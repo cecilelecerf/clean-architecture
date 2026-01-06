@@ -14,11 +14,10 @@ export async function generateActions(
       const action = await seedActionUseCase.execute({
         ISIN: raw.ISIN,
         name: raw.name,
-        totalNb: raw.totalNb,
         symbol: raw.symbol,
         market: raw.market,
         activitySector: raw.activitySector,
-        currentPrice: raw.current_price,
+        price: raw.current_price,
         currency: raw.currency,
         isAvailable: raw.isAvailable,
         createdAt: raw.createdAt,

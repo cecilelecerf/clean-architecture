@@ -9,9 +9,7 @@ export class AccountMapper {
     row: RowDataPacket,
     prefix: string = ""
   ): AccountEntity {
-    console.log(row);
     const iban = IBAN.from(row[`${prefix}iban`]);
-
     const balance = Money.from({
       amount: Number(row[`${prefix}balance`]),
       currency: row[`${prefix}currency`],

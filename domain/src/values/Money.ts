@@ -1,8 +1,8 @@
+import { InsufficientFundsError } from "@domain/errors/account";
 import {
   FactorNegativeError,
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
-  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 
@@ -15,13 +15,9 @@ export class Money {
     amount,
     currency,
   }: Pick<Money, "amount" | "currency">): Money {
-    return new Money(Number(amount), currency);
+    return new Money(Number(amount), currency.toUpperCase());
   }
 
-  /**
-   * Fabrique un objet Money.
-   * Retourne soit une instance valide, soit une erreur métier.
-   */
   public static create({
     amount,
     currency,
@@ -46,59 +42,122 @@ export class Money {
     return new Money(scaledAmount, currency.toUpperCase());
   }
 
-  public add(other: Money): Money | MoneyCurrencyMismatchError {
-    const currencyError = this.ensureSameCurrency(other);
-    if (currencyError) return currencyError;
-    return new Money(this.amount + other.amount, this.currency);
+  public add(other: Money): Money {
+    return new Money(
+      Number((this.amount + other.amount).toFixed(Money.SCALE)),
+      this.currency
+    );
   }
 
-  public subtract(
-    other: Money
-  ):
-    | Money
-    | MoneyCurrencyMismatchError
-    | MoneyAmountNegativeError
-    | MoneyAmountInvalidError
-    | MoneyCurrencyMissingError {
-    const currencyError = this.ensureSameCurrency(other);
-    if (currencyError instanceof Error) return currencyError;
+  public subtract(other: Money): Money | InsufficientFundsError {
     const result = this.amount - other.amount;
-    const money = Money.create({ amount: result, currency: this.currency });
-    return money;
+    if (result < 0) {
+      return new InsufficientFundsError(this, other);
+    }
+    return new Money(Number(result.toFixed(Money.SCALE)), this.currency);
   }
 
-  private ensureSameCurrency(other: Money): MoneyCurrencyMismatchError | void {
-    if (this.currency !== other.currency) {
-      return new MoneyCurrencyMismatchError();
+  public multiply(factor: number): Money | FactorNegativeError {
+    if (factor < 0) {
+      return new FactorNegativeError();
     }
+
+    const resultAmount = Number((this.amount * factor).toFixed(Money.SCALE));
+    const result = Money.create({
+      amount: resultAmount,
+      currency: this.currency,
+    });
+    if (result instanceof Error) throw result;
+    return result;
+  }
+
+  public divide(divisor: number): Money | FactorNegativeError {
+    if (divisor <= 0) {
+      return new FactorNegativeError();
+    }
+
+    const resultAmount = Number((this.amount / divisor).toFixed(Money.SCALE));
+    const result = Money.create({
+      amount: resultAmount,
+      currency: this.currency,
+    });
+    if (result instanceof Error) throw result;
+    return result;
+  }
+
+  public convertTo(
+    targetCurrency: string,
+    fromRate: number,
+    toRate: number
+  ): Money {
+    if (this.currency === targetCurrency.toUpperCase()) {
+      return this;
+    }
+
+    const amountInUSD = this.amount / fromRate;
+    const convertedAmount = amountInUSD * toRate;
+
+    const result = Money.create({
+      amount: Number(convertedAmount.toFixed(Money.SCALE)),
+      currency: targetCurrency.toUpperCase(),
+    });
+
+    if (result instanceof Error) throw result;
+    return result;
   }
 
   public equals(other: Money): boolean {
     return this.currency === other.currency && this.amount === other.amount;
   }
 
+  public isGreaterThan(other: Money): boolean {
+    return this.amount > other.amount;
+  }
+
+  public isLessThan(other: Money): boolean {
+    return this.amount < other.amount;
+  }
+
+  public isGreaterThanOrEqual(other: Money): boolean {
+    return this.amount >= other.amount;
+  }
+
+  public isLessThanOrEqual(other: Money): boolean {
+    return this.amount <= other.amount;
+  }
+
   public toString(): string {
     return `${this.amount.toFixed(Money.SCALE)} ${this.currency}`;
   }
-  public multiply(
-    factor: number
-  ):
-    | Money
-    | FactorNegativeError
-    | MoneyCurrencyMissingError
-    | MoneyAmountInvalidError
-    | MoneyAmountNegativeError {
-    if (factor < 0) {
-      return new FactorNegativeError();
-    }
 
-    const resultAmount = Number((this.amount * factor).toFixed(Money.SCALE));
-
-    const resultOrError = Money.create({
-      amount: resultAmount,
+  public toJSON() {
+    return {
+      amount: this.amount,
       currency: this.currency,
+    };
+  }
+
+  public format(locale: string = "fr-FR"): string {
+    const symbols: Record<string, string> = {
+      USD: "$",
+      EUR: "€",
+      GBP: "£",
+      JPY: "¥",
+      CHF: "CHF",
+      CAD: "CA$",
+      AUD: "A$",
+      CNY: "¥",
+    };
+
+    const symbol = symbols[this.currency] || this.currency;
+    const formattedAmount = this.amount.toLocaleString(locale, {
+      minimumFractionDigits: Money.SCALE,
+      maximumFractionDigits: Money.SCALE,
     });
-    if (resultOrError instanceof Error) return resultOrError;
-    return resultOrError;
+
+    if (this.currency === "EUR") {
+      return `${formattedAmount} ${symbol}`;
+    }
+    return `${symbol}${formattedAmount}`;
   }
 }

@@ -132,7 +132,6 @@ export const CreditRow = ({ credit, isAdmin, basePath }: Props) => {
 }
 
 
-// Shared Dialog Component
 export const CreditDialog = ({
     open,
     onOpenChange,

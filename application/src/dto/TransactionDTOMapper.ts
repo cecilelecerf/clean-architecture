@@ -4,7 +4,7 @@ import {
 } from "@application/ports/repositories/TransactionRepository";
 import { AccountDTO } from "@domain/entities/AccountEntity";
 import { TransactionDTO } from "@domain/entities/TransactionEntity";
-import { AccountDTOWithUser } from "./AccountDTOMapper";
+import { AccountDTOMapper, AccountDTOWithUser } from "./AccountDTOMapper";
 
 export type TransactionEntityWithAccountDTO = TransactionDTO & {
   fromAccount: AccountDTO;
@@ -32,16 +32,8 @@ export class TransactionDTOMapper {
     transaction: TransactionEntityWithAccountWithUser
   ): TransactionEntityWithAccountWithUserDTO {
     return Object.assign(transaction.toDTO(), {
-      fromAccount: Object.assign(transaction.fromAccount.toDTO(), {
-        user: transaction.fromAccount.user
-          ? transaction.fromAccount.user.toDTO()
-          : null,
-      }),
-      toAccount: Object.assign(transaction.toAccount.toDTO(), {
-        user: transaction.toAccount.user
-          ? transaction.toAccount.user.toDTO()
-          : null,
-      }),
+      fromAccount: AccountDTOMapper.map(transaction.fromAccount),
+      toAccount: AccountDTOMapper.map(transaction.toAccount),
     });
   }
   static withUserMaps(

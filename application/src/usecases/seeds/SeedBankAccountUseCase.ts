@@ -48,7 +48,7 @@ export class SeedBankAccountUseCase {
       name: request.name,
       currency: request.currency,
       color,
-      userId: request.userId ?? null,
+      userId: null,
       createdAt: request.createdAt ?? now,
       updatedAt: request.updatedAt ?? now,
     });

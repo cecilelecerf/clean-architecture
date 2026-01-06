@@ -6,7 +6,7 @@ import { OrderRepositoryMongo } from "../repositories/OrderRepositoryMongo";
 import { ActionRepositoryMongo } from "../repositories/ActionRepositoryMongo";
 import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
 import { GetAllByUserUseCase } from "@application/usecases/orders/GetAllByUserUseCase";
-import { GetAllByActionUseCase } from "@application/usecases/orders/GetAllByActionUseCase";
+import { GetAllByActionAndStatusUseCase } from "@application/usecases/orders/GetAllByActionUseCase";
 
 export const orderFactory = () => {
   const client = new MongoClient();
@@ -25,7 +25,7 @@ export const orderFactory = () => {
 
   const getAllByUser = new GetAllByUserUseCase(userRepository, orderRepository);
 
-  const getAllByAction = new GetAllByActionUseCase(
+  const getAllByAction = new GetAllByActionAndStatusUseCase(
     userRepository,
     orderRepository,
     actionRepository

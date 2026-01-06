@@ -1,26 +1,29 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
-import { ActionRepository } from "@application/ports/repositories/ActionRepository";
+import {
+  ActionRepository,
+  ActionStatistics,
+} from "@application/ports/repositories/ActionRepository";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { Money } from "@domain/values/Money";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { ISIN } from "@domain/values/ISIN";
 
 export class ActionRepositoryMySQL implements ActionRepository {
   constructor(private readonly client: MySQLClient) {}
 
   private mapRowToAction(row: RowDataPacket): ActionEntity {
-    const currentPrice = Money.from({
-      amount: row.current_price,
+    const price = Money.from({
+      amount: row.price,
       currency: row.currency,
     });
 
     return ActionEntity.from({
-      ISIN: row.isin,
+      ISIN: ISIN.from(row.isin),
       name: row.name,
-      totalNb: row.total_nb,
       symbol: row.symbol,
       market: row.market,
       activitySector: row.activity_sector,
-      currentPrice,
+      price,
       isAvailable: !!row.is_available,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
@@ -29,19 +32,22 @@ export class ActionRepositoryMySQL implements ActionRepository {
 
   /** Sauvegarder une action */
   async save(action: ActionEntity): Promise<void> {
+    console.log(action);
+    console.log(action.ISIN.getValue());
+    console.log(action.ISIN.getValue().length);
+    console.log("ISIN-----");
     await this.client.query<ResultSetHeader>(
       `INSERT INTO actions 
-        (isin, name, total_nb, symbol, market, activity_sector, current_price, currency, is_available, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (isin, name,  symbol, market, activity_sector, price, currency, is_available, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        action.ISIN,
+        action.ISIN.getValue(),
         action.name,
-        action.totalNb,
         action.symbol,
         action.market,
         action.activitySector,
-        action.currentPrice.amount,
-        action.currentPrice.currency,
+        action.price.amount,
+        action.price.currency,
         action.isAvailable ? 1 : 0,
         action.createdAt,
         action.updatedAt,
@@ -53,7 +59,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async findByISIN(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM actions WHERE isin = ?`,
-      [ISIN]
+      [ISIN.getValue()]
     );
 
     if (rows.length === 0) return null;
@@ -84,7 +90,11 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async setAvailability(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE actions SET is_available = ?, updated_at = ? WHERE isin = ?`,
-      [action.isAvailable ? 1 : 0, action.updatedAt || new Date(), action.ISIN]
+      [
+        action.isAvailable ? 1 : 0,
+        action.updatedAt || new Date(),
+        action.ISIN.getValue(),
+      ]
     );
   }
 
@@ -92,20 +102,19 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async update(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE actions 
-       SET name = ?, total_nb = ?, symbol = ?, market = ?, activity_sector = ?, 
-           current_price = ?, currency = ?, is_available = ?, updated_at = ? 
+       SET name = ?, symbol = ?, market = ?, activity_sector = ?, 
+           price = ?, currency = ?, is_available = ?, updated_at = ? 
        WHERE isin = ?`,
       [
         action.name,
-        action.totalNb,
         action.symbol,
         action.market,
         action.activitySector,
-        action.currentPrice.amount,
-        action.currentPrice.currency,
+        action.price.amount,
+        action.price.currency,
         action.isAvailable ? 1 : 0,
         action.updatedAt || new Date(),
-        action.ISIN,
+        action.ISIN.getValue(),
       ]
     );
   }
@@ -114,7 +123,64 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async delete(ISIN: ActionEntity["ISIN"]): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `DELETE FROM actions WHERE isin = ?`,
-      [ISIN]
+      [ISIN.getValue()]
     );
+  }
+
+  async getStatistics(
+    isin: ActionEntity["ISIN"],
+    now: Date
+  ): Promise<ActionStatistics> {
+    const IsinValue = isin.getValue();
+    const priceRow = await this.client.query<RowDataPacket[]>(
+      `SELECT price FROM actions WHERE ISIN = ?`,
+      [IsinValue]
+    );
+
+    const price = Number(priceRow[0]?.price || 0);
+
+    const stats = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+        (SELECT price FROM action_price_history 
+         WHERE isin = ? AND date >= DATE_SUB(?, INTERVAL 1 DAY) 
+         ORDER BY date ASC LIMIT 1) as price24h,
+        (SELECT price FROM action_price_history 
+         WHERE isin = ? AND date >= DATE_SUB(?, INTERVAL 7 DAY) 
+         ORDER BY date ASC LIMIT 1) as price7d,
+        (SELECT price FROM action_price_history 
+         WHERE isin = ? AND date >= DATE_SUB(?, INTERVAL 30 DAY) 
+         ORDER BY date ASC LIMIT 1) as price30d,
+        MIN(price) as minPrice,
+        MAX(price) as maxPrice,
+        AVG(price) as averagePrice,
+        SUM(volume) as totalVolume,
+        COUNT(*) as transactionCount
+      FROM action_price_history
+      WHERE isin = ?
+        AND date >= DATE_SUB(?, INTERVAL 30 DAY)`,
+      [IsinValue, now, IsinValue, now, IsinValue, now, IsinValue, now]
+    );
+
+    const price24h = Number(stats[0]?.price24h || price);
+    const price7d = Number(stats[0]?.price7d || price);
+    const price30d = Number(stats[0]?.price30d || price);
+
+    const change24h = price24h > 0 ? ((price - price24h) / price24h) * 100 : 0;
+    const change7d = price7d > 0 ? ((price - price7d) / price7d) * 100 : 0;
+    const change30d = price30d > 0 ? ((price - price30d) / price30d) * 100 : 0;
+    const priceChange = change24h;
+
+    return {
+      priceChange: Math.round(priceChange * 100) / 100,
+      change24h: Math.round(change24h * 100) / 100,
+      change7d: Math.round(change7d * 100) / 100,
+      change30d: Math.round(change30d * 100) / 100,
+      minPrice: Math.round(Number(stats[0]?.minPrice || price) * 100) / 100,
+      maxPrice: Math.round(Number(stats[0]?.maxPrice || price) * 100) / 100,
+      averagePrice:
+        Math.round(Number(stats[0]?.averagePrice || price) * 100) / 100,
+      totalVolume: Number(stats[0]?.totalVolume || 0),
+      transactionCount: Number(stats[0]?.transactionCount || 0),
+    };
   }
 }

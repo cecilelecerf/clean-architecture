@@ -20,13 +20,6 @@ export const OrderSchema = new Schema<OrderInterface>(
       },
       required: true,
     },
-    fee: {
-      type: {
-        amount: { type: Number, required: true },
-        currency: { type: String, required: true },
-      },
-      required: true,
-    },
     date: { type: Date, required: true },
     status: {
       type: String,

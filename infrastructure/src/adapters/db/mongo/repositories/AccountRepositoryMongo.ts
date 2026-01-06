@@ -1,4 +1,3 @@
-// @infrastructure/repositories/mongo/AccountRepositoryMongo.ts
 import {
   AccountEntityWithUser,
   AccountRepository,

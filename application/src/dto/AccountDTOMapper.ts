@@ -7,7 +7,7 @@ export type AccountDTOWithUser = AccountDTO & { user: UserToDTO | null };
 export class AccountDTOMapper {
   static map(account: AccountEntityWithUser): AccountDTOWithUser {
     return Object.assign(account.toDTO(), {
-      user: account.user ? account.user.toDTO() : null,
+      user: account.userId ? account.user.toDTO() : null,
     });
   }
   static maps(accounts: AccountEntityWithUser[]): AccountDTOWithUser[] {

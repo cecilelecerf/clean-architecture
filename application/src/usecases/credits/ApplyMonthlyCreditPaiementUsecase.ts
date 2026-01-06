@@ -1,22 +1,30 @@
 import { CreditNotFoundError } from "@application/errors/credits";
 import { FormuleCreditNotFoundError } from "@application/errors/formules-credit";
-import { UserNotActiveError, UserNotFoundError, UserRoleMismatchError } from "@application/errors/users";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
 import { FormuleCreditRepository } from "@application/ports/repositories/FormuleCreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { CreditDTO, CreditEntity } from "@domain/entities/CreditEntity"; 
+import { CreditDTO, CreditEntity } from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { CreditAlreadyPaidError } from "@domain/errors/credit";
-import { MoneyAmountInvalidError, MoneyAmountNegativeError, MoneyCurrencyMismatchError, MoneyCurrencyMissingError } from "@domain/errors/money";
+import {
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
 
-type Props = {clientId: UserEntity["id"];} & Pick<CreditEntity, "id">;
+type Props = { clientId: UserEntity["id"] } & Pick<CreditEntity, "id">;
 
 export class ApplyMonthlyCreditPaiementUsecase {
   constructor(
     private readonly creditRepository: CreditRepository,
     private readonly userRepository: UserRepository,
-    private readonly formuleRepository: FormuleCreditRepository,
+    private readonly formuleRepository: FormuleCreditRepository
   ) {}
 
   public async execute({
@@ -27,10 +35,9 @@ export class ApplyMonthlyCreditPaiementUsecase {
     | CreditNotFoundError
     | CreditAlreadyPaidError
     | MoneyCurrencyMissingError
-    | MoneyCurrencyMismatchError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | UserNotFoundError 
+    | UserNotFoundError
     | UserNotActiveError
     | UserRoleMismatchError
     | FormuleCreditNotFoundError
@@ -45,11 +52,15 @@ export class ApplyMonthlyCreditPaiementUsecase {
 
     if (credit.isFullyPaid()) return new CreditAlreadyPaidError(credit.id);
 
-    const formuleCredit = await this.formuleRepository.findById(credit.formuleCreditId);
+    const formuleCredit = await this.formuleRepository.findById(
+      credit.formuleCreditId
+    );
     if (!formuleCredit) return new FormuleCreditNotFoundError();
 
-    const updatedCredit = credit.payMonthly(formuleCredit.interestRate, formuleCredit.insuranceRate);
-    if (updatedCredit instanceof Error) return updatedCredit;
+    const updatedCredit = credit.payMonthly(
+      formuleCredit.interestRate,
+      formuleCredit.insuranceRate
+    );
 
     await this.creditRepository.update(credit);
     return credit.toDTO();

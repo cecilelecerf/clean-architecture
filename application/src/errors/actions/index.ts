@@ -1,1 +1,2 @@
-export * from "./ActionNotFoundError"
+export * from "./ActionNotFoundError";
+export * from "./ActionNotAvailableError";

@@ -11,12 +11,11 @@ export class OrderRepositoryMongo implements OrderRepository {
 
   private mapDocToOrder(doc: any): OrderEntity {
     const price = Money.from(doc.price);
-    const fee = Money.from(doc.fee);
 
     return OrderEntity.from({
       id: doc._id.toString(),
       userId: doc.userId,
-      actionId: doc.actionId,
+      ISIN: doc.actionId,
       type: doc.type,
       quantity: doc.quantity,
       price,
@@ -35,7 +34,7 @@ export class OrderRepositoryMongo implements OrderRepository {
     await OrderModel.create({
       _id: order.id,
       userId: order.userId,
-      actionId: order.actionId,
+      actionId: order.ISIN,
       type: order.type,
       quantity: order.quantity,
       price: {
@@ -103,7 +102,7 @@ export class OrderRepositoryMongo implements OrderRepository {
       {
         $set: {
           userId: order.userId,
-          actionId: order.actionId,
+          actionId: order.ISIN,
           type: order.type,
           quantity: order.quantity,
           price: {

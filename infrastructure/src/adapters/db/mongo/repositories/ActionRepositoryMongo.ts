@@ -1,8 +1,12 @@
-import { ActionRepository } from "@application/ports/repositories/ActionRepository";
+import {
+  ActionRepository,
+  ActionStatistics,
+} from "@application/ports/repositories/ActionRepository";
 import { MongoClient } from "../../MongoClient";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { ActionModel } from "../models/ActionModel";
 import { Money } from "@domain/values/Money";
+import { ActionPriceHistoryModel } from "../models/ActionPriceHistoryModel";
 
 export class ActionRepositoryMongo implements ActionRepository {
   constructor(private readonly client: MongoClient) {}
@@ -114,5 +118,59 @@ export class ActionRepositoryMongo implements ActionRepository {
     await this.client.connect();
 
     await ActionModel.deleteOne({ ISIN });
+  }
+
+  async getStatistics(isin: string): Promise<ActionStatistics> {
+    await this.client.connect();
+
+    const action = await ActionModel.findOne({ ISIN: isin }).lean();
+    const price = action?.currentPrice.amount || 0;
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 30);
+
+    const history = await ActionPriceHistoryModel.find({
+      isin,
+      date: { $gte: cutoffDate },
+    })
+      .sort({ date: 1 })
+      .lean();
+
+    const date24h = new Date();
+    date24h.setDate(date24h.getDate() - 1);
+
+    const date7d = new Date();
+    date7d.setDate(date7d.getDate() - 7);
+
+    const price24h =
+      history.find((h) => new Date(h.date) >= date24h)?.price || price;
+    const price7d =
+      history.find((h) => new Date(h.date) >= date7d)?.price || price;
+    const price30d = history[0]?.price || price;
+
+    const change24h = price24h > 0 ? ((price - price24h) / price24h) * 100 : 0;
+    const change7d = price7d > 0 ? ((price - price7d) / price7d) * 100 : 0;
+    const change30d = price30d > 0 ? ((price - price30d) / price30d) * 100 : 0;
+
+    const prices = history.map((h) => h.price);
+    const minPrice = prices.length > 0 ? Math.min(...prices) : price;
+    const maxPrice = prices.length > 0 ? Math.max(...prices) : price;
+    const averagePrice =
+      prices.length > 0
+        ? prices.reduce((sum, p) => sum + p, 0) / prices.length
+        : price;
+    const totalVolume = history.reduce((sum, h) => sum + h.volume, 0);
+
+    return {
+      priceChange: Math.round(change24h * 100) / 100,
+      change24h: Math.round(change24h * 100) / 100,
+      change7d: Math.round(change7d * 100) / 100,
+      change30d: Math.round(change30d * 100) / 100,
+      minPrice: Math.round(minPrice * 100) / 100,
+      maxPrice: Math.round(maxPrice * 100) / 100,
+      averagePrice: Math.round(averagePrice * 100) / 100,
+      totalVolume,
+      transactionCount: history.length,
+    };
   }
 }

@@ -18,7 +18,6 @@ import {
 import {
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
-  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import { findActiveUser } from "@application/utils/userValidators";
@@ -31,6 +30,7 @@ import {
   InvalidTransactionAmountError,
   InvalidTransactionLabelError,
 } from "@domain/errors/transaction";
+import { InsufficientFundsError } from "@domain/errors/account";
 
 interface Props {
   requestUserId: string;
@@ -68,11 +68,11 @@ export class TransfertBetweenAccountUseCase {
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | MoneyCurrencyMismatchError
     | UserNotFoundError
     | UserNotActiveError
     | InvalidTransactionLabelError
     | InvalidTransactionAmountError
+    | InsufficientFundsError
     | void
   > {
     const fromIbanResult = IBAN.create(fromIbanString);
@@ -102,11 +102,10 @@ export class TransfertBetweenAccountUseCase {
       return new UnauthorizedAccessAccountError();
     }
 
-    const withdrawResult = fromAccount.withdraw(amount);
+    const withdrawResult = fromAccount.debit(amount);
     if (withdrawResult instanceof Error) return withdrawResult;
 
-    const depositResult = toAccount.deposit(amount);
-    if (depositResult instanceof Error) return depositResult;
+    const depositResult = toAccount.credit(amount);
 
     const now = this.clockService.now();
 

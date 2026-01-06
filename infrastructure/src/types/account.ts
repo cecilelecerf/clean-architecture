@@ -28,6 +28,7 @@ export const accountDTOSchema = accountSchema.pick({
   amount: true,
   userId: true,
 });
+export type AccountDTO = z.infer<typeof accountDTOSchema>;
 
 export const accountWithUserSchemaDTO = accountDTOSchema.extend({
   user: userDtoSchema.nullable(),
@@ -41,7 +42,7 @@ export const accountResumeSchema = accountSchema.pick({
   type: true,
 });
 export const accountResumeWithUserSchema = accountResumeSchema.extend({
-  user: userDtoSchema.nullable(),
+  user: userDtoSchema.nullable().optional(),
 });
 export type AccountResumeWithUser = z.infer<typeof accountResumeWithUserSchema>;
 

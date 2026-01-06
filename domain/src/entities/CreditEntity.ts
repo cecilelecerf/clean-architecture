@@ -4,7 +4,6 @@ import { Percentage } from "@domain/values/Percentage";
 import {
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
-  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import {
@@ -15,6 +14,7 @@ import {
 } from "@domain/errors/credit";
 import { AccountEntity } from "./AccountEntity";
 import { FormuleCreditEntity } from "./FormuleCreditEntity";
+import { InsufficientFundsError } from "@domain/errors/account";
 
 export type MonthlySchedule = {
   capitalPaid: Money;
@@ -25,9 +25,9 @@ export type MonthlySchedule = {
 
 export enum CreditStatus {
   PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED", // Crédit en cours de paiement
+  ACCEPTED = "ACCEPTED",
   REFUSED = "REFUSED",
-  COMPLETED = "COMPLETED", // Crédit avec remboursement terminé
+  COMPLETED = "COMPLETED",
 }
 
 export class CreditEntity {
@@ -199,9 +199,9 @@ export class CreditEntity {
     | CreditEntity
     | CreditAlreadyPaidError
     | MoneyCurrencyMissingError
-    | MoneyCurrencyMismatchError
     | MoneyAmountInvalidError
-    | MoneyAmountNegativeError {
+    | MoneyAmountNegativeError
+    | InsufficientFundsError {
     if (this.isFullyPaid()) {
       return new CreditAlreadyPaidError(this.id);
     }
@@ -239,7 +239,7 @@ export class CreditEntity {
     | CreditAlreadyPaidError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | MoneyCurrencyMismatchError {
+    | InsufficientFundsError {
     const schedule: MonthlySchedule[] = [];
 
     const simulated = CreditEntity.from({ ...this });
@@ -331,8 +331,6 @@ export class CreditEntity {
     }
     return new InvalidCreditStatusError(status);
   }
-
-  // ✅ Alternative : fonction qui retourne le status validé ou une erreur
 }
 
 export type CreditDTO = {

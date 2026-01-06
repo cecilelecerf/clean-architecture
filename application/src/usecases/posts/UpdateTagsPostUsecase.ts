@@ -39,19 +39,15 @@ export class UpdateTagsPostUsecase {
     | InvalidPostAccessError
     | TagNotFoundError
   > {
-    // Validation utilisateur
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    // Récupération du post
     const post = await this.feedRepository.findById(postId);
     if (!post) return new PostNotFoundError();
 
-    // Vérification des permissions
     const access = post.permissionToModify(user);
     if (!access) return new InvalidPostAccessError(user.id, post.id);
 
-    // Dédoublonnage des tags
     const uniqueTagsId = Array.from(new Set(tagsId));
 
     const tags: TagEntity[] = [];

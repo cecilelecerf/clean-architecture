@@ -89,7 +89,6 @@ export default function SimulateCreditPage() {
         const totalRepayment = monthlyPayment * duration;
         const totalCost = totalInterest + totalInsurance;
 
-        // Taux effectif global (approximation)
         const effectiveRate = ((totalRepayment - amount) / amount / (duration / 12)) * 100;
 
         setSimulation({
@@ -258,10 +257,6 @@ export default function SimulateCreditPage() {
         .exhaustive();
 }
 
-// ============================================================================
-// Composant Résultats
-// ============================================================================
-
 interface SimulationResultsProps {
     simulation: SimulationResult;
     formule: any;
@@ -274,7 +269,7 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
     return (
         <div className="space-y-6">
             {/* Mensualité principale */}
-            <Card className="border-2 border-blue-200 bg-linear-to-br from-blue-50 to-indigo-50">
+            <Card className=" bg-linear-to-br from-blue-50 to-indigo-50">
                 <CardContent className="p-8">
                     <div className="text-center space-y-2">
                         <p className="text-sm text-blue-900 font-medium uppercase tracking-wide">
@@ -436,10 +431,6 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
         </div>
     );
 }
-
-// ============================================================================
-// Sous-composants
-// ============================================================================
 
 function CostItem({
     label,

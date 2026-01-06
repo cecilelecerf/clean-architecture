@@ -8,7 +8,6 @@ import {
   FactorNegativeError,
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
-  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import { BankInterestAccountNotFoundError } from "@application/errors/accounts/BankInterestAccountNotFoundError";
@@ -30,7 +29,6 @@ export class ApplyDailyInterestUseCase {
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
     | FactorNegativeError
-    | MoneyCurrencyMismatchError
     | BankInterestAccountNotFoundError
   > {
     const rateConfig = await this.savingRateRepository.findRateAtDate(
@@ -87,14 +85,13 @@ export class ApplyDailyInterestUseCase {
       }
 
       // Créditer le compte épargne
-      const depositResult = savingAccount.deposit(interest);
-      if (depositResult instanceof Error) return depositResult;
+      savingAccount.credit(interest);
 
       // Débiter le compte de la banque
-      const withdrawResult = bankAccount.withdraw(interest);
+      const withdrawResult = bankAccount.debit(interest);
       if (withdrawResult instanceof Error) {
         // Rollback du dépôt si le retrait échoue
-        savingAccount.withdraw(interest);
+        savingAccount.debit(interest);
         return withdrawResult;
       }
 

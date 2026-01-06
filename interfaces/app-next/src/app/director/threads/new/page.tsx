@@ -72,7 +72,6 @@ const AddParticipant = ({
         ]
     });
 
-    // ✅ FIX : Mutation immutable de l'état
     const handleToggleParticipant = (userId: UserId) => {
         setField((prev) => ({
             ...prev,
@@ -82,7 +81,6 @@ const AddParticipant = ({
         }));
     };
 
-    // ✅ Vérifier si un participant est sélectionné
     const isSelected = (userId: UserId) => field.participantsId.includes(userId);
 
     return match(queries)

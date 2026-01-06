@@ -3,7 +3,6 @@ import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import {
   accountDTOSchema,
   AccountId,
-  accountResumeWithUserSchema,
   accountSchema,
   accountWithUserSchemaDTO,
   NewAccount,

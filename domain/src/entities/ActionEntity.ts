@@ -1,35 +1,29 @@
 import {
   InvalidActionNameError,
-  InvalidISINError,
   InvalidSymbolError,
-  InvalidTotalNbError,
+  InvalidQuantityError,
 } from "@domain/errors/action";
+import {
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
+import { ISIN } from "@domain/values/ISIN";
 import { Money } from "@domain/values/Money";
 
 export class ActionEntity {
   private constructor(
-    public ISIN: string,
+    public ISIN: ISIN,
     public name: string,
-    public totalNb: number,
     public symbol: string,
     public market: string,
     public activitySector: string,
-    public currentPrice: Money,
+    public price: Money,
     public isAvailable: boolean,
     public createdAt: Date,
-    public updatedAt?: Date
+    public updatedAt: Date,
+    public defaultQuantity: number
   ) {}
-
-  private static validateISIN(isin: string): string | InvalidISINError {
-    const trimmed = isin.trim().toUpperCase();
-    const isinRegex = /^[A-Z]{2}[A-Z0-9]{9}[0-9]$/;
-
-    if (!isinRegex.test(trimmed)) {
-      return new InvalidISINError(isin);
-    }
-
-    return trimmed;
-  }
 
   private static validateName(name: string): string | InvalidActionNameError {
     const trimmed = name.trim();
@@ -51,16 +45,6 @@ export class ActionEntity {
     return trimmed;
   }
 
-  private static validateTotalNb(
-    totalNb: number
-  ): number | InvalidTotalNbError {
-    if (!Number.isInteger(totalNb) || totalNb <= 0) {
-      return new InvalidTotalNbError(totalNb);
-    }
-
-    return totalNb;
-  }
-
   private static validateMarket(market: string): string {
     return market.trim();
   }
@@ -68,98 +52,94 @@ export class ActionEntity {
   private static validateActivitySector(sector: string): string {
     return sector.trim();
   }
+  public static validateDefaultQuantity(quantity: number): boolean {
+    return quantity > 0;
+  }
 
   public static create({
-    ISIN,
     name,
-    totalNb,
     symbol,
     market,
     activitySector,
-    currentPrice,
+    price,
     isAvailable,
     createdAt,
+    defaultQuantity,
   }: Pick<
     ActionEntity,
-    | "ISIN"
     | "name"
-    | "totalNb"
     | "symbol"
     | "market"
     | "activitySector"
-    | "currentPrice"
+    | "price"
     | "isAvailable"
     | "createdAt"
+    | "defaultQuantity"
   >):
     | ActionEntity
-    | InvalidISINError
     | InvalidActionNameError
     | InvalidSymbolError
-    | InvalidTotalNbError {
-    const validatedISIN = this.validateISIN(ISIN);
-    if (validatedISIN instanceof Error) return validatedISIN;
-
+    | InvalidQuantityError {
     const validatedName = this.validateName(name);
     if (validatedName instanceof Error) return validatedName;
 
     const validatedSymbol = this.validateSymbol(symbol);
     if (validatedSymbol instanceof Error) return validatedSymbol;
 
-    const validatedTotalNb = this.validateTotalNb(totalNb);
-    if (validatedTotalNb instanceof Error) return validatedTotalNb;
-
     const validatedMarket = this.validateMarket(market);
     const validatedActivitySector = this.validateActivitySector(activitySector);
+    if (this.validateDefaultQuantity(defaultQuantity))
+      return new InvalidQuantityError(defaultQuantity);
 
     return new ActionEntity(
-      validatedISIN,
+      ISIN.generate(),
       validatedName,
-      validatedTotalNb,
       validatedSymbol,
       validatedMarket,
       validatedActivitySector,
-      currentPrice,
+      price,
       isAvailable,
       createdAt,
-      createdAt
+      createdAt,
+      defaultQuantity
     );
   }
 
   public static from({
     ISIN,
     name,
-    totalNb,
     symbol,
     market,
     activitySector,
-    currentPrice,
+    price,
     isAvailable,
     createdAt,
     updatedAt,
+    defaultQuantity,
   }: Pick<
     ActionEntity,
     | "ISIN"
     | "name"
-    | "totalNb"
     | "symbol"
     | "market"
     | "activitySector"
-    | "currentPrice"
+    | "price"
     | "isAvailable"
     | "createdAt"
     | "updatedAt"
+    | "defaultQuantity"
   >) {
     return new ActionEntity(
       ISIN,
       name,
-      totalNb,
       symbol,
       market,
       activitySector,
-      currentPrice,
+      price,
       isAvailable,
       createdAt,
-      updatedAt
+      updatedAt,
+      defaultQuantity
     );
   }
   public enable({ now }: { now: Date }): void {
@@ -172,38 +152,105 @@ export class ActionEntity {
     this.updatedAt = now;
   }
 
-  public updatePrice({ newPrice, now }: { newPrice: Money; now: Date }): void {
-    this.currentPrice = newPrice;
+  updatePrice({
+    newPrice,
+    now,
+  }: {
+    newPrice: Money;
+    now: Date;
+  }):
+    | ActionEntity
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
+    | MoneyCurrencyMissingError {
+    if (newPrice.currency !== this.price.currency) {
+      return new MoneyCurrencyMissingError(newPrice.currency);
+    }
+    this.price = newPrice;
     this.updatedAt = now;
+    return this;
   }
 
   update({
     name,
-    totalNb,
     symbol,
     market,
     activitySector,
-    price,
     isAvailable,
     now,
   }: {
     name?: string;
-    totalNb?: number;
     symbol?: string;
     market?: string;
     activitySector?: string;
-    price?: Money;
     isAvailable?: boolean;
     now: Date;
   }) {
     if (name) this.name = name;
-    if (totalNb) this.totalNb = totalNb;
     if (symbol) this.symbol = symbol;
     if (market) this.market = market;
     if (activitySector) this.activitySector = activitySector;
-    if (price) this.currentPrice = price;
     if (isAvailable !== undefined) {
       isAvailable ? this.enable({ now }) : this.disable({ now });
     }
   }
+
+  /**
+   * Diminue la quantité disponible sur le marché primaire
+   */
+  decreaseAvailableQuantity(
+    quantity: number,
+    now: Date
+  ): ActionEntity | InvalidQuantityError {
+    if (quantity <= 0 || !Number.isInteger(quantity)) {
+      return new InvalidQuantityError(quantity);
+    }
+
+    if (quantity > this.defaultQuantity) {
+      return new InvalidQuantityError(quantity);
+    }
+
+    return new ActionEntity(
+      this.ISIN,
+      this.name,
+      this.symbol,
+      this.market,
+      this.activitySector,
+      this.price,
+      this.isAvailable,
+      this.createdAt,
+      now,
+      this.defaultQuantity - quantity
+    );
+  }
+
+  public toDTO(): ActionDTO {
+    return {
+      ISIN: this.ISIN.getValue(),
+      name: this.name,
+      activitySector: this.activitySector,
+      symbol: this.symbol,
+      market: this.market,
+      price: this.price,
+      isAvailable: this.isAvailable,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+      defaultQuantity: this.defaultQuantity,
+    };
+  }
 }
+
+export type ActionDTO = {
+  ISIN: string;
+  createdAt: string;
+  updatedAt: string;
+} & Pick<
+  ActionEntity,
+  | "activitySector"
+  | "name"
+  | "symbol"
+  | "market"
+  | "price"
+  | "isAvailable"
+  | "defaultQuantity"
+>;

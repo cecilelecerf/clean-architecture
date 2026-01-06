@@ -6,10 +6,12 @@ import {
   FactorNegativeError,
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
-  MoneyCurrencyMismatchError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
-import { InvalidAccountNameError } from "@domain/errors/account";
+import {
+  InsufficientFundsError,
+  InvalidAccountNameError,
+} from "@domain/errors/account";
 import { InvalidAccountTypeError } from "@domain/errors/account/InvalidAccountType";
 import { TransactionEntity } from "./TransactionEntity";
 
@@ -105,22 +107,20 @@ export class AccountEntity {
     );
   }
 
-  public deposit(amount: Money): AccountEntity | MoneyCurrencyMismatchError {
+  public credit(amount: Money): AccountEntity {
     const newBalence = this.balance.add(amount);
-    if (newBalence instanceof Error) return newBalence;
     this.balance = newBalence;
     return this;
   }
 
-  // Retirer de l'argent
-  public withdraw(
+  public debit(
     amount: Money
   ):
-    | MoneyCurrencyMismatchError
     | AccountEntity
     | MoneyAmountNegativeError
     | MoneyAmountInvalidError
-    | MoneyCurrencyMissingError {
+    | MoneyCurrencyMissingError
+    | InsufficientFundsError {
     const newBalence = this.balance.subtract(amount);
     if (newBalence instanceof Error) return newBalence;
 
@@ -128,7 +128,6 @@ export class AccountEntity {
     return this;
   }
 
-  // Obtenir le solde actuel
   public getBalance(): Money {
     return this.balance;
   }

@@ -45,7 +45,7 @@ export class SeedAccountUseCase {
       iban,
       userId: request.userId,
       name: request.name,
-      type: request.accountType,
+      type: request.userId ? "courant" : "bank",
       balance,
       currency: request.currency,
       color,

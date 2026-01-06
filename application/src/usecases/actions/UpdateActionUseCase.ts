@@ -8,24 +8,22 @@ import { ActionRepository } from "@application/ports/repositories/ActionReposito
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { ActionEntity } from "@domain/entities/ActionEntity";
+import { ActionDTO, ActionEntity } from "@domain/entities/ActionEntity";
+import { InvalidISINError } from "@domain/errors/ISIN";
 import {
   MoneyAmountInvalidError,
   MoneyAmountNegativeError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
-import { Money } from "@domain/values/Money";
+import { ISIN } from "@domain/values/ISIN";
 
 interface Props {
   userId: string;
-  ISIN: string;
+  isin: string;
   name?: string;
-  totalNb?: number;
   symbol?: string;
   market?: string;
   activitySector?: string;
-  priceAmount?: number;
-  priceCurrency?: string;
   isAvailable?: boolean;
 }
 
@@ -38,17 +36,14 @@ export class UpdateActionUsecase {
 
   public async execute({
     userId,
-    ISIN,
+    isin,
     name,
-    totalNb,
     symbol,
     market,
     activitySector,
-    priceAmount,
-    priceCurrency,
     isAvailable,
   }: Props): Promise<
-    | ActionEntity
+    | ActionDTO
     | ActionNotFoundError
     | UserRoleMismatchError
     | UserNotFoundError
@@ -56,6 +51,7 @@ export class UpdateActionUsecase {
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
+    | InvalidISINError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -66,34 +62,21 @@ export class UpdateActionUsecase {
     )
       return new UserRoleMismatchError(["directeur"], user.role);
 
-    const action = await this.actionRepository.findByISIN(ISIN);
+    const validateIsin = ISIN.isValid(isin);
+    if (validateIsin instanceof Error) return validateIsin;
+    const action = await this.actionRepository.findByISIN(validateIsin);
     if (!action) return new ActionNotFoundError();
-
-    let price: Money | undefined;
-    if (priceAmount && priceCurrency) {
-      const priceVO:
-        | Money
-        | MoneyCurrencyMissingError
-        | MoneyAmountInvalidError
-        | MoneyAmountNegativeError = Money.create({
-        amount: priceAmount,
-        currency: priceCurrency,
-      });
-      if (priceVO instanceof Error) return priceVO;
-      else price = priceVO;
-    }
 
     action.update({
       name,
-      totalNb,
       symbol,
       market,
       activitySector,
-      price,
       isAvailable,
       now: this.clockService.now(),
     });
+
     await this.actionRepository.update(action);
-    return action;
+    return action.toDTO();
   }
 }
