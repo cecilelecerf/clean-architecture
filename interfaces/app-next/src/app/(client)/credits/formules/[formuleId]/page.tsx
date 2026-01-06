@@ -256,10 +256,6 @@ export default function FormulesPage() {
     .exhaustive();
 }
 
-// ============================================================================
-// Components
-// ============================================================================
-
 const RateCard = ({
   icon: Icon,
   label,
@@ -366,7 +362,6 @@ const BenefitItem = ({
   );
 };
 
-// Skeletons
 
 const FormulePageSkeleton = () => (
   <div className="space-y-8">

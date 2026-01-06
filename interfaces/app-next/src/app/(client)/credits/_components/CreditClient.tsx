@@ -55,7 +55,6 @@ export const ClientCredits = () => {
 
                     return (
                         <div className="space-y-8">
-                            {/* Crédits acceptés/actifs - Grid de cards */}
                             {credits.some((credit) => credit.status === "ACCEPTED") && (
                                 <section>
                                     <h2 className="text-xl font-semibold mb-4">Crédits en cours</h2>
@@ -63,7 +62,6 @@ export const ClientCredits = () => {
                                         {credits
                                             .filter((credit) => credit.status === "ACCEPTED")
                                             .map((credit) => {
-                                                // Déterminer si le crédit est futur ou actif
                                                 const isFuture = new Date(credit.startDate) > new Date();
                                                 const config = isFuture
                                                     ? statusConfig.ACCEPTED_FUTURE
@@ -126,7 +124,6 @@ export const ClientCredits = () => {
                                                                     </p>
                                                                 </div>
                                                             ) : (
-                                                                // CRÉDIT ACTIF - Solde restant
                                                                 <div className="flex justify-between items-center pt-2 border-t">
                                                                     <div className="space-y-1">
                                                                         <p className="text-xs text-gray-500 flex items-center gap-1">

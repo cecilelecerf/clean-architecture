@@ -21,18 +21,18 @@ export class PortfolioPositionEntity {
     ISIN,
     symbol,
     orders,
-    currentPrice: { amount, currency },
+    price: { amount, currency },
   }: { orders: OrderEntity[] } & Pick<
     ActionEntity,
-    "name" | "ISIN" | "symbol" | "currentPrice"
+    "name" | "ISIN" | "symbol" | "price"
   >) {
     let totalQuantity = 0;
     let totalInvested = 0;
-
     for (const order of orders) {
+      if (order.status !== "executed") continue;
       if (order.type === "buy") {
         totalQuantity += order.quantity;
-        totalInvested += order.price.amount * order.quantity;
+        totalInvested = totalInvested + order.price.amount * order.quantity;
       } else if (order.type === "sell") {
         totalQuantity -= order.quantity;
         const avgPrice = totalInvested / (totalQuantity + order.quantity);
@@ -43,6 +43,7 @@ export class PortfolioPositionEntity {
     if (totalQuantity <= 0) {
       return null;
     }
+
     const averagePrice = totalInvested / totalQuantity;
     const currentPrice = amount;
     const currentValue = totalQuantity * currentPrice;

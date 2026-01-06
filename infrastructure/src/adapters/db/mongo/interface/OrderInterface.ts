@@ -10,10 +10,6 @@ export interface OrderInterface {
     amount: number;
     currency: string;
   };
-  fee: {
-    amount: number;
-    currency: string;
-  };
   date: Date;
   status: "pending" | "executed" | "cancelled";
   createdAt: Date;

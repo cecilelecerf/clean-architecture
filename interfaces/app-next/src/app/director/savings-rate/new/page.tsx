@@ -17,7 +17,6 @@ export default function NewSavingsRatePage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validation
         if (!field.rate || !field.effectiveDate) {
             return;
         }

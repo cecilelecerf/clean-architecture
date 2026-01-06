@@ -42,7 +42,6 @@ export class Money {
     return new Money(scaledAmount, currency.toUpperCase());
   }
 
-  // Opérations simples (même devise uniquement)
   public add(other: Money): Money {
     return new Money(
       Number((this.amount + other.amount).toFixed(Money.SCALE)),
@@ -68,7 +67,7 @@ export class Money {
       amount: resultAmount,
       currency: this.currency,
     });
-    if (result instanceof Error) throw result; // Ne devrait jamais arriver
+    if (result instanceof Error) throw result;
     return result;
   }
 
@@ -86,7 +85,6 @@ export class Money {
     return result;
   }
 
-  // Conversion (avec taux explicites)
   public convertTo(
     targetCurrency: string,
     fromRate: number,
@@ -108,7 +106,6 @@ export class Money {
     return result;
   }
 
-  // Comparaisons simples (même devise)
   public equals(other: Money): boolean {
     return this.currency === other.currency && this.amount === other.amount;
   }

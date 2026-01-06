@@ -5,11 +5,10 @@ import { Money } from "@domain/values/Money";
 export interface SeedActionRequest {
   ISIN: string;
   name: string;
-  totalNb: number;
   symbol: string;
   market: string;
   activitySector: string;
-  currentPrice: number;
+  price: number;
   currency: string;
   isAvailable: boolean;
   createdAt?: Date;
@@ -23,13 +22,13 @@ export class SeedActionUseCase {
   ) {}
 
   async execute(request: SeedActionRequest): Promise<ActionEntity> {
-    const currentPrice = Money.create({
-      amount: request.currentPrice,
+    const price = Money.create({
+      amount: request.price,
       currency: request.currency,
     });
 
-    if (currentPrice instanceof Error) {
-      throw new Error(`Invalid current price: ${request.currentPrice}`);
+    if (price instanceof Error) {
+      throw new Error(`Invalid current price: ${request.price}`);
     }
 
     const now = this.clockService.now();
@@ -37,11 +36,10 @@ export class SeedActionUseCase {
     const action = ActionEntity.from({
       ISIN: request.ISIN,
       name: request.name,
-      totalNb: request.totalNb,
       symbol: request.symbol,
       market: request.market,
       activitySector: request.activitySector,
-      currentPrice,
+      price,
       isAvailable: request.isAvailable,
       createdAt: request.createdAt ?? now,
       updatedAt: request.updatedAt ?? now,

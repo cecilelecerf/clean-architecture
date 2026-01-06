@@ -1,4 +1,3 @@
-// @domain/services/MoneyConverter.ts
 import { Money } from "@domain/values/Money";
 import {
   MoneyCurrencyMissingError,

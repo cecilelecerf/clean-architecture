@@ -1,4 +1,3 @@
-// @application/usecases/actions/GetActionStatisticsUsecase.ts
 import { ActionRepository } from "@application/ports/repositories/ActionRepository";
 import { ActionNotFoundError } from "@application/errors/actions";
 import { ClockService } from "@application/ports/services/ClockService";

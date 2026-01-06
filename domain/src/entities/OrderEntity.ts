@@ -13,33 +13,24 @@ import {
 } from "@domain/errors/order";
 import { TransactionEntity } from "./TransactionEntity";
 import { AccountEntity } from "./AccountEntity";
+import { IBAN } from "@domain/values/IBAN";
+import { InvalidOrderStatusError } from "@domain/errors/order/InvalidOrderStatusError";
 
 export class OrderEntity {
   private constructor(
     public id: string,
-    public accountIban: AccountEntity["iban"],
-    public actionId: ActionEntity["ISIN"],
+    public IBAN: AccountEntity["iban"],
+    public ISIN: ActionEntity["ISIN"],
     public type: "buy" | "sell",
     public quantity: number,
     public price: Money,
-    public fee: Money,
     public status: "pending" | "executed" | "cancelled",
     public createdAt: Date,
     public updatedAt: Date,
     public date?: Date,
     public transactionId?: TransactionEntity["id"],
-    public limitPrice?: Money,
-    public scheduledFor?: Date
+    public executionPrice?: Money
   ) {}
-
-  private static validateQuantity(
-    quantity: number
-  ): number | InvalidQuantityError {
-    if (!Number.isInteger(quantity) || quantity <= 0) {
-      return new InvalidQuantityError(quantity);
-    }
-    return quantity;
-  }
 
   private static validateType(
     type: string
@@ -49,133 +40,60 @@ export class OrderEntity {
     }
     return type;
   }
-
-  private static calculateFee(
-    price: Money,
-    quantity: number
-  ):
-    | Money
-    | FactorNegativeError
-    | MoneyCurrencyMissingError
-    | MoneyAmountInvalidError
-    | MoneyAmountNegativeError {
-    const feeRate = 0.01;
-    const totalPrice = price.multiply(quantity);
-    if (totalPrice instanceof Error) return totalPrice;
-
-    const fee = totalPrice.multiply(feeRate);
-    if (fee instanceof Error) return fee;
-
-    return fee;
-  }
-
-  public static create({
-    id,
-    accountIban,
-    actionId,
-    type,
-    quantity,
-    price,
-    date,
-    createdAt,
-    transactionId,
-    limitPrice,
-    scheduledFor,
-  }: Pick<
-    OrderEntity,
-    | "id"
-    | "accountIban"
-    | "actionId"
-    | "type"
-    | "quantity"
-    | "price"
-    | "date"
-    | "createdAt"
-    | "transactionId"
-    | "limitPrice"
-    | "scheduledFor"
-  >):
-    | OrderEntity
-    | InvalidQuantityError
-    | InvalidOrderTypeError
-    | FactorNegativeError
-    | MoneyCurrencyMissingError
-    | MoneyAmountInvalidError
-    | MoneyAmountNegativeError {
-    const validatedQuantity = this.validateQuantity(quantity);
-    if (validatedQuantity instanceof Error) return validatedQuantity;
-
-    const validatedType = this.validateType(type);
-    if (validatedType instanceof Error) return validatedType;
-
-    const fee = this.calculateFee(price, validatedQuantity);
-    if (fee instanceof Error) return fee;
-
-    return new OrderEntity(
-      id,
-      accountIban,
-      actionId,
-      validatedType,
-      validatedQuantity,
-      price,
-      fee,
-      "pending",
-      createdAt,
-      createdAt,
-      date,
-      transactionId,
-      limitPrice,
-      scheduledFor
-    );
+  public static validateStatus(
+    status: string
+  ): OrderEntity["status"] | InvalidOrderStatusError {
+    if (
+      status !== "pending" &&
+      status !== "executed" &&
+      status !== "cancelled"
+    ) {
+      return new InvalidOrderStatusError(status);
+    }
+    return status;
   }
 
   public static from({
     id,
-    accountIban,
-    actionId,
+    IBAN,
+    ISIN,
     type,
     quantity,
     price,
-    fee,
     date,
     status,
     createdAt,
     updatedAt,
     transactionId,
-    limitPrice,
-    scheduledFor,
+    executionPrice,
   }: Pick<
     OrderEntity,
     | "id"
-    | "accountIban"
-    | "actionId"
+    | "IBAN"
+    | "ISIN"
     | "type"
     | "quantity"
     | "price"
-    | "fee"
     | "date"
     | "status"
     | "createdAt"
     | "updatedAt"
     | "transactionId"
-    | "limitPrice"
-    | "scheduledFor"
+    | "executionPrice"
   >) {
     return new OrderEntity(
       id,
-      accountIban,
-      actionId,
+      IBAN,
+      ISIN,
       type,
       quantity,
       price,
-      fee,
       status,
       createdAt,
       updatedAt,
       date,
       transactionId,
-      limitPrice,
-      scheduledFor
+      executionPrice
     );
   }
 
@@ -189,39 +107,78 @@ export class OrderEntity {
     if (totalPrice instanceof Error) {
       return totalPrice;
     }
-    return totalPrice.add(this.fee);
+    return totalPrice;
   }
 
-  public canBeExecuted({
-    now,
-    action,
+  static create({
+    id,
+    IBAN,
+    ISIN,
+    type,
+    quantity,
+    price,
+    createdAt,
   }: {
-    action: ActionEntity;
-    now: Date;
-  }): boolean {
-    if (!action.isAvailable) return false;
+    id: string;
+    IBAN: IBAN;
+    ISIN: string;
+    type: "buy" | "sell";
+    quantity: number;
+    price: Money;
+    createdAt: Date;
+  }): OrderEntity | InvalidOrderTypeError | InvalidQuantityError {
+    const validateType = OrderEntity.validateType(type);
+    if (validateType instanceof Error) return validateType;
+    if (quantity <= 0 || !Number.isInteger(quantity)) {
+      return new InvalidQuantityError(quantity);
+    }
 
-    if (this.scheduledFor && this.scheduledFor > now) {
-      return false;
-    }
-    if (this.limitPrice) {
-      if (this.type === "buy") {
-        return action.currentPrice.amount <= this.limitPrice.amount;
-      } else {
-        return action.currentPrice.amount >= this.limitPrice.amount;
-      }
-    }
-    return true;
+    return new OrderEntity(
+      id,
+      IBAN,
+      ISIN,
+      type,
+      quantity,
+      price,
+      "pending",
+      createdAt,
+      createdAt,
+      undefined,
+      undefined,
+      undefined
+    );
   }
 
+  /**
+   * Calcule le prix d'exécution entre deux ordres
+   * Règle : Le prix de l'ordre qui était déjà dans le carnet (maker)
+   */
+  static calculateExecutionPrice(
+    _newOrder: OrderEntity,
+    existingOrder: OrderEntity
+  ): Money {
+    return existingOrder.price;
+  }
+  isCompatibleWith(otherOrder: OrderEntity): boolean {
+    if (this.type === otherOrder.type) return false;
+
+    if (this.ISIN !== otherOrder.ISIN) return false;
+
+    const buyOrder = this.type === "buy" ? this : otherOrder;
+    const sellOrder = this.type === "sell" ? this : otherOrder;
+
+    const buyPrice = buyOrder.price;
+    const sellPrice = sellOrder.price;
+    return buyPrice.amount >= sellPrice.amount;
+  }
   public markExecuted({
     transactionId,
     now,
-    price,
+    executionPrice,
   }: {
     transactionId: TransactionEntity["id"];
     now: Date;
-    price?: Money;
+    executionPrice: Money;
   }): OrderEntity | InvalidOrderStatusTransitionError {
     if (this.status !== "pending") {
       return new InvalidOrderStatusTransitionError(
@@ -233,7 +190,7 @@ export class OrderEntity {
     this.date = now;
     this.updatedAt = now;
     this.transactionId = transactionId;
-    if (price) this.price = price;
+    this.executionPrice = executionPrice;
     this.status = "executed";
     return this;
   }
@@ -271,12 +228,11 @@ export class OrderEntity {
   public toDTO(): OrderToDTO {
     return {
       id: this.id,
-      IBAN: this.accountIban.value,
-      ISIN: this.actionId,
+      IBAN: this.IBAN.value,
+      ISIN: this.ISIN,
       type: this.type,
       price: this.price,
       quantity: this.quantity,
-      fee: this.fee,
       date: this.date ? this.date.toISOString() : undefined,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
@@ -294,5 +250,5 @@ export type OrderToDTO = {
   updatedAt: string;
 } & Pick<
   OrderEntity,
-  "id" | "type" | "quantity" | "price" | "fee" | "status" | "transactionId"
+  "id" | "type" | "quantity" | "price" | "status" | "transactionId"
 >;

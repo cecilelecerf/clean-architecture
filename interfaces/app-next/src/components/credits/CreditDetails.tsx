@@ -86,7 +86,6 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
             : statusConfig[credit.status];
     const StatusIcon = config.icon;
 
-    // Calculer la progression
     const totalAmount = credit.initialAmount.amount;
     const remainingAmount = credit.remainingBalance.amount;
     const paidAmount = totalAmount - remainingAmount;
@@ -96,7 +95,6 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
     const isAdmin = session.user.role !== "client"
     return (
         <div className="space-y-6">
-            {/* Card principale - Statut */}
             <Card className={`${config.bgColor} border-2 ${config.borderColor}`}>
                 <CardContent className="p-6">
                     <div className="flex justify-between items-start mb-4">
@@ -244,7 +242,6 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             </div>
                         </CardContent>
                     </Card>)}
-            {/* Progression du remboursement */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -324,7 +321,6 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
             </Card>
 
 
-            {/* Détails du crédit */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -389,7 +385,6 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                 </CardContent >
             </Card >
 
-            {/* Détails de l'utilisateur */}
             {isAdmin && (
                 <>
                     < Card >
@@ -451,7 +446,6 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                         </CardContent>
                     </Card >
 
-                    {/* Détails du compte */}
                     < Card >
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">

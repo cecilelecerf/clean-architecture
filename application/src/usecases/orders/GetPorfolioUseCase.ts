@@ -58,10 +58,10 @@ export class GetPortfolioUseCase {
     }
 
     const ordersByISIN = executedOrders.reduce((acc, order) => {
-      if (!acc[order.actionId]) {
-        acc[order.actionId] = [];
+      if (!acc[order.ISIN]) {
+        acc[order.ISIN] = [];
       }
-      acc[order.actionId].push(order);
+      acc[order.ISIN].push(order);
       return acc;
     }, {} as Record<string, typeof executedOrders>);
 
@@ -76,7 +76,7 @@ export class GetPortfolioUseCase {
         ISIN: action.ISIN,
         symbol: action.symbol,
         name: action.name,
-        currentPrice: action.currentPrice,
+        price: action.price,
         orders,
       });
 

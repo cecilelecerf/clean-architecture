@@ -132,9 +132,7 @@ export class UpdateActionUsecase {
     const total = action.currentPrice.multiply(order.quantity);
     if (total instanceof Error) return total;
 
-    const userAccount = await this.accountRepository.findByIBAN(
-      order.accountIban
-    );
+    const userAccount = await this.accountRepository.findByIBAN(order.IBAN);
     if (!userAccount) return new AccountNotFoundError();
 
     const bankAccount = await this.accountRepository.findBankInterestAccount();
@@ -148,7 +146,7 @@ export class UpdateActionUsecase {
     if (totalConvert instanceof Error) return totalConvert;
     const transaction = TransactionEntity.create({
       id: this.uuidService.generate(),
-      fromAccountId: order.accountIban,
+      fromAccountId: order.IBAN,
       toAccountId: bankAccount.iban,
       amount: totalConvert,
       label: `Achat ${order.quantity} action(s) ${action.symbol}`,

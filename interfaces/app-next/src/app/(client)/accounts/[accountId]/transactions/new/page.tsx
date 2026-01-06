@@ -33,7 +33,6 @@ export default function NewTransactionPage() {
   const { accountId } = useParams<{ accountId: AccountId }>();
   const router = useRouter();
 
-  // Récupérer la liste des comptes
   const accountsQuery = useQuery(endpoints.accounts.getAllByMe());
 
   const [formData, setFormData] = useState<Partial<NewTransaction> & { fromAccountIban: AccountId }>({ fromAccountIban: accountId });

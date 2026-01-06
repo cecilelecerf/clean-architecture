@@ -25,9 +25,9 @@ export type MonthlySchedule = {
 
 export enum CreditStatus {
   PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED", // Crédit en cours de paiement
+  ACCEPTED = "ACCEPTED",
   REFUSED = "REFUSED",
-  COMPLETED = "COMPLETED", // Crédit avec remboursement terminé
+  COMPLETED = "COMPLETED",
 }
 
 export class CreditEntity {
@@ -331,8 +331,6 @@ export class CreditEntity {
     }
     return new InvalidCreditStatusError(status);
   }
-
-  // ✅ Alternative : fonction qui retourne le status validé ou une erreur
 }
 
 export type CreditDTO = {

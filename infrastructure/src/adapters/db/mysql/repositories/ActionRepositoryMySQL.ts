@@ -11,19 +11,18 @@ export class ActionRepositoryMySQL implements ActionRepository {
   constructor(private readonly client: MySQLClient) {}
 
   private mapRowToAction(row: RowDataPacket): ActionEntity {
-    const currentPrice = Money.from({
-      amount: row.current_price,
+    const price = Money.from({
+      amount: row.price,
       currency: row.currency,
     });
 
     return ActionEntity.from({
       ISIN: row.isin,
       name: row.name,
-      totalNb: row.total_nb,
       symbol: row.symbol,
       market: row.market,
       activitySector: row.activity_sector,
-      currentPrice,
+      price,
       isAvailable: !!row.is_available,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
@@ -34,17 +33,16 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async save(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO actions 
-        (isin, name, total_nb, symbol, market, activity_sector, current_price, currency, is_available, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (isin, name,  symbol, market, activity_sector, price, currency, is_available, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         action.ISIN,
         action.name,
-        action.totalNb,
         action.symbol,
         action.market,
         action.activitySector,
-        action.currentPrice.amount,
-        action.currentPrice.currency,
+        action.price.amount,
+        action.price.currency,
         action.isAvailable ? 1 : 0,
         action.createdAt,
         action.updatedAt,
@@ -95,17 +93,16 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async update(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE actions 
-       SET name = ?, total_nb = ?, symbol = ?, market = ?, activity_sector = ?, 
-           current_price = ?, currency = ?, is_available = ?, updated_at = ? 
+       SET name = ?, symbol = ?, market = ?, activity_sector = ?, 
+           price = ?, currency = ?, is_available = ?, updated_at = ? 
        WHERE isin = ?`,
       [
         action.name,
-        action.totalNb,
         action.symbol,
         action.market,
         action.activitySector,
-        action.currentPrice.amount,
-        action.currentPrice.currency,
+        action.price.amount,
+        action.price.currency,
         action.isAvailable ? 1 : 0,
         action.updatedAt || new Date(),
         action.ISIN,
@@ -122,12 +119,12 @@ export class ActionRepositoryMySQL implements ActionRepository {
   }
 
   async getStatistics(isin: string, now: Date): Promise<ActionStatistics> {
-    const [currentPrice] = await this.client.query<RowDataPacket[]>(
-      `SELECT current_price FROM actions WHERE ISIN = ?`,
+    const priceRow = await this.client.query<RowDataPacket[]>(
+      `SELECT price FROM actions WHERE ISIN = ?`,
       [isin]
     );
 
-    const price = Number(currentPrice[0]?.current_price || 0);
+    const price = Number(priceRow[0]?.price || 0);
 
     const stats = await this.client.query<RowDataPacket[]>(
       `SELECT 

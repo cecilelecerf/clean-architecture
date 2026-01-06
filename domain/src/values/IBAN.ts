@@ -43,7 +43,7 @@ export class IBAN {
       .split("")
       .map((c) => {
         const code = c.charCodeAt(0);
-        if (code >= 65 && code <= 90) return (code - 55).toString(); // A=10, B=11 ...
+        if (code >= 65 && code <= 90) return (code - 55).toString();
         return c;
       })
       .join("");

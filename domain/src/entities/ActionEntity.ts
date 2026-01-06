@@ -4,17 +4,21 @@ import {
   InvalidSymbolError,
   InvalidTotalNbError,
 } from "@domain/errors/action";
+import {
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
 import { Money } from "@domain/values/Money";
 
 export class ActionEntity {
   private constructor(
     public ISIN: string,
     public name: string,
-    public totalNb: number,
     public symbol: string,
     public market: string,
     public activitySector: string,
-    public currentPrice: Money,
+    public price: Money,
     public isAvailable: boolean,
     public createdAt: Date,
     public updatedAt: Date
@@ -51,16 +55,6 @@ export class ActionEntity {
     return trimmed;
   }
 
-  private static validateTotalNb(
-    totalNb: number
-  ): number | InvalidTotalNbError {
-    if (!Number.isInteger(totalNb) || totalNb <= 0) {
-      return new InvalidTotalNbError(totalNb);
-    }
-
-    return totalNb;
-  }
-
   private static validateMarket(market: string): string {
     return market.trim();
   }
@@ -72,22 +66,20 @@ export class ActionEntity {
   public static create({
     ISIN,
     name,
-    totalNb,
     symbol,
     market,
     activitySector,
-    currentPrice,
+    price,
     isAvailable,
     createdAt,
   }: Pick<
     ActionEntity,
     | "ISIN"
     | "name"
-    | "totalNb"
     | "symbol"
     | "market"
     | "activitySector"
-    | "currentPrice"
+    | "price"
     | "isAvailable"
     | "createdAt"
   >):
@@ -105,20 +97,16 @@ export class ActionEntity {
     const validatedSymbol = this.validateSymbol(symbol);
     if (validatedSymbol instanceof Error) return validatedSymbol;
 
-    const validatedTotalNb = this.validateTotalNb(totalNb);
-    if (validatedTotalNb instanceof Error) return validatedTotalNb;
-
     const validatedMarket = this.validateMarket(market);
     const validatedActivitySector = this.validateActivitySector(activitySector);
 
     return new ActionEntity(
       validatedISIN,
       validatedName,
-      validatedTotalNb,
       validatedSymbol,
       validatedMarket,
       validatedActivitySector,
-      currentPrice,
+      price,
       isAvailable,
       createdAt,
       createdAt
@@ -128,11 +116,10 @@ export class ActionEntity {
   public static from({
     ISIN,
     name,
-    totalNb,
     symbol,
     market,
     activitySector,
-    currentPrice,
+    price,
     isAvailable,
     createdAt,
     updatedAt,
@@ -140,11 +127,10 @@ export class ActionEntity {
     ActionEntity,
     | "ISIN"
     | "name"
-    | "totalNb"
     | "symbol"
     | "market"
     | "activitySector"
-    | "currentPrice"
+    | "price"
     | "isAvailable"
     | "createdAt"
     | "updatedAt"
@@ -152,11 +138,10 @@ export class ActionEntity {
     return new ActionEntity(
       ISIN,
       name,
-      totalNb,
       symbol,
       market,
       activitySector,
-      currentPrice,
+      price,
       isAvailable,
       createdAt,
       updatedAt
@@ -172,9 +157,23 @@ export class ActionEntity {
     this.updatedAt = now;
   }
 
-  public updatePrice({ newPrice, now }: { newPrice: Money; now: Date }): void {
-    this.currentPrice = newPrice;
+  updatePrice({
+    newPrice,
+    now,
+  }: {
+    newPrice: Money;
+    now: Date;
+  }):
+    | ActionEntity
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError
+    | MoneyCurrencyMissingError {
+    if (newPrice.currency !== this.price.currency) {
+      return new MoneyCurrencyMissingError(newPrice.currency);
+    }
+    this.price = newPrice;
     this.updatedAt = now;
+    return this;
   }
 
   update({
@@ -197,11 +196,10 @@ export class ActionEntity {
     now: Date;
   }) {
     if (name) this.name = name;
-    if (totalNb) this.totalNb = totalNb;
     if (symbol) this.symbol = symbol;
     if (market) this.market = market;
     if (activitySector) this.activitySector = activitySector;
-    if (price) this.currentPrice = price;
+    if (price) this.price = price;
     if (isAvailable !== undefined) {
       isAvailable ? this.enable({ now }) : this.disable({ now });
     }

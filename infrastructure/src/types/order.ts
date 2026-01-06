@@ -1,35 +1,32 @@
 import z from "zod";
 import { userIdSchema } from "./user";
-import { actionIdSchema } from "./action";
+import { actionIsinSchema } from "./action";
 import { moneySchema } from "./money";
+import { accountIdSchema } from "./account";
 
 export const orderIdSchema = z.uuid().brand("order");
 export type OrderId = z.infer<typeof orderIdSchema>;
 
 export const orderSchema = z.object({
   id: orderIdSchema,
-  userId: userIdSchema,
-  actionId: actionIdSchema,
+  IBAN: accountIdSchema,
+  ISIN: actionIsinSchema,
   type: z.enum(["buy", "sell"]),
-  quantity: z.number().nonnegative(),
+  quantity: z.number().int().nonnegative(),
   price: moneySchema,
-  fee: moneySchema,
-  date: z.iso.datetime(),
+  date: z.iso.datetime().optional(),
   status: z.enum(["pending", "executed", "cancelled"]),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime().optional(),
 });
+export type Order = z.infer<typeof orderSchema>;
 
-export const orderDTOSchema = orderSchema.pick({
-  id: true,
-  type: true,
+export const buyActionSchema = orderSchema.pick({
   quantity: true,
+  IBAN: true,
   price: true,
-  fee: true,
-  date: true,
-  status: true,
-  actionId: true,
 });
+export type BuyAction = z.infer<typeof buyActionSchema>;
 
 export const portfolioPositionSchema = z.object({
   ISIN: z.string(),

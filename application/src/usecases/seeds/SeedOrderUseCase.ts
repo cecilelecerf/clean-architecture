@@ -14,12 +14,12 @@ export interface SeedOrderRequest {
   type: "buy" | "sell";
   quantity: number;
   price: number;
-  fee: number;
   currency: string;
   date: Date;
   status: "pending" | "executed" | "cancelled";
   createdAt?: Date;
   updatedAt?: Date;
+  transactionId?: string;
 }
 
 export class SeedOrderUseCase {
@@ -40,52 +40,61 @@ export class SeedOrderUseCase {
       throw new Error(`Invalid price: ${request.price}`);
     }
 
-    const fee = Money.create({
-      amount: request.fee,
-      currency: request.currency,
-    });
-    if (fee instanceof Error) {
-      throw new Error(`Invalid fee: ${request.fee}`);
-    }
-
     const clientAccount = await this.accountRepository.findByUserId(
       request.userId
     );
-    const bankAccount = await this.accountRepository.findBankInterestAccount();
-    if (!bankAccount) {
-      throw new BankInterestAccountNotFoundError();
+    if (!clientAccount || clientAccount.length === 0) {
+      throw new Error(`User account not found for userId: ${request.userId}`);
     }
 
-    const amount = price.multiply(request.quantity);
-    if (amount instanceof Error) throw new Error(`Invalid amount: ${amount}`);
-
     const now = this.clockService.now();
-    const transaction = TransactionEntity.from({
-      id: this.uuidService.generate(),
-      label: "Achat d'action",
-      icon: "",
-      toAccountId: bankAccount.iban,
-      fromAccountId: clientAccount[0].iban,
-      amount,
-      date: request.date,
-    });
+    let transactionId: string | undefined;
+
+    if (request.status === "executed") {
+      const bankAccount =
+        await this.accountRepository.findBankInterestAccount();
+      if (!bankAccount) {
+        throw new BankInterestAccountNotFoundError();
+      }
+
+      const amount = price.multiply(request.quantity);
+      if (amount instanceof Error) {
+        throw new Error(`Invalid amount calculation`);
+      }
+
+      const transaction = TransactionEntity.from({
+        id: request.transactionId ?? this.uuidService.generate(),
+        label:
+          request.type === "buy"
+            ? `Achat ${request.quantity} action(s)`
+            : `Vente ${request.quantity} action(s)`,
+        icon: request.type === "buy" ? "📈" : "📉",
+        fromAccountId:
+          request.type === "buy" ? clientAccount[0].iban : bankAccount.iban,
+        toAccountId:
+          request.type === "buy" ? bankAccount.iban : clientAccount[0].iban,
+        amount,
+        date: request.date,
+      });
+
+      await this.transactionRepository.save(transaction);
+      transactionId = transaction.id;
+    }
 
     const order = OrderEntity.from({
       id: this.uuidService.generate(),
-      accountIban: clientAccount[0].iban,
-      actionId: request.actionId,
+      IBAN: clientAccount[0].iban,
+      ISIN: request.actionId,
       type: request.type,
       quantity: request.quantity,
       price,
-      fee,
       date: request.date,
       status: request.status,
       createdAt: request.createdAt ?? now,
       updatedAt: request.updatedAt ?? now,
-      transactionId: transaction.id,
+      transactionId,
     });
 
-    await this.transactionRepository.save(transaction);
     await this.orderRepository.save(order);
     return order;
   }

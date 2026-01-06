@@ -2,17 +2,16 @@ import z from "zod";
 import { moneySchema } from "./money";
 import { accountIdSchema } from "./account";
 
-export const actionIdSchema = z.string().brand("action");
-export type ActionId = z.infer<typeof actionIdSchema>;
+export const actionIsinSchema = z.string().brand("action");
+export type ActionId = z.infer<typeof actionIsinSchema>;
 
 export const actionSchema = z.object({
-  ISIN: actionIdSchema,
+  ISIN: actionIsinSchema,
   name: z.string().min(1),
-  totalNb: z.number().nonnegative(),
   symbol: z.string().min(1),
   market: z.string().min(1),
   activitySector: z.string().min(1),
-  currentPrice: moneySchema,
+  price: moneySchema,
   isAvailable: z.boolean(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
@@ -25,22 +24,13 @@ export const actionPriceHistorySchema = z.object({
   volume: z.number().int().nonnegative(),
 });
 
-export const buyActionSchema = z.object({
-  quantity: z.number().int().positive(),
-  accountId: accountIdSchema,
-  limitPrice: moneySchema.optional(),
-  scheduledFor: z.iso.datetime().optional(),
-});
-export type BuyAction = z.infer<typeof buyActionSchema>;
-
 export const newActionSchema = actionSchema.pick({
   ISIN: true,
   name: true,
-  totalNb: true,
   symbol: true,
   market: true,
   activitySector: true,
-  currentPrice: true,
+  price: true,
   isAvailable: true,
 });
 export type NewAction = z.infer<typeof newActionSchema>;

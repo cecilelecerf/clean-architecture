@@ -20,7 +20,7 @@ import {
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
 import { Money } from "@domain/values/Money";
-
+// TODO : Create default order
 interface Props {
   userId: string;
   ISIN: string;
@@ -84,11 +84,10 @@ export class CreateActionUsecase {
     const action = ActionEntity.create({
       ISIN,
       name,
-      totalNb,
       symbol,
       market,
       activitySector,
-      currentPrice: price,
+      price,
       isAvailable,
       createdAt: today,
     });
