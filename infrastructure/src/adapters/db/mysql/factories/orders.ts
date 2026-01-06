@@ -51,10 +51,10 @@ export const orderFactory = () => {
     accountRepo,
     userRepository,
     orderRepository,
-    transactionRepo,
     uuidService,
     clockService,
-    moneyConvertorService
+    moneyConvertorService,
+    transactionRepo
   );
   const cancelledOrder = new CancelledOrderUsecase(
     userRepository,

@@ -3,9 +3,9 @@ import { OrderRepository } from "@application/ports/repositories/OrderRepository
 import { ClockService } from "@application/ports/services/ClockService";
 import { MoneyConverter } from "@domain/services/MoneyConverter";
 import { ActionStatisticsService } from "@domain/services/ActionStatisticsService";
-import { ActionEntity } from "@domain/entities/ActionEntity";
+import { ActionDTO, ActionEntity } from "@domain/entities/ActionEntity";
 
-type ActionSuggestion = ActionEntity & {
+type ActionSuggestion = ActionDTO & {
   priceChange7d?: number;
 };
 
@@ -34,7 +34,7 @@ export class GetActionSuggestionsUseCase {
 
     const validSuggestions = suggestionsWithStats.filter(
       (stat) => !(stat instanceof Error)
-    ) as Array<ActionEntity & { priceChange7d?: number; _volatility: number }>;
+    ) as Array<ActionDTO & { priceChange7d?: number; _volatility: number }>;
 
     const sorted = validSuggestions
       .sort((a, b) => b._volatility - a._volatility)
@@ -46,7 +46,7 @@ export class GetActionSuggestionsUseCase {
   private async enrichWithStats(
     action: ActionEntity
   ): Promise<
-    (ActionEntity & { priceChange7d?: number; _volatility: number }) | Error
+    (ActionDTO & { priceChange7d?: number; _volatility: number }) | Error
   > {
     try {
       const now = this.clockService.now();
@@ -60,7 +60,7 @@ export class GetActionSuggestionsUseCase {
         );
 
       if (orders.length === 0) {
-        return Object.assign(action, {
+        return Object.assign(action.toDTO(), {
           priceChange7d: undefined,
           _volatility: 0,
         });
@@ -68,7 +68,7 @@ export class GetActionSuggestionsUseCase {
 
       const oldestPrice = ActionStatisticsService.getOldestPrice(orders);
       if (!oldestPrice) {
-        return Object.assign(action, {
+        return Object.assign(action.toDTO(), {
           priceChange7d: undefined,
           _volatility: 0,
         });
@@ -89,13 +89,13 @@ export class GetActionSuggestionsUseCase {
 
       const volatility = ActionStatisticsService.calculateVolatility(orders);
 
-      return Object.assign(action, {
+      return Object.assign(action.toDTO(), {
         priceChange7d: priceChange,
         _volatility: volatility,
       });
     } catch (error) {
       console.error(`Error enriching action ${action.ISIN}:`, error);
-      return Object.assign(action, {
+      return Object.assign(action.toDTO(), {
         priceChange7d: undefined,
         _volatility: 0,
       });

@@ -1,3 +1,3 @@
 export * from "./InvalidActionNameError";
-export * from "./InvalidTotalNbError";
+export * from "./InvalidQuantityError";
 export * from "./InvalidSymbolError";

@@ -5,7 +5,7 @@ import {
 import { ActionRepository } from "@application/ports/repositories/ActionRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { ActionEntity } from "@domain/entities/ActionEntity";
+import { ActionDTO } from "@domain/entities/ActionEntity";
 
 interface Props {
   userId: string;
@@ -21,12 +21,13 @@ export class GetAllActionsByAvailabilityUsecase {
   public async execute({
     userId,
     isAvailable,
-  }: Props): Promise<ActionEntity[] | UserNotFoundError | UserNotActiveError> {
+  }: Props): Promise<ActionDTO[] | UserNotFoundError | UserNotActiveError> {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    return this.actionRepository.findAllAvailable(
+    const actions = await this.actionRepository.findAllAvailable(
       user.hasRole({ role: "client" }) ? true : isAvailable
     );
+    return actions.map((action) => action.toDTO());
   }
 }

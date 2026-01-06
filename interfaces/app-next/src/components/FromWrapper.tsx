@@ -151,7 +151,8 @@ export default function FormWrapper({
           ))
           .with("select", () => (
             <Select
-              value={field.get as string}
+              value={field.get as string || undefined}
+              defaultValue={field.get as string}
               onValueChange={(value) => field.set(value)}
               disabled={loading || field.disabled}
             >
@@ -167,49 +168,6 @@ export default function FormWrapper({
               </SelectContent>
             </Select>
           ))
-          .with("creatable-select", () => {
-            const value = field.get as string;
-            const [isOpen, setIsOpen] = useState(false);
-
-            const filteredOptions =
-              field.options?.filter(option =>
-                option.label.toLowerCase().includes((value ?? '').toLowerCase())
-              ) || [];
-
-            const handleSelect = (val: string) => {
-              field.set(val);
-              setIsOpen(false);
-            };
-
-            return (
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder={field.placeholder ?? "Sélectionnez ou créez"}
-                  value={value ?? ''}
-                  onChange={(e) => {
-                    field.set(e.target.value);
-                    setIsOpen(true);
-                  }}
-                  disabled={loading || field.disabled}
-                />
-
-                {value && filteredOptions.length > 0 && (
-                  <div className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
-                    {filteredOptions.map((option, idx) => (
-                      <div
-                        key={idx}
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleSelect(option.value)}
-                      >
-                        {option.label}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })
           .with("checkbox", () => (
             <Flex gap="5" className="flex-wrap">
               {field.options?.map((option, idx) => (

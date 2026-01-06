@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { ActionId } from "@infrastructure/types/action";
 import FormWrapper, { FormSection } from "@/components/FromWrapper";
+import { match } from "ts-pattern";
 
 const actionSchema = {
     name: { min: 2, max: 100 },
@@ -25,7 +26,7 @@ const actionSchema = {
 export const ActionForm = ({ isin }: { isin?: ActionId }) => {
     const router = useRouter();
     const isEditMode = !!isin;
-
+    const [isInitialized, setIsInitialized] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         symbol: "",
@@ -40,14 +41,15 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState<"error" | "success">("error");
 
-    const query = useQuery({
+    const actionQuery = useQuery({
         ...endpoints.actions.get({ isin: isin! }),
         enabled: isEditMode,
     });
+    const currenciesQuery = useQuery(endpoints.currencies.getAll())
 
     useEffect(() => {
-        if (isEditMode && query.status === "success" && query.data) {
-            const action = query.data;
+        if (isEditMode && actionQuery.status === "success" && actionQuery.data) {
+            const action = actionQuery.data;
             setFormData({
                 name: action.name,
                 symbol: action.symbol,
@@ -58,7 +60,7 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                 quantity: 0
             });
         }
-    }, [isEditMode, query.status, query.data]);
+    }, [isEditMode, actionQuery.status, actionQuery.data]);
 
     const createMutation = useMutation(endpoints.actions.create());
 
@@ -84,15 +86,14 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
         }
 
         const totalNb = formData.quantity
-        if (isNaN(totalNb) || totalNb < actionSchema.totalNb.min) {
+        if (!isEditMode && (isNaN(totalNb) || totalNb < actionSchema.totalNb.min)) {
             newErrors.totalNb = "Le nombre d'actions doit être un entier positif";
         }
 
         const price = formData.price.amount
-        if (isNaN(price) || price < actionSchema.price.min) {
+        if (!isEditMode && (isNaN(price) || price < actionSchema.price.min)) {
             newErrors.price = "Le prix doit être un nombre positif";
         }
-        console.log(newErrors)
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -172,7 +173,7 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
             fields: [
                 {
                     label: "Marché",
-                    type: "select",
+                    type: "radio",
                     placeholder: "Sélectionnez un marché",
                     get: formData.market,
                     set: (value) => setFormData({ ...formData, market: value as string }),
@@ -256,11 +257,15 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                             }
                         }),
                     required: true,
-                    options: [
-                        { label: "EUR (€)", value: "EUR" },
-                        { label: "USD ($)", value: "USD" },
-                        { label: "GBP (£)", value: "GBP" },
-                    ],
+                    options: match(currenciesQuery)
+                        .with(({ status: "error" }), () => [])
+                        .with(({ status: "pending" }), () => [])
+                        .with(({ status: "success" }), ({ data: currencies }) => currencies.map((currency) => ({
+                            label: `${currency.code} - ${currency.name} (${currency.symbol})`,
+                            value: currency.code
+                        })))
+                        .exhaustive()
+
                 },
             ],
         }] : []),
@@ -286,7 +291,7 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
         },
     ];
 
-    if (isEditMode && query.status === "pending") {
+    if (isEditMode && actionQuery.status === "pending") {
         return (
             <div className="container mx-auto py-8 px-4">
                 <div className="max-w-3xl mx-auto">

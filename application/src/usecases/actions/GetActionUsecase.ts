@@ -6,7 +6,7 @@ import {
 import { ActionRepository } from "@application/ports/repositories/ActionRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { ActionEntity } from "@domain/entities/ActionEntity";
+import { ActionDTO, ActionEntity } from "@domain/entities/ActionEntity";
 import { InvalidISINError } from "@domain/errors/ISIN";
 import { ISIN } from "@domain/values/ISIN";
 
@@ -25,7 +25,7 @@ export class GetActionUsecase {
     userId,
     isin,
   }: Props): Promise<
-    | ActionEntity
+    | ActionDTO
     | ActionNotFoundError
     | UserNotFoundError
     | UserNotActiveError
@@ -38,6 +38,6 @@ export class GetActionUsecase {
     if (validateIsin instanceof Error) return validateIsin;
     const action = await this.actionRepository.findByISIN(validateIsin);
     if (!action) return new ActionNotFoundError();
-    return action;
+    return action.toDTO();
   }
 }

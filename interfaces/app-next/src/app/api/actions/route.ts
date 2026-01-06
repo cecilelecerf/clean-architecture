@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
       ...payload,
       priceAmount: payload.price.amount,
       priceCurrency: payload.price.currency,
+      totalNb: payload.quantity,
     });
 
     if (result instanceof Error) {
@@ -59,16 +60,9 @@ export async function POST(req: NextRequest) {
         { status: result.statusCode ?? 400 },
       );
     }
+    console.log(result);
 
-    return NextResponse.json(
-      actionSchema
-        .omit({ createdAt: true, updatedAt: true })
-        .extend({
-          createdAt: z.date(),
-          updatedAt: z.date().optional(),
-        })
-        .parse(result),
-    );
+    return NextResponse.json(actionSchema.parse(result));
   } catch (err) {
     console.error(err);
     return NextResponse.json(

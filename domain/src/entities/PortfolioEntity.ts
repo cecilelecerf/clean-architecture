@@ -26,12 +26,9 @@ export class PortfolioPositionEntity {
     ActionEntity,
     "name" | "ISIN" | "symbol" | "price"
   >) {
-    console.log("--------------- " + name + "-------------");
-    console.log(orders.length);
     let totalQuantity = 0;
     let totalInvested = 0;
     for (const order of orders) {
-      console.log(order);
       if (order.status !== "executed") continue;
       if (order.type === "buy") {
         totalQuantity += order.quantity;
@@ -41,11 +38,21 @@ export class PortfolioPositionEntity {
         const avgPrice = totalInvested / (totalQuantity + order.quantity);
         totalInvested -= avgPrice * order.quantity;
       }
-      console.log(totalQuantity);
     }
-    console.log(totalQuantity);
     if (totalQuantity <= 0) {
-      return null;
+      return new PortfolioPositionEntity(
+        ISIN,
+        symbol,
+        name,
+        totalQuantity,
+        0,
+        0,
+        currency,
+        0,
+        0,
+        0,
+        0
+      );
     }
 
     const averagePrice = totalInvested / totalQuantity;
@@ -69,4 +76,32 @@ export class PortfolioPositionEntity {
       Math.round(gainLossPercent * 100) / 100
     );
   }
+  public toDTO(): PortfolioPositionDTO {
+    return {
+      ISIN: this.ISIN.getValue(),
+      name: this.name,
+      quantity: this.quantity,
+      averagePrice: this.averagePrice,
+      currentPrice: this.currentPrice,
+      currency: this.currency,
+      totalInvested: this.totalInvested,
+      currentValue: this.currentValue,
+      gainLoss: this.gainLoss,
+      gainLossPercent: this.gainLossPercent,
+      symbol: this.symbol,
+    };
+  }
 }
+export type PortfolioPositionDTO = { ISIN: string } & Pick<
+  PortfolioPositionEntity,
+  | "symbol"
+  | "name"
+  | "quantity"
+  | "averagePrice"
+  | "currentPrice"
+  | "currency"
+  | "totalInvested"
+  | "currentValue"
+  | "gainLoss"
+  | "gainLossPercent"
+>;

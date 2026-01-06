@@ -8,12 +8,15 @@ import {
   UserNotActiveError,
   UserRoleMismatchError,
 } from "@application/errors/users";
-import { PortfolioPositionEntity } from "@domain/entities/PortfolioEntity";
+import {
+  PortfolioPositionDTO,
+  PortfolioPositionEntity,
+} from "@domain/entities/PortfolioEntity";
 import { ISIN } from "@domain/values/ISIN";
 import { InvalidISINError } from "@domain/errors/ISIN";
 
 type Portfolio = {
-  positions: PortfolioPositionEntity[];
+  positions: PortfolioPositionDTO[];
   totalValue: number;
   totalInvested: number;
   totalGainLoss: number;
@@ -105,7 +108,7 @@ export class GetPortfolioUseCase {
     positions.sort((a, b) => b.currentValue - a.currentValue);
 
     return {
-      positions,
+      positions: positions.map((position) => position.toDTO()),
       totalValue: Math.round(totalValue * 100) / 100,
       totalInvested: Math.round(totalInvested * 100) / 100,
       totalGainLoss: Math.round(totalGainLoss * 100) / 100,

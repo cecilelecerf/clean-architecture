@@ -9,7 +9,10 @@ import {
   UserRoleMismatchError,
 } from "@application/errors/users";
 import { ActionNotFoundError } from "@application/errors/actions";
-import { PortfolioPositionEntity } from "@domain/entities/PortfolioEntity";
+import {
+  PortfolioPositionDTO,
+  PortfolioPositionEntity,
+} from "@domain/entities/PortfolioEntity";
 import { ISIN } from "@domain/values/ISIN";
 import { InvalidISINError } from "@domain/errors/ISIN";
 
@@ -29,7 +32,7 @@ export class GetPortoflioByISINUseCase {
     userId,
     isin,
   }: Props): Promise<
-    | PortfolioPositionEntity
+    | PortfolioPositionDTO
     | null
     | UserNotFoundError
     | UserNotActiveError
@@ -53,7 +56,10 @@ export class GetPortoflioByISINUseCase {
         user.id,
         "executed"
       );
-
-    return PortfolioPositionEntity.create({ ...action, orders: actionOrders });
+    const position = PortfolioPositionEntity.create({
+      ...action,
+      orders: actionOrders,
+    });
+    return position.toDTO();
   }
 }

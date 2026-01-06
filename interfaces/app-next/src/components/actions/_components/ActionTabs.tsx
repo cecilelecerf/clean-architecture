@@ -15,31 +15,19 @@ import {
     BarChart3,
     LineChart as LineChartIcon,
 } from "lucide-react";
-import {
-    AreaChart,
-    Area,
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-} from "recharts";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Action, } from "@infrastructure/types/action";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { MyOrders } from "./MyOrder";
 import { ChartTab } from "./ChartTab";
+import clsx from "clsx";
 
 export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: boolean }) => {
     const statsQuery = useQuery(endpoints.actions.getStats({ isin: action.ISIN }));
 
     return (
         <Tabs defaultValue="overview" className="w-full">
-            <TabsList className={`grid w-full grid-cols-${isAdmin ? 3 : 4} mb-4`}>
+            <TabsList className={clsx(`grid w-full mb-4`, isAdmin ? "grid-cols-3" : "grid-cols-4")}>
                 <TabsTrigger value="overview" className="text-xs sm:text-sm">
                     <Activity className="w-4 h-4 mr-1 hidden sm:inline" />
                     Vue d'ensemble
@@ -110,8 +98,7 @@ export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: bool
                     </CardContent>
                 </Card>
             </TabsContent>
-            {isAdmin && (
-
+            {!isAdmin && (
                 <TabsContent value="my-order" className="space-y-4"><MyOrders action={action} /></TabsContent>
             )}
             {/* Chart Tab */}

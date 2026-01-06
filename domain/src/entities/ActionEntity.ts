@@ -1,7 +1,7 @@
 import {
   InvalidActionNameError,
   InvalidSymbolError,
-  InvalidTotalNbError,
+  InvalidQuantityError,
 } from "@domain/errors/action";
 import {
   MoneyAmountInvalidError,
@@ -21,7 +21,8 @@ export class ActionEntity {
     public price: Money,
     public isAvailable: boolean,
     public createdAt: Date,
-    public updatedAt: Date
+    public updatedAt: Date,
+    public defaultQuantity: number
   ) {}
 
   private static validateName(name: string): string | InvalidActionNameError {
@@ -51,6 +52,9 @@ export class ActionEntity {
   private static validateActivitySector(sector: string): string {
     return sector.trim();
   }
+  public static validateDefaultQuantity(quantity: number): boolean {
+    return quantity > 0;
+  }
 
   public static create({
     name,
@@ -60,6 +64,7 @@ export class ActionEntity {
     price,
     isAvailable,
     createdAt,
+    defaultQuantity,
   }: Pick<
     ActionEntity,
     | "name"
@@ -69,11 +74,12 @@ export class ActionEntity {
     | "price"
     | "isAvailable"
     | "createdAt"
+    | "defaultQuantity"
   >):
     | ActionEntity
     | InvalidActionNameError
     | InvalidSymbolError
-    | InvalidTotalNbError {
+    | InvalidQuantityError {
     const validatedName = this.validateName(name);
     if (validatedName instanceof Error) return validatedName;
 
@@ -82,6 +88,8 @@ export class ActionEntity {
 
     const validatedMarket = this.validateMarket(market);
     const validatedActivitySector = this.validateActivitySector(activitySector);
+    if (this.validateDefaultQuantity(defaultQuantity))
+      return new InvalidQuantityError(defaultQuantity);
 
     return new ActionEntity(
       ISIN.generate(),
@@ -92,7 +100,8 @@ export class ActionEntity {
       price,
       isAvailable,
       createdAt,
-      createdAt
+      createdAt,
+      defaultQuantity
     );
   }
 
@@ -106,6 +115,7 @@ export class ActionEntity {
     isAvailable,
     createdAt,
     updatedAt,
+    defaultQuantity,
   }: Pick<
     ActionEntity,
     | "ISIN"
@@ -117,6 +127,7 @@ export class ActionEntity {
     | "isAvailable"
     | "createdAt"
     | "updatedAt"
+    | "defaultQuantity"
   >) {
     return new ActionEntity(
       ISIN,
@@ -127,7 +138,8 @@ export class ActionEntity {
       price,
       isAvailable,
       createdAt,
-      updatedAt
+      updatedAt,
+      defaultQuantity
     );
   }
   public enable({ now }: { now: Date }): void {
@@ -161,20 +173,16 @@ export class ActionEntity {
 
   update({
     name,
-    totalNb,
     symbol,
     market,
     activitySector,
-    price,
     isAvailable,
     now,
   }: {
     name?: string;
-    totalNb?: number;
     symbol?: string;
     market?: string;
     activitySector?: string;
-    price?: Money;
     isAvailable?: boolean;
     now: Date;
   }) {
@@ -182,9 +190,67 @@ export class ActionEntity {
     if (symbol) this.symbol = symbol;
     if (market) this.market = market;
     if (activitySector) this.activitySector = activitySector;
-    if (price) this.price = price;
     if (isAvailable !== undefined) {
       isAvailable ? this.enable({ now }) : this.disable({ now });
     }
   }
+
+  /**
+   * Diminue la quantité disponible sur le marché primaire
+   */
+  decreaseAvailableQuantity(
+    quantity: number,
+    now: Date
+  ): ActionEntity | InvalidQuantityError {
+    if (quantity <= 0 || !Number.isInteger(quantity)) {
+      return new InvalidQuantityError(quantity);
+    }
+
+    if (quantity > this.defaultQuantity) {
+      return new InvalidQuantityError(quantity);
+    }
+
+    return new ActionEntity(
+      this.ISIN,
+      this.name,
+      this.symbol,
+      this.market,
+      this.activitySector,
+      this.price,
+      this.isAvailable,
+      this.createdAt,
+      now,
+      this.defaultQuantity - quantity
+    );
+  }
+
+  public toDTO(): ActionDTO {
+    return {
+      ISIN: this.ISIN.getValue(),
+      name: this.name,
+      activitySector: this.activitySector,
+      symbol: this.symbol,
+      market: this.market,
+      price: this.price,
+      isAvailable: this.isAvailable,
+      createdAt: this.createdAt.toISOString(),
+      updatedAt: this.updatedAt.toISOString(),
+      defaultQuantity: this.defaultQuantity,
+    };
+  }
 }
+
+export type ActionDTO = {
+  ISIN: string;
+  createdAt: string;
+  updatedAt: string;
+} & Pick<
+  ActionEntity,
+  | "activitySector"
+  | "name"
+  | "symbol"
+  | "market"
+  | "price"
+  | "isAvailable"
+  | "defaultQuantity"
+>;

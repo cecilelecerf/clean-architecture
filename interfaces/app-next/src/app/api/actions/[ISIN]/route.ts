@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { newActionSchema, updateActionSchema } from '@infrastructure/types/action';
+import { updateActionSchema } from '@infrastructure/types/action';
 import { actionFactory } from '@infrastructure/adapters/db/mysql/factories/action';
 
 export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/actions/[ISIN]'>) {
@@ -17,7 +17,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/actions/[I
     const payload = updateActionSchema.parse(body);
     const result = await actionFactory().admin.updateAction.execute({
       userId: session.user.id,
-      ISIN,
+      isin: ISIN,
       ...payload,
     });
 
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<'/api/actions/[ISI
 
     const result = await actionFactory().getAction.execute({
       userId: session.user.id,
-      ISIN,
+      isin: ISIN,
     });
 
     if (result instanceof Error) {

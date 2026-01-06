@@ -22,7 +22,7 @@ export async function POST(
     const result = await orderFactory().placeOrder.execute({
       userId: session.user.id,
       IBAN,
-      ISIN,
+      isin: ISIN,
       type: type as 'buy' | 'sell',
       quantity,
       price: price.amount,

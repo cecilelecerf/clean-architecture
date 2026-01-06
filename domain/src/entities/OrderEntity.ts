@@ -162,14 +162,13 @@ export class OrderEntity {
   }
   isCompatibleWith(otherOrder: OrderEntity): boolean {
     if (this.type === otherOrder.type) return false;
-
-    if (this.ISIN !== otherOrder.ISIN) return false;
-
+    if (!this.ISIN.equals(otherOrder.ISIN)) return false;
     const buyOrder = this.type === "buy" ? this : otherOrder;
     const sellOrder = this.type === "sell" ? this : otherOrder;
 
     const buyPrice = buyOrder.price;
     const sellPrice = sellOrder.price;
+    console.log(buyPrice.amount >= sellPrice.amount);
     return buyPrice.amount >= sellPrice.amount;
   }
   public markExecuted({
