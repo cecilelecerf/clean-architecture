@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { match } from 'ts-pattern';
 import { Textarea } from './ui/textarea';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from './ui/label';
-import { AlertCircle, Calendar, CheckCircle2, Mail, User, Lock, DollarSign, ArrowLeft } from 'lucide-react';
+import { AlertCircle, Calendar, CheckCircle2, Mail, User, Lock, DollarSign, ArrowLeft, LucideIcon, Phone } from 'lucide-react';
 import { ButtonLoading } from './buttons/ButtonLoading';
 import { Flex } from '@radix-ui/themes';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
@@ -22,10 +22,11 @@ import {
 } from '@/components/ui/select';
 import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
+import clsx from 'clsx';
 
 export type FormField = {
   label: string;
-  type?: "text" | "email" | "textarea" | "password" | "date" | "checkbox" | "radio" | "select" | "creatable-select" | "number" | "other" | "icon";
+  type?: "text" | "email" | "textarea" | "password" | "date" | "checkbox" | "radio" | "select" | "creatable-select" | "number" | "other" | "icon" | "tel";
   placeholder?: string;
   get: string | string[] | number;
   set: (e: string | string[] | number) => void;
@@ -39,6 +40,8 @@ export type FormField = {
   };
   description?: string;
   required?: boolean;
+  icon?: LucideIcon
+  withIcon?: boolean
 };
 
 export type FormSection = {
@@ -62,7 +65,8 @@ interface FormWrapperProps {
   showBackButton?: boolean;
 }
 
-const getFieldIcon = (type?: string) => {
+const getFieldIcon = (icon?: LucideIcon, type?: string) => {
+  if (icon) return icon
   switch (type) {
     case 'email':
       return Mail;
@@ -72,6 +76,8 @@ const getFieldIcon = (type?: string) => {
       return Calendar;
     case 'number':
       return DollarSign;
+    case 'tel':
+      return Phone;
     case 'text':
     default:
       return User;
@@ -106,7 +112,7 @@ export default function FormWrapper({
   };
 
   const renderField = (field: FormField, index: number) => {
-    const Icon = getFieldIcon(field.type);
+    const Icon = getFieldIcon(field.icon, field.type);
 
     return (
       <Field key={index}>
@@ -134,7 +140,7 @@ export default function FormWrapper({
           ))
           .with("number", () => (
             <div className="relative">
-              <Icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              {(field.withIcon || field.icon) && <Icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />}
               <Input
                 type="number"
                 required={field.required}
@@ -142,10 +148,24 @@ export default function FormWrapper({
                 onChange={(e) => field.set(e.target.value)}
                 placeholder={field.placeholder}
                 disabled={loading || field.disabled}
-                className="pl-10"
+                className={clsx((field.withIcon || field.icon) && "pl-10")}
                 min={field.numberOptions?.min}
                 max={field.numberOptions?.max}
                 step={field.numberOptions?.step ?? 1}
+              />
+            </div>
+          ))
+          .with("tel", () => (
+            <div className="relative">
+              {(field.withIcon || field.icon) && <Icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />}
+              <Input
+                type="tel"
+                required={field.required}
+                value={field.get as string}
+                onChange={(e) => field.set(e.target.value)}
+                placeholder={field.placeholder}
+                disabled={loading || field.disabled}
+                className={clsx((field.withIcon || field.icon) && "pl-10")}
               />
             </div>
           ))
@@ -236,7 +256,7 @@ export default function FormWrapper({
           .with("other", () => field.layout)
           .otherwise(() => (
             <div className="relative">
-              <Icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              {(field.withIcon || field.icon) && <Icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />}
               <Input
                 type={field.type ?? 'text'}
                 required={field.required}
@@ -244,7 +264,7 @@ export default function FormWrapper({
                 onChange={(e) => field.set(e.target.value)}
                 placeholder={field.placeholder}
                 disabled={loading || field.disabled}
-                className="pl-10"
+                className={clsx((field.withIcon || field.icon) && "pl-10")}
                 min={field.numberOptions?.min}
                 max={field.numberOptions?.max}
               />

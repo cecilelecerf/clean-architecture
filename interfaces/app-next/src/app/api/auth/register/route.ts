@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { userSchema } from '@infrastructure/types/user';
+import { clientSchema, userSchema } from '@infrastructure/types/user';
 import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
 import z from 'zod';
 
 const clientUrl = process.env.NEXT_PUBLIC_CLIENT_URL;
 
-const reqSchema = userSchema
-  .pick({ firstname: true, lastname: true, email: true })
-  .extend({ plainedPassword: z.string() });
+const reqSchema = clientSchema
+  .pick({
+    firstname: true,
+    lastname: true,
+    email: true,
+    address: true,
+    dateOfBirth: true,
+    phoneNumber: true,
+    sexe: true,
+  })
+  .extend({ plainedPassword: z.string(), confirmPlainedPassword: z.string() });
 export type RegisterPayload = z.infer<typeof reqSchema>;
 
 export type RegisterResponse = z.infer<typeof userSchema>;

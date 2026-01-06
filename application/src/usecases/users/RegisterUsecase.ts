@@ -11,16 +11,45 @@ import { UuidService } from "@application/ports/services/UuidService";
 import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import {
-  InvalidFirstnameError,
-  InvalidLastnameError,
+  AddressMissingNumberError,
+  AddressRequiredError,
+  AddressTooLongError,
+  AddressTooShortError,
+  CityInvalidCharactersError,
+  CityRequiredError,
+  CityTooLongError,
+  CityTooShortError,
+  CountryInvalidCharactersError,
+  CountryRequiredError,
+  CountryTooLongError,
+  CountryTooShortError,
+  DateOfBirthInFutureError,
+  DateOfBirthRequiredError,
+  DateOfBirthTooOldError,
+  InvalidDateOfBirthError,
+  InvalidPhoneNumberError,
+  InvalidSexeError,
+  PhoneNumberRequiredError,
+  PostalCodeInvalidCharactersError,
+  PostalCodeRequiredError,
+  PostalCodeTooLongError,
+  PostalCodeTooShortError,
+  SexeRequiredError,
+  UserTooYoungError,
 } from "@domain/errors/user";
+import { InvalidFirstnameError } from "@domain/errors/user/InvalidFirstnameError";
+import { InvalidLastnameError } from "@domain/errors/user/InvalidLastnameError";
 import { Email } from "@domain/values/Email";
 
 type Props = {
   plainedPassword: string;
   email: string;
   confirmationUrl: string;
-} & Pick<UserEntity, "firstname" | "lastname">;
+  sexe: string;
+  dateOfBirth: string;
+} & Required<
+  Pick<UserEntity, "firstname" | "lastname" | "address" | "phoneNumber">
+>;
 
 export class RegisterUsecase {
   public constructor(
@@ -38,6 +67,10 @@ export class RegisterUsecase {
     email,
     plainedPassword,
     confirmationUrl,
+    address,
+    phoneNumber,
+    dateOfBirth,
+    sexe,
   }: Props): Promise<
     | UserToDTO
     | EmailInvalidFormatError
@@ -45,6 +78,31 @@ export class RegisterUsecase {
     | UserNotFoundError
     | InvalidFirstnameError
     | InvalidLastnameError
+    | PhoneNumberRequiredError
+    | InvalidPhoneNumberError
+    | SexeRequiredError
+    | InvalidSexeError
+    | DateOfBirthRequiredError
+    | InvalidDateOfBirthError
+    | DateOfBirthInFutureError
+    | DateOfBirthTooOldError
+    | UserTooYoungError
+    | AddressRequiredError
+    | AddressTooShortError
+    | AddressTooLongError
+    | AddressMissingNumberError
+    | CityRequiredError
+    | CityTooShortError
+    | CityTooLongError
+    | CityInvalidCharactersError
+    | CountryRequiredError
+    | CountryTooShortError
+    | CountryTooLongError
+    | CountryInvalidCharactersError
+    | PostalCodeRequiredError
+    | PostalCodeTooShortError
+    | PostalCodeTooLongError
+    | PostalCodeInvalidCharactersError
   > {
     const emailVO = Email.create(email);
     if (emailVO instanceof Error) return emailVO;
@@ -56,7 +114,7 @@ export class RegisterUsecase {
 
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
-
+    const date = new Date(dateOfBirth);
     const user = UserEntity.create({
       id,
       email: emailVO,
@@ -65,6 +123,10 @@ export class RegisterUsecase {
       passwordHash,
       createdAt,
       role: "client",
+      phoneNumber,
+      address,
+      sexe,
+      dateOfBirth: date,
     });
 
     if (user instanceof Error) return user;

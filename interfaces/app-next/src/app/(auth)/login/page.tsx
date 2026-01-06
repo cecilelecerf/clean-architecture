@@ -45,8 +45,8 @@ export default function LoginPage() {
       <FormWrapper
         title="Se connecter"
         fields={[
-          { get: email, set: (e) => setEmail(e as string), label: 'Email', type: 'email' },
-          { get: password, set: (e) => setPassword(e as string), label: 'Mot de passe', type: 'password' },
+          { get: email, set: (e) => setEmail(e as string), label: 'Email', type: 'email', withIcon: true, required: true },
+          { get: password, set: (e) => setPassword(e as string), label: 'Mot de passe', type: 'password', withIcon: true, required: true },
         ]}
         button="Connexion"
         loading={false}

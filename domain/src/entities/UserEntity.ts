@@ -1,13 +1,49 @@
 import {
-  InvalidLastnameError,
-  UserAlreadyBannedError,
-  UserCannotBanDirectorError,
-  UserCannotBanSelfError,
-  UserNotBannedError,
+  AddressMissingNumberError,
+  AddressRequiredError,
+  AddressTooLongError,
+  AddressTooShortError,
+  CityInvalidCharactersError,
+  CityRequiredError,
+  CityTooLongError,
+  CityTooShortError,
+  CountryInvalidCharactersError,
+  CountryRequiredError,
+  CountryTooLongError,
+  CountryTooShortError,
+  DateOfBirthInFutureError,
+  DateOfBirthRequiredError,
+  DateOfBirthTooOldError,
+  InvalidAddressError,
+  InvalidCityError,
+  InvalidCountryError,
+  InvalidDateOfBirthError,
+  InvalidPhoneNumberError,
+  InvalidPostalCodeError,
+  InvalidSexeError,
+  PhoneNumberRequiredError,
+  PostalCodeInvalidCharactersError,
+  PostalCodeRequiredError,
+  PostalCodeTooLongError,
+  PostalCodeTooShortError,
+  SexeRequiredError,
+  UserTooYoungError,
 } from "@domain/errors/user";
 import { InvalidFirstnameError } from "@domain/errors/user/InvalidFirstnameError";
+import { InvalidLastnameError } from "@domain/errors/user/InvalidLastnameError";
+import { UserAlreadyBannedError } from "@domain/errors/user/UserAlreadyBannedError";
+import { UserCannotBanDirectorError } from "@domain/errors/user/UserCannotBanDirectorError";
+import { UserCannotBanSelfError } from "@domain/errors/user/UserCannotBanSelfError";
 import { UserCannotUnbanDirectorError } from "@domain/errors/user/UserCannotUnbanDirectorError";
+import { UserNotBannedError } from "@domain/errors/user/UserNotBannedError";
 import { Email } from "@domain/values/Email";
+
+type Address = {
+  city: string;
+  country: string;
+  address: string;
+  postalCode: string;
+};
 
 export class UserEntity {
   private constructor(
@@ -20,6 +56,10 @@ export class UserEntity {
     public isActiveField: boolean,
     public createdAt: Date,
     public updatedAt: Date,
+    public phoneNumber?: string,
+    public sexe?: "girl" | "boy" | "other",
+    public address?: Address,
+    public dateOfBirth?: Date,
     public confirmedAt?: Date
   ) {}
 
@@ -34,6 +74,10 @@ export class UserEntity {
     confirmedAt,
     createdAt,
     updatedAt,
+    phoneNumber,
+    address,
+    dateOfBirth,
+    sexe,
   }: Pick<
     UserEntity,
     | "id"
@@ -46,6 +90,10 @@ export class UserEntity {
     | "createdAt"
     | "isActiveField"
     | "updatedAt"
+    | "address"
+    | "dateOfBirth"
+    | "phoneNumber"
+    | "sexe"
   >) {
     return new UserEntity(
       id,
@@ -57,6 +105,10 @@ export class UserEntity {
       isActiveField,
       createdAt,
       updatedAt,
+      phoneNumber,
+      sexe,
+      address,
+      dateOfBirth,
       confirmedAt
     );
   }
@@ -69,6 +121,10 @@ export class UserEntity {
     passwordHash,
     role,
     createdAt,
+    phoneNumber,
+    dateOfBirth,
+    address,
+    sexe,
   }: Pick<
     UserEntity,
     | "id"
@@ -79,11 +135,83 @@ export class UserEntity {
     | "role"
     | "confirmedAt"
     | "createdAt"
-  >): UserEntity | InvalidFirstnameError | InvalidLastnameError {
+    | "address"
+    | "dateOfBirth"
+    | "phoneNumber"
+  > & { sexe?: string }):
+    | UserEntity
+    | InvalidFirstnameError
+    | InvalidLastnameError
+    | PhoneNumberRequiredError
+    | InvalidPhoneNumberError
+    | SexeRequiredError
+    | InvalidSexeError
+    | DateOfBirthRequiredError
+    | InvalidDateOfBirthError
+    | DateOfBirthInFutureError
+    | DateOfBirthTooOldError
+    | UserTooYoungError
+    | AddressRequiredError
+    | AddressTooShortError
+    | AddressTooLongError
+    | AddressMissingNumberError
+    | CityRequiredError
+    | CityTooShortError
+    | CityTooLongError
+    | CityInvalidCharactersError
+    | CountryRequiredError
+    | CountryTooShortError
+    | CountryTooLongError
+    | CountryInvalidCharactersError
+    | PostalCodeRequiredError
+    | PostalCodeTooShortError
+    | PostalCodeTooLongError
+    | PostalCodeInvalidCharactersError {
     const firstnameStr = this.validateFirstname(firstname);
     if (firstnameStr instanceof Error) return firstnameStr;
     const lastnameStr = this.validateLastname(lastname);
     if (lastnameStr instanceof Error) return lastnameStr;
+    let mobile: string | undefined;
+    let dob: Date | undefined;
+    let validatedAddress: Address | undefined;
+    let validatedSexe: "girl" | "boy" | "other" | undefined;
+    if (role === "client") {
+      const tmpPhone = this.validatePhone(phoneNumber);
+      if (tmpPhone instanceof Error) return tmpPhone;
+      mobile = tmpPhone;
+
+      const tmpValidatedSexe = sexe ? this.validateSexe(sexe) : undefined;
+      if (tmpValidatedSexe instanceof Error) return tmpValidatedSexe;
+      validatedSexe = tmpValidatedSexe;
+
+      const tmpDob = dateOfBirth
+        ? this.validateDateOfBirth(dateOfBirth)
+        : undefined;
+      if (tmpDob instanceof Error) return tmpDob;
+      dob = tmpDob;
+
+      let tmpValidatedAddress: Address | undefined;
+      const addr = this.validateAddress(address?.address);
+      if (addr instanceof Error) return addr;
+
+      const c = this.validateCity(address?.city);
+      if (c instanceof Error) return c;
+
+      const ctr = this.validateCountry(address?.country);
+      if (ctr instanceof Error) return ctr;
+
+      const pc = this.validatePostalCode(address?.postalCode);
+      if (pc instanceof Error) return pc;
+
+      tmpValidatedAddress = {
+        address: addr!,
+        city: c!,
+        country: ctr!,
+        postalCode: pc!,
+      };
+
+      validatedAddress = tmpValidatedAddress;
+    }
     return new UserEntity(
       id,
       firstnameStr,
@@ -93,7 +221,11 @@ export class UserEntity {
       role,
       true,
       createdAt,
-      createdAt
+      createdAt,
+      phoneNumber,
+      validatedSexe,
+      validatedAddress,
+      dateOfBirth
     );
   }
   public update({
@@ -205,6 +337,219 @@ export class UserEntity {
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
     };
+  }
+  private static validatePhone(
+    phone: string | undefined
+  ): string | PhoneNumberRequiredError | InvalidPhoneNumberError {
+    if (!phone) return new PhoneNumberRequiredError();
+
+    const trimmed = phone.trim();
+    const cleaned = trimmed.replace(/[\s\-\(\)]/g, "");
+    const phoneRegex = /^(\+\d{1,3})?\d{7,15}$/;
+
+    if (!phoneRegex.test(cleaned)) {
+      return new InvalidPhoneNumberError();
+    }
+
+    return cleaned;
+  }
+
+  /**
+   * Valide le sexe/genre
+   */
+  private static validateSexe(
+    sexe: string | undefined
+  ): "girl" | "boy" | "other" | SexeRequiredError | InvalidSexeError {
+    if (!sexe) return new SexeRequiredError();
+
+    const normalized = sexe.trim().toLowerCase();
+    const validValues = ["girl", "boy", "other"];
+
+    if (!validValues.includes(normalized)) {
+      return new InvalidSexeError();
+    }
+
+    return normalized as "girl" | "boy" | "other";
+  }
+
+  /**
+   * Valide la date de naissance
+   */
+  private static validateDateOfBirth(
+    date: Date | string | undefined
+  ):
+    | Date
+    | DateOfBirthRequiredError
+    | InvalidDateOfBirthError
+    | DateOfBirthInFutureError
+    | DateOfBirthTooOldError
+    | UserTooYoungError {
+    if (!date) return new DateOfBirthRequiredError();
+
+    const parsedDate = typeof date === "string" ? new Date(date) : date;
+
+    if (isNaN(parsedDate.getTime())) {
+      return new InvalidDateOfBirthError();
+    }
+
+    const now = new Date();
+    const minDate = new Date(
+      now.getFullYear() - 150,
+      now.getMonth(),
+      now.getDate()
+    );
+
+    if (parsedDate > now) {
+      return new DateOfBirthInFutureError();
+    }
+
+    if (parsedDate < minDate) {
+      return new DateOfBirthTooOldError();
+    }
+
+    const minAgeDate = new Date(
+      now.getFullYear() - 18,
+      now.getMonth(),
+      now.getDate()
+    );
+    if (parsedDate > minAgeDate) {
+      return new UserTooYoungError();
+    }
+
+    return parsedDate;
+  }
+
+  /**
+   * Valide une adresse
+   */
+  private static validateAddress(
+    address: string | undefined
+  ):
+    | string
+    | AddressRequiredError
+    | AddressTooShortError
+    | AddressTooLongError
+    | AddressMissingNumberError {
+    if (!address) return new AddressRequiredError();
+
+    const trimmed = address.trim();
+
+    if (trimmed.length < 5) {
+      return new AddressTooShortError();
+    }
+
+    if (trimmed.length > 255) {
+      return new AddressTooLongError();
+    }
+
+    if (!/\d/.test(trimmed)) {
+      return new AddressMissingNumberError();
+    }
+
+    return trimmed;
+  }
+
+  /**
+   * Valide une ville
+   */
+  private static validateCity(
+    city: string | undefined
+  ):
+    | string
+    | CityRequiredError
+    | CityTooShortError
+    | CityTooLongError
+    | CityInvalidCharactersError {
+    if (!city) return new CityRequiredError();
+
+    const trimmed = city.trim();
+
+    if (trimmed.length < 2) {
+      return new CityTooShortError();
+    }
+
+    if (trimmed.length > 100) {
+      return new CityTooLongError();
+    }
+
+    const cityRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
+    if (!cityRegex.test(trimmed)) {
+      return new CityInvalidCharactersError();
+    }
+
+    const capitalized = trimmed
+      .split(/[\s\-]/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(trimmed.includes("-") ? "-" : " ");
+
+    return capitalized;
+  }
+
+  /**
+   * Valide un pays
+   */
+  private static validateCountry(
+    country: string | undefined
+  ):
+    | string
+    | CountryRequiredError
+    | CountryTooShortError
+    | CountryTooLongError
+    | CountryInvalidCharactersError {
+    if (!country) return new CountryRequiredError();
+
+    const trimmed = country.trim();
+
+    if (trimmed.length < 2) {
+      return new CountryTooShortError();
+    }
+
+    if (trimmed.length > 100) {
+      return new CountryTooLongError();
+    }
+
+    const countryRegex = /^[a-zA-ZÀ-ÿ\s]+$/;
+    if (!countryRegex.test(trimmed)) {
+      return new CountryInvalidCharactersError();
+    }
+
+    const capitalized = trimmed
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+    return capitalized;
+  }
+
+  /**
+   * Valide un code postal
+   */
+  private static validatePostalCode(
+    postalCode: string | undefined
+  ):
+    | string
+    | PostalCodeRequiredError
+    | PostalCodeTooShortError
+    | PostalCodeTooLongError
+    | PostalCodeInvalidCharactersError {
+    if (!postalCode) return new PostalCodeRequiredError();
+
+    const trimmed = postalCode.trim().toUpperCase();
+
+    if (trimmed.length < 3) {
+      return new PostalCodeTooShortError();
+    }
+
+    if (trimmed.length > 10) {
+      return new PostalCodeTooLongError();
+    }
+
+    const postalCodeRegex = /^[A-Z0-9\s\-]{3,10}$/;
+    if (!postalCodeRegex.test(trimmed)) {
+      return new PostalCodeInvalidCharactersError();
+    }
+
+    return trimmed;
   }
 }
 
