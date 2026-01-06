@@ -7,10 +7,12 @@ import { ActionRepository } from "@application/ports/repositories/ActionReposito
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { ActionEntity } from "@domain/entities/ActionEntity";
+import { InvalidISINError } from "@domain/errors/ISIN";
+import { ISIN } from "@domain/values/ISIN";
 
 interface Props {
   userId: string;
-  ISIN: string;
+  isin: string;
 }
 
 export class GetActionUsecase {
@@ -21,13 +23,20 @@ export class GetActionUsecase {
 
   public async execute({
     userId,
-    ISIN,
+    isin,
   }: Props): Promise<
-    ActionEntity | ActionNotFoundError | UserNotFoundError | UserNotActiveError
+    | ActionEntity
+    | ActionNotFoundError
+    | UserNotFoundError
+    | UserNotActiveError
+    | InvalidISINError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-    const action = await this.actionRepository.findByISIN(ISIN);
+
+    const validateIsin = ISIN.isValid(isin);
+    if (validateIsin instanceof Error) return validateIsin;
+    const action = await this.actionRepository.findByISIN(validateIsin);
     if (!action) return new ActionNotFoundError();
     return action;
   }

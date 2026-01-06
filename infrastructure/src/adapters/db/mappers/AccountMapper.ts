@@ -10,7 +10,6 @@ export class AccountMapper {
     prefix: string = ""
   ): AccountEntity {
     const iban = IBAN.from(row[`${prefix}iban`]);
-
     const balance = Money.from({
       amount: Number(row[`${prefix}balance`]),
       currency: row[`${prefix}currency`],

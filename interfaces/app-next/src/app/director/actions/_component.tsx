@@ -16,15 +16,10 @@ import { ActionId } from "@infrastructure/types/action";
 import FormWrapper, { FormSection } from "@/components/FromWrapper";
 
 const actionSchema = {
-    ISIN: {
-        min: 12,
-        max: 12,
-        pattern: /^[A-Z]{2}[A-Z0-9]{9}[0-9]$/,
-    },
     name: { min: 2, max: 100 },
     symbol: { min: 1, max: 10 },
     totalNb: { min: 1 },
-    currentPrice: { min: 0.01 },
+    price: { min: 0.01 },
 };
 
 export const ActionForm = ({ isin }: { isin?: ActionId }) => {
@@ -32,13 +27,12 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
     const isEditMode = !!isin;
 
     const [formData, setFormData] = useState({
-        ISIN: "" as ActionId,
         name: "",
         symbol: "",
         market: "",
         activitySector: "",
-        totalNb: 0,
-        currentPrice: { amount: 0, currency: "EUR" },
+        quantity: 0,
+        price: { amount: 0, currency: "EUR" },
         isAvailable: "true",
     });
 
@@ -55,14 +49,13 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
         if (isEditMode && query.status === "success" && query.data) {
             const action = query.data;
             setFormData({
-                ISIN: action.ISIN,
                 name: action.name,
                 symbol: action.symbol,
                 market: action.market,
                 activitySector: action.activitySector,
-                totalNb: action.totalNb,
-                currentPrice: { amount: action.price.amount, currency: action.price.currency, },
+                price: { amount: action.price.amount, currency: action.price.currency, },
                 isAvailable: action.isAvailable ? "true" : "false",
+                quantity: 0
             });
         }
     }, [isEditMode, query.status, query.data]);
@@ -73,12 +66,6 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
-        if (
-            !formData.ISIN.match(actionSchema.ISIN.pattern) ||
-            formData.ISIN.length !== 12
-        ) {
-            newErrors.ISIN = "Format ISIN invalide (12 caractères, ex: FR0000120271)";
-        }
 
         if (formData.name.length < actionSchema.name.min) {
             newErrors.name = `Le nom doit faire au moins ${actionSchema.name.min} caractères`;
@@ -96,14 +83,14 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
             newErrors.activitySector = "Le secteur d'activité est requis";
         }
 
-        const totalNb = formData.totalNb
+        const totalNb = formData.quantity
         if (isNaN(totalNb) || totalNb < actionSchema.totalNb.min) {
             newErrors.totalNb = "Le nombre d'actions doit être un entier positif";
         }
 
-        const price = formData.currentPrice.amount
-        if (isNaN(price) || price < actionSchema.currentPrice.min) {
-            newErrors.currentPrice = "Le prix doit être un nombre positif";
+        const price = formData.price.amount
+        if (isNaN(price) || price < actionSchema.price.min) {
+            newErrors.price = "Le prix doit être un nombre positif";
         }
         console.log(newErrors)
 
@@ -158,16 +145,6 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
             description: "Informations de base sur l'action",
             icon: FileText,
             fields: [
-                {
-                    label: "ISIN",
-                    type: "text",
-                    placeholder: "FR0000120271",
-                    get: formData.ISIN,
-                    set: (value) => setFormData({ ...formData, ISIN: value as ActionId }),
-                    disabled: isEditMode,
-                    required: true,
-                    description: errors.ISIN || "Code ISIN à 12 caractères (ex: FR0000120271)",
-                },
                 {
                     label: "Symbole",
                     type: "text",
@@ -233,41 +210,49 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                 },
             ],
         },
-        {
-            title: "Valeur",
-            description: "Informations financières",
+        ...(!isEditMode ? [{
+            title: "Valeur initiale",
+            description: "Informations financières de départ",
             icon: DollarSign,
             fields: [
                 {
                     label: "Nombre total d'actions",
-                    type: "number",
+                    type: "number" as const,
                     placeholder: "1000000",
-                    get: formData.totalNb,
-                    set: (value) => setFormData({ ...formData, totalNb: Array.isArray(value) ? Number(value[0]) : Number(value) }),
+                    get: formData.quantity,
+                    set: (value: string | string[]) =>
+                        setFormData({ ...formData, quantity: Array.isArray(value) ? Number(value[0]) : Number(value) }),
                     required: true,
                     numberOptions: { min: 1, step: 1 },
-                    description: errors.totalNb || "Nombre total d'actions disponibles",
+                    description: errors.quantity || "Nombre total d'actions disponibles",
                 },
                 {
-                    label: "Prix actuel",
-                    type: "number",
+                    label: "Prix initial",
+                    type: "number" as const,
                     placeholder: "150.00",
-                    get: formData.currentPrice.amount,
-                    set: (value) =>
-                        setFormData({ ...formData, currentPrice: { ...formData.currentPrice, amount: Number(value) } }),
+                    get: formData.price.amount,
+                    set: (value: string | string[]) =>
+                        setFormData({
+                            ...formData,
+                            price: {
+                                ...formData.price,
+                                amount: Array.isArray(value) ? Number(value[0]) : Number(value)
+                            }
+                        }),
                     required: true,
                     numberOptions: { min: 0.01, step: 0.01 },
-                    description: errors.currentPrice || "Prix unitaire de l'action",
+                    description: errors.currentPrice || "Prix unitaire initial de l'action",
                 },
                 {
                     label: "Devise",
-                    type: "select",
-                    get: formData.currentPrice.currency,
-                    set: (value) =>
+                    type: "select" as const,
+                    get: formData.price.currency,
+                    set: (value: string | string[]) =>
                         setFormData({
-                            ...formData, currentPrice: {
-                                ...formData.currentPrice, currency
-                                    : value as string,
+                            ...formData,
+                            price: {
+                                ...formData.price,
+                                currency: Array.isArray(value) ? value[0] : value,
                             }
                         }),
                     required: true,
@@ -278,7 +263,7 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                     ],
                 },
             ],
-        },
+        }] : []),
         {
             title: "Paramètres",
             description: "Configuration de disponibilité",

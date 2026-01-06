@@ -1,6 +1,5 @@
 import {
   InvalidActionNameError,
-  InvalidISINError,
   InvalidSymbolError,
   InvalidTotalNbError,
 } from "@domain/errors/action";
@@ -9,11 +8,12 @@ import {
   MoneyAmountNegativeError,
   MoneyCurrencyMissingError,
 } from "@domain/errors/money";
+import { ISIN } from "@domain/values/ISIN";
 import { Money } from "@domain/values/Money";
 
 export class ActionEntity {
   private constructor(
-    public ISIN: string,
+    public ISIN: ISIN,
     public name: string,
     public symbol: string,
     public market: string,
@@ -23,17 +23,6 @@ export class ActionEntity {
     public createdAt: Date,
     public updatedAt: Date
   ) {}
-
-  private static validateISIN(isin: string): string | InvalidISINError {
-    const trimmed = isin.trim().toUpperCase();
-    const isinRegex = /^[A-Z]{2}[A-Z0-9]{9}[0-9]$/;
-
-    if (!isinRegex.test(trimmed)) {
-      return new InvalidISINError(isin);
-    }
-
-    return trimmed;
-  }
 
   private static validateName(name: string): string | InvalidActionNameError {
     const trimmed = name.trim();
@@ -64,7 +53,6 @@ export class ActionEntity {
   }
 
   public static create({
-    ISIN,
     name,
     symbol,
     market,
@@ -74,7 +62,6 @@ export class ActionEntity {
     createdAt,
   }: Pick<
     ActionEntity,
-    | "ISIN"
     | "name"
     | "symbol"
     | "market"
@@ -84,13 +71,9 @@ export class ActionEntity {
     | "createdAt"
   >):
     | ActionEntity
-    | InvalidISINError
     | InvalidActionNameError
     | InvalidSymbolError
     | InvalidTotalNbError {
-    const validatedISIN = this.validateISIN(ISIN);
-    if (validatedISIN instanceof Error) return validatedISIN;
-
     const validatedName = this.validateName(name);
     if (validatedName instanceof Error) return validatedName;
 
@@ -101,7 +84,7 @@ export class ActionEntity {
     const validatedActivitySector = this.validateActivitySector(activitySector);
 
     return new ActionEntity(
-      validatedISIN,
+      ISIN.generate(),
       validatedName,
       validatedSymbol,
       validatedMarket,

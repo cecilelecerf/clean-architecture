@@ -46,9 +46,6 @@ import { generateNotifications } from "../../seeds/12_generateNotifications";
 import { generateBankAccounts } from "../../seeds/01B_generateBankAccounts";
 import { generateFormuleCredits } from "../../seeds/01C_generateFormulesCredit";
 import { FormuleCreditRepositoryMySQL } from "../repositories/FormuleCreditRepositoryMySQL";
-import { seedPriceHistory } from "../../seeds/09_generateActionHistories";
-import { SeedActionPriceHistoryUseCase } from "@application/usecases/seeds/SeedActionPriceHistoryUseCase";
-import { ActionPriceHistoryRepositoryMySQL } from "../repositories/ActionPriceHistoryRepositoryMySQL";
 import { generateCurrencies } from "../../seeds/00_seedCurrency";
 import { CurrencyRepositoryMySQL } from "../repositories/CurrencyRepositoryMySQL";
 
@@ -72,9 +69,7 @@ const all = async () => {
   const orderRepository = new OrderRepositoryMySQL(mysqlClient);
   const notificationRepository = new NotificationRepositoryMySQL(mysqlClient);
   const formuleRepository = new FormuleCreditRepositoryMySQL(mysqlClient);
-  const actionPriceRepository = new ActionPriceHistoryRepositoryMySQL(
-    mysqlClient
-  );
+
   const currencyRepo = new CurrencyRepositoryMySQL(mysqlClient);
 
   // 3. Initialiser les services
@@ -169,13 +164,6 @@ const all = async () => {
     clockService
   );
 
-  const seedActionPriceHistoryUsecase = new SeedActionPriceHistoryUseCase(
-    actionRepository,
-    actionPriceRepository,
-    uuidService,
-    clockService
-  );
-
   // 5. Exécuter les seeds
   await generateCurrencies(currencyRepo, clockService);
   const directors = await seedDirector(seedUserUseCase, clockService);
@@ -231,7 +219,6 @@ const all = async () => {
   );
 
   const actions = await generateActions(seedActionUseCase);
-  await seedPriceHistory(actions, clockService, seedActionPriceHistoryUsecase);
   await generateSavingsRate(seedSavingsRateUseCase);
 
   await generateOrders(clients, actions, seedOrderUseCase, clockService);

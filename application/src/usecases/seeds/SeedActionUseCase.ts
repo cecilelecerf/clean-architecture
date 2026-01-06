@@ -33,8 +33,7 @@ export class SeedActionUseCase {
 
     const now = this.clockService.now();
 
-    const action = ActionEntity.from({
-      ISIN: request.ISIN,
+    const action = ActionEntity.create({
       name: request.name,
       symbol: request.symbol,
       market: request.market,
@@ -42,8 +41,9 @@ export class SeedActionUseCase {
       price,
       isAvailable: request.isAvailable,
       createdAt: request.createdAt ?? now,
-      updatedAt: request.updatedAt ?? now,
     });
+    if (action instanceof Error)
+      throw new Error(`Invalid current price: ${request.price}`);
 
     await this.actionRepository.save(action);
     return action;

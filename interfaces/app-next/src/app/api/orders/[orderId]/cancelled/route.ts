@@ -1,20 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { actionFactory } from '@infrastructure/adapters/db/mysql/factories/action';
+import { orderFactory } from '@infrastructure/adapters/db/mysql/factories/orders';
 
-export async function GET(req: NextRequest, ctx: RouteContext<'/api/actions/[ISIN]'>) {
+export async function PATCH(
+  req: NextRequest,
+  ctx: RouteContext<'/api/orders/[orderId]/cancelled'>,
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    const { ISIN } = await ctx.params;
+    const { orderId } = await ctx.params;
 
-    const result = await actionFactory().getActionHistory.execute({
-      isin: ISIN,
+    const result = await orderFactory().cancelledOrder.execute({
+      userId: session.user.id,
+      orderId,
     });
-
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },

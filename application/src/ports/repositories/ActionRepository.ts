@@ -19,5 +19,8 @@ export interface ActionRepository {
   save(action: ActionEntity): Promise<void>;
   update(action: ActionEntity): Promise<void>;
   delete(isin: ActionEntity["ISIN"]): Promise<void>;
-  getStatistics(isin: string, now: Date): Promise<ActionStatistics>;
+  getStatistics(
+    isin: ActionEntity["ISIN"],
+    now: Date
+  ): Promise<ActionStatistics>;
 }

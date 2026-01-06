@@ -1,19 +1,12 @@
 import { ActionRepository } from "@application/ports/repositories/ActionRepository";
-import { ActionPriceHistoryRepository } from "@application/ports/repositories/ActionPriceHistoryRepository";
+import { OrderRepository } from "@application/ports/repositories/OrderRepository";
 import { ClockService } from "@application/ports/services/ClockService";
+import { MoneyConverter } from "@domain/services/MoneyConverter";
+import { ActionStatisticsService } from "@domain/services/ActionStatisticsService";
+import { ActionEntity } from "@domain/entities/ActionEntity";
 
-type ActionSuggestion = {
-  ISIN: string;
-  symbol: string;
-  name: string;
-  currentPrice: {
-    amount: number;
-    currency: string;
-  };
-  market: string;
-  activitySector: string;
-  priceChange?: number;
-  isAvailable: boolean;
+type ActionSuggestion = ActionEntity & {
+  priceChange7d?: number;
 };
 
 type Props = {
@@ -23,67 +16,89 @@ type Props = {
 export class GetActionSuggestionsUseCase {
   constructor(
     private readonly actionRepository: ActionRepository,
-    private readonly actionPriceHistoryRepository: ActionPriceHistoryRepository,
-    private readonly clockService: ClockService
+    private readonly orderRepository: OrderRepository,
+    private readonly clockService: ClockService,
+    private readonly moneyConverter: MoneyConverter
   ) {}
 
-  async execute({ limit = 5 }: Props): Promise<ActionSuggestion[]> {
-    const allActions = await this.actionRepository.findAll();
+  async execute({ limit = 5 }: Props): Promise<ActionSuggestion[] | Error> {
+    const allActions = await this.actionRepository.findAllAvailable(true);
 
-    const availableActions = allActions.filter((action) => action.isAvailable);
-
-    if (availableActions.length === 0) {
+    if (allActions.length === 0) {
       return [];
     }
 
     const suggestionsWithStats = await Promise.all(
-      availableActions.map(async (action) => {
-        try {
-          const history = await this.actionPriceHistoryRepository.findByISIN(
-            action.ISIN,
-            this.clockService.now(),
-            7
-          );
-
-          let priceChange: number | undefined = undefined;
-
-          if (history.length >= 2) {
-            const oldestPrice = history[0].price;
-            const currentPrice = action.currentPrice.amount;
-
-            if (oldestPrice > 0) {
-              priceChange = ((currentPrice - oldestPrice) / oldestPrice) * 100;
-              priceChange = Math.round(priceChange * 100) / 100;
-            }
-          }
-
-          return {
-            ...action,
-            _priceChangeAbs: priceChange ? Math.abs(priceChange) : 0,
-          };
-        } catch (error) {
-          return {
-            ISIN: action.ISIN,
-            symbol: action.symbol,
-            name: action.name,
-            currentPrice: {
-              amount: action.currentPrice.amount,
-              currency: action.currentPrice.currency,
-            },
-            market: action.market,
-            activitySector: action.activitySector,
-            priceChange: undefined,
-            isAvailable: action.isAvailable,
-            _priceChangeAbs: 0,
-          };
-        }
-      })
+      allActions.map((action) => this.enrichWithStats(action))
     );
 
-    const sorted = suggestionsWithStats
-      .sort((a, b) => b._priceChangeAbs - a._priceChangeAbs)
+    const validSuggestions = suggestionsWithStats.filter(
+      (stat) => !(stat instanceof Error)
+    ) as Array<ActionEntity & { priceChange7d?: number; _volatility: number }>;
+
+    const sorted = validSuggestions
+      .sort((a, b) => b._volatility - a._volatility)
       .slice(0, limit);
 
-    return sorted.map(({ _priceChangeAbs, ...suggestion }) => suggestion);
+    return sorted;
+  }
+
+  private async enrichWithStats(
+    action: ActionEntity
+  ): Promise<
+    (ActionEntity & { priceChange7d?: number; _volatility: number }) | Error
+  > {
+    try {
+      const now = this.clockService.now();
+      const startDate = this.clockService.addDays(now, -7);
+
+      const orders =
+        await this.orderRepository.findAllExecutedByISINAndDateRange(
+          action.ISIN,
+          startDate,
+          now
+        );
+
+      if (orders.length === 0) {
+        return Object.assign(action, {
+          priceChange7d: undefined,
+          _volatility: 0,
+        });
+      }
+
+      const oldestPrice = ActionStatisticsService.getOldestPrice(orders);
+      if (!oldestPrice) {
+        return Object.assign(action, {
+          priceChange7d: undefined,
+          _volatility: 0,
+        });
+      }
+
+      const convertedPrice = await this.moneyConverter.convert(
+        oldestPrice,
+        action.price.currency
+      );
+      if (convertedPrice instanceof Error) return convertedPrice;
+
+      const priceChange = ActionStatisticsService.calculatePriceChangePercent(
+        action.price,
+        convertedPrice
+      );
+
+      if (priceChange instanceof Error) return priceChange;
+
+      const volatility = ActionStatisticsService.calculateVolatility(orders);
+
+      return Object.assign(action, {
+        priceChange7d: priceChange,
+        _volatility: volatility,
+      });
+    } catch (error) {
+      console.error(`Error enriching action ${action.ISIN}:`, error);
+      return Object.assign(action, {
+        priceChange7d: undefined,
+        _volatility: 0,
+      });
+    }
   }
 }

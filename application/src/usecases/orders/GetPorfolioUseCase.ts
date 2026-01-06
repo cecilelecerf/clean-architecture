@@ -9,6 +9,8 @@ import {
   UserRoleMismatchError,
 } from "@application/errors/users";
 import { PortfolioPositionEntity } from "@domain/entities/PortfolioEntity";
+import { ISIN } from "@domain/values/ISIN";
+import { InvalidISINError } from "@domain/errors/ISIN";
 
 type Portfolio = {
   positions: PortfolioPositionEntity[];
@@ -33,9 +35,12 @@ export class GetPortfolioUseCase {
   async execute({
     userId,
   }: Props): Promise<
-    Portfolio | UserNotFoundError | UserNotActiveError | UserRoleMismatchError
+    | Portfolio
+    | UserNotFoundError
+    | UserNotActiveError
+    | UserRoleMismatchError
+    | InvalidISINError
   > {
-    console.log(userId);
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
     if (!user.hasRole({ role: "client" }))
@@ -58,10 +63,10 @@ export class GetPortfolioUseCase {
     }
 
     const ordersByISIN = executedOrders.reduce((acc, order) => {
-      if (!acc[order.ISIN]) {
-        acc[order.ISIN] = [];
+      if (!acc[order.ISIN.getValue()]) {
+        acc[order.ISIN.getValue()] = [];
       }
-      acc[order.ISIN].push(order);
+      acc[order.ISIN.getValue()].push(order);
       return acc;
     }, {} as Record<string, typeof executedOrders>);
 
@@ -69,7 +74,9 @@ export class GetPortfolioUseCase {
     let defaultCurrency = "EUR";
 
     for (const [isin, orders] of Object.entries(ordersByISIN)) {
-      const action = await this.actionRepository.findByISIN(isin);
+      const validateIsin = ISIN.isValid(isin);
+      if (validateIsin instanceof Error) return validateIsin;
+      const action = await this.actionRepository.findByISIN(validateIsin);
       if (!action) continue;
 
       const position = PortfolioPositionEntity.create({

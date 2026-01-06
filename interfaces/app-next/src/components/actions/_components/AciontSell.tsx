@@ -33,7 +33,7 @@ type Props = {
     closeSell: () => void;
 }
 export const ActionSellContainer = ({ action, closeSell, sellOpen }: Props) => {
-    const portfolioQuery = useQuery(endpoints.orders.portfolio.getByISIN({ ISIN: action.ISIN }))
+    const portfolioQuery = useQuery(endpoints.orders.actions.portfolio({ ISIN: action.ISIN }))
     return match(portfolioQuery)
         .with({ status: "error" }, () => "erro")
         .with(({ status: "pending" }), () => 'pending')

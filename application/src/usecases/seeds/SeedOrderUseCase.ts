@@ -4,13 +4,14 @@ import { OrderRepository } from "@application/ports/repositories/OrderRepository
 import { TransactionRepository } from "@application/ports/repositories/TransactionRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
+import { ActionEntity } from "@domain/entities/ActionEntity";
 import { OrderEntity } from "@domain/entities/OrderEntity";
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
 import { Money } from "@domain/values/Money";
 
 export interface SeedOrderRequest {
   userId: string;
-  actionId: string;
+  actionId: ActionEntity["ISIN"];
   type: "buy" | "sell";
   quantity: number;
   price: number;

@@ -53,26 +53,23 @@ export const ActionCard = ({ action, onClick }: ActionCardProps) => {
                                 {action.activitySector}
                             </Badge>
                         </div>
-
-
                     </div>
 
                     <div className="flex flex-col items-end gap-2">
                         <div className="text-right">
                             <p className="text-xl font-bold text-gray-900">
-                                {action.currentPrice.amount.toLocaleString("fr-FR", {
+                                {action.price.amount.toLocaleString("fr-FR", {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,
                                 })}
                             </p>
-                            <p className="text-xs text-gray-500">{action.currentPrice.currency}</p>
+                            <p className="text-xs text-gray-500">{action.price.currency}</p>
                         </div>
                         <ChevronRight className="w-5 h-5 text-gray-400" />
                     </div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-500">
                     <span>ISIN: {action.ISIN}</span>
-                    <span>{action.totalNb.toLocaleString("fr-FR")} actions</span>
                 </div>
             </CardContent>
         </Card>

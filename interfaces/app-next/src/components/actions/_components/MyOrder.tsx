@@ -11,11 +11,11 @@ import React from "react";
 
 export function MyOrders({ action }: { action: Action }) {
     const positionsQuery = useQuery(
-        endpoints.orders.portfolio.getByISIN({ ISIN: action.ISIN })
+        endpoints.orders.actions.portfolio({ ISIN: action.ISIN })
     );
 
     const orderQuery = useQuery(
-        endpoints.orders.actions.getAllByAction({ ISIN: action.ISIN, status: "pending" })
+        endpoints.orders.actions.getAllMeByAction({ ISIN: action.ISIN, status: "pending" })
     );
 
     return (

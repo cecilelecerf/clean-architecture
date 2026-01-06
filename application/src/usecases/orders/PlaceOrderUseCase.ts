@@ -41,11 +41,13 @@ import {
 } from "@domain/errors/transaction";
 import { SameAccountTransactionError } from "@domain/errors/transaction/SameAccountTransactionError";
 import { AccountNotFoundError } from "@application/errors/accounts";
+import { ISIN } from "@domain/values/ISIN";
+import { InvalidISINError } from "@domain/errors/ISIN";
 
 type PlaceOrderParams = {
   userId: string;
   IBAN: string;
-  ISIN: string;
+  isin: string;
   type: "buy" | "sell";
   quantity: number;
   price: number;
@@ -66,7 +68,7 @@ export class PlaceOrderUseCase {
   async execute({
     userId,
     IBAN: accountId,
-    ISIN,
+    isin,
     type,
     quantity,
     price,
@@ -86,10 +88,14 @@ export class PlaceOrderUseCase {
     | MoneyAmountNegativeError
     | InvalidQuantityError
     | AccountNotFoundError
+    | InvalidISINError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-    const action = await this.actionRepository.findByISIN(ISIN);
+
+    const validateIsin = ISIN.isValid(isin);
+    if (validateIsin instanceof Error) return validateIsin;
+    const action = await this.actionRepository.findByISIN(validateIsin);
     if (!action) return new ActionNotFoundError();
     if (!action.isAvailable) return new ActionNotAvailableError(action.ISIN);
 
@@ -110,7 +116,7 @@ export class PlaceOrderUseCase {
     const order = OrderEntity.create({
       id: this.uuidService.generate(),
       IBAN: accountIBAN,
-      ISIN,
+      ISIN: action.ISIN,
       type: type,
       quantity: quantity,
       price: moneyPrice,
@@ -122,14 +128,20 @@ export class PlaceOrderUseCase {
     await this.orderRepository.save(order);
 
     const matchResult = await this.tryMatchOrder(order, action);
+
+    if (matchResult.remainingOrder) {
+      let isMatch = true;
+      let remainingOrder: OrderEntity | undefined = matchResult.remainingOrder;
+      while (isMatch && remainingOrder) {
+        const newMatch = await this.tryMatchOrder(remainingOrder, action);
+        isMatch = newMatch.matched;
+        remainingOrder = newMatch.remainingOrder;
+      }
+    }
     if (matchResult.matched) {
       return matchResult.executedOrder!.toDTO();
     }
 
-    const message =
-      type === "buy"
-        ? `⏳ Order placed: will buy when price drops to ${order.price}€ or below`
-        : `⏳ Order placed: will sell when price rises to ${order.price}€ or above`;
     return order.toDTO();
   }
 
@@ -143,6 +155,7 @@ export class PlaceOrderUseCase {
     matched: boolean;
     executedOrder?: OrderEntity;
     executionPrice?: Money;
+    remainingOrder?: OrderEntity;
   }> {
     const oppositeType = newOrder.type === "buy" ? "sell" : "buy";
     // TODO : best method
@@ -190,6 +203,7 @@ export class PlaceOrderUseCase {
       matched: true,
       executedOrder: executed.newOrder,
       executionPrice,
+      remainingOrder: executed.remainingOrder,
     };
   }
 
@@ -203,7 +217,11 @@ export class PlaceOrderUseCase {
     quantity: number,
     action: ActionEntity
   ): Promise<
-    | { newOrder: OrderEntity; matchOrder: OrderEntity }
+    | {
+        newOrder: OrderEntity;
+        matchOrder: OrderEntity;
+        remainingOrder?: OrderEntity;
+      }
     | null
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
@@ -296,8 +314,9 @@ export class PlaceOrderUseCase {
       return null;
     }
 
+    let remainingOrder: OrderEntity | undefined;
     if (newOrder.quantity > quantity) {
-      const remainingOrder = OrderEntity.create({
+      const order = OrderEntity.create({
         id: this.uuidService.generate(),
         IBAN: newOrder.IBAN,
         ISIN: newOrder.ISIN,
@@ -307,8 +326,9 @@ export class PlaceOrderUseCase {
         createdAt: now,
       });
 
-      if (!(remainingOrder instanceof Error)) {
-        await this.orderRepository.save(remainingOrder);
+      if (!(order instanceof Error)) {
+        await this.orderRepository.save(order);
+        remainingOrder = order;
       }
     }
 
@@ -345,6 +365,7 @@ export class PlaceOrderUseCase {
     return {
       newOrder: executedNew,
       matchOrder: executedMatch,
+      remainingOrder: remainingOrder,
     };
   }
 }

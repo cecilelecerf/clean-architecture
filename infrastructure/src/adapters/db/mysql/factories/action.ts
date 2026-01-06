@@ -7,9 +7,6 @@ import { SystemClockService } from "@infrastructure/adapters/services/SystemCloc
 import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/actions/GetAllActionsByAvailabilityUseCase";
 import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
 import { GetActionUsecase } from "@application/usecases/actions/GetActionUsecase";
-import { GetActionStatisticsUsecase } from "@application/usecases/actions/GetActionStatisticsUsecase";
-import { GetActionPriceHistoryUsecase } from "@application/usecases/actions/GetActionPriceHistoryUsecase";
-import { ActionPriceHistoryRepositoryMySQL } from "../repositories/ActionPriceHistoryRepositoryMySQL";
 import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
 import { TransactionRepositoryMySQL } from "../repositories/TransactionRepositoryMySQL";
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
@@ -17,6 +14,7 @@ import { OrderRepositoryMySQL } from "../repositories/OrderRepositoryMySQL";
 import { GetActionSuggestionsUseCase } from "@application/usecases/actions/GetActionSuggestionsUseCase";
 import { MoneyConverterService } from "@infrastructure/adapters/services/MoneyConverterService";
 import { CurrencyRepositoryMySQL } from "../repositories/CurrencyRepositoryMySQL";
+import { GetActionStatisticsUseCase } from "@application/usecases/actions/GetActionStatisticsUsecase";
 
 export const actionFactory = () => {
   const client = new MySQLClient();
@@ -24,9 +22,7 @@ export const actionFactory = () => {
   const accountRepo = new AccountRepositoryMySQL(client);
   const transactionRepo = new TransactionRepositoryMySQL(client);
   const orderRepo = new OrderRepositoryMySQL(client);
-  const actionPriceHistoryRepository = new ActionPriceHistoryRepositoryMySQL(
-    client
-  );
+
   const currencyRepo = new CurrencyRepositoryMySQL(client);
   const userRepository = new UserRepositoryMySQL(client);
   const clockService = new SystemClockService();
@@ -55,20 +51,18 @@ export const actionFactory = () => {
     userRepository
   );
   const getAction = new GetActionUsecase(actionRepository, userRepository);
-  const getActionStat = new GetActionStatisticsUsecase(
+  const getActionStat = new GetActionStatisticsUseCase(
     actionRepository,
-    clockService
-  );
-  const getActionHistory = new GetActionPriceHistoryUsecase(
-    actionRepository,
-    actionPriceHistoryRepository,
-    clockService
+    orderRepo,
+    clockService,
+    moneyConvertorService
   );
 
   const suggestion = new GetActionSuggestionsUseCase(
     actionRepository,
-    actionPriceHistoryRepository,
-    clockService
+    orderRepo,
+    clockService,
+    moneyConvertorService
   );
 
   return {
@@ -79,7 +73,6 @@ export const actionFactory = () => {
     getAllActionsByAvailability,
     getAction,
     getActionStat,
-    getActionHistory,
     suggestion,
   };
 };

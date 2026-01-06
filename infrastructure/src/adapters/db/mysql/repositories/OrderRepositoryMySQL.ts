@@ -1,11 +1,16 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
-import { OrderRepository } from "@application/ports/repositories/OrderRepository";
+import {
+  OrderEntityWithAccount,
+  OrderRepository,
+} from "@application/ports/repositories/OrderRepository";
 import { OrderEntity } from "@domain/entities/OrderEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { Money } from "@domain/values/Money";
 import { IBAN } from "@domain/values/IBAN";
+import { AccountMapper } from "../../mappers/AccountMapper";
+import { ISIN } from "@domain/values/ISIN";
 
 export class OrderRepositoryMySQL implements OrderRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -14,7 +19,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
     return OrderEntity.from({
       id: row.id,
       IBAN: IBAN.from(row.account_iban),
-      ISIN: row.action_isin,
+      ISIN: ISIN.from(row.action_isin),
       type: row.type,
       quantity: row.quantity,
       price: Money.from({
@@ -56,7 +61,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
       [
         order.id,
         order.IBAN.value,
-        order.ISIN,
+        order.ISIN.getValue(),
         order.type,
         order.quantity,
         order.price.amount,
@@ -81,7 +86,34 @@ export class OrderRepositoryMySQL implements OrderRepository {
     const row = rows[0];
     return this.mapRowToOrder(row);
   }
+  async findByIdWithAccount(
+    id: OrderEntity["id"]
+  ): Promise<OrderEntityWithAccount | null> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT 
+      o.*,
+      a.iban as acc_iban,
+      a.name as acc_name,
+      a.type as acc_type,
+      a.balance as acc_balance,
+      a.color as acc_color,
+      a.currency as acc_currency,
+      a.created_at as acc_created_at,
+      a.updated_at as acc_updated_at,
+      a.user_id as acc_user_id
+     FROM orders o
+     LEFT JOIN accounts a ON o.account_iban = a.iban
+     WHERE o.id = ?`,
+      [id]
+    );
 
+    if (rows.length === 0) return null;
+
+    const row = rows[0];
+    const account = AccountMapper.mapRowToAccount(row, "acc_");
+    const order = this.mapRowToOrder(row);
+    return Object.assign(order, { account });
+  }
   async findAllByUserId(userId: UserEntity["id"]): Promise<OrderEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT o.* FROM orders o 
@@ -113,8 +145,8 @@ export class OrderRepositoryMySQL implements OrderRepository {
         order.quantity,
         order.price.amount,
         order.price.currency,
-        order.date,
-        order.status ?? null,
+        order.date ?? null,
+        order.status,
         order.createdAt,
         order.updatedAt,
         order.transactionId ?? null,
@@ -152,7 +184,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
     status?: OrderEntity["status"]
   ): Promise<OrderEntity[]> {
     const conditions = ["action_isin = ?"];
-    const params: any[] = [actionId];
+    const params: any[] = [actionId.getValue()];
 
     if (status !== undefined) {
       conditions.push("status = ?");
@@ -162,6 +194,45 @@ export class OrderRepositoryMySQL implements OrderRepository {
     const query = `SELECT * FROM orders 
                  WHERE ${conditions.join(" AND ")} 
                  ORDER BY created_at ASC`;
+
+    const rows = await this.client.query<RowDataPacket[]>(query, params);
+
+    return rows.map((row) => this.mapRowToOrder(row));
+  }
+  async findAllExecutedByISINAndDateRange(
+    actionId: ActionEntity["ISIN"],
+    startDate: Date,
+    endDate: Date
+  ): Promise<OrderEntity[]> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT * FROM orders 
+        WHERE action_isin = ? 
+        AND date >= ?
+        AND date <= ?
+        AND status = "executed"
+        ORDER BY date ASC`,
+      [actionId.getValue(), startDate, endDate]
+    );
+
+    return rows.map((row) => this.mapRowToOrder(row));
+  }
+
+  async findAllByActionIdAndStatusAndUserId(
+    actionId: ActionEntity["ISIN"],
+    userId: UserEntity["id"],
+    status?: OrderEntity["status"]
+  ): Promise<OrderEntity[]> {
+    const conditions = ["o.action_isin = ?", "a.user_id = ?"];
+    const params: any[] = [actionId.getValue(), userId];
+    if (status !== undefined) {
+      conditions.push("o.status = ?");
+      params.push(status);
+    }
+
+    const query = `SELECT o.* FROM orders o
+                LEFT JOIN accounts a ON o.account_iban = a.iban
+                 WHERE ${conditions.join(" AND ")} 
+                 ORDER BY o.created_at ASC`;
 
     const rows = await this.client.query<RowDataPacket[]>(query, params);
 
@@ -177,7 +248,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
       `SELECT * FROM orders 
        WHERE action_isin = ? AND status = ? AND type = ?
        ORDER BY created_at ASC`,
-      [actionId, status, type]
+      [actionId.getValue(), status, type]
     );
 
     return rows.map((row) => this.mapRowToOrder(row));
@@ -190,7 +261,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
       `SELECT * FROM orders 
        WHERE action_isin = ? AND status = 'pending' AND execution_type = 'limit'
        ORDER BY created_at ASC`,
-      [actionId]
+      [actionId.getValue()]
     );
 
     return rows.map((row) => this.mapRowToOrder(row));

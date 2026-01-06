@@ -15,6 +15,7 @@ import { TransactionEntity } from "./TransactionEntity";
 import { AccountEntity } from "./AccountEntity";
 import { IBAN } from "@domain/values/IBAN";
 import { InvalidOrderStatusError } from "@domain/errors/order/InvalidOrderStatusError";
+import { ISIN } from "@domain/values/ISIN";
 
 export class OrderEntity {
   private constructor(
@@ -121,7 +122,7 @@ export class OrderEntity {
   }: {
     id: string;
     IBAN: IBAN;
-    ISIN: string;
+    ISIN: ISIN;
     type: "buy" | "sell";
     quantity: number;
     price: Money;
@@ -229,7 +230,7 @@ export class OrderEntity {
     return {
       id: this.id,
       IBAN: this.IBAN.value,
-      ISIN: this.ISIN,
+      ISIN: this.ISIN.getValue(),
       type: this.type,
       price: this.price,
       quantity: this.quantity,

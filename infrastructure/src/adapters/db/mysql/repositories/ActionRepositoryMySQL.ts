@@ -6,6 +6,7 @@ import {
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { Money } from "@domain/values/Money";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { ISIN } from "@domain/values/ISIN";
 
 export class ActionRepositoryMySQL implements ActionRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -17,7 +18,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
     });
 
     return ActionEntity.from({
-      ISIN: row.isin,
+      ISIN: ISIN.from(row.isin),
       name: row.name,
       symbol: row.symbol,
       market: row.market,
@@ -31,12 +32,16 @@ export class ActionRepositoryMySQL implements ActionRepository {
 
   /** Sauvegarder une action */
   async save(action: ActionEntity): Promise<void> {
+    console.log(action);
+    console.log(action.ISIN.getValue());
+    console.log(action.ISIN.getValue().length);
+    console.log("ISIN-----");
     await this.client.query<ResultSetHeader>(
       `INSERT INTO actions 
         (isin, name,  symbol, market, activity_sector, price, currency, is_available, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        action.ISIN,
+        action.ISIN.getValue(),
         action.name,
         action.symbol,
         action.market,
@@ -54,7 +59,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async findByISIN(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM actions WHERE isin = ?`,
-      [ISIN]
+      [ISIN.getValue()]
     );
 
     if (rows.length === 0) return null;
@@ -85,7 +90,11 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async setAvailability(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE actions SET is_available = ?, updated_at = ? WHERE isin = ?`,
-      [action.isAvailable ? 1 : 0, action.updatedAt || new Date(), action.ISIN]
+      [
+        action.isAvailable ? 1 : 0,
+        action.updatedAt || new Date(),
+        action.ISIN.getValue(),
+      ]
     );
   }
 
@@ -105,7 +114,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
         action.price.currency,
         action.isAvailable ? 1 : 0,
         action.updatedAt || new Date(),
-        action.ISIN,
+        action.ISIN.getValue(),
       ]
     );
   }
@@ -114,14 +123,18 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async delete(ISIN: ActionEntity["ISIN"]): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `DELETE FROM actions WHERE isin = ?`,
-      [ISIN]
+      [ISIN.getValue()]
     );
   }
 
-  async getStatistics(isin: string, now: Date): Promise<ActionStatistics> {
+  async getStatistics(
+    isin: ActionEntity["ISIN"],
+    now: Date
+  ): Promise<ActionStatistics> {
+    const IsinValue = isin.getValue();
     const priceRow = await this.client.query<RowDataPacket[]>(
       `SELECT price FROM actions WHERE ISIN = ?`,
-      [isin]
+      [IsinValue]
     );
 
     const price = Number(priceRow[0]?.price || 0);
@@ -145,7 +158,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
       FROM action_price_history
       WHERE isin = ?
         AND date >= DATE_SUB(?, INTERVAL 30 DAY)`,
-      [isin, now, isin, now, isin, now, isin, now]
+      [IsinValue, now, IsinValue, now, IsinValue, now, IsinValue, now]
     );
 
     const price24h = Number(stats[0]?.price24h || price);

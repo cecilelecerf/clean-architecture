@@ -8,13 +8,15 @@ import { OrderRepository } from "@application/ports/repositories/OrderRepository
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { OrderEntity, OrderToDTO } from "@domain/entities/OrderEntity";
+import { InvalidISINError } from "@domain/errors/ISIN";
 import { InvalidOrderStatusError } from "@domain/errors/order/InvalidOrderStatusError";
+import { ISIN } from "@domain/values/ISIN";
 type Props = {
   userId: string;
   actionId: string;
   status?: string;
 };
-export class GetAllByActionAndStatusUseCase {
+export class GetAllByActionAndStatusAndUserIdUseCase {
   public constructor(
     private readonly userRepository: UserRepository,
     private readonly orderRepository: OrderRepository,
@@ -31,6 +33,7 @@ export class GetAllByActionAndStatusUseCase {
     | UserNotActiveError
     | ActionNotFoundError
     | InvalidOrderStatusError
+    | InvalidISINError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -40,13 +43,18 @@ export class GetAllByActionAndStatusUseCase {
       if (s instanceof Error) return s;
       validateStatus = s;
     }
-    const action = await this.actionRepository.findByISIN(actionId);
+
+    const validateIsin = ISIN.isValid(actionId);
+    if (validateIsin instanceof Error) return validateIsin;
+    const action = await this.actionRepository.findByISIN(validateIsin);
     if (!action) return new ActionNotFoundError();
 
-    const orders = await this.orderRepository.findAllByActionIdAndStatus(
-      actionId,
-      validateStatus
-    );
+    const orders =
+      await this.orderRepository.findAllByActionIdAndStatusAndUserId(
+        validateIsin,
+        user.id,
+        validateStatus
+      );
     return orders.map((order) => order.toDTO());
   }
 }

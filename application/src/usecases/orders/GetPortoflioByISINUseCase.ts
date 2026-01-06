@@ -10,6 +10,8 @@ import {
 } from "@application/errors/users";
 import { ActionNotFoundError } from "@application/errors/actions";
 import { PortfolioPositionEntity } from "@domain/entities/PortfolioEntity";
+import { ISIN } from "@domain/values/ISIN";
+import { InvalidISINError } from "@domain/errors/ISIN";
 
 type Props = {
   userId: UserEntity["id"];
@@ -33,19 +35,24 @@ export class GetPortoflioByISINUseCase {
     | UserNotActiveError
     | UserRoleMismatchError
     | ActionNotFoundError
+    | InvalidISINError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
     if (!user.hasRole({ role: "client" }))
       return new UserRoleMismatchError(["client"], user.role);
 
-    const action = await this.actionRepository.findByISIN(isin);
+    const validateIsin = ISIN.isValid(isin);
+    if (validateIsin instanceof Error) return validateIsin;
+    const action = await this.actionRepository.findByISIN(validateIsin);
     if (!action) return new ActionNotFoundError();
 
-    const actionOrders = await this.orderRepository.findAllByActionIdAndStatus(
-      isin,
-      "executed"
-    );
+    const actionOrders =
+      await this.orderRepository.findAllByActionIdAndStatusAndUserId(
+        action.ISIN,
+        user.id,
+        "executed"
+      );
 
     return PortfolioPositionEntity.create({ ...action, orders: actionOrders });
   }

@@ -2,10 +2,10 @@ import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { get, patch, post } from '@/lib/apiClient';
 import {
   ActionId,
-  actionPriceHistorySchema,
   actionSchema,
   actionStatsSchema,
   NewAction,
+  UpdateAction,
 } from '@infrastructure/types/action';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
@@ -54,7 +54,7 @@ export const actionsEndpoint = createEndpointsNodes({
   // Modifier une action
   update: ({ actionIsin }: { actionIsin: ActionId }) =>
     mutationOptions({
-      mutationFn: async ({ payload }: { payload: NewAction }) => {
+      mutationFn: async ({ payload }: { payload: UpdateAction }) => {
         const data = await patch(`/actions/${actionIsin}`, payload);
         return actionSchema.parse(data);
       },
@@ -64,16 +64,6 @@ export const actionsEndpoint = createEndpointsNodes({
       },
     }),
 
-  // GET /api/actions
-  // Liste des actions (selon l'utilisateur (client ou banque))
-  getHistory: ({ isin }: { isin: ActionId }) =>
-    queryOptions({
-      queryKey: ['actions', isin, 'history'],
-      queryFn: () =>
-        get(`/actions/${isin}/history`).then((data) => {
-          return safeParseWithLog(actionPriceHistorySchema.array(), data);
-        }),
-    }),
   // GET /api/actions
   // Liste des actions (selon l'utilisateur (client ou banque))
   getStats: ({ isin }: { isin: ActionId }) =>

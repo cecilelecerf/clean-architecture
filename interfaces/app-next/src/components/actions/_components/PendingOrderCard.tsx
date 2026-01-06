@@ -27,6 +27,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Order } from "@infrastructure/types/order";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
+import { endpoints } from "@/utils/endpoint";
 
 
 interface PendingOrderCardProps {
@@ -41,25 +42,8 @@ export function PendingOrderCard({
     actionName = "Action"
 }: PendingOrderCardProps) {
     const [showCancelDialog, setShowCancelDialog] = useState(false);
-    const queryClient = useQueryClient();
 
-    const cancelOrderMutation = useMutation({
-        mutationFn: async (orderId: string) => {
-            const response = await fetch(`/api/orders/${orderId}/cancel`, {
-                method: "POST",
-            });
-            if (!response.ok) throw new Error("Failed to cancel order");
-            return response.json();
-        },
-        onSuccess: () => {
-            toast.success("Ordre annulé avec succès");
-            queryClient.invalidateQueries({ queryKey: ["orders"] });
-            setShowCancelDialog(false);
-        },
-        onError: () => {
-            toast.error("Erreur lors de l'annulation de l'ordre");
-        },
-    });
+    const cancelOrderMutation = useMutation(endpoints.orders.cancelled({ orderId: order.id }));
 
     const isBuy = order.type === "buy";
 
@@ -183,7 +167,15 @@ export function PendingOrderCard({
                             Non, conserver
                         </AlertDialogCancel>
                         <AlertDialogAction
-                            onClick={() => cancelOrderMutation.mutate(order.id)}
+                            onClick={() => cancelOrderMutation.mutate({}, {
+                                onSuccess: () => {
+                                    toast.success("Ordre annulé avec succès");
+                                    setShowCancelDialog(false);
+                                },
+                                onError: () => {
+                                    toast.error("Erreur lors de l'annulation de l'ordre");
+                                },
+                            })}
                             disabled={cancelOrderMutation.isPending}
                             className="bg-red-500 hover:bg-red-600"
                         >

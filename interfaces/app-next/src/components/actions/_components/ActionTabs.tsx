@@ -32,22 +32,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Action, } from "@infrastructure/types/action";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { MyOrders } from "./MyOrder";
+import { ChartTab } from "./ChartTab";
 
-export const ActionTabs = ({ action }: { action: Action }) => {
+export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: boolean }) => {
     const statsQuery = useQuery(endpoints.actions.getStats({ isin: action.ISIN }));
-    const priceHistoryQuery = useQuery(endpoints.actions.getHistory({ isin: action.ISIN }));
 
     return (
         <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-4">
+            <TabsList className={`grid w-full grid-cols-${isAdmin ? 3 : 4} mb-4`}>
                 <TabsTrigger value="overview" className="text-xs sm:text-sm">
                     <Activity className="w-4 h-4 mr-1 hidden sm:inline" />
                     Vue d'ensemble
                 </TabsTrigger>
-                <TabsTrigger value="my-order" className="text-xs sm:text-sm">
-                    <LineChartIcon className="w-4 h-4 mr-1 hidden sm:inline" />
-                    Mes actions
-                </TabsTrigger>
+                {!isAdmin && (
+                    <TabsTrigger value="my-order" className="text-xs sm:text-sm">
+                        <LineChartIcon className="w-4 h-4 mr-1 hidden sm:inline" />
+                        Mes actions
+                    </TabsTrigger>
+                )}
                 <TabsTrigger value="chart" className="text-xs sm:text-sm">
                     <LineChartIcon className="w-4 h-4 mr-1 hidden sm:inline" />
                     Graphiques
@@ -108,113 +110,13 @@ export const ActionTabs = ({ action }: { action: Action }) => {
                     </CardContent>
                 </Card>
             </TabsContent>
+            {isAdmin && (
 
-            <TabsContent value="my-order" className="space-y-4"><MyOrders action={action} /></TabsContent>
+                <TabsContent value="my-order" className="space-y-4"><MyOrders action={action} /></TabsContent>
+            )}
             {/* Chart Tab */}
             <TabsContent value="chart" className="space-y-4">
-                {match(priceHistoryQuery)
-                    .with({ status: "pending" }, () => <ChartSkeleton />)
-                    .with({ status: "error" }, () => (
-                        <Card>
-                            <CardContent className="p-4">
-                                <p className="text-sm text-gray-500 text-center">
-                                    Impossible de charger l'historique
-                                </p>
-                            </CardContent>
-                        </Card>
-                    ))
-                    .with({ status: "success" }, ({ data: history }) => (
-                        <>
-                            <Card>
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="text-base flex items-center gap-2">
-                                        <TrendingUp className="w-4 h-4" />
-                                        Évolution du prix (30 jours)
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <ResponsiveContainer width="100%" height={250}>
-                                        <AreaChart data={history}>
-                                            <defs>
-                                                <linearGradient
-                                                    id="colorPrice"
-                                                    x1="0"
-                                                    y1="0"
-                                                    x2="0"
-                                                    y2="1"
-                                                >
-                                                    <stop
-                                                        offset="5%"
-                                                        stopColor="#3b82f6"
-                                                        stopOpacity={0.3}
-                                                    />
-                                                    <stop
-                                                        offset="95%"
-                                                        stopColor="#3b82f6"
-                                                        stopOpacity={0}
-                                                    />
-                                                </linearGradient>
-                                            </defs>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis
-                                                dataKey="date"
-                                                tick={{ fontSize: 12 }}
-                                                tickFormatter={(date) =>
-                                                    format(new Date(date), "dd/MM", { locale: fr })
-                                                }
-                                            />
-                                            <YAxis
-                                                tick={{ fontSize: 12 }}
-                                                domain={["auto", "auto"]}
-                                            />
-                                            <Tooltip
-                                                content={<CustomTooltip currency={action.price.currency} />}
-                                            />
-                                            <Area
-                                                type="monotone"
-                                                dataKey="price"
-                                                stroke="#3b82f6"
-                                                strokeWidth={2}
-                                                fillOpacity={1}
-                                                fill="url(#colorPrice)"
-                                            />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="text-base flex items-center gap-2">
-                                        <Activity className="w-4 h-4" />
-                                        Volume de transactions
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <ResponsiveContainer width="100%" height={200}>
-                                        <BarChart data={history}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis
-                                                dataKey="date"
-                                                tick={{ fontSize: 12 }}
-                                                tickFormatter={(date) =>
-                                                    format(new Date(date), "dd/MM", { locale: fr })
-                                                }
-                                            />
-                                            <YAxis tick={{ fontSize: 12 }} />
-                                            <Tooltip />
-                                            <Bar
-                                                dataKey="volume"
-                                                fill="#8b5cf6"
-                                                radius={[4, 4, 0, 0]}
-                                            />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </CardContent>
-                            </Card>
-                        </>
-                    ))
-                    .exhaustive()}
+                <ChartTab action={action} />
             </TabsContent>
 
             {/* Stats Tab */}
@@ -241,19 +143,19 @@ export const ActionTabs = ({ action }: { action: Action }) => {
                                 <CardContent className="space-y-3">
                                     <PerformanceRow
                                         label="Variation 24h"
-                                        value={stats.change24h}
+                                        value={stats.priceChange24h}
                                         isPercentage
                                     />
                                     <Separator />
                                     <PerformanceRow
                                         label="Variation 7j"
-                                        value={stats.change7d}
+                                        value={stats.priceChange7d}
                                         isPercentage
                                     />
                                     <Separator />
                                     <PerformanceRow
                                         label="Variation 30j"
-                                        value={stats.change30d}
+                                        value={stats.priceChange30d}
                                         isPercentage
                                     />
                                 </CardContent>
@@ -262,13 +164,13 @@ export const ActionTabs = ({ action }: { action: Action }) => {
                             <div className="grid grid-cols-2 gap-3">
                                 <StatCard
                                     label="Prix min (30j)"
-                                    value={`${stats.minPrice} ${action.price.currency}`}
+                                    value={`${stats.minPrice7d} ${action.price.currency}`}
                                     icon={TrendingDown}
                                     color="red"
                                 />
                                 <StatCard
                                     label="Prix max (30j)"
-                                    value={`${stats.maxPrice} ${action.price.currency}`}
+                                    value={`${stats.maxPrice7d} ${action.price.currency}`}
                                     icon={TrendingUp}
                                     color="green"
                                 />
@@ -282,18 +184,18 @@ export const ActionTabs = ({ action }: { action: Action }) => {
                                 </CardHeader>
                                 <CardContent className="space-y-3">
                                     <MobileDetailRow
-                                        label="Volume total"
-                                        value={stats.totalVolume}
+                                        label="Volume total (7j)"
+                                        value={stats.totalVolume7d}
                                     />
                                     <Separator />
                                     <MobileDetailRow
-                                        label="Prix moyen"
-                                        value={`${stats.averagePrice} ${action.price.currency}`}
+                                        label="Prix moyen (7j)"
+                                        value={`${stats.averagePrice7d} ${action.price.currency}`}
                                     />
                                     <Separator />
                                     <MobileDetailRow
-                                        label="Transactions"
-                                        value={stats.transactionCount}
+                                        label="Transactions (7j)"
+                                        value={stats.transactionCount7d}
                                     />
                                 </CardContent>
                             </Card>
@@ -415,33 +317,7 @@ function StatCard({
     );
 }
 
-const CustomTooltip = ({ active, payload, currency }: any) => {
-    if (active && payload && payload.length) {
-        return (
-            <div className="bg-white p-3 border rounded-lg shadow-lg">
-                <p className="text-xs text-gray-600 mb-1">
-                    {format(new Date(payload[0].payload.date), "dd MMMM yyyy", {
-                        locale: fr,
-                    })}
-                </p>
-                <p className="text-sm font-bold">
-                    {payload[0].value} {currency}
-                </p>
-            </div>
-        );
-    }
-    return null;
-};
 
-function ChartSkeleton() {
-    return (
-        <Card>
-            <CardContent className="p-6">
-                <Skeleton className="h-64 w-full" />
-            </CardContent>
-        </Card>
-    );
-}
 
 function StatsSkeleton() {
     return (

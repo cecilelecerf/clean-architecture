@@ -10,7 +10,6 @@ import { findActiveUser } from "@application/utils/userValidators";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import {
   InvalidActionNameError,
-  InvalidISINError,
   InvalidSymbolError,
   InvalidTotalNbError,
 } from "@domain/errors/action";
@@ -23,7 +22,6 @@ import { Money } from "@domain/values/Money";
 // TODO : Create default order
 interface Props {
   userId: string;
-  ISIN: string;
   name: string;
   totalNb: number;
   symbol: string;
@@ -44,7 +42,6 @@ export class CreateActionUsecase {
   // Création des actions que pour les user ayant le rôle de directeur
   public async execute({
     userId,
-    ISIN,
     name,
     totalNb,
     symbol,
@@ -60,7 +57,6 @@ export class CreateActionUsecase {
     | MoneyAmountNegativeError
     | UserNotFoundError
     | UserNotActiveError
-    | InvalidISINError
     | InvalidActionNameError
     | InvalidSymbolError
     | InvalidTotalNbError
@@ -82,7 +78,6 @@ export class CreateActionUsecase {
     const today = this.clockService.now();
 
     const action = ActionEntity.create({
-      ISIN,
       name,
       symbol,
       market,

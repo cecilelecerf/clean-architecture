@@ -1,6 +1,4 @@
 import z from "zod";
-import { userIdSchema } from "./user";
-import { actionIsinSchema } from "./action";
 import { moneySchema } from "./money";
 import { accountIdSchema } from "./account";
 
@@ -10,14 +8,14 @@ export type OrderId = z.infer<typeof orderIdSchema>;
 export const orderSchema = z.object({
   id: orderIdSchema,
   IBAN: accountIdSchema,
-  ISIN: actionIsinSchema,
+  ISIN: z.string(),
   type: z.enum(["buy", "sell"]),
-  quantity: z.number().int().nonnegative(),
+  quantity: z.number().int().positive(),
   price: moneySchema,
   date: z.iso.datetime().optional(),
   status: z.enum(["pending", "executed", "cancelled"]),
   createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime().optional(),
+  updatedAt: z.iso.datetime(),
 });
 export type Order = z.infer<typeof orderSchema>;
 

@@ -49,8 +49,8 @@ export async function POST(req: NextRequest) {
     const result = await actionFactory().admin.createAction.execute({
       userId: session.user.id,
       ...payload,
-      priceAmount: payload.currentPrice.amount,
-      priceCurrency: payload.currentPrice.currency,
+      priceAmount: payload.price.amount,
+      priceCurrency: payload.price.currency,
     });
 
     if (result instanceof Error) {

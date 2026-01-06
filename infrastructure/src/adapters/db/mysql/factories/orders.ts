@@ -5,7 +5,7 @@ import { OrderRepositoryMySQL } from "../repositories/OrderRepositoryMySQL";
 import { ActionRepositoryMySQL } from "../repositories/ActionRepositoryMySQL";
 import { GetAllByUserUseCase } from "@application/usecases/orders/GetAllByUserUseCase";
 import { UserRepositoryMySQL } from "../repositories/UserRepositoryMySQL";
-import { GetAllByActionAndStatusUseCase } from "@application/usecases/orders/GetAllByActionAndStatusUseCase";
+import { GetAllByActionAndStatusAndUserIdUseCase } from "@application/usecases/orders/GetAllByActionAndStatusAndUserIdUseCase";
 import { GetPortfolioUseCase } from "@application/usecases/orders/GetPorfolioUseCase";
 import { GetPortoflioByISINUseCase } from "@application/usecases/orders/GetPortoflioByISINUseCase";
 import { CurrencyRepositoryMySQL } from "../repositories/CurrencyRepositoryMySQL";
@@ -13,6 +13,9 @@ import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
 import { TransactionRepositoryMySQL } from "../repositories/TransactionRepositoryMySQL";
 import { MoneyConverterService } from "@infrastructure/adapters/services/MoneyConverterService";
 import { PlaceOrderUseCase } from "@application/usecases/orders/PlaceOrderUseCase";
+import { CancelledOrderUsecase } from "@application/usecases/orders/CancelledOrderUsecase";
+import { GetOrderExecutedByDateRangeUsecase } from "@application/usecases/orders/GetOrderExecutedByDateRangeUsecase";
+
 export const orderFactory = () => {
   const client = new MySQLClient();
   const userRepository = new UserRepositoryMySQL(client);
@@ -27,11 +30,12 @@ export const orderFactory = () => {
   const moneyConvertorService = new MoneyConverterService(currencyRepo);
   const getAllByUser = new GetAllByUserUseCase(userRepository, orderRepository);
 
-  const getAllByActionAndStatus = new GetAllByActionAndStatusUseCase(
-    userRepository,
-    orderRepository,
-    actionRepository
-  );
+  const getAllByActionAndStatusAndUserId =
+    new GetAllByActionAndStatusAndUserIdUseCase(
+      userRepository,
+      orderRepository,
+      actionRepository
+    );
   const getPorfolio = new GetPortfolioUseCase(
     orderRepository,
     actionRepository,
@@ -52,11 +56,24 @@ export const orderFactory = () => {
     clockService,
     moneyConvertorService
   );
+  const cancelledOrder = new CancelledOrderUsecase(
+    userRepository,
+    orderRepository,
+    clockService
+  );
+  const getOrderHistory = new GetOrderExecutedByDateRangeUsecase(
+    actionRepository,
+    orderRepository,
+    clockService
+  );
+
   return {
     getPorfolio,
     getAllByUser,
-    getAllByActionAndStatus,
+    getAllByActionAndStatusAndUserId,
     getPortoflioByISIN,
     placeOrder,
+    cancelledOrder,
+    getOrderHistory,
   };
 };

@@ -1,6 +1,6 @@
 import z from "zod";
 import { moneySchema } from "./money";
-import { accountIdSchema } from "./account";
+import { orderSchema } from "./order";
 
 export const actionIsinSchema = z.string().brand("action");
 export type ActionId = z.infer<typeof actionIsinSchema>;
@@ -18,34 +18,39 @@ export const actionSchema = z.object({
 });
 
 export type Action = z.infer<typeof actionSchema>;
-export const actionPriceHistorySchema = z.object({
-  date: z.iso.datetime(),
-  price: z.number().positive(),
-  volume: z.number().int().nonnegative(),
-});
+export const newActionSchema = actionSchema
+  .pick({
+    name: true,
+    symbol: true,
+    market: true,
+    activitySector: true,
+    price: true,
+    isAvailable: true,
+  })
+  .extend({
+    quantity: orderSchema.shape.quantity,
+  });
+export type NewAction = z.infer<typeof newActionSchema>;
 
-export const newActionSchema = actionSchema.pick({
-  ISIN: true,
+export const updateActionSchema = newActionSchema.pick({
   name: true,
   symbol: true,
   market: true,
   activitySector: true,
-  price: true,
   isAvailable: true,
 });
-export type NewAction = z.infer<typeof newActionSchema>;
-
+export type UpdateAction = z.infer<typeof updateActionSchema>;
 export const actionStatsSchema = z.object({
-  priceChange: z.number(),
-  change24h: z.number(),
-  change7d: z.number(),
-  change30d: z.number(),
-  minPrice: z.number().positive(),
-  maxPrice: z.number().positive(),
-  averagePrice: z.number().positive(),
-  totalVolume: z.number().int().nonnegative(),
-  transactionCount: z.number().int().nonnegative(),
+  currentPrice: moneySchema,
+  priceChange24h: z.number(),
+  priceChange7d: z.number(),
+  priceChange30d: z.number(),
+  minPrice7d: z.number().positive(),
+  maxPrice7d: z.number().positive(),
+  averagePrice7d: z.number().positive(),
+  totalVolume7d: z.number().int().nonnegative(),
+  transactionCount7d: z.number().int().nonnegative(),
+  volatility31d: z.number(),
 });
 
-export type ActionPriceHistory = z.infer<typeof actionPriceHistorySchema>;
 export type ActionStats = z.infer<typeof actionStatsSchema>;

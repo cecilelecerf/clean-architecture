@@ -129,18 +129,18 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                                                 {match(statsQuery)
                                                     .with({ status: "success" }, ({ data: stats }) => (
                                                         <div
-                                                            className={`flex items-center gap-1 text-sm font-semibold ${stats.priceChange >= 0
+                                                            className={`flex items-center gap-1 text-sm font-semibold ${stats.priceChange24h >= 0
                                                                 ? "text-green-300"
                                                                 : "text-red-300"
                                                                 }`}
                                                         >
-                                                            {stats.priceChange >= 0 ? (
+                                                            {stats.priceChange24h >= 0 ? (
                                                                 <TrendingUp className="w-4 h-4" />
                                                             ) : (
                                                                 <TrendingDown className="w-4 h-4" />
                                                             )}
-                                                            {stats.priceChange >= 0 ? "+" : ""}
-                                                            {stats.priceChange.toFixed(2)}%
+                                                            {stats.priceChange24h >= 0 ? "+" : ""}
+                                                            {stats.priceChange24h.toFixed(2)}%
                                                         </div>
                                                     ))
                                                     .otherwise(() => null)}
@@ -158,7 +158,7 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                         </>
                     ))
                     .exhaustive()}
-                ‡
+
                 {match(actionQuery)
                     .with({ status: "pending" }, () => <></>)
                     .with({ status: "error" }, () => (
@@ -171,7 +171,7 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                         </Card>
                     ))
                     .with({ status: "success" }, ({ data: action }) => (
-                        <ActionTabs action={action} />
+                        <ActionTabs action={action} isAdmin={isAdmin} />
 
                     ))
                     .exhaustive()}

@@ -26,9 +26,12 @@ export class PortfolioPositionEntity {
     ActionEntity,
     "name" | "ISIN" | "symbol" | "price"
   >) {
+    console.log("--------------- " + name + "-------------");
+    console.log(orders.length);
     let totalQuantity = 0;
     let totalInvested = 0;
     for (const order of orders) {
+      console.log(order);
       if (order.status !== "executed") continue;
       if (order.type === "buy") {
         totalQuantity += order.quantity;
@@ -38,8 +41,9 @@ export class PortfolioPositionEntity {
         const avgPrice = totalInvested / (totalQuantity + order.quantity);
         totalInvested -= avgPrice * order.quantity;
       }
+      console.log(totalQuantity);
     }
-
+    console.log(totalQuantity);
     if (totalQuantity <= 0) {
       return null;
     }
