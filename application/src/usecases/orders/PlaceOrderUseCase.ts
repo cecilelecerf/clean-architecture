@@ -39,8 +39,8 @@ import {
 import {
   InvalidTransactionAmountError,
   InvalidTransactionLabelError,
+  SameAccountError,
 } from "@domain/errors/transaction";
-import { SameAccountTransactionError } from "@domain/errors/transaction/SameAccountTransactionError";
 import { AccountNotFoundError } from "@application/errors/accounts";
 import { ISIN } from "@domain/values/ISIN";
 import { InvalidISINError } from "@domain/errors/ISIN";
@@ -305,7 +305,7 @@ export class PlaceOrderUseCase {
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | SameAccountTransactionError
+    | SameAccountError
     | InvalidTransactionLabelError
     | InvalidTransactionAmountError
   > {

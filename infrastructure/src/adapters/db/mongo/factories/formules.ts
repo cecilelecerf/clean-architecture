@@ -11,12 +11,15 @@ import { GetFormuleUsecase } from "@application/usecases/formules-credit/GetForm
 import { GetAllActiveFormulesUsecase } from "@application/usecases/formules-credit/GetAllActiveFormulesUseCase";
 import { GetFormuleCreditTypesUseCase } from "@application/usecases/formules-credit/GetFormuleCreditTypesUseCase";
 import { AccountRepositoryMongo } from "../repositories/AccountRepositoryMongo";
+import { GetFormuleStatisticsUsecase } from "@application/usecases/formules-credit/GetFormuleStatisticsUsecase";
+import { CreditRepositoryMongo } from "../repositories/CreditRepositoryMongo";
 
 export const formuleFactory = () => {
   const client = new MongoClient();
   const userRepository = new UserRepositoryMongo(client);
   const formuleRepository = new FormuleCreditRepositoryMongo(client);
   const accountRepository = new AccountRepositoryMongo(client);
+  const creditRepository = new CreditRepositoryMongo(client);
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
 
@@ -51,7 +54,10 @@ export const formuleFactory = () => {
   const getFormule = new GetFormuleUsecase(formuleRepository, userRepository);
 
   const getTypes = new GetFormuleCreditTypesUseCase(userRepository);
-
+  const stats = new GetFormuleStatisticsUsecase(
+    formuleRepository,
+    creditRepository
+  );
   return {
     createFormule,
     activateFormule,
@@ -60,5 +66,6 @@ export const formuleFactory = () => {
     getAllActive,
     getFormule,
     getTypes,
+    stats,
   };
 };

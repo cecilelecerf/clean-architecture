@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 import { CurrencyInterface } from "../interface/CurrencyInterface";
-import { currencySchema } from "../schema/CurrencySchema";
+import { CurrencySchema } from "../schema/CurrencySchema";
 
-export const CurrencyModel = mongoose.model<CurrencyInterface>(
-  "Currency",
-  currencySchema
-);
+export const CurrencyModel =
+  mongoose.models.Currency ||
+  mongoose.model<CurrencyInterface>("Currency", CurrencySchema);

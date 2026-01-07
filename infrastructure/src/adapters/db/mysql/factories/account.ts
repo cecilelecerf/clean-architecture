@@ -3,7 +3,6 @@ import { UserRepositoryMySQL } from "@infrastructure/adapters/db/mysql/repositor
 import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
 import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
-import { TransactionRepositoryMySQL } from "../repositories/TransactionRepositoryMySQL";
 import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailService";
 
 import { ApplyDailyInterestUseCase } from "@application/usecases/accounts/ApplyDailyInterestUseCase";
@@ -15,6 +14,7 @@ import { GetAccountsUseCase } from "@application/usecases/accounts/GetAccountsUs
 import { TransfertBetweenAccountUseCase } from "@application/usecases/accounts/TransfertBetweenAccountUseCasee";
 import { GetAllAccountsByTypeUserCase } from "@application/usecases/accounts/GetAllAccountsByTypeUseCase";
 import { RenameAccountUseCase } from "@application/usecases/accounts/RenameAccountUseCasee";
+import { TransactionRepositoryMySQL } from "../repositories/TransactionRepositoryMySQL";
 
 export const accountFactory = () => {
   const client = new MySQLClient();
@@ -71,7 +71,6 @@ export const accountFactory = () => {
     admin: {
       applyDailyInterest,
     },
-
     createAccount,
     deleteAccount,
     getAccountByIBAN,

@@ -4,6 +4,7 @@ import { UserRepositoryMongo } from "../repositories/UserRepositoryMongo";
 import { TransactionRepositoryMongo } from "../repositories/TransactionRepositoryMongo";
 import { AccountRepositoryMongo } from "../repositories/AccountRepositoryMongo";
 import { SystemClockService } from "@infrastructure/adapters/services/SystemClockService";
+import { GetTransactionByIdUseCase } from "@application/usecases/transactions/GetTransactionByIdUsecase";
 
 export const transactionFactory = () => {
   const client = new MongoClient();
@@ -18,8 +19,13 @@ export const transactionFactory = () => {
     accountRepository,
     clockService
   );
+  const getById = new GetTransactionByIdUseCase(
+    userRepository,
+    transactionRepository
+  );
 
   return {
     getAllByAccount,
+    getById,
   };
 };
