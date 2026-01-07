@@ -22,18 +22,17 @@ export const transactionSchema = z.object({
 
 export type Transaction = z.infer<typeof transactionSchema>;
 
-export const transactionDTOWithIbanSchema = transactionSchema
-  .pick({
-    id: true,
-    label: true,
-    fromAccountIban: true,
-    toAccountIban: true,
-    amount: true,
-    currency: true,
-    date: true,
-    icon: true,
-    type: true,
-  })
+export const transactionDTOWithIbanSchema = transactionSchema.pick({
+  id: true,
+  label: true,
+  fromAccountIban: true,
+  toAccountIban: true,
+  amount: true,
+  currency: true,
+  date: true,
+  icon: true,
+  type: true,
+});
 
 export const transactionDTOSchema = transactionSchema
   .pick({
@@ -59,11 +58,11 @@ export const transactionDTOWithAccountResumeSchema =
 export type TransactionWithAccountDTO = z.infer<
   typeof transactionDTOWithAccountResumeSchema
 >;
-export const newTransactionSchema = transactionSchema.pick({
-  label: true,
-  amount: true,
-  icon: true,
-  toAccountIban: true,
-  currency: true,
-});
+export const newTransactionSchema = transactionSchema
+  .pick({
+    label: true,
+    amount: true,
+    icon: true,
+  })
+  .extend({ toAccountIban: z.string() });
 export type NewTransaction = z.infer<typeof newTransactionSchema>;

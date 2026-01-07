@@ -3,14 +3,12 @@ import {
   UserNotActiveError,
   UserRoleMismatchError,
 } from "@application/errors/users";
-import {
-  UserNotBannedError,
-  UserCannotUnbanDirectorError,
-} from "@domain/errors/user";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
+import { UserCannotUnbanDirectorError } from "@domain/errors/user/UserCannotUnbanDirectorError";
+import { UserNotBannedError } from "@domain/errors/user/UserNotBannedError";
 
 type Props = {
   targetUserId: UserEntity["id"];

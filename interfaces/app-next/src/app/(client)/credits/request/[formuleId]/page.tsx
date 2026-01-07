@@ -1,84 +1,47 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 import { StepSelectAccount } from "./StepSelectAccount";
 import { StepCreditForm } from "./StepCreditForm";
-import { FormuleId } from "@infrastructure/types/formule";
+import { FormuleDTO, FormuleId } from "@infrastructure/types/formule";
 import { AccountId } from "@infrastructure/types/account";
+import { match } from "ts-pattern";
+
 
 export default function RequestCreditPage() {
   const { formuleId } = useParams<{ formuleId: FormuleId }>();
-  const router = useRouter();
 
-  const [step, setStep] = useState<1 | 2>(1);
-  const [formData, setFormData] = useState({
-    accountId: undefined as string | undefined,
-    amount: "",
-    currency: "",
-    startDate: "",
-    durationMonths: "",
-  });
+  const query = useQuery(endpoints.formules.get({ formuleId }))
+  return match(query)
+    .with(({ status: "error" }), () => "error")
+    .with(({ status: "pending" }), () => "pending")
+    .with(({ status: "success" }), ({ data: formule }) => <Content formule={formule} />)
+    .exhaustive()
+}
 
-  const formuleQuery = useQuery(
-    endpoints.formules.get({ formuleId })
-  );
 
-  const mutation = useMutation(endpoints.credits.create());
+const Content = ({ formule }: { formule: FormuleDTO }) => {
+  const [step, setStep] = useState<0 | 1>(0);
 
-  const submit = () => {
-    const effectiveDateISO = new Date(formData.startDate).toISOString();
-    console.log(formData.startDate)
-    console.log(effectiveDateISO)
+  const [info, setInfo] = useState<{ accountId: AccountId | null, currency: string | null }>({ accountId: null, currency: null })
 
-    mutation.mutate(
-      {
-        accountId: formData.accountId as AccountId,
-        formuleCreditId: formuleId as FormuleId,
-        initialAmount: {
-          amount: parseFloat(formData.amount),
-          currency: formData.currency,
-        },
-        durationMonths: parseFloat(formData.durationMonths),
-        startDate: effectiveDateISO
-      },
-      {
-        onSuccess: (data) => {
-          router.push(`/credits/${data.id}`);
-        },
-      }
-    );
-  };
-
-  if (!formuleQuery.data) return null;
 
   return (
     <div className="max-w-2xl mx-auto">
-      {step === 1 && (
+      {step === 0 && (
         <StepSelectAccount
-          selectedAccountId={formData.accountId}
-          onSelect={(accountId, currency) =>
-            setFormData((prev) => ({
-              ...prev,
-              accountId,
-              currency
-            }))
-          }
-          onNext={() => setStep(2)}
+          selectedAccountId={info.accountId}
+          onSelect={(accountId, currency) => setInfo({ accountId, currency })}
+          onNext={() => setStep(1)}
         />
       )}
 
-      {step === 2 && (
+      {step === 1 && (
         <StepCreditForm
-          data={formData}
-          setData={(partial) =>
-            setFormData((prev) => ({ ...prev, ...partial }))
-          }
-          onSubmit={submit}
-          loading={mutation.isPending}
-          minAmount={formuleQuery.data.minAmount ?? undefined}
-          maxAmount={formuleQuery.data.maxAmount ?? undefined}
+          formule={formule}
+          info={info}
         />
       )}
     </div>

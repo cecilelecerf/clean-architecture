@@ -1,64 +1,71 @@
-"use client"
-import { ButtonBack } from "@/components/buttons/ButtonBack";
-import { TagsFilters } from "@/components/feeds/TagsFilters";
-import FormWrapper, { Field } from "@/components/FromWrapper";
+'use client';
+
+import FormWrapper, { DataInfo } from "@/components/erfer";
 import { socket } from "@/lib/socket";
 import { endpoints } from "@/utils/endpoint";
-import { NewPost } from "@/utils/endpoint/feedsEndpoint";
-import { Post } from "@infrastructure/types/feed";
-import { useMutation } from "@tanstack/react-query";
+import { postSchema, Tag } from "@infrastructure/types/feed";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { match } from "ts-pattern";
+import { NewPost, newPostSchema } from "@/utils/endpoint/feedsEndpoint";
 
-export default function PostsPage() {
-    const router = useRouter()
-    const [field, setField] = useState<NewPost>({ title: "", content: "", tagsId: [] });
-    const fields: Field[] = [
-        {
-            label: 'Titre',
-            get: field.title,
-            set: (e) => setField((prev) => ({ ...prev, title: Array.isArray(e) ? e[0] : e })),
-        },
-        {
-            label: 'Contenu',
-            get: field.content,
-            set: (e) => setField((prev) => ({ ...prev, content: Array.isArray(e) ? e[0] : e })),
-            type: "textarea"
-        }, {
-            label: "Tags",
-            get: field.tagsId,
-            set: (e) => { },
-            type: "other",
-            layout: <TagsFilters setSelectedTagsId={(value) => setField((prev) => ({
-                ...prev,
-                tagsId: typeof value === 'function' ? value(prev.tagsId) : value
-            }))} selectedTagsId={field.tagsId} />
-        }
-    ];
 
-    const mutate = useMutation<Post, Error, NewPost>(endpoints.feeds.posts.add())
-    const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        mutate.mutate(field, {
-            onSuccess: (post) => {
-                router.push("/admin/feeds");
-                if (post.publishedAt)
-                    socket.emit("post:status", { post })
+
+export default function NewPostPage() {
+
+    const tags = useQuery(endpoints.feeds.tags.getAll())
+
+    return match(tags)
+        .with(({ status: "error" }), () => "error")
+        .with(({ status: "pending" }), () => "pending")
+        .with(({ status: "success" }), ({ data: tags }) => <Content tags={tags} />)
+        .exhaustive()
+}
+
+
+const Content = ({ tags }: { tags: Tag[] }) => {
+    const router = useRouter();
+
+    const form = useForm<NewPost>({
+        resolver: zodResolver(newPostSchema),
+        defaultValues: { title: "", content: "", tagsId: [] },
+    });
+
+    const mutate = useMutation(endpoints.feeds.posts.add());
+
+    const onSubmit = (values: NewPost) => {
+        const tagsId = values.tagsId.map((id) => id as z.infer<typeof postSchema.shape.tagsId.element>);
+        mutate.mutate(
+            { ...values, tagsId },
+            {
+                onSuccess: (post) => {
+                    router.push("/admin/feeds");
+                    if (post.publishedAt) socket.emit("post:status", { post });
+                },
             }
-        })
-    }
+        );
+    };
 
+    const data: DataInfo<NewPost> = {
+        title: { label: "Titre", type: "text" },
+        content: { label: "Contenu", type: "textarea" },
+        tagsId: {
+            label: "Tags",
+            type: "tag",
+            options: tags.map((tag) => ({ value: tag.id, label: tag.label, tagColor: tag.color }))
+        }
+    }
     return (
-        <>
-            <ButtonBack />
-            <form onSubmit={(e) => onSubmit(e)} className="max-w-lg mx-auto mt-10" >
-                <FormWrapper
-                    title="Nouvelle conversation"
-                    fields={fields}
-                    button="Contacter"
-                    loading={mutate.isPending}
-                />
-            </form >
-        </>
-    );
+        <FormWrapper<NewPost>
+            title="Nouveau post"
+            form={form}
+            data={data}
+            onSubmit={onSubmit}
+            labelButton="Publier"
+            loading={mutate.isPending}
+        />
+    )
 }

@@ -88,7 +88,7 @@ export class ActionEntity {
 
     const validatedMarket = this.validateMarket(market);
     const validatedActivitySector = this.validateActivitySector(activitySector);
-    if (this.validateDefaultQuantity(defaultQuantity))
+    if (!this.validateDefaultQuantity(defaultQuantity))
       return new InvalidQuantityError(defaultQuantity);
 
     return new ActionEntity(

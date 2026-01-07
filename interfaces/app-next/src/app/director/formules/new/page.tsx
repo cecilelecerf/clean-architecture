@@ -15,13 +15,13 @@ export default function NewFormulePage() {
   const [step, setStep] = useState<1 | 2>(1);
   const [formData, setFormData] = useState({
     accountId: undefined as string | undefined,
-    interestRate: "",
-    insuranceRate: "",
+    interestRate: 0,
+    insuranceRate: 0,
     type: "",
     label: "",
     description: "",
-    minAmount: "",
-    maxAmount: "",
+    minAmount: 0,
+    maxAmount: 0,
     currency: ""
   });
 
@@ -41,13 +41,13 @@ export default function NewFormulePage() {
     mutation.mutate(
       {
         accountId: formData.accountId as string & $brand<"account">,
-        interestRate: parseFloat(formData.interestRate),
-        insuranceRate: parseFloat(formData.insuranceRate),
+        interestRate: formData.interestRate,
+        insuranceRate: formData.insuranceRate,
         type: formData.type,
         label: formData.label,
         description: formData.description,
-        minAmount: parseFloat(formData.minAmount),
-        maxAmount: parseFloat(formData.maxAmount),
+        minAmount: formData.minAmount,
+        maxAmount: formData.maxAmount,
         currency: formData.currency
       },
       {

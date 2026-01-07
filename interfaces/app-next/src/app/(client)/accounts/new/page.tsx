@@ -1,81 +1,83 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Color, colorSchema } from '@infrastructure/types/color';
-import { Account, NewAccount } from '@infrastructure/types/account';
-import { useMutation } from '@tanstack/react-query';
-import { endpoints } from '@/utils/endpoint';
-import FormWrapper, { Field as TField } from '@/components/FromWrapper';
-import clsx from 'clsx';
-import { bgColorClasses, textColorClasses } from '@/utils/color';
-import { Check } from 'lucide-react';
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { endpoints } from "@/utils/endpoint";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import FormWrapper, { Section } from "@/components/erfer";
+import { NewAccount, newAccountSchema } from "@infrastructure/types/account";
+import { CreditCard, Palette } from "lucide-react";
+
 
 export default function NewAccountPage() {
+  const router = useRouter();
 
-  const [field, setField] = useState<NewAccount>({
-    color: null,
-    name: "",
-    type: "courant"
+  const form = useForm<NewAccount>({
+    resolver: zodResolver(newAccountSchema),
   });
-
-  const fields: TField[] = [
-    {
-      label: 'Nom du compte',
-      get: field.name,
-      set: (e) => setField((prev) => ({ ...prev, name: e as string })),
-    },
-    {
-      label: 'Type de compte',
-      type: 'radio',
-      get: field.type,
-      set: (e) => setField((prev) => ({ ...prev, type: e as Account["type"] })),
-      options: [
-        { label: 'Courant', value: "courant" },
-        { label: 'Epargne', value: "epargne" },
-      ],
-    },
-    {
-      label: 'Couleur',
-      get: field.color,
-      set: (e) => setField((prev) => ({ ...prev, color: e as Color })),
-      type: "other",
-      layout: (
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-          {colorSchema.options.map((c, i) => (
-            <div
-              key={i}
-              className={clsx(
-                `h-9 flex justify-center items-center rounded-xl cursor-pointer hover:scale-110 transition-all ${bgColorClasses[300][c]}`,
-                c === field.color && 'shadow scale-105',
-              )}
-              onClick={() => setField((prev) => ({
-                ...prev,
-                color: prev.color === c ? null : c
-              }))}
-            >
-              {c === field.color && <Check className={textColorClasses[700][c]} />}
-            </div>
-          ))}
-        </div>
-      )
-    },
-  ];
 
   const mutation = useMutation(endpoints.accounts.create());
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    mutation.mutate(field);
+  const onSubmit = (values: NewAccount) => {
+    mutation.mutate(values, {
+      onSuccess: () => router.push("/accounts"),
+    });
   };
 
+  const sections: Section<NewAccount>[] = [
+    {
+      title: "Informations générales",
+      description: "Détails principaux du compte",
+      icon: CreditCard,
+      data: {
+        name: {
+          label: "Nom du compte",
+          type: "text",
+        },
+        type: {
+          label: "Type de compte",
+          type: "radio",
+          options: [
+            { label: "Courant", value: "courant" },
+            { label: "Épargne", value: "epargne" },
+          ],
+        },
+      },
+    },
+    {
+      title: "Apparence",
+      description: "Personnalisation visuelle du compte",
+      icon: Palette,
+      data: {
+        color: {
+          label: "Couleur",
+          type: "icon",
+          options: [
+            { label: "🔴", value: "red" },
+            { label: "🔵", value: "blue" },
+            { label: "🟡", value: "yellow" },
+            { label: "🟢", value: "green" },
+            { label: "🟠", value: "orange" },
+            { label: "🟣", value: "purple" },
+          ],
+        },
+      }
+
+
+    },
+  ];
+
   return (
-    <form onSubmit={handleSubmit}>
-      <FormWrapper
-        title='Créer un nouveau compte'
-        fields={fields}
-        button='Créer'
-        loading={mutation.isPending}
-      />
-    </form>
+    <FormWrapper<NewAccount>
+      title="Créer un nouveau compte"
+      description="Ajoutez un nouveau compte bancaire"
+      form={form}
+      data={sections}
+      labelButton="Créer"
+      loading={mutation.isPending}
+      onSubmit={onSubmit}
+      showBackButton
+    />
   );
 }

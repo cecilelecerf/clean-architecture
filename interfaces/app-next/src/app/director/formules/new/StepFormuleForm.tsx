@@ -1,114 +1,127 @@
-import FormWrapper, { Field as TField } from '@/components/FromWrapper';
-import { useMutation, useQuery } from "@tanstack/react-query";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 
+import { Percent, FileText, Coins } from "lucide-react";
+import FormWrapper, { Section } from "@/components/erfer";
+import { useForm } from "react-hook-form";
+import { NewFormule, newFormuleSchema } from "@/utils/endpoint/formuleEndpoints";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 type FormuleFormData = {
-    interestRate: string;
-    insuranceRate: string;
+    interestRate: number;
+    insuranceRate: number;
     type: string;
     label: string;
     description: string;
-    minAmount?: string;
-    maxAmount?: string;
+    minAmount?: number;
+    maxAmount?: number;
     currency: string;
 };
 
-export const StepFormuleForm = ({ data, setData, onSubmit, loading }: { data: FormuleFormData, setData: (data: Partial<FormuleFormData>) => void, onSubmit: () => void, loading: boolean }) => {
+export const StepFormuleForm = ({
+    data,
+    setData,
+    onSubmit,
+    loading,
+}: {
+    data: FormuleFormData;
+    setData: (data: Partial<FormuleFormData>) => void;
+    onSubmit: () => void;
+    loading: boolean;
+}) => {
     const query = useQuery(endpoints.formules.getTypes());
 
-    const typeOptions = (query.data || []).map((t) => ({
-        label: t.label,
-        value: t.value,
-    }));
-
-    const fields: TField[] = [
+    const typeOptions =
+        query.data?.map((t) => ({
+            label: t.label,
+            value: t.value,
+        })) ?? [];
+    const form = useForm<Omit<NewFormule, "accountId">>({
+        resolver: zodResolver(newFormuleSchema.omit({ accountId: true })),
+        defaultValues: {
+            maxAmount: data?.maxAmount ?? 100,
+            minAmount: data?.maxAmount ?? 100,
+            currency: data.currency,
+            description: data.description,
+            label: data.label,
+            type: data.type,
+            insuranceRate: data.insuranceRate,
+            interestRate: data.interestRate
+        },
+    });
+    const sections: Section<Omit<NewFormule, "accountId">>[] = [
         {
-            label: 'Taux d\'interêt',
-            type: 'number',
-            get: data.interestRate.toString(),
-            set: (e) => setData({ interestRate: e as string }),
-            numberOptions: {
-                min: 0,
-                step: 0.01,
+            title: "Taux",
+            description: "Paramètres financiers du prêt",
+            icon: Percent,
+            data: {
+                interestRate: {
+                    label: "Taux d'intérêt",
+                    type: "number",
+                },
+                insuranceRate: {
+                    label: "Taux d'assurance",
+                    type: "number",
+                },
             },
         },
         {
-            label: 'Taux d\'assurance',
-            type: 'number',
-            get: data.insuranceRate.toString(),
-            set: (e) => setData({ insuranceRate: e as string }),
-            numberOptions: {
-                min: 0,
-                step: 0.01,
+            title: "Informations",
+            description: "Identification de la formule",
+            icon: FileText,
+            data: {
+                type: {
+                    label: "Type de prêt",
+                    type: "select",
+                    options: typeOptions,
+                },
+                label: {
+                    label: "Label",
+                    type: "text",
+                },
+                description: {
+                    label: "Description",
+                    type: "textarea",
+                },
             },
         },
         {
-            label: "Type de prêt",
-            type: "select",
-            placeholder: "Sélectionnez un type",
-            get: data.type,
-            set: (value) => setData({ type: value as string }),
-            options: typeOptions,
-            disabled: query.isLoading,
-        },
-        {
-            label: "Label",
-            type: "text",
-            get: data.label,
-            set: (e) => setData({ label: e as string })
-        },
-        {
-            label: "Description",
-            type: "textarea",
-            get: data.description,
-            set: (e) => setData({ description: e as string })
-        },
-        {
-            label: 'Montant minimum',
-            type: 'number',
-            get: data.minAmount.toString(),
-            set: (e) => setData({ minAmount: e === '' ? undefined : e as string }),
-            numberOptions: {
-                min: 0,
-                step: 1,
+            title: "Montants",
+            description: "Plage de montants autorisés",
+            icon: Coins,
+            data: {
+                minAmount: {
+                    label: "Montant minimum",
+                    type: "number",
+                },
+                maxAmount: {
+                    label: "Montant maximum",
+                    type: "number",
+                },
+                currency: {
+                    label: "Devise",
+                    type: "select",
+                    options: [
+                        { label: "Euro", value: "EUR" },
+                        { label: "Dollar américain", value: "USD" },
+                        { label: "Livre sterling", value: "GBP" },
+                    ],
+                },
             },
         },
-        {
-            label: 'Montant maximum',
-            type: 'number',
-            get: data.maxAmount.toString(),
-            set: (e) => setData({ maxAmount: e === '' ? undefined : e as string }),
-            numberOptions: {
-                min: 0,
-                step: 1,
-            },
-        },
-        {
-            label: "Devise",
-            type: "select",
-            get: data.currency,
-            set: (e) => setData({ currency: e as string }),
-            options: [
-                { label: "Euro", value: "EUR", icon: "" },
-                { label: "Dollar américain", value: "USD", icon: "" },
-                { label: "Livre sterling", value: "GBP", icon: "" },
-            ]
-        },
-    ]
+    ];
 
     return (
-        <form
-            onSubmit={(e) => {
-                e.preventDefault();
-                onSubmit();
-            }}>
-            <FormWrapper
-                title="Nouveau prêt"
-                description="Créer une formule d'un prêt"
-                fields={fields}
-                button="Enregistrer"
-                loading={loading}
-            ></FormWrapper>
-        </form>
-    )
-}
+        <FormWrapper<Omit<NewFormule, "accountId">>
+            title="Nouveau prêt"
+            description="Créer une formule de prêt"
+            data={sections}
+            labelButton="Enregistrer"
+            loading={loading}
+            onSubmit={onSubmit}
+            form={form}
+        />
+    );
+};

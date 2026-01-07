@@ -10,8 +10,8 @@ import { PostMessage } from "./PostMessage";
 import { JoinThread } from "@/app/admin/client-threads/[threadId]/Join";
 import { ButtonBack } from "../buttons/ButtonBack";
 import { useSession } from "next-auth/react";
-import { MessageWithUserDTO } from "@infrastructure/types/message";
 import { Skeleton } from "../ui/skeleton";
+import { MessageWithUserDTO } from "@infrastructure/types/thread";
 
 type Props = { thread: ThreadWithUser, defaultMessages: MessageWithUserDTO[], userId: UserDto["id"], withSetting?: boolean, addElementInTop?: ReactNode }
 

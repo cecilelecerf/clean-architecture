@@ -7,11 +7,9 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
-import {
-  UserAlreadyBannedError,
-  UserCannotBanDirectorError,
-  UserCannotBanSelfError,
-} from "@domain/errors/user";
+import { UserAlreadyBannedError } from "@domain/errors/user/UserAlreadyBannedError";
+import { UserCannotBanDirectorError } from "@domain/errors/user/UserCannotBanDirectorError";
+import { UserCannotBanSelfError } from "@domain/errors/user/UserCannotBanSelfError";
 
 type Props = {
   targetUserId: UserEntity["id"];

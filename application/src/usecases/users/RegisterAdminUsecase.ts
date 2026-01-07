@@ -16,9 +16,18 @@ import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import {
-  InvalidFirstnameError,
-  InvalidLastnameError,
+  DateOfBirthInFutureError,
+  DateOfBirthRequiredError,
+  DateOfBirthTooOldError,
+  InvalidDateOfBirthError,
+  InvalidPhoneNumberError,
+  InvalidSexeError,
+  PhoneNumberRequiredError,
+  SexeRequiredError,
+  UserTooYoungError,
 } from "@domain/errors/user";
+import { InvalidFirstnameError } from "@domain/errors/user/InvalidFirstnameError";
+import { InvalidLastnameError } from "@domain/errors/user/InvalidLastnameError";
 import { Email } from "@domain/values/Email";
 
 type Props = {
@@ -52,9 +61,18 @@ export class RegisterAdminUsecase {
     | EmailInvalidFormatError
     | EmailAlreadyExistsError
     | UserRoleMismatchError
+    | InvalidRoleError
     | InvalidFirstnameError
     | InvalidLastnameError
-    | InvalidRoleError
+    | PhoneNumberRequiredError
+    | InvalidPhoneNumberError
+    | SexeRequiredError
+    | InvalidSexeError
+    | DateOfBirthRequiredError
+    | InvalidDateOfBirthError
+    | DateOfBirthInFutureError
+    | DateOfBirthTooOldError
+    | UserTooYoungError
   > {
     const actor = await findActiveUser(this.userRepository, directorId);
     if (actor instanceof Error) return actor;

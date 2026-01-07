@@ -13,6 +13,7 @@ export interface SeedActionRequest {
   isAvailable: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  quantity: number;
 }
 
 export class SeedActionUseCase {
@@ -26,13 +27,11 @@ export class SeedActionUseCase {
       amount: request.price,
       currency: request.currency,
     });
-
     if (price instanceof Error) {
       throw new Error(`Invalid current price: ${request.price}`);
     }
 
     const now = this.clockService.now();
-
     const action = ActionEntity.create({
       name: request.name,
       symbol: request.symbol,
@@ -41,6 +40,7 @@ export class SeedActionUseCase {
       price,
       isAvailable: request.isAvailable,
       createdAt: request.createdAt ?? now,
+      defaultQuantity: request.quantity,
     });
     if (action instanceof Error)
       throw new Error(`Invalid current price: ${request.price}`);

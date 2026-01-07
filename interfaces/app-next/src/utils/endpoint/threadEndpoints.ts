@@ -1,13 +1,18 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
-import { Thread, ThreadId, threadSchema } from '@infrastructure/types/thread';
+import {
+  messageWithUserSchema,
+  NewExternalThread,
+  NewThread,
+  Thread,
+  ThreadId,
+  threadSchema,
+} from '@infrastructure/types/thread';
 import { userDtoSchema, UserId } from '@infrastructure/types/user';
-import { messageWithUserSchema } from '@infrastructure/types/message';
 import z from 'zod';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { NewExternalThread, NewThread } from '@/app/api/threads/route';
 import { AddParticipant } from '@/app/api/threads/[threadId]/transfer/route';
 
 // ============================================================================

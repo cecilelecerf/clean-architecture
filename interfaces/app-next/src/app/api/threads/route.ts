@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { threadsFactory } from '@infrastructure/adapters/db/mysql/factories/threads';
-import { threadSchema } from '@infrastructure/types/thread';
-import { messageSchema } from '@infrastructure/types/message';
-import z from 'zod';
-import { userIdSchema } from '@infrastructure/types/user';
+import { newExternalThreadSchema, newThreadSchema } from '@infrastructure/types/thread';
 
 export async function GET(req: NextRequest) {
   try {
@@ -32,16 +29,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: err.message || 'Erreur serveur' }, { status: 500 });
   }
 }
-
-const newThreadSchema = threadSchema.pick({ title: true }).extend({
-  participantsId: userIdSchema.array(),
-});
-
-export type NewThread = z.infer<typeof newThreadSchema>;
-const newExternalThreadSchema = newThreadSchema.extend({
-  messageContent: messageSchema.shape.content,
-});
-export type NewExternalThread = z.infer<typeof newExternalThreadSchema>;
 
 export async function POST(req: NextRequest) {
   try {

@@ -232,33 +232,81 @@ export class UserEntity {
     firstname,
     lastname,
     email,
+    phoneNumber,
+    sexe,
+    dateOfBirth,
+    address,
     now,
   }: {
     firstname?: string;
     lastname?: string;
     email?: Email;
+    phoneNumber?: string;
+    sexe?: string;
+    dateOfBirth?: Date | string;
+    address?: Partial<Address>;
     now: Date;
-  }): UserEntity | InvalidFirstnameError | InvalidLastnameError {
-    if (firstname) {
-      const firstnameStr = UserEntity.validateFirstname(firstname);
-      if (firstnameStr instanceof Error) return firstnameStr;
-      this.firstname = firstnameStr;
+  }) {
+    if (firstname !== undefined) {
+      const v = UserEntity.validateFirstname(firstname);
+      if (v instanceof Error) return v;
+      this.firstname = v;
     }
 
-    if (lastname) {
-      const lastnameStr = UserEntity.validateLastname(lastname);
-      if (lastnameStr instanceof Error) return lastnameStr;
-      this.lastname = lastnameStr;
+    if (lastname !== undefined) {
+      const v = UserEntity.validateLastname(lastname);
+      if (v instanceof Error) return v;
+      this.lastname = v;
     }
 
     if (email !== undefined) {
       this.email = email;
     }
 
+    if (this.role === "client") {
+      if (phoneNumber !== undefined) {
+        const v = UserEntity.validatePhone(phoneNumber);
+        if (v instanceof Error) return v;
+        this.phoneNumber = v;
+      }
+
+      if (sexe !== undefined) {
+        const v = UserEntity.validateSexe(sexe);
+        if (v instanceof Error) return v;
+        this.sexe = v;
+      }
+
+      if (dateOfBirth !== undefined) {
+        const v = UserEntity.validateDateOfBirth(dateOfBirth);
+        if (v instanceof Error) return v;
+        this.dateOfBirth = v;
+      }
+
+      if (address !== undefined) {
+        const addr = UserEntity.validateAddress(address.address);
+        if (addr instanceof Error) return addr;
+
+        const city = UserEntity.validateCity(address.city);
+        if (city instanceof Error) return city;
+
+        const country = UserEntity.validateCountry(address.country);
+        if (country instanceof Error) return country;
+
+        const pc = UserEntity.validatePostalCode(address.postalCode);
+        if (pc instanceof Error) return pc;
+
+        this.address = {
+          address: addr,
+          city,
+          country,
+          postalCode: pc,
+        };
+      }
+    }
+
     this.updatedAt = now;
     return this;
   }
-
   private static validateFirstname(
     firstname: string
   ): string | InvalidFirstnameError {
