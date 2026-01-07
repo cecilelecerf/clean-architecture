@@ -21,5 +21,4 @@ accountsRouter.get("/:accountIban/transactions/:transactionIban", authMiddleware
 
 accountsRouter.get("/:accountIban/transactions/:transactionIban/users/:userId", authMiddleware, AccountsController.getTransactionByUserId);
 
-
-
+export default accountsRouter;
