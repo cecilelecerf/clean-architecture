@@ -1,22 +1,17 @@
 import express, { Router } from "express";
-import { authMiddleware } from "../middlewares/auth.middleware";
 import { PostsController } from "../controllers/posts.controller";
 
 const postsRouter: Router = express.Router();
 
-postsRouter.get("/", authMiddleware, PostsController.getWithFilter);
-postsRouter.post("/", authMiddleware, PostsController.add);
+postsRouter.get("/", PostsController.getWithFilter);
+postsRouter.post("/", PostsController.add);
 
-postsRouter.get("/unread", authMiddleware, PostsController.getUnreadWithTag);
+postsRouter.get("/unread", PostsController.getUnreadWithTag);
 
-postsRouter.get("/:postId", authMiddleware, PostsController.getByIdWithTags);
-postsRouter.patch("/:postId", authMiddleware, PostsController.edit);
-postsRouter.delete("/:postId", authMiddleware, PostsController.delete);
+postsRouter.get("/:postId", PostsController.getByIdWithTags);
+postsRouter.patch("/:postId", PostsController.edit);
+postsRouter.delete("/:postId", PostsController.delete);
 
-postsRouter.patch(
-  "/:postId/status",
-  authMiddleware,
-  PostsController.updateStatus
-);
-postsRouter.patch("/:postId/read", authMiddleware, PostsController.markAsRead);
+postsRouter.patch("/:postId/status", PostsController.updateStatus);
+postsRouter.patch("/:postId/read", PostsController.markAsRead);
 export default postsRouter;

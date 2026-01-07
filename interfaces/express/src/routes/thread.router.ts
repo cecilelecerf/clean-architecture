@@ -12,11 +12,7 @@ threadRouter.post("/:id/join", ThreadController.join);
 threadRouter.post("/:id/transfer", ThreadController.transfer);
 
 threadRouter.get("/:id/messages", ThreadController.getMessages);
-threadRouter.post(
-  "/:id/messages",
-
-  ThreadController.sendMessage
-);
+threadRouter.post("/:id/messages", ThreadController.sendMessage);
 
 threadRouter.post(
   "/:id/participants/:userId",
