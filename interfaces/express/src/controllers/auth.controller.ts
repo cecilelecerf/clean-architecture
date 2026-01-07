@@ -13,7 +13,6 @@ export class AuthController {
       if (result instanceof Error) {
         return res.status(401).json({ message: result.message });
       }
-      console.log(result);
       return res.status(200).json(result);
     } catch (error) {
       next(error);

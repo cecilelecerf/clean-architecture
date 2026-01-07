@@ -46,11 +46,9 @@ export class SendMessage {
   > {
     const user = await findActiveUser(this.userRepository, senderId);
     if (user instanceof Error) return user;
-
     const thread = await this.threadRepository.findById(threadId);
     if (!thread) return new ThreadNotFoundError();
     if (thread.isClose) return new ThreadClosedError(thread.id);
-
     if (!thread.hasAccess(user.id))
       return new InvalidThreadAccessError(user.id, thread.id);
 

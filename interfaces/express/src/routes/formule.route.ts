@@ -4,14 +4,19 @@ import { FormuleController } from "../controllers/formule.controller";
 
 const formuleRouter: Router = express.Router();
 
-formuleRouter.get("/formules", authMiddleware, FormuleController.getAll);
-formuleRouter.post("/formules", authMiddleware, FormuleController.post);
+formuleRouter.get("/", authMiddleware, FormuleController.getAll);
+formuleRouter.post("/", authMiddleware, FormuleController.post);
 
-formuleRouter.get("/formules/types", authMiddleware, FormuleController.geTypes);
+formuleRouter.get("/types", authMiddleware, FormuleController.geTypes);
 
-formuleRouter.get("/formules/active", authMiddleware, FormuleController.getActive);
+formuleRouter.get("/active", authMiddleware, FormuleController.getActive);
 
-formuleRouter.get("/formules/:formuleId", authMiddleware, FormuleController.getFormule);
-formuleRouter.patch("/formules/:formuleId", authMiddleware, FormuleController.patch);
+formuleRouter.get("/:formuleId", authMiddleware, FormuleController.getFormule);
+formuleRouter.patch("/:formuleId", authMiddleware, FormuleController.patch);
 
-formuleRouter.get("/formules/:formuleId/stats", authMiddleware, FormuleController.getStats);
+formuleRouter.get(
+  "/:formuleId/stats",
+  authMiddleware,
+  FormuleController.getStats
+);
+export default formuleRouter;
