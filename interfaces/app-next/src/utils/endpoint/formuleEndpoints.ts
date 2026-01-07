@@ -71,7 +71,7 @@ export const formuleEndpoint = createEndpointsNodes({
     queryOptions({
       queryKey: ['formules', 'types', 'list'],
       queryFn: async () =>
-        get(`/formules/type`).then((data) => safeParseWithLog(formuleTypesSchema.array(), data)),
+        get(`/formules/types`).then((data) => safeParseWithLog(formuleTypesSchema.array(), data)),
     }),
 
   // POST /api/formules

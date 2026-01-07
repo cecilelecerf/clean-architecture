@@ -19,7 +19,6 @@ export const authOptions = {
         password: { label: 'Mot de passe', type: 'password' },
       },
       async authorize(credentials) {
-        console.log(credentials);
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
           method: 'POST',
           headers: {
@@ -32,7 +31,6 @@ export const authOptions = {
           throw new Error(text);
         }
         const json = await res.json();
-        console.log(json);
         const result = safeParseWithLog(responseSchema, json);
         return {
           id: result.user.id,

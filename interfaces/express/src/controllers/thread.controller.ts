@@ -38,8 +38,6 @@ export class ThreadController {
       const threadId = req.params.id;
       if (!threadId)
         return res.status(400).json({ message: "Missing thread ID" });
-      console.log(threadId);
-      console.log("getById");
       const result = await threadsFactory().getThreadById.execute({
         userId: req.user.userId,
         threadId,
@@ -322,7 +320,6 @@ export class ThreadController {
   ) {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-      console.log(req.user);
       const result = await threadsFactory().advisorGetAllThread.execute({
         administratorId: req.user.userId,
       });

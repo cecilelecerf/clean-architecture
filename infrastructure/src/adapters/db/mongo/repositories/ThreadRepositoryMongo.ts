@@ -152,8 +152,6 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     threadId: string
   ): Promise<ThreadEntityWithUsers | null> {
     await this.client.connect();
-    console.log("-threadid");
-    console.log(threadId);
     const doc = await ThreadModel.findById(threadId)
       .populate({ path: "administratorId" })
       .populate({

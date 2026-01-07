@@ -12,8 +12,6 @@ export class MessageRepositoryMongo implements MessageRepository {
   constructor(private readonly client: MongoClient) {}
 
   private mapDocToMessage(doc: any): MessageEntity {
-    console.log(typeof doc.senderId);
-    console.log(typeof doc.senderId === "string");
     return MessageEntity.from({
       id: doc._id.toString(),
       threadId: doc.threadId?.toString() || doc.threadId,
