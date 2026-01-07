@@ -165,3 +165,9 @@ export type RegisterResponse = z.infer<typeof userSchema>;
 
 export const banUserSchema = z.object({ status: z.boolean() });
 export type ReqBanUser = z.infer<typeof banUserSchema>;
+
+export const tokenSchema = z.object({
+  token: z.string(),
+});
+
+export const resetPasswordSchema = tokenSchema.extend({ password: z.string() });
