@@ -22,6 +22,7 @@ export async function generateActions(
         isAvailable: raw.isAvailable,
         createdAt: raw.createdAt,
         updatedAt: raw.createdAt,
+        quantity: raw.totalNb,
       });
 
       actions.push(action);

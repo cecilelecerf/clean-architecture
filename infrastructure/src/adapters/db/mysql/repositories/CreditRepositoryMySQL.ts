@@ -53,7 +53,6 @@ export class CreditRepositoryMySQL implements CreditRepository {
         u.confirmed_at as user_confirmed_at,
 
         a.iban as account_iban,
-        a.role as account_role,
         a.name as account_name,
         a.type as account_type,
         a.balance as account_balance,
@@ -126,8 +125,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
         f.currency as form_currency,
         f.updated_at as form_updated_at,
 
-        a.iban as account_iban,
-        a.role as account_role,
+        a.iban as account_iban, 
         a.name as account_name,
         a.type as account_type,
         a.balance as account_balance,

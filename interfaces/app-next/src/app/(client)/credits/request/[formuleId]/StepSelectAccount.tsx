@@ -4,8 +4,9 @@ import { endpoints } from "@/utils/endpoint";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
+import { AccountId } from "@infrastructure/types/account";
 
-export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext }: { selectedAccountId?: string, onSelect: (accountId: string, currency: string) => void, onNext: () => void }) => {
+export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext }: { selectedAccountId: AccountId | null, onSelect: (accountId: AccountId | null, currency: string | null) => void, onNext: () => void }) => {
   const query = useQuery(endpoints.accounts.getAllByMe());
 
   if (query.isLoading) return <p>Chargement des comptes...</p>;

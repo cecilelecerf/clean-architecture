@@ -26,11 +26,12 @@ export const postWithTagsAndUserSchema = postSchema.extend({
 });
 export type PostWithTagsAndUser = z.infer<typeof postWithTagsAndUserSchema>;
 
-export const newPostSchema = postSchema.pick({
-  title: true,
-  content: true,
-  tagsId: true,
-});
+export const newPostSchema = postSchema
+  .pick({
+    title: true,
+    content: true,
+  })
+  .extend({ tagsId: z.string().array() });
 export type NewPost = z.infer<typeof newPostSchema>;
 
 export const newTagSchema = tagSchema.pick({

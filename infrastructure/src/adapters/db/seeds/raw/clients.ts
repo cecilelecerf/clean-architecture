@@ -4,6 +4,15 @@ export const rawClients = [
     lastname: "client",
     email: "client@example.com",
     password: "password123",
+    sexe: "boy",
+    dateOfBirth: new Date("1990-05-15"),
+    phoneNumber: "+33612345678",
+    address: {
+      address: "12 Rue de la Paix",
+      city: "Paris",
+      country: "France",
+      postalCode: "75001",
+    },
     accounts: [
       {
         name: "Compte courant",
@@ -54,6 +63,15 @@ export const rawClients = [
     lastname: "Martin",
     email: "benjamin.martin@example.com",
     password: "password123",
+    sexe: "boy",
+    dateOfBirth: new Date("1985-08-20"),
+    phoneNumber: "+33623456789",
+    address: {
+      address: "5 Avenue Victor Hugo",
+      city: "Lyon",
+      country: "France",
+      postalCode: "69001",
+    },
     accounts: [
       {
         name: "Compte courant",
@@ -87,6 +105,15 @@ export const rawClients = [
     lastname: "Leroy",
     email: "claire.leroy@example.com",
     password: "password123",
+    sexe: "girl",
+    dateOfBirth: new Date("1992-03-12"),
+    phoneNumber: "+33634567890",
+    address: {
+      address: "22 Boulevard Saint-Germain",
+      city: "Paris",
+      country: "France",
+      postalCode: "75005",
+    },
     accounts: [
       {
         name: "Compte courant",
@@ -120,6 +147,15 @@ export const rawClients = [
     lastname: "Moreau",
     email: "david.moreau@example.com",
     password: "password123",
+    sexe: "boy",
+    dateOfBirth: new Date("1988-11-05"),
+    phoneNumber: "+33645678901",
+    address: {
+      address: "10 Rue du Faubourg Saint-Antoine",
+      city: "Paris",
+      country: "France",
+      postalCode: "75011",
+    },
     accounts: [
       {
         name: "Compte courant",
@@ -153,6 +189,15 @@ export const rawClients = [
     lastname: "Bernard",
     email: "emma.bernard@example.com",
     password: "password123",
+    sexe: "girl",
+    dateOfBirth: new Date("1995-06-18"),
+    phoneNumber: "+33656789012",
+    address: {
+      address: "8 Rue de la République",
+      city: "Marseille",
+      country: "France",
+      postalCode: "13001",
+    },
     accounts: [
       {
         name: "Compte courant",
@@ -186,6 +231,15 @@ export const rawClients = [
     lastname: "Girard",
     email: "florent.girard@example.com",
     password: "password123",
+    sexe: "boy",
+    dateOfBirth: new Date("1991-09-10"),
+    phoneNumber: "+33667890123",
+    address: {
+      address: "3 Place Bellecour",
+      city: "Lyon",
+      country: "France",
+      postalCode: "69002",
+    },
     accounts: [
       {
         name: "Compte courant",
@@ -219,6 +273,15 @@ export const rawClients = [
     lastname: "Mercier",
     email: "julie.mercier@example.com",
     password: "password123",
+    sexe: "girl",
+    dateOfBirth: new Date("1993-12-01"),
+    phoneNumber: "+33678901234",
+    address: {
+      address: "7 Rue du Général Leclerc",
+      city: "Nice",
+      country: "France",
+      postalCode: "06000",
+    },
     accounts: [
       {
         name: "Compte courant",
@@ -252,6 +315,15 @@ export const rawClients = [
     lastname: "Renaud",
     email: "kevin.renaud@example.com",
     password: "password123",
+    sexe: "boy",
+    dateOfBirth: new Date("1989-07-22"),
+    phoneNumber: "+33689012345",
+    address: {
+      address: "15 Rue Nationale",
+      city: "Toulouse",
+      country: "France",
+      postalCode: "31000",
+    },
     accounts: [
       {
         name: "Compte courant",
@@ -285,6 +357,15 @@ export const rawClients = [
     lastname: "Petit",
     email: "lucie.petit@example.com",
     password: "password123",
+    sexe: "girl",
+    dateOfBirth: new Date("1994-04-30"),
+    phoneNumber: "+33690123456",
+    address: {
+      address: "9 Rue des Lilas",
+      city: "Bordeaux",
+      country: "France",
+      postalCode: "33000",
+    },
     accounts: [
       {
         name: "Compte courant",
@@ -318,6 +399,15 @@ export const rawClients = [
     lastname: "Robert",
     email: "maxime.robert@example.com",
     password: "password123",
+    sexe: "boy",
+    dateOfBirth: new Date("1990-02-14"),
+    phoneNumber: "+33601234567",
+    address: {
+      address: "18 Rue de la Gare",
+      city: "Lille",
+      country: "France",
+      postalCode: "59000",
+    },
     accounts: [
       {
         name: "Compte courant",

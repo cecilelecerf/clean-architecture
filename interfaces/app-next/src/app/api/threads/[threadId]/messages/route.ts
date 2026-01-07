@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { sendMessageFactory } from '@infrastructure/adapters/db/mysql/factories/messages/sendMessageFactory';
-import { messageSchema } from '@infrastructure/types/message';
 import z from 'zod';
 export const newMessageSchema = messageSchema.pick({ content: true });
 export type NewMessage = z.infer<typeof newMessageSchema>;
 
 import { getThreadMessagesFactory } from '@infrastructure/adapters/db/mysql/factories/messages/getThreadMessagesFactory';
+import { messageSchema } from '@infrastructure/types/thread';
 
 export async function GET(req: NextRequest, ctx: RouteContext<'/api/threads/[threadId]/messages'>) {
   try {

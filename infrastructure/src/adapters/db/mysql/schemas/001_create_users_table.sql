@@ -8,5 +8,15 @@ CREATE TABLE IF NOT EXISTS users (
     is_active BOOLEAN DEFAULT TRUE NOT NULL,
     created_at DATETIME NOT NULL,
     confirmed_at DATETIME,
-    updated_at DATETIME
+    updated_at DATETIME,
+    phone_number VARCHAR(20),
+    city VARCHAR(100),
+    address VARCHAR(255),
+    country VARCHAR(100),
+    postal_code VARCHAR(10),
+    sexe ENUM('girl', 'boy', 'other'),
+    date_of_birth DATE,
+    INDEX idx_users_email (email),
+    INDEX idx_users_role (role),
+    INDEX idx_users_active (is_active)
 );

@@ -1,177 +1,156 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import { endpoints } from "@/utils/endpoint";
-import { UpdateFormule } from "@/utils/endpoint/formuleEndpoints";
-import FormWrapper, { Field as TField } from "@/components/FromWrapper";
-import { FormuleDTO, FormuleTypes } from "@infrastructure/types/formule";
+import FormWrapper, { Section } from "@/components/erfer";
 
-export const UpdateFormuleForm = ({ formule, types }: { formule: FormuleDTO, types: FormuleTypes[] }) => {
+import {
+  FormuleDTO,
+  FormuleTypes,
+} from "@infrastructure/types/formule";
+
+import {
+  Percent,
+  FileText,
+  Coins,
+  Settings,
+} from "lucide-react";
+import z from "zod";
+import { UpdateFormule, updateFormuleSchema } from "@/utils/endpoint/formuleEndpoints";
+
+
+export const UpdateFormuleForm = ({
+  formule,
+  types,
+}: {
+  formule: FormuleDTO;
+  types: FormuleTypes[];
+}) => {
   const router = useRouter();
 
-
-  const typeOptions = types.map((t) => ({
-    label: t.label,
-    value: t.value,
-  }));
-
-  const [field, setField] = useState<UpdateFormule>({
-    interestRate: formule.interestRate,
-    insuranceRate: formule.insuranceRate,
-    type: formule.type,
-    label: formule.label,
-    description: formule.description,
-    minAmount: formule.minAmount,
-    maxAmount: formule.maxAmount,
-    currency: formule.currency,
-    isActive: formule.isActive,
+  const form = useForm<UpdateFormule>({
+    resolver: zodResolver(updateFormuleSchema),
   });
 
   const mutation = useMutation(
     endpoints.formules.update({ formuleId: formule.id })
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  /** 🔁 Hydratation */
+  useEffect(() => {
+    form.reset({
+      interestRate: formule.interestRate,
+      insuranceRate: formule.insuranceRate,
+      type: formule.type,
+      label: formule.label,
+      description: formule.description,
+      minAmount: formule.minAmount,
+      maxAmount: formule.maxAmount,
+      currency: formule.currency,
+      isActive: formule.isActive,
+    });
+  }, [formule]);
 
-    if (!field.type || !field.interestRate) return;
-
-    mutation.mutate(field, { onSuccess: () => router.push(`/director/formules/${formule.id}`) });
+  const handleSubmit = (values: UpdateFormule) => {
+    mutation.mutate(values, {
+      onSuccess: () =>
+        router.push(`/director/formules/${formule.id}`),
+    });
   };
 
+  const typeOptions = types.map((t) => ({
+    label: t.label,
+    value: t.value,
+  }));
 
-  const fields: TField[] = [
+  const sections: Section<UpdateFormule>[] = [
     {
-      label: "Taux d'intérêt",
-      type: "number",
-      get: field.interestRate.toString(),
-      set: (e) =>
-        setField((prev) => ({
-          ...prev,
-          interestRate: Number(e),
-        })),
-      numberOptions: {
-        min: 0,
-        step: 0.01,
+      title: "Taux",
+      description: "Paramètres financiers de la formule",
+      icon: Percent,
+      data: {
+        interestRate: {
+          label: "Taux d'intérêt",
+          type: "number",
+        },
+        insuranceRate: {
+          label: "Taux d'assurance",
+          type: "number",
+        },
       },
     },
     {
-      label: 'Taux d\'assurance',
-      type: 'number',
-      get: field.insuranceRate.toString(),
-      set: (e) =>
-        setField((prev) => ({
-          ...prev,
-          insuranceRate: Number(e),
-        })),
-      numberOptions: {
-        min: 0,
-        step: 0.01,
+      title: "Informations",
+      description: "Identification de la formule",
+      icon: FileText,
+      data: {
+        type: {
+          label: "Type de prêt",
+          type: "select",
+          options: typeOptions,
+        },
+        label: {
+          label: "Label",
+          type: "text",
+        },
+        description: {
+          label: "Description",
+          type: "textarea",
+        },
       },
     },
     {
-
-      label: "Type de prêt",
-      type: "select",
-      placeholder: "Sélectionnez un type",
-      get: field.type,
-      set: (value) =>
-        setField(prev => ({
-          ...prev,
-          type: value as string,
-        })),
-      options: typeOptions,
-    },
-    {
-      label: "Label",
-      type: "text",
-      get: field.label,
-      set: (e) =>
-        setField((prev) => ({
-          ...prev,
-          label: e as string,
-        })),
-    },
-    {
-      label: "Description",
-      type: "textarea",
-      get: field.description,
-      set: (e) =>
-        setField((prev) => ({
-          ...prev,
-          description: e as string,
-        })),
-    },
-    {
-      label: 'Montant minimum',
-      type: 'number',
-      get: field.minAmount.toString(),
-      set: (e) =>
-        setField((prev) => ({
-          ...prev,
-          minAmount: Number(e),
-        })),
-      numberOptions: {
-        min: 0,
-        step: 1,
+      title: "Montants",
+      description: "Plage de montants autorisés",
+      icon: Coins,
+      data: {
+        minAmount: {
+          label: "Montant minimum",
+          type: "number",
+        },
+        maxAmount: {
+          label: "Montant maximum",
+          type: "number",
+        },
+        currency: {
+          label: "Devise",
+          type: "select",
+          options: [
+            { label: "Euro", value: "EUR" },
+            { label: "Dollar américain", value: "USD" },
+            { label: "Livre sterling", value: "GBP" },
+          ],
+        },
       },
     },
     {
-      label: 'Montant maximum',
-      type: 'number',
-      get: field.maxAmount.toString(),
-      set: (e) =>
-        setField((prev) => ({
-          ...prev,
-          maxAmount: Number(e),
-        })),
-      numberOptions: {
-        min: 0,
-        step: 1,
+      title: "Paramètres",
+      description: "État de la formule",
+      icon: Settings,
+      data: {
+        isActive: {
+          label: "Formule active",
+          type: "switch",
+        },
       },
     },
-    {
-      label: "Devise",
-      type: "select",
-      get: field.currency,
-      set: (e) =>
-        setField((prev) => ({
-          ...prev,
-          currency: e as string,
-        })),
-      options: [
-        { label: "Euro", value: "EUR", icon: "" },
-        { label: "Dollar américain", value: "USD", icon: "" },
-        { label: "Livre sterling", value: "GBP", icon: "" },
-      ]
-    },
-    {
-      label: "Formule active",
-      type: "checkbox",
-      get: field.isActive ? ["active"] : [],
-      set: (e) =>
-        setField((prev) => ({
-          ...prev,
-          isActive: Array.isArray(e) && e.includes("active"),
-        })),
-      options: [
-        { label: "Active", value: "active", icon: "" },
-      ],
-    }
   ];
 
   return (
-    <form onSubmit={handleSubmit}>
-      <FormWrapper
-        title="Modifier la formule"
-        description="Mettre à jour la formule de prêt"
-        fields={fields}
-        button="Enregistrer"
-        loading={mutation.isPending}
-      />
-    </form>
+    <FormWrapper<UpdateFormule>
+      title="Modifier la formule"
+      description="Mettre à jour la formule de prêt"
+      form={form}
+      data={sections}
+      labelButton="Enregistrer"
+      loading={mutation.isPending}
+      onSubmit={handleSubmit}
+      showBackButton
+    />
   );
-}
+};

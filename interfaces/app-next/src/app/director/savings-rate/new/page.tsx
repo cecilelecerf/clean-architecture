@@ -1,67 +1,50 @@
 "use client"
 
-import { NewSavingsrate } from "@/utils/endpoint/savingsrateEndpoints"
-import { useState } from "react"
+import { NewSavingsrate, newSavingsrateSchema } from "@/utils/endpoint/savingsrateEndpoints"
 import { endpoints } from '@/utils/endpoint';
 import { useMutation } from "@tanstack/react-query";
-import FormWrapper, { Field as TField } from '@/components/FromWrapper';
 import router from "next/router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import FormWrapper, { DataInfo } from "@/components/erfer";
 
 export default function NewSavingsRatePage() {
-    const [field, setField] = useState<NewSavingsrate>({
-        rate: 0,
-        effectiveDate: ''
-    })
+    const form = useForm<NewSavingsrate>({
+        resolver: zodResolver(newSavingsrateSchema),
+    });
     const mutation = useMutation(endpoints.savingsRates.create());
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (values: NewSavingsrate) => {
 
-        if (!field.rate || !field.effectiveDate) {
+        if (!values.rate || !values.effectiveDate) {
             return;
         }
 
-        const effectiveDateISO = new Date(field.effectiveDate).toISOString();
+        const effectiveDateISO = new Date(values.effectiveDate).toISOString();
 
-        mutation.mutate({ rate: field.rate, effectiveDate: effectiveDateISO }, { onSuccess: () => router.push(`/savingsrate`) });
+        mutation.mutate({ rate: values.rate, effectiveDate: effectiveDateISO }, { onSuccess: () => router.push(`/savingsrate`) });
     };
 
-    const fields: TField[] = [
-        {
-            label: 'Taux',
-            type: 'number',
-            get: field.rate.toString(),
-            set: (e) =>
-                setField((prev) => ({
-                    ...prev,
-                    rate: Number(e),
-                })),
-            numberOptions: {
-                min: 0,
-                step: 0.01,
-            },
+    const fields: DataInfo<NewSavingsrate> = {
+        rate: {
+            label: "Taux",
+            type: "number"
         },
-        {
-            label: 'Date d\'entrée en vigueur',
-            type: 'date',
-            get: field.effectiveDate,
-            set: (e) =>
-                setField((prev) => ({
-                    ...prev,
-                    effectiveDate: e as string,
-                })),
-        },
-    ]
+        effectiveDate: {
+            label: "Date d\'entrée en vigueur",
+            type: 'date'
+        }
+    }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <FormWrapper
-                title="Nouveau taux d'épargne"
-                description="Créer un taux d'épargne"
-                fields={fields}
-                button="Enregistrer"
-                loading={mutation.isPending}
-            ></FormWrapper>
-        </form>
+        <FormWrapper<NewSavingsrate>
+            title="Nouveau taux d'épargne"
+            description="Créer un taux d'épargne"
+            data={fields}
+            labelButton="Enregistrer"
+            loading={mutation.isPending}
+            form={form}
+            onSubmit={handleSubmit}
+        ></FormWrapper>
     )
 }

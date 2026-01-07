@@ -59,7 +59,7 @@ export class CurrencyRepositoryMySQL implements CurrencyRepository {
       code: row.code,
       exchangeRate: Number(row.exchange_rate),
       createdAt: new Date(row.created_at),
-      updatedAt: row.updated_at ? new Date(row.updated_at) : undefined,
+      updatedAt: new Date(row.updated_at),
     });
   }
 }

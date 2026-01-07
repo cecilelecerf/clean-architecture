@@ -12,7 +12,7 @@ import {
 export const userIdSchema = z.uuid().brand("user");
 export type UserId = z.infer<typeof userIdSchema>;
 
-const baseUserSchema = z.object({
+export const baseUserSchema = z.object({
   id: userIdSchema,
   firstname: z
     .string({ error: "Le prénom est obligatoire" })
@@ -40,15 +40,16 @@ const addressSchema = z.object({
   address: addressLineSchema,
   postalCode: postalCodeSchema,
 });
+const clientSchema = baseUserSchema.extend({
+  role: z.literal("client"),
+  sexe: sexeSchema,
+  address: addressSchema,
+  dateOfBirth: dateOfBirthSchema,
+  phoneNumber: phoneNumberSchema,
+});
 
 export const userSchema = z.discriminatedUnion("role", [
-  baseUserSchema.extend({
-    role: z.literal("client"),
-    sexe: sexeSchema,
-    address: addressSchema,
-    dateOfBirth: dateOfBirthSchema,
-    phoneNumber: phoneNumberSchema,
-  }),
+  clientSchema,
   baseUserSchema.extend({
     role: z.literal("conseiller"),
   }),
@@ -63,56 +64,20 @@ export type ClientUser = Extract<User, { role: "client" }>;
 export type ConseillerUser = Extract<User, { role: "conseiller" }>;
 export type DirecteurUser = Extract<User, { role: "directeur" }>;
 
-export const createClientSchema = baseUserSchema
+export const createClientSchema = clientSchema
   .omit({
     id: true,
-    passwordHash: true,
     createdAt: true,
     updatedAt: true,
     confirmedAt: true,
+    isActiveField: true,
+    address: true,
   })
   .extend({
-    role: z.literal("client"),
-    password: z.string().min(8),
-    sexe: z.enum(["girl", "boy", "other"]),
-    address: addressSchema,
-    dateOfBirth: z.iso.datetime(),
-    phoneNumber: z.string(),
+    confirmPassword: clientSchema.shape.passwordHash,
+    ...addressSchema.shape,
   });
-
-export const createConseillerSchema = baseUserSchema
-  .omit({
-    id: true,
-    passwordHash: true,
-    createdAt: true,
-    updatedAt: true,
-    confirmedAt: true,
-  })
-  .extend({
-    role: z.literal("conseiller"),
-    password: z.string().min(8),
-  });
-
-export const createDirecteurSchema = baseUserSchema
-  .omit({
-    id: true,
-    passwordHash: true,
-    createdAt: true,
-    updatedAt: true,
-    confirmedAt: true,
-  })
-  .extend({
-    role: z.literal("directeur"),
-    password: z.string().min(8),
-  });
-
-export const createUserSchema = z.discriminatedUnion("role", [
-  createClientSchema,
-  createConseillerSchema,
-  createDirecteurSchema,
-]);
-
-export type CreateUserPayload = z.infer<typeof createUserSchema>;
+export type CreateClientPayload = z.infer<typeof createClientSchema>;
 
 export const updateUserBaseSchema = z.object({
   firstname: z.string().optional(),
@@ -139,10 +104,6 @@ export const userDtoSchema = z.discriminatedUnion("role", [
     role: z.literal("client"),
     isActiveField: z.boolean(),
     confirmedAt: z.iso.datetime().nullable().optional(),
-    sexe: z.enum(["girl", "boy", "other"]),
-    address: addressSchema,
-    dateOfBirth: z.iso.datetime(),
-    phoneNumber: z.string(),
   }),
   z.object({
     id: userIdSchema,

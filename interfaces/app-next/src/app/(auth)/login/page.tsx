@@ -1,22 +1,26 @@
 'use client';
-import FormWrapper from '../../../components/FromWrapper';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { match } from 'ts-pattern';
 import Link from 'next/link';
-
+import FormWrapper, { DataInfo } from '@/components/erfer';
+import { useForm } from 'react-hook-form';
+import z from 'zod';
+import { createClientSchema } from '@infrastructure/types/user';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { User } from 'lucide-react';
+const loginSchema = createClientSchema.pick({ email: true, passwordHash: true })
+type Login = z.infer<typeof loginSchema>
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState<string>();
-  const [password, setPassword] = useState<string>();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<Login>({
+    resolver: zodResolver(loginSchema),
+  })
+  const handleSubmit = async (values: Login) => {
     const res = await signIn('credentials', {
       redirect: false,
-      email,
-      password,
+      email: values.email,
+      password: values.passwordHash,
     });
 
     if (!res?.ok) {
@@ -38,17 +42,17 @@ export default function LoginPage() {
       .otherwise(() => router.push('/unauthorized'));
 
   };
+  const data: DataInfo<Login> = { email: { label: "Email", type: "email" }, passwordHash: { label: "Mot de passe", type: "password" } }
 
   return (
-    <form onSubmit={(e) => handleSubmit(e)}>
+    <>
       <Link href="/">ACCUEIL</Link>
-      <FormWrapper
+      <FormWrapper<Login>
         title="Se connecter"
-        fields={[
-          { get: email, set: (e) => setEmail(e as string), label: 'Email', type: 'email', withIcon: true, required: true },
-          { get: password, set: (e) => setPassword(e as string), label: 'Mot de passe', type: 'password', withIcon: true, required: true },
-        ]}
-        button="Connexion"
+        form={form}
+        data={data}
+        onSubmit={handleSubmit}
+        labelButton="Connexion"
         loading={false}
       >
         <div className="space-y-2 text-center text-sm">
@@ -70,6 +74,6 @@ export default function LoginPage() {
         </div>
       </FormWrapper>
 
-    </form>
+    </>
   );
 }

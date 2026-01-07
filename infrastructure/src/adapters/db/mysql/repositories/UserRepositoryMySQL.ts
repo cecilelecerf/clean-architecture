@@ -9,39 +9,41 @@ import { AccountEntity } from "@domain/entities/AccountEntity";
 export class UserRepositoryMySQL implements UserRepository {
   constructor(private readonly client: MySQLClient) {}
 
-  /** Trouver un utilisateur par ID */
+  /** Trouver par ID */
   async findById(id: UserEntity["id"]): Promise<UserEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM users WHERE id = ?",
       [id]
     );
 
-    if (rows.length === 0) return null;
-
+    if (!rows.length) return null;
     return UserMapper.mapRowToUser(rows[0]);
   }
 
-  /** Trouver un utilisateur par email */
+  /** Trouver par email */
   async findByEmail(email: Email): Promise<UserEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM users WHERE email = ?",
       [email.value]
     );
 
-    if (rows.length === 0) return null;
-
+    if (!rows.length) return null;
     return UserMapper.mapRowToUser(rows[0]);
   }
 
-  /** Trouver un utilisateur par iban */
+  /** Trouver par IBAN */
   async findByIban(iban: AccountEntity["iban"]): Promise<UserEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM users u LEFT JOIN accounts a ON u.id = a.user_id WHERE a.iban = ? ",
+      `
+      SELECT u.*
+      FROM users u
+      INNER JOIN accounts a ON a.user_id = u.id
+      WHERE a.iban = ?
+      `,
       [iban]
     );
 
-    if (rows.length === 0) return null;
-
+    if (!rows.length) return null;
     return UserMapper.mapRowToUser(rows[0]);
   }
 
@@ -54,12 +56,15 @@ export class UserRepositoryMySQL implements UserRepository {
     return rows.map((row) => UserMapper.mapRowToUser(row));
   }
 
-  /** Utilisateurs actifs par rôle */
+  /** Utilisateurs actifs (optionnellement par rôle) */
   async findAllByRoleAndIsActif(
     role?: UserEntity["role"]
   ): Promise<UserEntity[]> {
-    let query =
-      "SELECT * FROM users WHERE is_active = 1 AND confirmed_at IS NOT NULL";
+    let query = `
+      SELECT * FROM users
+      WHERE is_active = 1
+      AND confirmed_at IS NOT NULL
+    `;
     const params: any[] = [];
 
     if (role) {
@@ -70,16 +75,33 @@ export class UserRepositoryMySQL implements UserRepository {
     query += " ORDER BY lastname ASC, firstname ASC";
 
     const rows = await this.client.query<RowDataPacket[]>(query, params);
-
     return rows.map((row) => UserMapper.mapRowToUser(row));
   }
 
-  /** Sauvegarder un utilisateur */
+  /** Sauvegarde (CREATE) */
   async save(user: UserEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO users 
-      (id, firstname, lastname, email, password_hash, role, is_active, created_at, confirmed_at, updated_at) 
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `
+      INSERT INTO users (
+        id,
+        firstname,
+        lastname,
+        email,
+        password_hash,
+        role,
+        is_active,
+        phone_number,
+        sexe,
+        date_of_birth,
+        address,
+        city,
+        country,
+        postal_code,
+        created_at,
+        updated_at,
+        confirmed_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
       [
         user.id,
         user.firstname,
@@ -88,26 +110,42 @@ export class UserRepositoryMySQL implements UserRepository {
         user.passwordHash,
         user.role,
         user.isActiveField,
+        user.phoneNumber ?? null,
+        user.sexe ?? null,
+        user.dateOfBirth ?? null,
+        user.address?.address ?? null,
+        user.address?.city ?? null,
+        user.address?.country ?? null,
+        user.address?.postalCode ?? null,
         user.createdAt,
-        user.confirmedAt ?? null,
         user.updatedAt,
+        user.confirmedAt ?? null,
       ]
     );
   }
 
-  /** Mettre à jour un utilisateur */
+  /** Mise à jour */
   async update(user: UserEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `UPDATE users 
-     SET firstname = ?, 
-         lastname = ?, 
-         email = ?, 
-         password_hash = ?, 
-         role = ?, 
-         is_active = ?, 
-         confirmed_at = ?, 
-         updated_at = ? 
-      WHERE id = ?`,
+      `
+      UPDATE users SET
+        firstname = ?,
+        lastname = ?,
+        email = ?,
+        password_hash = ?,
+        role = ?,
+        is_active = ?,
+        phone_number = ?,
+        sexe = ?,
+        date_of_birth = ?,
+        address = ?,
+        city = ?,
+        country = ?,
+        postal_code = ?,
+        confirmed_at = ?,
+        updated_at = ?
+      WHERE id = ?
+      `,
       [
         user.firstname,
         user.lastname,
@@ -115,6 +153,13 @@ export class UserRepositoryMySQL implements UserRepository {
         user.passwordHash,
         user.role,
         user.isActiveField,
+        user.phoneNumber ?? null,
+        user.sexe ?? null,
+        user.dateOfBirth ?? null,
+        user.address?.address ?? null,
+        user.address?.city ?? null,
+        user.address?.country ?? null,
+        user.address?.postalCode ?? null,
         user.confirmedAt ?? null,
         user.updatedAt,
         user.id,
@@ -122,17 +167,23 @@ export class UserRepositoryMySQL implements UserRepository {
     );
   }
 
-  /** Supprimer un utilisateur */
+  /** Suppression */
   async delete(id: UserEntity["id"]): Promise<void> {
     await this.client.query<ResultSetHeader>("DELETE FROM users WHERE id = ?", [
       id,
     ]);
   }
 
-  /** Utilisateurs actifs par rôle */
+  /** Compter les utilisateurs actifs par rôle */
   async countUserByRole(role: UserEntity["role"]): Promise<number> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT COUNT(*) as count FROM users WHERE is_active = 1 AND confirmed_at IS NOT NULL AND role = ?",
+      `
+      SELECT COUNT(*) as count
+      FROM users
+      WHERE role = ?
+        AND is_active = 1
+        AND confirmed_at IS NOT NULL
+      `,
       [role]
     );
 

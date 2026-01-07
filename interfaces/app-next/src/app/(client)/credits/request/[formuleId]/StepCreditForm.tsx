@@ -1,81 +1,90 @@
-"use client";
-import FormWrapper, { Field } from "@/components/FromWrapper";
+'use client';
 
-type CreditFormData = {
-  amount: string;
-  startDate: string;
-  durationMonths: string;
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import FormWrapper, { DataInfo } from '@/components/erfer';
+import { useMutation } from '@tanstack/react-query';
+import { endpoints } from '@/utils/endpoint';
+import { AccountId } from '@infrastructure/types/account';
+import { FormuleDTO } from '@infrastructure/types/formule';
+import { useRouter } from 'next/navigation';
+import { requestCreditSchema } from '@/utils/endpoint/creditEndpoints';
+
+const formRequestCreditSchema = requestCreditSchema.pick({
+  durationMonths: true,
+}).extend({
+  initialAmount: z.number(),
+  startDate: z.string()
+})
+
+export type FormRequestCredit = z.infer<typeof formRequestCreditSchema>
+
+type StepCreditFormProps = {
+  minAmount?: number;
+  maxAmount?: number;
+  formule: FormuleDTO
+  info: { accountId: AccountId, currency: string }
 };
 
-export const StepCreditForm = ({ data, setData, onSubmit, loading, minAmount, maxAmount }: { data: CreditFormData, setData: (data: Partial<CreditFormData>) => void, onSubmit: () => void, loading: boolean, minAmount?: number, maxAmount?: number }) => {
-  const getMinStartDate = () => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
+export const StepCreditForm = ({ formule, info }: StepCreditFormProps) => {
+  const mutation = useMutation(endpoints.credits.create());
+  const router = useRouter()
+  const form = useForm<FormRequestCredit>({
+    resolver: zodResolver(formRequestCreditSchema),
+  });
+
+  const data: DataInfo<FormRequestCredit> = {
+    initialAmount: {
+      label: 'Montant souhaité',
+      type: 'number',
+      placeholder: `Entre ${formule.minAmount ?? 100} et ${formule.maxAmount ?? 10000} €`,
+    },
+    startDate: {
+      label: 'Date de début',
+      type: 'date',
+      placeholder: 'YYYY-MM-DD',
+    },
+    durationMonths: {
+      label: 'Durée (mois)',
+      type: 'number',
+      placeholder: 'Ex: 12',
+    },
   };
 
-  const isAmountValid = () => {
-    const value = Number(data.amount);
-    if (Number.isNaN(value)) return false;
 
-    if (minAmount !== undefined && value < minAmount) return false;
-    if (maxAmount !== undefined && value > maxAmount) return false;
 
-    return true;
-  };
-
-  const fields: Field[] = [
-    {
-      label: "Montant souhaité",
-      type: "number",
-      get: data.amount,
-      set: (v) => setData({ amount: v as string }),
-      numberOptions: {
-        min: minAmount ?? 100,
-        max: maxAmount ?? undefined,
-        step: 100,
+  const submit = (values: FormRequestCredit) => {
+    const effectiveDateISO = new Date(values.startDate).toISOString();
+    console.log(effectiveDateISO)
+    mutation.mutate(
+      {
+        accountId: info.accountId,
+        formuleCreditId: formule.id,
+        initialAmount: {
+          amount: values.initialAmount,
+          currency: info.currency
+        },
+        durationMonths: values.durationMonths,
+        startDate: effectiveDateISO
       },
-    },
-    {
-      label: "Date de début",
-      type: "date",
-      get: data.startDate,
-      set: (v) => setData({ startDate: v as string }),
-      numberOptions: { min: getMinStartDate() },
-    },
-    {
-      label: `Durée (mois)${data.durationMonths && Number(data.durationMonths) > 0
-        ? ` (${Math.floor(Number(data.durationMonths) / 12)} an${Number(data.durationMonths) >= 24 ? "s" : ""
-        })`
-        : ""
-        }`,
-      type: "number",
-      get: data.durationMonths,
-      set: (v) => setData({ durationMonths: v as string }),
-      numberOptions: { min: 1 },
-    },
-  ];
+      {
+        onSuccess: (data) => {
+          router.push(`/credits/${data.id}`);
+        },
+      }
+    );
+  };
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (!isAmountValid()) return;
-        onSubmit();
-      }}>
-
-      <FormWrapper
-        title="Informations du crédit"
-        description="Renseignez les détails de votre crédit"
-        fields={fields}
-        button="Envoyer la demande"
-        loading={loading}
-      />
-
-      {!isAmountValid() && data.amount && (
-        <p className="text-sm text-red-500 mt-1">
-          Le montant doit être compris entre {minAmount?.toLocaleString()} € et {maxAmount?.toLocaleString()} €
-        </p>
-      )}
-    </form>
+    <FormWrapper<FormRequestCredit>
+      title="Informations du crédit"
+      description="Renseignez les détails de votre crédit"
+      form={form}
+      data={data}
+      onSubmit={submit}
+      labelButton="Envoyer la demande"
+      loading={mutation.isPending}
+    />
   );
-}
+};

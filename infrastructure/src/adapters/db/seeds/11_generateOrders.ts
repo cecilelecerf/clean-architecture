@@ -50,14 +50,7 @@ function generateBuyOrder(
     status,
     createdAt: date,
     updatedAt: date,
-    executionType: status === "executed" ? "market" : "limit",
   };
-
-  if (status === "pending") {
-    order.limitPrice = parseFloat(
-      (action.price.amount * randomFloat(0.85, 0.95)).toFixed(2)
-    );
-  }
 
   return order;
 }
@@ -95,14 +88,7 @@ function generateSellOrder(
     status,
     createdAt: date,
     updatedAt: date,
-    executionType: status === "executed" ? "market" : "limit",
   };
-
-  if (status === "pending") {
-    order.limitPrice = parseFloat(
-      (action.price.amount * randomFloat(1.05, 1.15)).toFixed(2)
-    );
-  }
 
   return order;
 }
@@ -127,7 +113,7 @@ function generateOrdersForUser(
   const inventory: ActionInventory = {};
 
   for (const action of actions) {
-    inventory[action.ISIN] = {
+    inventory[action.ISIN.getValue()] = {
       totalBought: 0,
       totalSold: 0,
       availableToSell: 0,
@@ -142,22 +128,23 @@ function generateOrdersForUser(
       const buyOrder = generateBuyOrder(userId, action, i, clockService);
       orders.push(buyOrder);
 
-      inventory[action.ISIN].totalBought += buyOrder.quantity;
-      inventory[action.ISIN].availableToSell += buyOrder.quantity;
+      inventory[action.ISIN.getValue()].totalBought += buyOrder.quantity;
+      inventory[action.ISIN.getValue()].availableToSell += buyOrder.quantity;
 
       if (Math.random() < sellProbability) {
         const sellOrder = generateSellOrder(
           userId,
           action,
           i,
-          inventory[action.ISIN].availableToSell,
+          inventory[action.ISIN.getValue()].availableToSell,
           clockService
         );
         if (sellOrder) {
           orders.push(sellOrder);
 
-          inventory[action.ISIN].totalSold += sellOrder.quantity;
-          inventory[action.ISIN].availableToSell -= sellOrder.quantity;
+          inventory[action.ISIN.getValue()].totalSold += sellOrder.quantity;
+          inventory[action.ISIN.getValue()].availableToSell -=
+            sellOrder.quantity;
         }
       }
     }
@@ -222,17 +209,6 @@ export async function generateOrders(
           orders.push(order);
 
           const action = actions.find((a) => a.ISIN === order.ISIN);
-          const executionInfo =
-            order.executionType === "limit" && order.limitPrice
-              ? ` @ limit ${order.limitPrice.amount}€`
-              : "";
-          console.log(
-            `  ✅ Order created: ${order.type.toUpperCase()} ${
-              order.quantity
-            }x ${action?.symbol || order.ISIN} (${order.status}${
-              order.executionType === "limit" ? " - LIMIT" : ""
-            }${executionInfo}) for ${client.email}`
-          );
         } catch (err) {
           console.warn(`  ⚠️  Failed to create order:`, err);
         }
@@ -241,7 +217,7 @@ export async function generateOrders(
       // Afficher le résumé de l'inventaire pour ce client
       console.log(`  📊 Inventaire pour ${client.email}:`);
       Object.entries(inventory).forEach(([isin, inv]) => {
-        const action = actions.find((a) => a.ISIN === isin);
+        const action = actions.find((a) => a.ISIN.getValue() === isin);
         console.log(
           `     ${action?.symbol || isin}: ${inv.totalBought} achetées, ${
             inv.totalSold

@@ -9,9 +9,18 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import {
-  InvalidFirstnameError,
-  InvalidLastnameError,
+  DateOfBirthInFutureError,
+  DateOfBirthRequiredError,
+  DateOfBirthTooOldError,
+  InvalidDateOfBirthError,
+  InvalidPhoneNumberError,
+  InvalidSexeError,
+  PhoneNumberRequiredError,
+  SexeRequiredError,
+  UserTooYoungError,
 } from "@domain/errors/user";
+import { InvalidFirstnameError } from "@domain/errors/user/InvalidFirstnameError";
+import { InvalidLastnameError } from "@domain/errors/user/InvalidLastnameError";
 import { Email } from "@domain/values/Email";
 
 type Props = {
@@ -41,6 +50,15 @@ export class UpdateUserUsecase {
     | UserRoleMismatchError
     | InvalidFirstnameError
     | InvalidLastnameError
+    | PhoneNumberRequiredError
+    | InvalidPhoneNumberError
+    | SexeRequiredError
+    | InvalidSexeError
+    | DateOfBirthRequiredError
+    | InvalidDateOfBirthError
+    | DateOfBirthInFutureError
+    | DateOfBirthTooOldError
+    | UserTooYoungError
   > {
     const user = await this.userRepository.findById(userId);
     if (!user) return new UserNotFoundError();
