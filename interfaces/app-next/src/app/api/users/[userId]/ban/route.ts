@@ -8,16 +8,13 @@ import {
   UserNotFoundError,
   UserRoleMismatchError,
 } from '@application/errors/users';
-import {
-  UserAlreadyBannedError,
-  UserCannotBanDirectorError,
-  UserCannotBanSelfError,
-  UserCannotUnbanDirectorError,
-  UserNotBannedError,
-} from '@domain/errors/user';
 import z from 'zod';
-const banUserSchema = z.object({ status: z.boolean() });
-export type ReqBanUser = z.infer<typeof banUserSchema>;
+import { UserAlreadyBannedError } from '@domain/errors/user/UserAlreadyBannedError';
+import { UserCannotBanSelfError } from '@domain/errors/user/UserCannotBanSelfError';
+import { UserCannotBanDirectorError } from '@domain/errors/user/UserCannotBanDirectorError';
+import { UserNotBannedError } from '@domain/errors/user/UserNotBannedError';
+import { UserCannotUnbanDirectorError } from '@domain/errors/user/UserCannotUnbanDirectorError';
+import { banUserSchema, ReqBanUser } from '@infrastructure/types/user';
 
 export async function POST(req: NextRequest, ctx: RouteContext<'/api/users/[userId]/ban'>) {
   try {

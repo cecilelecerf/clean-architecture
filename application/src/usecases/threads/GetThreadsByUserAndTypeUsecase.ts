@@ -3,10 +3,7 @@ import {
   UserNotFoundError,
   UserRoleMismatchError,
 } from "@application/errors/users";
-import {
-  ThreadEntityWithUsers,
-  ThreadRepository,
-} from "@application/ports/repositories/ThreadRepository";
+import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import {
   ThreadEntityWithUsersDTO,

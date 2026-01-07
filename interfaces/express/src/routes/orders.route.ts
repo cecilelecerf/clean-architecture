@@ -4,13 +4,35 @@ import { OrdersController } from "../controllers/orders.controller";
 
 const ordersRouter: Router = express.Router();
 
-ordersRouter.get("/orders", authMiddleware, OrdersController.getAllByUser);
+ordersRouter.get("/", authMiddleware, OrdersController.getAllByUser);
 
-ordersRouter.get("/orders/portfolio", authMiddleware, OrdersController.getPortfolio);
+ordersRouter.get("/portfolio", authMiddleware, OrdersController.getPortfolio);
 
-ordersRouter.get("/orders/actions/:ISIN", authMiddleware, OrdersController.getAllByActionStatusAndUser);
-ordersRouter.get("/orders/actions/:ISIN/portfolio", authMiddleware, OrdersController.getPortfolioByISIN);
-ordersRouter.get("/orders/actions/:ISIN/history", authMiddleware, OrdersController.getHistory);
-ordersRouter.post("/orders/actions/:ISIN/:type", authMiddleware, OrdersController.placeOrder);
+ordersRouter.get(
+  "/actions/:ISIN",
+  authMiddleware,
+  OrdersController.getAllByActionStatusAndUser
+);
+ordersRouter.get(
+  "/actions/:ISIN/portfolio",
+  authMiddleware,
+  OrdersController.getPortfolioByISIN
+);
+ordersRouter.get(
+  "/actions/:ISIN/history",
+  authMiddleware,
+  OrdersController.getHistory
+);
+ordersRouter.post(
+  "/actions/:ISIN/:type",
+  authMiddleware,
+  OrdersController.placeOrder
+);
 
-ordersRouter.patch("/orders/:orderId/cancel", authMiddleware, OrdersController.cancelOrder);
+ordersRouter.patch(
+  "/:orderId/cancel",
+  authMiddleware,
+  OrdersController.cancelOrder
+);
+
+export default ordersRouter;

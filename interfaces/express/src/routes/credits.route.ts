@@ -4,17 +4,35 @@ import { CreditsController } from "../controllers/credits.controller";
 
 const creditsRouter: Router = express.Router();
 
-creditsRouter.get("/credits", authMiddleware, CreditsController.getAllByUser);
-creditsRouter.post("/credits", authMiddleware, CreditsController.request);
+creditsRouter.get("/", authMiddleware, CreditsController.getAllByUser);
+creditsRouter.post("/", authMiddleware, CreditsController.request);
 
-creditsRouter.get("/credits/:creditId", authMiddleware, CreditsController.getCredit);
-creditsRouter.patch("/credits/:creditId", authMiddleware, CreditsController.applyMonthlyPaiement);
+  
+ 
+creditsRouter.get("/users/:userId", authMiddleware, CreditsController.getOneByUser);
+ 
 
-creditsRouter.patch("/credits/:creditId/grant", authMiddleware, CreditsController.grantCredit);
+creditsRouter.get("/status", authMiddleware, CreditsController.getAllByStatus);
 
-creditsRouter.get("/credits/users/:userId", authMiddleware, CreditsController.getOneByUser);
+creditsRouter.get(
+  "/formules/:formuleId",
+  authMiddleware,
+  CreditsController.getAllByFormule
+);
 
-creditsRouter.get("/credits/status", authMiddleware, CreditsController.getAllByStatus);
+ 
+creditsRouter.patch(
+  "/:creditId/grant",
+  authMiddleware,
+  CreditsController.grantCredit
+);
+creditsRouter.get("/:creditId", authMiddleware, CreditsController.getCredit);
+creditsRouter.patch(
+  "/:creditId",
+  authMiddleware,
+  CreditsController.applyMonthlyPaiement
+);
 
-creditsRouter.get("/credits/formules/:formuleId", authMiddleware, CreditsController.getAllByFormule);
 
+export default creditsRouter;
+ 

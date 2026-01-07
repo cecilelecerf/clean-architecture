@@ -36,7 +36,6 @@ export class GetThreadByIdUsecase {
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-
     const thread = await this.threadRepository.findWithUserById(threadId);
     if (!thread) return new ThreadNotFoundError();
     if (!thread.hasAccess(user.id) && thread.administratorId !== null)

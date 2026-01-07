@@ -22,7 +22,7 @@ export class UserMapper {
     const email = Email.from(doc.email);
 
     return UserEntity.from({
-      id: doc._id,
+      id: doc._id.toString(),
       firstname: doc.firstname,
       lastname: doc.lastname,
       email,

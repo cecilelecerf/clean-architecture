@@ -602,6 +602,10 @@ export class UserEntity {
 
     return trimmed;
   }
+
+  public static isUserRole(role: string): role is UserEntity["role"] {
+    return ["client", "conseiller", "directeur"].includes(role);
+  }
 }
 
 export type UserToDTO = {
