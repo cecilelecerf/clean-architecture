@@ -1,21 +1,26 @@
 {
   "version": "0.1.0",
   "private": true,
+  "name": "express",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "run": "ts-node -r tsconfig-paths/register ./express/server.ts"
+    "build": "tsc -p tsconfig.json",
+    "express": "tsx watch ./src/index.ts"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "typescript": "^5.6.3"
   },
   "dependencies": {
     "@types/body-parser": "^1.19.6",
     "@types/express": "^5.0.3",
     "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
     "express": "^5.1.0",
-    "tsconfig-paths": "^4.2.0"
+    "infrastructure": "workspace:*",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.6"
   }
 }

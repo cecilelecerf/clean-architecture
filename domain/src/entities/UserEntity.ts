@@ -377,6 +377,9 @@ export class UserEntity {
       role: this.role,
       confirmedAt: this.confirmedAt?.toISOString(),
       isActiveField: this.isActiveField,
+      dateOfBirth: this.dateOfBirth?.toISOString(),
+      address: this.address,
+      sexe: this.sexe,
     };
   }
   public toMe(): UserToMe {
@@ -601,9 +604,20 @@ export class UserEntity {
   }
 }
 
-export type UserToDTO = { email: string; confirmedAt?: string } & Pick<
+export type UserToDTO = {
+  email: string;
+  confirmedAt?: string;
+  dateOfBirth?: string;
+} & Pick<
   UserEntity,
-  "id" | "firstname" | "lastname" | "role" | "isActiveField"
+  | "id"
+  | "firstname"
+  | "lastname"
+  | "role"
+  | "isActiveField"
+  | "address"
+  | "sexe"
+  | "phoneNumber"
 >;
 
 export type UserToMe = UserToDTO & { createdAt: string; updatedAt: string };

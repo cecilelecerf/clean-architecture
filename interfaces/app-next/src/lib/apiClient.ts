@@ -1,6 +1,5 @@
-import { getSession } from 'next-auth/react';
-import { toast } from 'sonner';
-
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
@@ -9,29 +8,33 @@ async function request<T>(
   path: string,
   options: { method?: HttpMethod; body?: any } = {},
 ): Promise<T> {
-  const session = await getSession();
+  const session = await getServerSession(authOptions);
   const token = session?.user?.accessToken;
-
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
+  console.log(token);
   try {
+    console.log(`${apiUrl}/api${path}`);
     const res = await fetch(`${apiUrl}/api${path}`, {
       method: options.method ?? 'GET',
       headers,
       body: options.body ? JSON.stringify(options.body) : undefined,
     });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ message: 'Erreur réseau' }));
+      throw new Error(error.message || `Erreur HTTP ${res.status}`);
+    }
 
     const data = await res.json();
-
-    if (!res.ok) throw new Error(data.message || 'Une erreur est survenue');
-
+    console.log('Response data:', data);
     return data as T;
   } catch (err) {
-    toast.error(err.message);
+    console.error('API Error:', err);
+    throw err;
   }
 }
 
