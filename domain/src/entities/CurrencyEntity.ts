@@ -74,7 +74,6 @@ export class CurrencyEntity {
   }): CurrencyEntity | InvalidExchangeRateError {
     const validatedRate = CurrencyEntity.validateExchangeRate(newRate);
     if (validatedRate instanceof Error) return validatedRate;
-
     this.exchangeRate = validatedRate;
     this.updatedAt = now;
     return this;

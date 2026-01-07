@@ -46,7 +46,7 @@ export class CreateAccountUseCase {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    const ibanVO = IBAN.generate("FR", "20041010050500013M02606");
+    const ibanVO = IBAN.generate("FR");
 
     const colorVO = Color.create(color);
     if (colorVO instanceof Error) return colorVO;
