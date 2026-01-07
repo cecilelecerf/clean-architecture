@@ -7,11 +7,10 @@ const creditsRouter: Router = express.Router();
 creditsRouter.get("/", authMiddleware, CreditsController.getAllByUser);
 creditsRouter.post("/", authMiddleware, CreditsController.request);
 
-creditsRouter.get(
-  "/users/:userId",
-  authMiddleware,
-  CreditsController.getOneByUser
-);
+  
+ 
+creditsRouter.get("/users/:userId", authMiddleware, CreditsController.getOneByUser);
+ 
 
 creditsRouter.get("/status", authMiddleware, CreditsController.getAllByStatus);
 
@@ -21,6 +20,12 @@ creditsRouter.get(
   CreditsController.getAllByFormule
 );
 
+ 
+creditsRouter.patch(
+  "/:creditId/grant",
+  authMiddleware,
+  CreditsController.grantCredit
+);
 creditsRouter.get("/:creditId", authMiddleware, CreditsController.getCredit);
 creditsRouter.patch(
   "/:creditId",
@@ -28,10 +33,6 @@ creditsRouter.patch(
   CreditsController.applyMonthlyPaiement
 );
 
-creditsRouter.patch(
-  "/:creditId/grant",
-  authMiddleware,
-  CreditsController.grantCredit
-);
 
 export default creditsRouter;
+ 
