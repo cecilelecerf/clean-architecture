@@ -15,3 +15,5 @@ postsRouter.delete("/:postId", authMiddleware, PostsController.delete);
 
 postsRouter.patch("/:postId/status", authMiddleware, PostsController.updateStatus);
 postsRouter.patch("/:postId/read", authMiddleware, PostsController.markAsRead);
+
+export default postsRouter;
