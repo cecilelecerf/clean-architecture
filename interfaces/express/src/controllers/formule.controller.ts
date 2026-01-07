@@ -77,7 +77,6 @@ export class FormuleController {
 
   static async geTypes(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      console.log("get types");
       const userId = req.user?.userId;
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
@@ -114,7 +113,6 @@ export class FormuleController {
 
   static async getFormule(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      console.log("yesy");
       const userId = req.user?.userId;
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
 

@@ -36,7 +36,6 @@ export class AccountMapper {
       currency: doc.balance.currency,
     });
     const color = Color.from(doc.color);
-    console.log(doc.userId._id);
     const userId = doc.userId
       ? !doc.userId._id
         ? doc.userId.toString()

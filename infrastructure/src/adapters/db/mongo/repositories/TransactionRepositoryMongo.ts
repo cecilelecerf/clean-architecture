@@ -101,7 +101,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     })
       .sort({ date: -1 })
       .lean();
-    console.log(docs);
     return docs.map(this.mapDocToTransaction);
   }
 
@@ -177,7 +176,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
       .skip(skip)
       .limit(limit)
       .lean();
-    console.log(docs);
     return { transactions: docs.map(this.mapDocToTransaction), total };
   }
 }

@@ -59,10 +59,7 @@ export class OrdersController {
 
       const { ISIN } = req.params;
 
-      const { searchParams } = new URL(req.url);
-
-      const status = searchParams.get("status") ?? undefined;
-
+      const status = req.query.status as string | undefined;
       const result =
         await orderFactory().getAllByActionAndStatusAndUserId.execute({
           userId,

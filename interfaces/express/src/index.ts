@@ -12,6 +12,7 @@ import ordersRouter from "./routes/orders.route";
 import accountsRouter from "./routes/accounts.route";
 import postsRouter from "./routes/posts.route";
 import currenciesRouter from "./routes/currencies.route";
+import actionsRouter from "./routes/actions.route";
 
 const app = express();
 const port = 3002;
@@ -35,6 +36,7 @@ app.use("/api/orders", authMiddleware, ordersRouter);
 app.use("/api/accounts", authMiddleware, accountsRouter);
 app.use("/api/posts", authMiddleware, postsRouter);
 app.use("/api/currencies", authMiddleware, currenciesRouter);
+app.use("/api/actions", authMiddleware, actionsRouter);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

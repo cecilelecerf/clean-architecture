@@ -28,7 +28,6 @@ export class AccountRepositoryMongo implements AccountRepository {
   async findByIBAN(iban: IBAN): Promise<AccountEntity | null> {
     await this.client.connect();
     const doc = await AccountModel.findById(iban.value).lean();
-    console.log(doc);
     return doc ? AccountMapper.mapDocToAccount(doc) : null;
   }
 
@@ -48,6 +47,7 @@ export class AccountRepositoryMongo implements AccountRepository {
       type: "epargne",
       userId: null,
     }).lean();
+    const account = AccountMapper.mapDocToAccount(doc);
     return doc ? AccountMapper.mapDocToAccount(doc) : null;
   }
 

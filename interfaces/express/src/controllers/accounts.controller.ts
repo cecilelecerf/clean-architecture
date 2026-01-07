@@ -224,7 +224,6 @@ export class AccountsController {
     try {
       const userId = req.user?.userId;
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
-      console.log(req.params);
       const { transactionId } = req.params;
       const result = await transactionFactory().getById.execute({
         transactionId: transactionId,

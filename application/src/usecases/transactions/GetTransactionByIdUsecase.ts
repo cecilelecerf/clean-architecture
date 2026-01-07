@@ -64,13 +64,10 @@ export class GetTransactionByIdUseCase {
         transactionId
       );
     if (!transaction) return new TransactionNotFoundError(transactionId);
-    console.log(transaction);
     let contextIban: IBAN | undefined;
 
     const isFromAccount = transaction.fromAccount?.isClientAccount(client);
     const isToAccount = transaction.toAccount?.isClientAccount(client);
-    console.log(isFromAccount);
-    console.log(isToAccount);
 
     if (!isFromAccount && !isToAccount && client.hasRole({ role: "client" })) {
       return new UnauthorizedTransactionAccessError(client.id, transaction.id);
