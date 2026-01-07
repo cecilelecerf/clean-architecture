@@ -14,7 +14,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { MenuLink } from './MenuLink';
 import { SignOutButton } from '@/components/SignOutButton';
-import { CircleX, Home, Menu, MessageSquare, CreditCard, ClockFading, Newspaper, LucideIcon } from 'lucide-react';
+import { CircleX, Home, Menu, MessageSquare, CreditCard, ClockFading, Newspaper, LucideIcon, User } from 'lucide-react';
 
 const menuItems: { icon: LucideIcon, label: string, href: string }[] = [
     { icon: Home, label: "Mes comptes", href: "/accounts" },
@@ -22,6 +22,7 @@ const menuItems: { icon: LucideIcon, label: string, href: string }[] = [
     { icon: Newspaper, label: "Actualités", href: "/feeds" },
     { icon: ClockFading, label: "Crédits", href: "/credits" },
     { icon: CreditCard, label: "Actions", href: "/actions" },
+    { icon: User, label: "Profile", href: "/profil" }
 ];
 
 export const MenuDrawer = () => (
