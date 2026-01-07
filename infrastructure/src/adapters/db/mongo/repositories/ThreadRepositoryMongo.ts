@@ -7,6 +7,7 @@ import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { ThreadModel } from "../models/ThreadModel";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { UserMapper } from "../../mappers/UserMapper";
+import { Types } from "mongoose";
 
 export class ThreadRepositoryMongo implements ThreadRepository {
   constructor(private readonly client: MongoClient) {}
@@ -14,8 +15,12 @@ export class ThreadRepositoryMongo implements ThreadRepository {
   private mapDocToThread(doc: any): ThreadEntity {
     return ThreadEntity.from({
       id: doc._id.toString(),
-      administratorId: doc.administratorId,
-      participantsId: doc.participantsId,
+      administratorId: doc.administratorId
+        ? doc.administratorId.toString()
+        : undefined,
+      participantsId: doc.participantsId.map((participant: Types.UUID) =>
+        participant.toString()
+      ),
       title: doc.title,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -36,7 +41,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     const thread = ThreadEntity.from({
       id: doc._id.toString(),
       administratorId: doc.administratorId?._id?.toString() || null,
-      participantsId: participants.map((p) => p.id),
+      participantsId: participants.map((p) => p.id.toString()),
       title: doc.title,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -147,7 +152,8 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     threadId: string
   ): Promise<ThreadEntityWithUsers | null> {
     await this.client.connect();
-
+    console.log("-threadid");
+    console.log(threadId);
     const doc = await ThreadModel.findById(threadId)
       .populate({ path: "administratorId" })
       .populate({

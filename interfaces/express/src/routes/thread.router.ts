@@ -19,7 +19,7 @@ threadRouter.post(
 );
 
 threadRouter.post(
-  "/:id/participants",
+  "/:id/participants/:userId",
   authMiddleware,
   ThreadController.addParticipant
 );
@@ -28,5 +28,17 @@ threadRouter.delete(
   authMiddleware,
   ThreadController.removeParticipant
 );
+
+threadRouter.get(
+  "/users/:userId/client",
+  authMiddleware,
+  ThreadController.getByClient
+);
+threadRouter.get(
+  "/users/advisor",
+  authMiddleware,
+  ThreadController.advisorGetAll
+);
+threadRouter.get("/users/:userId", authMiddleware, ThreadController.getByUser);
 
 export default threadRouter;

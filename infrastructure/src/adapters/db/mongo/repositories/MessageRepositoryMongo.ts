@@ -6,18 +6,21 @@ import { MongoClient } from "../../MongoClient";
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { MessageModel } from "../models/MessageModel";
-import { UserEntity } from "@domain/entities/UserEntity";
-import { Email } from "@domain/values/Email";
 import { UserMapper } from "../../mappers/UserMapper";
 
 export class MessageRepositoryMongo implements MessageRepository {
   constructor(private readonly client: MongoClient) {}
 
   private mapDocToMessage(doc: any): MessageEntity {
+    console.log(typeof doc.senderId);
+    console.log(typeof doc.senderId === "string");
     return MessageEntity.from({
       id: doc._id.toString(),
       threadId: doc.threadId?.toString() || doc.threadId,
-      senderId: doc.senderId?.toString() || doc.senderId,
+      senderId:
+        typeof doc.senderId === "string"
+          ? doc.senderId?.toString()
+          : doc.senderId._id,
       content: doc.content,
       sentAt: doc.sentAt,
       readBy: doc.readBy || [],
@@ -87,7 +90,7 @@ export class MessageRepositoryMongo implements MessageRepository {
     await this.client.connect();
 
     const docs = await MessageModel.find({ threadId })
-      .populate({ path: "senderId" }) // assure la population de sender
+      .populate({ path: "senderId" })
       .sort({ sentAt: 1 })
       .lean<any[]>();
 
