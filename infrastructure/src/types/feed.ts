@@ -41,3 +41,15 @@ export type Post = z.infer<typeof postSchema>;
 export const postWithTagsSchema = postSchema.extend({
   tags: tagToFrontSchema.array(),
 });
+
+export const newPostSchema = postSchema
+  .pick({
+    title: true,
+    content: true,
+  })
+  .extend({ tagsId: z.string().array() });
+export type NewPost = z.infer<typeof newPostSchema>;
+
+export const publishActionSchema = z.object({
+  status: z.enum(['publish', 'unpublish']),
+});
