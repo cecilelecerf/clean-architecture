@@ -2,7 +2,6 @@ import { Types } from "mongoose";
 
 export interface FormuleCreditInterface {
   _id: Types.UUID;
-  userId: Types.UUID;
   interestRate: number;
   insuranceRate: number;
   type: string;
@@ -11,14 +10,14 @@ export interface FormuleCreditInterface {
   isActive: boolean;
   accountId: Types.UUID;
   createdAt: Date;
-  minAmount: {
+  minAmount?: {
     amount: number;
-    currency: string;
+    currency?: string;
   };
-  maxAmount: {
+  maxAmount?: {
     amount: number;
-    currency: string;
+    currency?: string;
   };
-  currency: string;
+  currency?: string;
   updatedAt: Date;
 }

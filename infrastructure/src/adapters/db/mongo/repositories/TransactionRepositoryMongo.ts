@@ -1,4 +1,3 @@
-// infrastructure/adapters/db/mongo/repositories/TransactionRepositoryMongo.ts
 import {
   TransactionEntityWithAccount,
   TransactionEntityWithAccountWithUser,

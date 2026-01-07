@@ -3,24 +3,21 @@ import { OrderInterface } from "../interface/OrderInterface";
 
 export const OrderSchema = new Schema<OrderInterface>(
   {
-    _id: {
-      type: Types.UUID,
-      required: true,
-      unique: true,
-      index: true,
-    },
-    userId: { type: Schema.Types.UUID, ref: "User", required: true },
+    _id: { type: Types.UUID, required: true, unique: true, index: true },
+    accountIban: { type: String, ref: "Account", required: true },
     actionId: { type: String, ref: "Action", required: true },
     type: { type: String, enum: ["buy", "sell"], required: true },
     quantity: { type: Number, required: true },
     price: {
-      type: {
-        amount: { type: Number, required: true },
-        currency: { type: String, required: true },
-      },
-      required: true,
+      amount: { type: Number, required: true },
+      currency: { type: String, required: true, default: "EUR", length: 3 },
     },
-    date: { type: Date, required: true },
+    executionPrice: {
+      amount: { type: Number, required: false },
+      currency: { type: String, required: false, length: 3 },
+    },
+    date: { type: Date, required: false },
+    transactionId: { type: Types.UUID, ref: "Transaction", required: false },
     status: {
       type: String,
       enum: ["pending", "executed", "cancelled"],
@@ -34,3 +31,6 @@ export const OrderSchema = new Schema<OrderInterface>(
     versionKey: false,
   }
 );
+
+OrderSchema.index({ actionId: 1, status: 1 });
+OrderSchema.index({ createdAt: 1 });

@@ -13,7 +13,7 @@ export class NotificationRepositoryMongo implements NotificationRepository {
       clientId: doc.clientId,
       title: doc.title,
       content: doc.content,
-      isRead: doc.isRead,
+      isRead: !!doc.isRead,
       type: doc.type,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -30,10 +30,10 @@ export class NotificationRepositoryMongo implements NotificationRepository {
       clientId: notification.clientId,
       title: notification.title,
       content: notification.content,
-      isRead: notification.isRead,
+      isRead: notification.isRead ?? false,
       type: notification.type,
-      createdAt: notification.createdAt,
-      updatedAt: notification.updatedAt,
+      createdAt: notification.createdAt ?? new Date(),
+      updatedAt: notification.updatedAt ?? notification.createdAt ?? new Date(),
     });
   }
 
@@ -59,7 +59,7 @@ export class NotificationRepositoryMongo implements NotificationRepository {
       .sort({ createdAt: -1 })
       .lean();
 
-    return docs.map((doc) => this.mapDocToNotification(doc));
+    return docs.map(this.mapDocToNotification);
   }
 
   /** Toutes les notifications d'un conseiller */
@@ -72,7 +72,7 @@ export class NotificationRepositoryMongo implements NotificationRepository {
       .sort({ createdAt: -1 })
       .lean();
 
-    return docs.map((doc) => this.mapDocToNotification(doc));
+    return docs.map(this.mapDocToNotification);
   }
 
   /** Notifications récentes d'un client */
@@ -87,7 +87,7 @@ export class NotificationRepositoryMongo implements NotificationRepository {
       .limit(limit)
       .lean();
 
-    return docs.map((doc) => this.mapDocToNotification(doc));
+    return docs.map(this.mapDocToNotification);
   }
 
   /** Mettre à jour une notification */
@@ -98,13 +98,11 @@ export class NotificationRepositoryMongo implements NotificationRepository {
       { _id: notification.id },
       {
         $set: {
-          advisorId: notification.advisorId,
-          clientId: notification.clientId,
           title: notification.title,
           content: notification.content,
-          isRead: notification.isRead,
+          isRead: notification.isRead ?? false,
           type: notification.type,
-          updatedAt: notification.updatedAt,
+          updatedAt: notification.updatedAt ?? new Date(),
         },
       }
     );
@@ -113,7 +111,6 @@ export class NotificationRepositoryMongo implements NotificationRepository {
   /** Supprimer une notification */
   async delete(id: NotificationEntity["id"]): Promise<void> {
     await this.client.connect();
-
     await NotificationModel.deleteOne({ _id: id });
   }
 }

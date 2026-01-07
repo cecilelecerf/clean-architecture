@@ -5,10 +5,17 @@ export interface UserInterface {
   firstname: string;
   lastname: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   role: "client" | "conseiller" | "directeur";
   isActive: boolean;
+  confirmedAt?: Date;
+  phoneNumber?: string;
+  city?: string;
+  address?: string;
+  country?: string;
+  postalCode?: string;
+  sexe?: "girl" | "boy" | "other";
+  dateOfBirth?: Date;
   createdAt: Date;
-  confirmedAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 }

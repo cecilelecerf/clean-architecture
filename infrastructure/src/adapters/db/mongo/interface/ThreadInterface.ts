@@ -4,9 +4,9 @@ export interface ThreadInterface {
   _id: Types.UUID;
   participantsId: Types.UUID[];
   title: string;
-  createdAt: Date;
   isClose: boolean;
-  type: "external" | "internal";
+  type: "internal" | "external";
   administratorId?: Types.UUID;
+  createdAt: Date;
   updatedAt: Date;
 }
