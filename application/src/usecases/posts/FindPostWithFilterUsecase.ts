@@ -70,7 +70,6 @@ export class FindPostWithFilterUsecase {
         },
         { page, limit }
       );
-
     return {
       posts: PostDTOMapper.tagsAndUserMaps(posts.posts),
       total: posts.total,
