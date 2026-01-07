@@ -57,12 +57,12 @@ export class ThreadController {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
       const type = req.query.type as "external" | "internal" | undefined;
-
       let result;
 
       if (type === "external") {
         const data = newExternalThreadSchema.parse(req.body);
-
+        console.log(data.participantsId);
+        console.log(req.user.userId);
         result = await threadsFactory().startExternalThread.execute({
           clientId: data.participantsId[0],
           ...data,
