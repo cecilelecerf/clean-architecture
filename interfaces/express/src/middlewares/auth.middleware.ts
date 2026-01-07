@@ -3,9 +3,7 @@ import { Request, Response, NextFunction } from "express";
 
 export interface AuthRequest extends Request {
   user?: {
-    id: string;
-    email: string;
-    role: "client" | "conseiller" | "directeur";
+    userId: string;
   };
 }
 
@@ -16,7 +14,6 @@ export const authMiddleware = (
 ) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ message: "Unauthorized" });
-  console.log(authHeader);
   const token = authHeader.split(" ")[1];
   try {
     const jwtService = new JwtTokenService();

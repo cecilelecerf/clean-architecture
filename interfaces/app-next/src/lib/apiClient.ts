@@ -1,5 +1,6 @@
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth';
+import { getSession } from 'next-auth/react';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
@@ -8,7 +9,7 @@ async function request<T>(
   path: string,
   options: { method?: HttpMethod; body?: any } = {},
 ): Promise<T> {
-  const session = await getServerSession(authOptions);
+  const session = await getSession();
   const token = session?.user?.accessToken;
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -16,9 +17,7 @@ async function request<T>(
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
-  console.log(token);
   try {
-    console.log(`${apiUrl}/api${path}`);
     const res = await fetch(`${apiUrl}/api${path}`, {
       method: options.method ?? 'GET',
       headers,

@@ -5,8 +5,7 @@ import { AuthRequest } from "../middlewares/auth.middleware";
 export class ThreadController {
   static async getAll(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      console.log("test");
-      const userId = req.user?.id;
+      const userId = req.user?.userId;
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
       const result =
@@ -14,7 +13,6 @@ export class ThreadController {
           type: "external",
           userId,
         });
-      console.log(result);
       res.json(result);
     } catch (error) {
       next(error);

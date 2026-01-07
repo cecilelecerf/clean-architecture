@@ -1,8 +1,8 @@
 import express, { Router } from "express";
-import { AuthController } from "../controllers/auth.controller";
+import { ThreadController } from "../controllers/thread.controller";
 
 const threadRouter: Router = express.Router();
 
-threadRouter.get("/", AuthController.login);
+threadRouter.get("/", ThreadController.getAll);
 
 export default threadRouter;
