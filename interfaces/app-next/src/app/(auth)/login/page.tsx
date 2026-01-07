@@ -29,7 +29,6 @@ export default function LoginPage() {
       return;
     }
     const sessionRes = await fetch('/api/auth/session');
-    console.log(sessionRes)
     const session = await sessionRes.json();
 
     if (!session?.user?.role) {

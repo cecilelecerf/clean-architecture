@@ -64,6 +64,7 @@ export class StartExternalThreadUsecase {
 
     const actor = await findActiveUser(this.userRepository, actorId);
     if (actor instanceof Error) return actor;
+
     if (actor.hasRole({ role: "client" }) && actor.id !== client.id)
       return new UserRoleMismatchError(["conseiller", "directeur"], actor.role);
 

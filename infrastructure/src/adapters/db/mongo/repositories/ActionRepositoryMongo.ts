@@ -30,7 +30,6 @@ export class ActionRepositoryMongo implements ActionRepository {
 
   async save(action: ActionEntity): Promise<void> {
     await this.client.connect();
-    console.log(action);
     await ActionModel.create({
       _id: action.ISIN.getValue(),
       name: action.name,

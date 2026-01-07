@@ -4,10 +4,10 @@ import { authMiddleware } from "../middlewares/auth.middleware";
 
 const tagsRouter: Router = express.Router();
 
-tagsRouter.get("/tags", authMiddleware, TagsController.getAll);
-tagsRouter.post("/tags", authMiddleware, TagsController.post);
+tagsRouter.get("/", authMiddleware, TagsController.getAll);
+tagsRouter.post("/", authMiddleware, TagsController.post);
 
-tagsRouter.patch("/tags/:tagId", authMiddleware, TagsController.patch);
-tagsRouter.delete("/tags/:tagId", authMiddleware, TagsController.delete);
+tagsRouter.patch("/:tagId", authMiddleware, TagsController.patch);
+tagsRouter.delete("/:tagId", authMiddleware, TagsController.delete);
 
 export default tagsRouter;

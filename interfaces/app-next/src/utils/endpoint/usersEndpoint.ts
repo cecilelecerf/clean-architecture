@@ -1,16 +1,17 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { get, patch, post } from '@/lib/apiClient';
 import {
-  PayloadUserUpdateSchema,
+  baseUserSchema,
+  RegisterAdminPayload,
+  ReqBanUser,
   User,
+  UserDto,
   userDtoSchema,
   UserId,
   userSchema,
 } from '@infrastructure/types/user';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { RegisterAdminPayload } from '@/app/api/users/new/route';
-import { ReqBanUser } from '@/app/api/users/[userId]/ban/route';
 import { queryClient } from '@/lib/queryClient';
 import { userStatsSchema } from '@infrastructure/types/stat';
 export const usersEndpoint = createEndpointsNodes({
@@ -40,7 +41,7 @@ export const usersEndpoint = createEndpointsNodes({
       queryKey: ['me'],
       queryFn: () =>
         get(`/users/me`).then((data) =>
-          safeParseWithLog(userSchema.omit({ passwordHash: true }), data),
+          safeParseWithLog(baseUserSchema.omit({ passwordHash: true }), data),
         ),
     }),
   stats: ({ id }: { id: UserId }) =>
@@ -74,7 +75,7 @@ export const usersEndpoint = createEndpointsNodes({
     }),
   update: ({ id }: { id: UserId }) =>
     mutationOptions({
-      mutationFn: ({ payload }: { payload: PayloadUserUpdateSchema }) =>
+      mutationFn: ({ payload }: { payload: UserDto }) =>
         patch(`/users/me`, { ...payload }).then((data) => userDtoSchema.parse(data)),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['users', id] });
