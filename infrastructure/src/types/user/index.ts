@@ -151,3 +151,17 @@ export const reqRegisterSchema = clientSchema
   })
   .extend({ plainedPassword: z.string(), confirmPlainedPassword: z.string() });
 export type RegisterPayload = z.infer<typeof reqRegisterSchema>;
+
+export const registerAdminPayload = baseUserSchema
+  .pick({
+    firstname: true,
+    lastname: true,
+    email: true,
+  })
+  .extend({ role: z.string() });
+export type RegisterAdminPayload = z.infer<typeof registerAdminPayload>;
+
+export type RegisterResponse = z.infer<typeof userSchema>;
+
+export const banUserSchema = z.object({ status: z.boolean() });
+export type ReqBanUser = z.infer<typeof banUserSchema>;

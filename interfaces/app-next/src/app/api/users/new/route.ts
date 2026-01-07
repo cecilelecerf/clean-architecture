@@ -1,21 +1,10 @@
 import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
-import { baseUserSchema, userSchema } from '@infrastructure/types/user';
+import { registerAdminPayload, RegisterAdminPayload } from '@infrastructure/types/user';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
-import z from 'zod';
 import { authOptions } from '../../auth/[...nextauth]/route';
 const clientUrl = process.env.NEXT_PUBLIC_CLIENT_URL;
 
-export const registerAdminPayload = baseUserSchema
-  .pick({
-    firstname: true,
-    lastname: true,
-    email: true,
-  })
-  .extend({ role: z.string() });
-export type RegisterAdminPayload = z.infer<typeof registerAdminPayload>;
-
-export type RegisterResponse = z.infer<typeof userSchema>;
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
