@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { endpoints } from "@/utils/endpoint";
-import FormWrapper, { Section } from "@/components/erfer";
+import FormWrapper, { Section } from "@/components/FormWrapper";
 
 import {
   FormuleDTO,

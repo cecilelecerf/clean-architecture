@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 
 import { Percent, FileText, Coins } from "lucide-react";
-import FormWrapper, { Section } from "@/components/erfer";
+import FormWrapper, { Section } from "@/components/FormWrapper";
 import { useForm } from "react-hook-form";
 import { NewFormule, newFormuleSchema } from "@/utils/endpoint/formuleEndpoints";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
-import FormWrapper, { DataInfo } from "@/components/erfer";
+import FormWrapper, { DataInfo } from "@/components/FormWrapper";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { endpoints } from "@/utils/endpoint";

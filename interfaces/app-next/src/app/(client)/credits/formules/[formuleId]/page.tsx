@@ -16,21 +16,17 @@ import {
   CircleAlert,
   Plus,
   Calculator,
-  TrendingUp,
   Users,
-  CreditCard,
   CheckCircle,
   Clock,
   ArrowRight,
   Shield,
   Percent,
-  Euro,
 } from "lucide-react";
 
 export default function FormulesPage() {
   const { formuleId } = useParams<{ formuleId: FormuleId }>();
   const formuleQuery = useQuery(endpoints.formules.get({ formuleId }));
-  const statsQuery = useQuery(endpoints.formules.stats({ id: formuleId }));
   const router = useRouter();
 
   return match(formuleQuery)
@@ -47,19 +43,15 @@ export default function FormulesPage() {
 
       return (
         <div className="space-y-8">
-          {/* Hero Section */}
           <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 p-8 md:p-12">
-            {/* Background Pattern */}
             <div className="absolute inset-0">
               <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
               <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-yellow-400/20 blur-3xl animate-pulse" />
               <div className="absolute -left-32 -bottom-32 h-96 w-96 rounded-full bg-blue-400/20 blur-3xl animate-pulse delay-1000" />
             </div>
 
-            {/* Content */}
             <div className="relative">
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-center">
-                {/* Left: Info */}
                 <div className="space-y-6 text-white">
                   <Badge className="bg-white/20 hover:bg-white/25 text-white border-white/30 backdrop-blur-sm text-base px-4 py-1.5 w-fit">
                     <Bookmark className="w-4 h-4 mr-2" />
@@ -87,7 +79,6 @@ export default function FormulesPage() {
                   )}
                 </div>
 
-                {/* Right: Rates & CTA */}
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <RateCard
@@ -127,49 +118,6 @@ export default function FormulesPage() {
               </div>
             </div>
           </div>
-
-          {/* Statistics */}
-          {match(statsQuery)
-            .with({ status: "success" }, ({ data: stats }) => (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
-                    Statistiques de la formule
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard
-                      icon={CreditCard}
-                      label="Crédits actifs"
-                      value={stats.activeCreditsCount}
-                      color="blue"
-                    />
-                    <StatCard
-                      icon={Users}
-                      label="Clients"
-                      value={stats.totalClients}
-                      color="green"
-                    />
-                    <StatCard
-                      icon={CheckCircle}
-                      label="Taux d'acceptation"
-                      value={`${stats.acceptanceRate}%`}
-                      color="purple"
-                    />
-                    <StatCard
-                      icon={Euro}
-                      label="Capital prêté"
-                      value={`${(stats.totalLoanedAmount / 1000).toFixed(0)}k€`}
-                      color="orange"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-            .with({ status: "pending" }, () => <StatsSkeleton />)
-            .otherwise(() => null)}
 
           {/* Conditions & Limits */}
           <Card>

@@ -33,6 +33,29 @@ export class IBAN {
     return new IBAN(sanitized);
   }
 
+  public static generate(countryCode: string, bban: string): IBAN {
+    const sanitizedCountry = countryCode.toUpperCase();
+    const sanitizedBban = bban.replace(/\s+/g, "").toUpperCase();
+
+    const rearranged = sanitizedBban + sanitizedCountry + "00";
+    const numeric = rearranged
+      .split("")
+      .map((c) => {
+        const code = c.charCodeAt(0);
+        if (code >= 65 && code <= 90) return (code - 55).toString();
+        return c;
+      })
+      .join("");
+
+    let remainder = "";
+    for (let i = 0; i < numeric.length; i += 7) {
+      const block = remainder + numeric.substring(i, i + 7);
+      remainder = (parseInt(block, 10) % 97).toString();
+    }
+
+    const checkDigits = String(98 - parseInt(remainder, 10)).padStart(2, "0");
+    return new IBAN(`${sanitizedCountry}${checkDigits}${sanitizedBban}`);
+  }
   public is(other: IBAN): boolean {
     return this.value === other.value;
   }

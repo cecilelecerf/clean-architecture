@@ -38,11 +38,8 @@ export default function AccountsPage() {
 
                 {/* Right side */}
                 <div className="text-right">
-                  <p className={`font-bold ${account.amount > 0 ? "text-emerald-700" : "text-red-700"} `}>
-                    {account.amount.toLocaleString('fr-FR', {
-                      style: 'currency',
-                      currency: 'EUR',
-                    })}
+                  <p className={`font-bold ${account.balance.amount > 0 ? "text-emerald-700" : "text-red-700"} `}>
+                    {account.balance.amount.toLocaleString('fr-FR', { style: 'currency', currency: account.balance.currency })}
                   </p>
                   <p className={`text-xs font-medium mt-0.5`}>Disponible</p>
                 </div>

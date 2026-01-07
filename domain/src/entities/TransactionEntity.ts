@@ -1,4 +1,4 @@
-import { Money } from "@domain/values/Money";
+import { Money, MoneyToDTO } from "@domain/values/Money";
 import { AccountEntity } from "./AccountEntity";
 import { IBAN } from "@domain/values/IBAN";
 import {
@@ -131,8 +131,7 @@ export class TransactionEntity {
       label: this.label,
       icon: this.icon,
       date: this.date.toISOString(),
-      amount: this.amount.amount,
-      currency: this.amount.currency,
+      amount: this.amount.toJSON(),
       fromAccountIban: this.fromAccountId.value,
       toAccountIban: this.toAccountId.value,
       type: contextIban ? this.getTypeForAccount(contextIban) : undefined,
@@ -141,8 +140,7 @@ export class TransactionEntity {
 }
 
 export type TransactionDTO = {
-  amount: number;
-  currency: string;
+  amount: MoneyToDTO;
   fromAccountIban: string;
   toAccountIban: string;
   date: string;

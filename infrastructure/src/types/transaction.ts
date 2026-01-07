@@ -4,6 +4,7 @@ import {
   accountIdSchema,
   accountResumeWithUserSchema,
 } from "./account";
+import { moneySchema } from "./money";
 
 const transactionIdSchema = z.uuid().brand("transaction");
 export type TransactionId = z.infer<typeof transactionIdSchema>;
@@ -13,8 +14,7 @@ export const transactionSchema = z.object({
   label: z.string(),
   fromAccountIban: accountIdSchema,
   toAccountIban: accountIdSchema,
-  amount: z.any(),
-  currency: z.string().min(1),
+  amount: moneySchema,
   date: z.iso.datetime(),
   type: z.enum(["credit", "debit"]).optional(),
   icon: z.string(),
@@ -28,7 +28,6 @@ export const transactionDTOWithIbanSchema = transactionSchema.pick({
   fromAccountIban: true,
   toAccountIban: true,
   amount: true,
-  currency: true,
   date: true,
   icon: true,
   type: true,
@@ -39,7 +38,6 @@ export const transactionDTOSchema = transactionSchema
     id: true,
     label: true,
     amount: true,
-    currency: true,
     date: true,
     icon: true,
     type: true,
@@ -62,7 +60,6 @@ export const newTransactionSchema = transactionSchema
   .pick({
     label: true,
     amount: true,
-    currency: true,
     icon: true,
   })
   .extend({ toAccountIban: z.string() });

@@ -4,12 +4,12 @@ import { authMiddleware } from "../middlewares/auth.middleware";
 
 const savingsrateRouter: Router = express.Router();
 
-savingsrateRouter.get("/", authMiddleware, SavingsrateController.getAll);
+savingsrateRouter.get("/", SavingsrateController.getAll);
 savingsrateRouter.get(
   "/current",
-  authMiddleware,
+
   SavingsrateController.getCurrent
 );
-savingsrateRouter.post("/", authMiddleware, SavingsrateController.post);
+savingsrateRouter.post("/", SavingsrateController.post);
 
 export default savingsrateRouter;

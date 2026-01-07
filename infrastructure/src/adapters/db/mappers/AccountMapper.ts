@@ -24,7 +24,6 @@ export class AccountMapper {
       type: row[`${prefix}type`],
       color,
       balance,
-      currency: row[`${prefix}currency`],
       createdAt: row[`${prefix}created_at`],
       updatedAt: row[`${prefix}updated_at`],
     });
@@ -37,14 +36,19 @@ export class AccountMapper {
       currency: doc.balance.currency,
     });
     const color = Color.from(doc.color);
+    console.log(doc.userId._id);
+    const userId = doc.userId
+      ? !doc.userId._id
+        ? doc.userId.toString()
+        : doc.userId._id.toString()
+      : null;
     return AccountEntity.from({
       iban,
-      userId: doc.userId ?? null,
+      userId: userId,
       name: doc.name,
       type: doc.type,
       color,
       balance,
-      currency: doc.currency,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     });

@@ -4,13 +4,13 @@ import { authMiddleware } from "../middlewares/auth.middleware";
 
 const userRouter: Router = express.Router();
 
-userRouter.get("/", authMiddleware, UserController.getAll);
-userRouter.get("/me", authMiddleware, UserController.me);
-userRouter.get("/:id", authMiddleware, UserController.getById);
-userRouter.get("/:id/stats", authMiddleware, UserController.stats);
+userRouter.get("/", UserController.getAll);
+userRouter.get("/me", UserController.me);
+userRouter.get("/:id", UserController.getById);
+userRouter.get("/:id/stats", UserController.stats);
 
-userRouter.post("/new", authMiddleware, UserController.create);
-userRouter.post("/:id/ban", authMiddleware, UserController.ban);
-userRouter.patch("/me", authMiddleware, UserController.updateMe);
+userRouter.post("/new", UserController.create);
+userRouter.post("/:id/ban", UserController.ban);
+userRouter.patch("/me", UserController.updateMe);
 
 export default userRouter;

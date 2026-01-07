@@ -66,17 +66,19 @@ export class GetAllTransactionsByAccountUsecase {
   > {
     const client = await findActiveUser(this.userRepository, clientId);
     if (client instanceof Error) return client;
-
+    console.log("test");
     const ibanVO = IBAN.create(iban);
     if (ibanVO instanceof Error) return ibanVO;
 
     if (client.hasRole({ role: "client" })) {
       const account = await this.accountRepository.findByIBAN(ibanVO);
+      console.log(account);
+
       if (!account?.isClientAccount(client)) {
         return new InvalidAccountOwnerError();
       }
     }
-
+    console.log(requesterId);
     if (requesterId) {
       const admin = await findActiveUser(this.userRepository, requesterId);
       if (admin instanceof Error) return admin;
@@ -90,7 +92,6 @@ export class GetAllTransactionsByAccountUsecase {
 
     const page = filters?.page ?? 1;
     const limit = filters?.limit ?? 20;
-
     const result = await this.transactionRepository.findAllByAccountWithFilters(
       ibanVO,
       {

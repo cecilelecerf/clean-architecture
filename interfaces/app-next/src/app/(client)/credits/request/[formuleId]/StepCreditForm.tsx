@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import FormWrapper, { DataInfo } from '@/components/erfer';
+import FormWrapper, { DataInfo } from '@/components/FormWrapper';
 import { useMutation } from '@tanstack/react-query';
 import { endpoints } from '@/utils/endpoint';
 import { AccountId } from '@infrastructure/types/account';

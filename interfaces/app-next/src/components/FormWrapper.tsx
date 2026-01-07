@@ -321,7 +321,8 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                                 );
                                             })}
                                         </Flex>
-                                    )).with("command", () => {
+                                    ))
+                                    .with("command", () => {
                                         const valueArray = (field.value as string[]) ?? [];
                                         return (
                                             <Command>

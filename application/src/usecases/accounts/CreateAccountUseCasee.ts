@@ -15,12 +15,10 @@ import { IBAN } from "@domain/values/IBAN";
 import { Money } from "@domain/values/Money";
 
 interface Props {
-  iban: string;
   userId: string;
   name: string;
   type: "courant" | "epargne";
   color: string;
-  initialBalance: number;
   currency: string;
 }
 
@@ -33,12 +31,10 @@ export class CreateAccountUseCase {
   ) {}
 
   public async execute({
-    iban,
     userId,
     name,
     type,
     color,
-    initialBalance,
     currency,
   }: Props): Promise<
     | UserNotFoundError
@@ -50,14 +46,13 @@ export class CreateAccountUseCase {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    const ibanVO = IBAN.create(iban);
-    if (ibanVO instanceof Error) return ibanVO;
+    const ibanVO = IBAN.generate("FR", "20041010050500013M02606");
 
     const colorVO = Color.create(color);
     if (colorVO instanceof Error) return colorVO;
 
     const balanceVO = Money.create({
-      amount: initialBalance,
+      amount: 0,
       currency,
     });
     if (balanceVO instanceof Error) return balanceVO;
@@ -76,7 +71,6 @@ export class CreateAccountUseCase {
       type,
       color: colorVO,
       balance: balanceVO,
-      currency: currency,
       createdAt: today,
     });
 
