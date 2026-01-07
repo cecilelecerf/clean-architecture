@@ -26,10 +26,10 @@ export class JwtTokenService implements TokenService {
     return jwt.sign(payload, CONFIRMATION_SECRET, { expiresIn: "24h" });
   }
 
-  async validateToken(
+  validateToken(
     token: string,
     expectedType: "auth" | "confirmation" = "auth"
-  ): Promise<any> {
+  ): any {
     const secret = expectedType === "auth" ? AUTH_SECRET : CONFIRMATION_SECRET;
     return jwt.verify(token, secret);
   }

@@ -65,7 +65,6 @@ export const dateOfBirthSchema = z.iso
 export const phoneNumberSchema = z
   .string({ error: "Le numéro de téléphone est obligatoire" })
   .trim()
-  .transform((v) => v.replace(/[\s\-\(\)]/g, ""))
   .refine(
     (v) => /^(\+\d{1,3})?\d{7,15}$/.test(v),
     "Numéro de téléphone invalide"

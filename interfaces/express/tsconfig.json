@@ -8,9 +8,9 @@
     "declarationMap": true
   },
   "references": [
-    { "path": "../../domain" },
-    { "path": "../adapters" },
-    { "path": "../../application" }
+    { "path": "../../domain/" },
+    { "path": "../../application/" },
+    { "path": "../../infrastructure/" }
   ],
-  "include": ["."]
+  "include": ["src/**/*"]
 }

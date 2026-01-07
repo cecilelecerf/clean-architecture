@@ -35,7 +35,7 @@ export class FormuleType {
     return FormuleType.VALID_TYPES.includes(value as any);
   }
 
-  public get value(): string {
+  public getValue(): string {
     return this._value;
   }
 

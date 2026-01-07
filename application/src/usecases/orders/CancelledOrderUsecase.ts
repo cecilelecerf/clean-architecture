@@ -44,7 +44,6 @@ export class CancelledOrderUsecase {
       return new InvalidOrderAccessError(user.id, order.id);
 
     order.markCancelled({ now: this.clockService.now() });
-    console.log(order);
     await this.orderRepository.update(order);
     return order.toDTO();
   }

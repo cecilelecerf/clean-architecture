@@ -2,13 +2,12 @@ import { Types } from "mongoose";
 
 export interface CreditInterface {
   _id: Types.UUID;
-  accountId: Types.UUID;
+  accountId: String;
   formuleCreditId: Types.UUID;
   initialAmount: {
     amount: number;
     currency: string;
   };
-  insuranceRate: number;
   durationMonths: number;
   startDate: Date;
   monthlyPayment: {
@@ -19,9 +18,9 @@ export interface CreditInterface {
     amount: number;
     currency: string;
   };
-  status: string;
+  status: "PENDING" | "ACCEPTED" | "REFUSED" | "COMPLETED";
   createdAt: Date;
-  advisor: Types.UUID;
+  advisor?: Types.UUID | null;
   updatedAt: Date;
-  reason: string;
+  reason?: string;
 }

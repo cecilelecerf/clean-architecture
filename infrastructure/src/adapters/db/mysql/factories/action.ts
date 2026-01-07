@@ -8,7 +8,6 @@ import { GetAllActionsByAvailabilityUsecase } from "@application/usecases/action
 import { UpdateActionUsecase } from "@application/usecases/actions/UpdateActionUseCase";
 import { GetActionUsecase } from "@application/usecases/actions/GetActionUsecase";
 import { AccountRepositoryMySQL } from "../repositories/AccountRepositoryMysql";
-import { NodeUuidService } from "@infrastructure/adapters/services/NodeUuidService";
 import { OrderRepositoryMySQL } from "../repositories/OrderRepositoryMySQL";
 import { GetActionSuggestionsUseCase } from "@application/usecases/actions/GetActionSuggestionsUseCase";
 import { MoneyConverterService } from "@infrastructure/adapters/services/MoneyConverterService";
@@ -24,7 +23,6 @@ export const actionFactory = () => {
   const currencyRepo = new CurrencyRepositoryMySQL(client);
   const userRepository = new UserRepositoryMySQL(client);
   const clockService = new SystemClockService();
-  const uuidService = new NodeUuidService();
   const moneyConvertorService = new MoneyConverterService(currencyRepo);
 
   const createAction = new CreateActionUsecase(

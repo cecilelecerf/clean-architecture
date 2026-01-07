@@ -168,7 +168,6 @@ export class OrderEntity {
 
     const buyPrice = buyOrder.price;
     const sellPrice = sellOrder.price;
-    console.log(buyPrice.amount >= sellPrice.amount);
     return buyPrice.amount >= sellPrice.amount;
   }
   public markExecuted({

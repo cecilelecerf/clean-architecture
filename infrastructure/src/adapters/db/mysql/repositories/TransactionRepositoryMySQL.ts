@@ -35,9 +35,11 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
     endDate: Date
   ): Promise<TransactionEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM transactions 
-       WHERE date BETWEEN ? AND ? 
-       ORDER BY date DESC`,
+      `
+      SELECT * FROM transactions 
+      WHERE date BETWEEN ? AND ? 
+      ORDER BY date DESC
+      `,
       [startDate, endDate]
     );
 
@@ -46,9 +48,11 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
 
   async findByIban(iban: IBAN): Promise<TransactionEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM transactions 
-       WHERE from_account_id = ? OR to_account_id = ? 
-       ORDER BY date DESC`,
+      `
+      SELECT * FROM transactions 
+      WHERE from_account_id = ? OR to_account_id = ? 
+      ORDER BY date DESC
+      `,
       [iban.value, iban.value]
     );
 
@@ -57,9 +61,18 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
 
   async save(transaction: TransactionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
-      `INSERT INTO transactions 
-        (id, label, icon, from_account_id, to_account_id, amount, currency, date) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `
+      INSERT INTO transactions (
+        id,
+        label,
+        icon,
+        from_account_id,
+        to_account_id,
+        amount,
+        currency,
+        date
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `,
       [
         transaction.id,
         transaction.label,
@@ -89,7 +102,6 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
     );
 
     if (rows.length === 0) return null;
-
     return this.mapRowToTransaction(rows[0]);
   }
 
@@ -97,7 +109,8 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
     id: TransactionEntity["id"]
   ): Promise<TransactionEntityWithAccountWithUser | null> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT 
+      `
+      SELECT 
         t.*,
         from_acc.iban as from_iban,
         from_acc.user_id as from_user_id,
@@ -142,14 +155,14 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
       INNER JOIN accounts to_acc ON t.to_account_id = to_acc.iban
       LEFT JOIN users from_user ON from_acc.user_id = from_user.id
       LEFT JOIN users to_user ON to_acc.user_id = to_user.id
-      WHERE t.id = ?`,
+      WHERE t.id = ?
+      `,
       [id]
     );
 
     if (rows.length === 0) return null;
 
     const row = rows[0];
-
     const fromAccount = AccountMapper.mapRowToAccount(row, "from_");
     const toAccount = AccountMapper.mapRowToAccount(row, "to_");
     const fromUser = UserMapper.mapRowToUser(row, "from_user_");
@@ -216,15 +229,11 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
     const offset = (page - 1) * limit;
 
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM transactions 
-       WHERE ${whereSQL}
-       ORDER BY date DESC 
-       LIMIT ${limit} OFFSET ${offset}`,
+      `SELECT * FROM transactions WHERE ${whereSQL} ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`,
       params
     );
 
     const transactions = rows.map((row) => this.mapRowToTransaction(row));
-
     return { transactions, total };
   }
 }

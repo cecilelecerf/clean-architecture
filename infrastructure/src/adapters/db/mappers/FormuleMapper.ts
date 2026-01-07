@@ -58,23 +58,29 @@ export class FormuleMapper {
 
     const minAmount =
       doc.minAmount != null && doc.currency
-        ? Money.from({ amount: doc.minAmount, currency: doc.currency })
+        ? Money.from({
+            amount: doc.minAmount.amount,
+            currency: doc.minAmount.currency,
+          })
         : undefined;
 
     const maxAmount =
       doc.maxAmount != null && doc.currency
-        ? Money.from({ amount: doc.maxAmount, currency: doc.currency })
+        ? Money.from({
+            amount: doc.maxAmount.amount,
+            currency: doc.maxAmount.currency,
+          })
         : undefined;
 
     return FormuleCreditEntity.from({
       id: doc._id.toString(),
       interestRate,
       insuranceRate,
-      type: doc.type,
+      type: FormuleType.from(doc.type),
       label: doc.label,
       description: doc.description,
       isActive: doc.isActive,
-      accountId: doc.accountId,
+      accountId: IBAN.from(doc.accountId),
       createdAt: doc.createdAt,
       minAmount,
       maxAmount,

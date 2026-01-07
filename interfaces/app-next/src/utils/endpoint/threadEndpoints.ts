@@ -89,7 +89,7 @@ export const threadsEndpoint = createEndpointsNodes({
     queryOptions({
       queryKey: ['threads', 'list', 'advisor'],
       queryFn: () => {
-        return get(`/threads/advisor`).then((data) =>
+        return get(`/threads/users/advisor`).then((data) =>
           safeParseWithLog(threadWithUserSchema.array(), data),
         );
       },

@@ -70,7 +70,6 @@ export const accountFactory = () => {
     admin: {
       applyDailyInterest,
     },
-
     createAccount,
     deleteAccount,
     getAccountByIBAN,

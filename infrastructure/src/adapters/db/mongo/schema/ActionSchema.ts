@@ -3,13 +3,13 @@ import { ActionInterface } from "../interface/ActionInterface";
 
 export const ActionSchema = new Schema<ActionInterface>(
   {
-    ISIN: { type: String, required: true, unique: true },
+    _id: { type: String, required: true },
     name: { type: String, required: true },
-    totalNb: { type: Number, required: true },
+    defaultQuantity: { type: Number, required: true },
     symbol: { type: String, required: true },
     market: { type: String, required: true },
     activitySector: { type: String, required: true },
-    currentPrice: {
+    price: {
       type: {
         amount: { type: Number, required: true },
         currency: { type: String, required: true },

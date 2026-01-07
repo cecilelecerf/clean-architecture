@@ -31,13 +31,12 @@ export class AccountMapper {
   }
 
   static mapDocToAccount(doc: any): AccountEntity {
-    const iban = IBAN.from(doc.iban);
+    const iban = IBAN.from(doc._id);
     const balance = Money.from({
-      amount: Number(doc.balance),
-      currency: doc.currency,
+      amount: Number(doc.balance.amount),
+      currency: doc.balance.currency,
     });
     const color = Color.from(doc.color);
-
     return AccountEntity.from({
       iban,
       userId: doc.userId ?? null,

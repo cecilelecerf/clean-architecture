@@ -1,7 +1,14 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
-import { UserId } from '@infrastructure/types/user';
+import { userDtoSchema, UserId } from '@infrastructure/types/user';
+import z from 'zod';
+import { tokenSchema } from '@/utils/endpoint/authEndpoint';
+import { safeParseWithLog } from '@/lib/zodUtils';
+
+const responseSchema = z.object({
+  user: userDtoSchema,
+  token: tokenSchema.shape.token,
+});
 
 export const authOptions = {
   providers: [
@@ -12,18 +19,24 @@ export const authOptions = {
         password: { label: 'Mot de passe', type: 'password' },
       },
       async authorize(credentials) {
-        const result = await usersFactory().login.execute({
-          email: credentials.email,
-          plainedPassword: credentials.password,
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: credentials.email, password: credentials.password }),
         });
-        if (result instanceof Error) return null;
-
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text);
+        }
+        const json = await res.json();
+        const result = safeParseWithLog(responseSchema, json);
         return {
-          id: result.user.id as UserId,
+          id: result.user.id,
           name: result.user.lastname,
-          email: result.user.email.toString(),
+          email: result.user.email,
           role: result.user.role,
-          image: undefined,
           accessToken: result.token,
         };
       },
@@ -32,7 +45,6 @@ export const authOptions = {
   session: {
     strategy: 'jwt' as const,
   },
-
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -47,7 +59,7 @@ export const authOptions = {
       session.user.id = token.id as UserId;
       session.user.email = token.email;
       session.user.accessToken = token.accessToken;
-      session.user.role = token.role;
+      session.user.role = token.role as 'client' | 'conseiller' | 'directeur';
       return session;
     },
   },

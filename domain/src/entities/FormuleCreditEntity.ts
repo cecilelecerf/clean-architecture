@@ -174,7 +174,7 @@ export class FormuleCreditEntity {
       id: this.id,
       interestRate: this.interestRate.value,
       insuranceRate: this.insuranceRate.value,
-      type: this.type.value,
+      type: this.type.getValue(),
       label: this.label,
       description: this.description,
       isActive: this.isActive,

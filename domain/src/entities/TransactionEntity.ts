@@ -4,8 +4,8 @@ import { IBAN } from "@domain/values/IBAN";
 import {
   InvalidTransactionAmountError,
   InvalidTransactionLabelError,
+  SameAccountError,
 } from "@domain/errors/transaction";
-import { SameAccountTransactionError } from "@domain/errors/transaction/SameAccountTransactionError";
 
 export class TransactionEntity {
   private constructor(
@@ -43,9 +43,9 @@ export class TransactionEntity {
   private static validateAccounts(
     fromAccountId: IBAN,
     toAccountId: IBAN
-  ): void | SameAccountTransactionError {
+  ): void | SameAccountError {
     if (fromAccountId.is(toAccountId)) {
-      return new SameAccountTransactionError(fromAccountId.value);
+      return new SameAccountError(fromAccountId.value);
     }
   }
 
@@ -68,7 +68,7 @@ export class TransactionEntity {
     | "date"
   >):
     | TransactionEntity
-    | SameAccountTransactionError
+    | SameAccountError
     | InvalidTransactionLabelError
     | InvalidTransactionAmountError {
     const accountsValidation = this.validateAccounts(

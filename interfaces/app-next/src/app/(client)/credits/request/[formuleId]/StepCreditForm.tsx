@@ -56,7 +56,6 @@ export const StepCreditForm = ({ formule, info }: StepCreditFormProps) => {
 
   const submit = (values: FormRequestCredit) => {
     const effectiveDateISO = new Date(values.startDate).toISOString();
-    console.log(effectiveDateISO)
     mutation.mutate(
       {
         accountId: info.accountId,

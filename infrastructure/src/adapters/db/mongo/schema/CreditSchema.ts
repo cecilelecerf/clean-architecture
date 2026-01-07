@@ -3,43 +3,32 @@ import { CreditInterface } from "../interface/CreditInterface";
 
 export const CreditSchema = new Schema<CreditInterface>(
   {
-    _id: {
-      type: Types.UUID,
-      required: true,
-      unique: true,
-      index: true,
-    },
-    accountId: { type: Schema.Types.UUID, ref: "Account", required: true },
-    formuleCreditId: { type: Schema.Types.UUID, ref: "Formule", required: true },
+    _id: { type: String, required: true },
+    accountId: { type: String, ref: "Account", required: true },
+    formuleCreditId: { type: Types.UUID, ref: "Formule", required: true },
     initialAmount: {
-      type: {
-        amount: { type: Number, required: true },
-        currency: { type: String, required: true },
-      },
-      required: true,
+      amount: { type: Number, required: true },
+      currency: { type: String, required: true, length: 3 },
     },
-    insuranceRate: { type: Number, required: true },
     durationMonths: { type: Number, required: true },
     startDate: { type: Date, required: true },
     monthlyPayment: {
-      type: {
-        amount: { type: Number, required: true },
-        currency: { type: String, required: true },
-      },
-      required: true,
+      amount: { type: Number, required: true },
+      currency: { type: String, required: true, length: 3 },
     },
     remainingBalance: {
-      type: {
-        amount: { type: Number, required: true },
-        currency: { type: String, required: true },
-      },
+      amount: { type: Number, required: true },
+      currency: { type: String, required: true, length: 3 },
+    },
+    status: {
+      type: String,
+      enum: ["PENDING", "ACCEPTED", "REFUSED", "COMPLETED"],
       required: true,
     },
-    status: { type: String, enum: ["PENDING", "ACCEPTED", "REFUSED", "COMPLETED"], required: false },
     createdAt: { type: Date, required: true },
-    advisor: { type: Schema.Types.UUID, ref: "User", required: false },
-    updatedAt: { type: Date, required: false },
-    reason: { type: String, required: false}
+    advisor: { type: Types.UUID, ref: "User", required: false, default: null },
+    updatedAt: { type: Date, required: true },
+    reason: { type: String, required: false },
   },
   {
     collection: "credits",

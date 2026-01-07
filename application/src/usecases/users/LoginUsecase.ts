@@ -6,7 +6,7 @@ import {
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
-import { UserEntity } from "@domain/entities/UserEntity";
+import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import { Email } from "@domain/values/Email";
 
@@ -26,7 +26,7 @@ export class LoginUsecase {
     email,
     plainedPassword,
   }: Props): Promise<
-    | { user: UserEntity; token: string }
+    | { user: UserToDTO; token: string }
     | UserNotFoundError
     | InvalidCredentialsError
     | EmailInvalidFormatError
@@ -45,6 +45,6 @@ export class LoginUsecase {
     const token = await this.tokenService.generateAuthToken({
       userId: user.id,
     });
-    return { user, token };
+    return { user: user.toDTO(), token };
   }
 }

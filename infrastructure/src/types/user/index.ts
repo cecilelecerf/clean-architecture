@@ -40,7 +40,7 @@ const addressSchema = z.object({
   address: addressLineSchema,
   postalCode: postalCodeSchema,
 });
-const clientSchema = baseUserSchema.extend({
+export const clientSchema = baseUserSchema.extend({
   role: z.literal("client"),
   sexe: sexeSchema,
   address: addressSchema,
@@ -132,3 +132,36 @@ export const advisorStat = z.object({
   refusedCreditsCount: z.number(),
   activeThreadsCount: z.number(),
 });
+
+export const loginSchema = clientSchema
+  .pick({
+    email: true,
+  })
+  .extend({ password: baseUserSchema.shape.passwordHash });
+export type LoginPayload = z.infer<typeof loginSchema>;
+export const reqRegisterSchema = clientSchema
+  .pick({
+    firstname: true,
+    lastname: true,
+    email: true,
+    address: true,
+    dateOfBirth: true,
+    phoneNumber: true,
+    sexe: true,
+  })
+  .extend({ plainedPassword: z.string(), confirmPlainedPassword: z.string() });
+export type RegisterPayload = z.infer<typeof reqRegisterSchema>;
+
+export const registerAdminPayload = baseUserSchema
+  .pick({
+    firstname: true,
+    lastname: true,
+    email: true,
+  })
+  .extend({ role: z.string() });
+export type RegisterAdminPayload = z.infer<typeof registerAdminPayload>;
+
+export type RegisterResponse = z.infer<typeof userSchema>;
+
+export const banUserSchema = z.object({ status: z.boolean() });
+export type ReqBanUser = z.infer<typeof banUserSchema>;

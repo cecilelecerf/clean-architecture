@@ -63,7 +63,7 @@ export class CurrencyRepositoryMongo implements CurrencyRepository {
       code: doc.code,
       exchangeRate: doc.exchangeRate,
       createdAt: new Date(doc.createdAt),
-      updatedAt: doc.updatedAt ? new Date(doc.updatedAt) : undefined,
+      updatedAt: new Date(doc.updatedAt),
     });
   }
 }

@@ -42,7 +42,11 @@ export function selectFormuleCredit(
   const selectedFormule = validFormules[randomIndex];
 
   console.log(
-    `  🎯 Formule sélectionnée: "${selectedFormule.label}" (${selectedFormule.type.value}) - Taux: ${selectedFormule.interestRate.value}%`
+    `  🎯 Formule sélectionnée: "${
+      selectedFormule.label
+    }" (${selectedFormule.type.getValue()}) - Taux: ${
+      selectedFormule.interestRate.value
+    }%`
   );
 
   return selectedFormule;

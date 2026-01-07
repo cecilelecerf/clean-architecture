@@ -38,7 +38,6 @@ export async function seedCredits(
           );
           continue;
         }
-
         const credit = await seedCreditUseCase.execute({
           userId,
           advisorId: null,
@@ -48,7 +47,6 @@ export async function seedCredits(
           durationMonths: randomCredit.durationMonths,
           creditType,
         });
-
         const typeLabel = formatCreditTypeLabel(creditType);
 
         console.log(

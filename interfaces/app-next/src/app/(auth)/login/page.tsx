@@ -8,9 +8,10 @@ import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { createClientSchema } from '@infrastructure/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { User } from 'lucide-react';
+
 const loginSchema = createClientSchema.pick({ email: true, passwordHash: true })
 type Login = z.infer<typeof loginSchema>
+
 export default function LoginPage() {
   const router = useRouter()
   const form = useForm<Login>({

@@ -6,7 +6,7 @@
   },
   "include": [
     "src/**/*",
-    "../domain/src/errors/transaction/SameAccountTransactionError.ts"
+    "../domain/src/errors/transaction/SameAccountError.ts"
   ],
   "references": [{ "path": "../domain" }]
 }

@@ -62,6 +62,7 @@ export const newTransactionSchema = transactionSchema
   .pick({
     label: true,
     amount: true,
+    currency: true,
     icon: true,
   })
   .extend({ toAccountIban: z.string() });

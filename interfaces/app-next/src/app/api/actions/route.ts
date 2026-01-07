@@ -60,7 +60,6 @@ export async function POST(req: NextRequest) {
         { status: result.statusCode ?? 400 },
       );
     }
-    console.log(result);
 
     return NextResponse.json(actionSchema.parse(result));
   } catch (err) {

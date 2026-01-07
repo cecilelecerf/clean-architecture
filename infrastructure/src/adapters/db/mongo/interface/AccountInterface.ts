@@ -1,17 +1,23 @@
 import { Types } from "mongoose";
 
 export interface AccountInterface {
-  _id: Types.UUID;
-  iban: string;
-  userId: Types.UUID;
+  _id: string;
+  userId?: Types.UUID | null;
   name: string;
   type: "courant" | "epargne";
-  color: string;
+  color:
+    | "yellow"
+    | "blue"
+    | "purple"
+    | "gray"
+    | "orange"
+    | "pink"
+    | "red"
+    | "green";
   balance: {
     amount: number;
     currency: string;
   };
-  currency: string,
   createdAt: Date;
   updatedAt: Date;
 }

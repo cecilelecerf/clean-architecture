@@ -46,6 +46,8 @@ import { generateBankAccounts } from "../../seeds/01B_generateBankAccounts";
 import { FormuleCreditRepositoryMongo } from "../repositories/FormuleCreditRepositoryMongo";
 import { generateFormuleCredits } from "../../seeds/01C_generateFormulesCredit";
 import { SeedFormuleCreditUseCase } from "@application/usecases/seeds/SeedFormuleCreditUseCase";
+import { generateCurrencies } from "../../seeds/00_seedCurrency";
+import { CurrencyRepositoryMongo } from "../repositories/CurrencyRepositoryMongo";
 
 const all = async () => {
   console.log("🌱 Starting MongoDB seed...\n");
@@ -66,11 +68,14 @@ const all = async () => {
   const orderRepository = new OrderRepositoryMongo(mongoClient);
   const notificationRepository = new NotificationRepositoryMongo(mongoClient);
   const formuleRepository = new FormuleCreditRepositoryMongo(mongoClient);
+  const currencyRepo = new CurrencyRepositoryMongo(mongoClient);
 
+  // 3. Initialiser les services
   const encryptionService = new BcryptEncryptionService();
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
 
+  // 4. Initialiser les use cases
   const seedUserUseCase = new SeedUserUseCase(
     userRepository,
     encryptionService,
@@ -134,6 +139,8 @@ const all = async () => {
 
   const seedOrderUseCase = new SeedOrderUseCase(
     orderRepository,
+    accountRepository,
+    transactionRepository,
     uuidService,
     clockService
   );
@@ -156,6 +163,7 @@ const all = async () => {
   );
 
   // 5. Exécuter les seeds
+  await generateCurrencies(currencyRepo, clockService);
   const directors = await seedDirector(seedUserUseCase, clockService);
 
   const bankAccounts = await generateBankAccounts(seedBankAccountUseCase);
@@ -175,8 +183,8 @@ const all = async () => {
   );
 
   await generateExternalThreads(
-    clients,
     advisors,
+    clients,
     seedThreadUseCase,
     seedMessageUseCase,
     clockService
@@ -209,19 +217,16 @@ const all = async () => {
   );
 
   const actions = await generateActions(seedActionUseCase);
-
   await generateSavingsRate(seedSavingsRateUseCase);
 
   await generateOrders(clients, actions, seedOrderUseCase, clockService);
 
-  await generateNotifications(
-    advisors,
-    clients,
-    seedNotificationUseCase,
-    clockService
-  );
-
-  await generateBankAccounts(seedBankAccountUseCase);
+  // await generateNotifications(
+  //   advisors,
+  //   clients,
+  //   seedNotificationUseCase,
+  //   clockService
+  // );
 };
 
 all()

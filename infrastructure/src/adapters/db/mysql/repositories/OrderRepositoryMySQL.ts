@@ -133,22 +133,6 @@ export class OrderRepositoryMySQL implements OrderRepository {
   }
 
   async update(order: OrderEntity): Promise<void> {
-    console.log([
-      order.IBAN.value,
-      order.ISIN.getValue(),
-      order.type,
-      order.quantity,
-      order.price.amount,
-      order.price.currency,
-      order.date ?? null,
-      order.status,
-      order.createdAt,
-      order.updatedAt,
-      order.transactionId ?? null,
-      order.executionPrice ? order.executionPrice.amount : null,
-      order.executionPrice ? order.executionPrice.currency : null,
-      order.id,
-    ]);
     await this.client.query<ResultSetHeader>(
       `UPDATE orders 
        SET account_iban = ?, action_isin = ?, type = ?, quantity = ?, 

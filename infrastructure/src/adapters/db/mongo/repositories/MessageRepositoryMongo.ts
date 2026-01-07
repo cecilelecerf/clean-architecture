@@ -6,8 +6,7 @@ import { MongoClient } from "../../MongoClient";
 import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { MessageModel } from "../models/MessageModel";
-import { UserEntity } from "@domain/entities/UserEntity";
-import { Email } from "@domain/values/Email";
+import { UserMapper } from "../../mappers/UserMapper";
 
 export class MessageRepositoryMongo implements MessageRepository {
   constructor(private readonly client: MongoClient) {}
@@ -16,25 +15,13 @@ export class MessageRepositoryMongo implements MessageRepository {
     return MessageEntity.from({
       id: doc._id.toString(),
       threadId: doc.threadId?.toString() || doc.threadId,
-      senderId: doc.senderId?.toString() || doc.senderId,
+      senderId:
+        typeof doc.senderId === "string"
+          ? doc.senderId?.toString()
+          : doc.senderId._id,
       content: doc.content,
       sentAt: doc.sentAt,
       readBy: doc.readBy || [],
-    });
-  }
-
-  private mapDocToSender(doc: any): UserEntity {
-    return UserEntity.from({
-      id: doc._id.toString(),
-      firstname: doc.firstname,
-      lastname: doc.lastname,
-      email: Email.from(doc.email),
-      passwordHash: doc.passwordHash,
-      role: doc.role,
-      isActiveField: doc.isActive,
-      createdAt: doc.createdAt,
-      confirmedAt: doc.confirmedAt,
-      updatedAt: doc.updatedAt,
     });
   }
 
@@ -50,6 +37,15 @@ export class MessageRepositoryMongo implements MessageRepository {
       sentAt: message.sentAt,
       readBy: message.readBy,
     });
+
+    // Assurer que l'expéditeur est marqué comme ayant lu le message
+    if (!message.readBy.includes(message.senderId)) {
+      message.readBy.push(message.senderId);
+      await MessageModel.updateOne(
+        { _id: message.id },
+        { $set: { readBy: message.readBy } }
+      );
+    }
   }
 
   /** 🔍 Tous les messages d'un thread */
@@ -62,22 +58,22 @@ export class MessageRepositoryMongo implements MessageRepository {
       .sort({ sentAt: 1 })
       .lean();
 
-    return docs.map((doc) => this.mapDocToMessage(doc));
+    return docs.map(this.mapDocToMessage);
   }
 
   /** 🔄 Mettre à jour un message */
   async update(message: MessageEntity): Promise<void> {
     await this.client.connect();
 
-    await MessageModel.findByIdAndUpdate(
-      message.id,
+    // Met à jour le contenu et la liste des lecteurs
+    await MessageModel.updateOne(
+      { _id: message.id },
       {
         $set: {
           content: message.content,
           readBy: message.readBy,
         },
-      },
-      { new: true }
+      }
     );
   }
 
@@ -92,15 +88,13 @@ export class MessageRepositoryMongo implements MessageRepository {
     await this.client.connect();
 
     const docs = await MessageModel.find({ threadId })
-      .populate({
-        path: "senderId",
-      })
+      .populate({ path: "senderId" })
       .sort({ sentAt: 1 })
       .lean<any[]>();
 
     return docs.map((doc): MessageWithUser => {
       const message = this.mapDocToMessage(doc);
-      const sender = this.mapDocToSender(doc.senderId);
+      const sender = UserMapper.mapDocToUser(doc.senderId);
       return Object.assign(message, { sender });
     });
   }

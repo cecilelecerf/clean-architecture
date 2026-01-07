@@ -26,7 +26,6 @@ export class Money {
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError {
-    console.log(currency, amount);
     if (!currency || currency.trim() === "") {
       return new MoneyCurrencyMissingError(currency);
     }
@@ -40,7 +39,6 @@ export class Money {
     }
 
     const scaledAmount = Number(amount.toFixed(Money.SCALE));
-    console.log(scaledAmount);
     return new Money(scaledAmount, currency.toUpperCase());
   }
 

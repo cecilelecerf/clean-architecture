@@ -7,7 +7,7 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 
-type Props = { userId: UserEntity["id"]; role?: UserEntity["role"] };
+type Props = { userId: UserEntity["id"]; role?: string };
 
 export class GetUsersByRoleUseCase {
   public constructor(private readonly userRepository: UserRepository) {}
@@ -25,7 +25,16 @@ export class GetUsersByRoleUseCase {
         ["conseiller", "directeur"],
         advisor.role
       );
-    const users = await this.userRepository.findAllByRoleAndIsActif(role);
+
+    if (role && !UserEntity.isUserRole(role))
+      return new UserRoleMismatchError(
+        [],
+        role as "client" | "directeur" | "conseiller"
+      );
+
+    const users = await this.userRepository.findAllByRoleAndIsActif(
+      role as "client" | "directeur" | "conseiller"
+    );
     return users.map((user) => user.toDTO());
   }
 }

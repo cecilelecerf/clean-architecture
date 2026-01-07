@@ -6,9 +6,9 @@ export interface PostInterface {
   title: string;
   content: string;
   tagsId: Types.UUID[];
-  createdAt: Date;
   readBy: Types.UUID[];
+  clientId?: Types.UUID;
+  publishedAt?: Date;
+  createdAt: Date;
   updatedAt: Date;
-  publishedAt: Date;
-  clientId: Types.UUID[];
 }

@@ -1,130 +1,221 @@
-import { OrderRepository } from "@application/ports/repositories/OrderRepository";
+import {
+  OrderEntityWithAccount,
+  OrderRepository,
+} from "@application/ports/repositories/OrderRepository";
 import { MongoClient } from "../../MongoClient";
 import { OrderEntity } from "@domain/entities/OrderEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { OrderModel } from "../models/OrderModel";
 import { Money } from "@domain/values/Money";
+import { IBAN } from "@domain/values/IBAN";
+import { ISIN } from "@domain/values/ISIN";
+import { AccountModel } from "../models/AccountModel";
+import { AccountMapper } from "../../mappers/AccountMapper";
 
 export class OrderRepositoryMongo implements OrderRepository {
   constructor(private readonly client: MongoClient) {}
 
   private mapDocToOrder(doc: any): OrderEntity {
-    const price = Money.from(doc.price);
-
     return OrderEntity.from({
       id: doc._id.toString(),
-      userId: doc.userId,
-      ISIN: doc.actionId,
+      IBAN: IBAN.from(doc.IBAN),
+      ISIN: ISIN.from(doc.ISIN),
       type: doc.type,
       quantity: doc.quantity,
-      price,
-      fee,
-      date: doc.date,
+      price: Money.from(doc.price),
+      executionPrice: doc.executionPrice
+        ? Money.from(doc.executionPrice)
+        : undefined,
       status: doc.status,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
+      date: doc.date,
+      transactionId: doc.transactionId,
     });
   }
 
-  /** Sauvegarder un ordre */
   async save(order: OrderEntity): Promise<void> {
     await this.client.connect();
-
     await OrderModel.create({
       _id: order.id,
-      userId: order.userId,
-      actionId: order.ISIN,
+      IBAN: order.IBAN.value,
+      ISIN: order.ISIN.getValue(),
       type: order.type,
       quantity: order.quantity,
       price: {
         amount: order.price.amount,
         currency: order.price.currency,
       },
-      fee: {
-        amount: order.fee.amount,
-        currency: order.fee.currency,
-      },
-      date: order.date,
+      executionPrice: order.executionPrice
+        ? {
+            amount: order.executionPrice.amount,
+            currency: order.executionPrice.currency,
+          }
+        : undefined,
       status: order.status,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
+      date: order.date ?? null,
+      transactionId: order.transactionId ?? null,
     });
   }
 
-  /** Trouver un ordre par ID */
   async findById(id: OrderEntity["id"]): Promise<OrderEntity | null> {
     await this.client.connect();
 
     const doc = await OrderModel.findById(id).lean();
     if (!doc) return null;
-
     return this.mapDocToOrder(doc);
   }
 
-  /** Tous les ordres d'un utilisateur */
   async findAllByUserId(userId: UserEntity["id"]): Promise<OrderEntity[]> {
     await this.client.connect();
-
-    const docs = await OrderModel.find({ userId }).sort({ date: -1 }).lean();
-
-    return docs.map((doc) => this.mapDocToOrder(doc));
+    const docs = await OrderModel.find({ "IBAN.userId": userId })
+      .sort({ createdAt: -1 })
+      .lean();
+    return docs.map(this.mapDocToOrder);
   }
 
-  /** Tous les ordres d'une action */
-  async findAllByActionId(
-    actionId: ActionEntity["ISIN"]
-  ): Promise<OrderEntity[]> {
-    await this.client.connect();
-
-    const docs = await OrderModel.find({ actionId }).sort({ date: -1 }).lean();
-
-    return docs.map((doc) => this.mapDocToOrder(doc));
-  }
-
-  /** Ordres en attente */
   async findAllOpen(): Promise<OrderEntity[]> {
     await this.client.connect();
-
     const docs = await OrderModel.find({ status: "pending" })
-      .sort({ date: -1 })
+      .sort({ createdAt: 1 })
       .lean();
-
-    return docs.map((doc) => this.mapDocToOrder(doc));
+    return docs.map(this.mapDocToOrder);
   }
 
-  /** Mettre à jour un ordre */
   async update(order: OrderEntity): Promise<void> {
     await this.client.connect();
-
     await OrderModel.updateOne(
       { _id: order.id },
       {
         $set: {
-          userId: order.userId,
-          actionId: order.ISIN,
+          IBAN: order.IBAN.value,
+          ISIN: order.ISIN.getValue(),
           type: order.type,
           quantity: order.quantity,
           price: {
             amount: order.price.amount,
             currency: order.price.currency,
           },
-          fee: {
-            amount: order.fee.amount,
-            currency: order.fee.currency,
-          },
-          date: order.date,
+          executionPrice: order.executionPrice
+            ? {
+                amount: order.executionPrice.amount,
+                currency: order.executionPrice.currency,
+              }
+            : undefined,
           status: order.status,
+          createdAt: order.createdAt,
           updatedAt: order.updatedAt,
+          date: order.date ?? null,
+          transactionId: order.transactionId ?? null,
         },
       }
     );
   }
 
-  /** Supprimer un ordre */
   async delete(id: OrderEntity["id"]): Promise<void> {
     await this.client.connect();
-
     await OrderModel.deleteOne({ _id: id });
+  }
+
+  async findAllByUserIdAndStatus(
+    userId: UserEntity["id"],
+    status: OrderEntity["status"]
+  ): Promise<OrderEntity[]> {
+    await this.client.connect();
+    const docs = await OrderModel.find({
+      "IBAN.userId": userId,
+      status,
+    })
+      .sort({ createdAt: 1 })
+      .lean();
+    return docs.map(this.mapDocToOrder);
+  }
+
+  async findAllByActionIdAndStatus(
+    actionId: ActionEntity["ISIN"],
+    status?: OrderEntity["status"]
+  ): Promise<OrderEntity[]> {
+    await this.client.connect();
+    const filter: any = { ISIN: actionId.getValue() };
+    if (status) filter.status = status;
+    const docs = await OrderModel.find(filter).sort({ createdAt: 1 }).lean();
+    return docs.map(this.mapDocToOrder);
+  }
+
+  async findAllExecutedByISINAndDateRange(
+    actionId: ActionEntity["ISIN"],
+    startDate: Date,
+    endDate: Date
+  ): Promise<OrderEntity[]> {
+    await this.client.connect();
+    const docs = await OrderModel.find({
+      ISIN: actionId.getValue(),
+      status: "executed",
+      date: { $gte: startDate, $lte: endDate },
+    })
+      .sort({ date: 1 })
+      .lean();
+    return docs.map(this.mapDocToOrder);
+  }
+
+  async findAllByActionIdAndStatusAndUserId(
+    actionId: ActionEntity["ISIN"],
+    userId: UserEntity["id"],
+    status?: OrderEntity["status"]
+  ): Promise<OrderEntity[]> {
+    await this.client.connect();
+    const filter: any = { ISIN: actionId.getValue(), "IBAN.userId": userId };
+    if (status) filter.status = status;
+    const docs = await OrderModel.find(filter).sort({ createdAt: 1 }).lean();
+    return docs.map(this.mapDocToOrder);
+  }
+
+  async findAllByActionIdAndStatusAndType(
+    actionId: ActionEntity["ISIN"],
+    status: OrderEntity["status"],
+    type: OrderEntity["type"]
+  ): Promise<OrderEntity[]> {
+    await this.client.connect();
+    const docs = await OrderModel.find({
+      ISIN: actionId.getValue(),
+      status,
+      type,
+    })
+      .sort({ createdAt: 1 })
+      .lean();
+    return docs.map(this.mapDocToOrder);
+  }
+
+  async findPendingLimitOrders(
+    actionId: ActionEntity["ISIN"]
+  ): Promise<OrderEntity[]> {
+    await this.client.connect();
+    const docs = await OrderModel.find({
+      ISIN: actionId.getValue(),
+      status: "pending",
+      executionType: "limit",
+    })
+      .sort({ createdAt: 1 })
+      .lean();
+    return docs.map(this.mapDocToOrder);
+  }
+  async findByIdWithAccount(
+    id: OrderEntity["id"]
+  ): Promise<OrderEntityWithAccount | null> {
+    await this.client.connect();
+
+    const orderDoc = await OrderModel.findById(id).lean();
+    if (!orderDoc) return null;
+
+    const accountDoc = await AccountModel.findOne({
+      iban: orderDoc.IBAN,
+    }).lean();
+    const account = AccountMapper.mapRowToAccount(accountDoc);
+    const order = this.mapDocToOrder(orderDoc);
+
+    return Object.assign(order, { account });
   }
 }

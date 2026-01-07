@@ -9,7 +9,6 @@ import { AccountEntity } from "@domain/entities/AccountEntity";
 export class UserRepositoryMySQL implements UserRepository {
   constructor(private readonly client: MySQLClient) {}
 
-  /** Trouver par ID */
   async findById(id: UserEntity["id"]): Promise<UserEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM users WHERE id = ?",
@@ -20,7 +19,6 @@ export class UserRepositoryMySQL implements UserRepository {
     return UserMapper.mapRowToUser(rows[0]);
   }
 
-  /** Trouver par email */
   async findByEmail(email: Email): Promise<UserEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM users WHERE email = ?",
@@ -31,7 +29,6 @@ export class UserRepositoryMySQL implements UserRepository {
     return UserMapper.mapRowToUser(rows[0]);
   }
 
-  /** Trouver par IBAN */
   async findByIban(iban: AccountEntity["iban"]): Promise<UserEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `
@@ -47,23 +44,20 @@ export class UserRepositoryMySQL implements UserRepository {
     return UserMapper.mapRowToUser(rows[0]);
   }
 
-  /** Tous les utilisateurs */
   async findAll(): Promise<UserEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM users ORDER BY created_at DESC"
     );
-
     return rows.map((row) => UserMapper.mapRowToUser(row));
   }
 
-  /** Utilisateurs actifs (optionnellement par rôle) */
   async findAllByRoleAndIsActif(
     role?: UserEntity["role"]
   ): Promise<UserEntity[]> {
     let query = `
       SELECT * FROM users
       WHERE is_active = 1
-      AND confirmed_at IS NOT NULL
+        AND confirmed_at IS NOT NULL
     `;
     const params: any[] = [];
 
@@ -78,7 +72,6 @@ export class UserRepositoryMySQL implements UserRepository {
     return rows.map((row) => UserMapper.mapRowToUser(row));
   }
 
-  /** Sauvegarde (CREATE) */
   async save(user: UserEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `
@@ -124,7 +117,6 @@ export class UserRepositoryMySQL implements UserRepository {
     );
   }
 
-  /** Mise à jour */
   async update(user: UserEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `
@@ -167,14 +159,12 @@ export class UserRepositoryMySQL implements UserRepository {
     );
   }
 
-  /** Suppression */
   async delete(id: UserEntity["id"]): Promise<void> {
     await this.client.query<ResultSetHeader>("DELETE FROM users WHERE id = ?", [
       id,
     ]);
   }
 
-  /** Compter les utilisateurs actifs par rôle */
   async countUserByRole(role: UserEntity["role"]): Promise<number> {
     const rows = await this.client.query<RowDataPacket[]>(
       `
