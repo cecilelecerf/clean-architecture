@@ -57,8 +57,8 @@ export class SavingsrateController {
             const payload = savingRateSchema.pick({
                 rate: true,
                 effectiveDate: true,
-                })
-                .parse(req.body);
+            })
+            .parse(req.body);
 
             const result = await savingsrateFactory().setSavingsRate.execute({
                 rate: payload.rate,
