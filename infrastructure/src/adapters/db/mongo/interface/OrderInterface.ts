@@ -2,8 +2,8 @@ import { Types } from "mongoose";
 
 export interface OrderInterface {
   _id: Types.UUID;
-  accountIban: string;
-  actionId: string;
+  IBAN: string;
+  ISIN: string;
   type: "buy" | "sell";
   quantity: number;
   price: {

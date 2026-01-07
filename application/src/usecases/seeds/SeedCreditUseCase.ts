@@ -43,13 +43,12 @@ export class SeedCreditUseCase {
     if (!formuleCredit.isActive) {
       throw new Error(`FormuleCredit is inactive: ${request.formuleCreditId}`);
     }
-
     const accounts = await this.accountRepository.findByUserId(request.userId);
     if (!accounts || accounts.length === 0) {
       throw new Error(`No account found for user: ${request.userId}`);
     }
-    const account = accounts[0];
 
+    const account = accounts[0];
     const initialAmount = Money.create({
       amount: request.initialAmount,
       currency: request.currency,
@@ -105,7 +104,6 @@ export class SeedCreditUseCase {
       default:
         throw new Error(`Unknown credit type: ${request.creditType}`);
     }
-
     const credit = CreditEntity.create(
       {
         id: this.uuidService.generate(),

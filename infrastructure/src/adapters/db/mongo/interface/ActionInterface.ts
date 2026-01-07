@@ -1,14 +1,11 @@
-import { Types } from "mongoose";
-
 export interface ActionInterface {
-  _id: Types.UUID;
-  ISIN: string;
+  _id: string;
   name: string;
-  totalNb: number;
+  defaultQuantity: number;
   symbol: string;
   market: string;
   activitySector: string;
-  currentPrice: {
+  price: {
     amount: number;
     currency: string;
   };

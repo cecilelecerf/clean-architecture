@@ -10,12 +10,11 @@ export class FormuleCreditRepositoryMongo implements FormuleCreditRepository {
   /** Sauvegarder une formule d'un crédit */
   async save(formule: FormuleCreditEntity): Promise<void> {
     await this.client.connect();
-
     await FormuleCreditModel.create({
       _id: formule.id,
       interestRate: formule.interestRate.value,
       insuranceRate: formule.insuranceRate.value,
-      type: formule.type.value, // aligné avec MySQL
+      type: formule.type.getValue(),
       label: formule.label,
       description: formule.description,
       isActive: formule.isActive,
@@ -48,7 +47,7 @@ export class FormuleCreditRepositoryMongo implements FormuleCreditRepository {
         $set: {
           interestRate: formule.interestRate.value,
           insuranceRate: formule.insuranceRate.value,
-          type: formule.type.value, // aligné avec MySQL
+          type: formule.type.getValue(),
           label: formule.label,
           description: formule.description,
           isActive: formule.isActive,
@@ -88,9 +87,7 @@ export class FormuleCreditRepositoryMongo implements FormuleCreditRepository {
   async findAll(): Promise<FormuleCreditEntity[]> {
     await this.client.connect();
 
-    const docs = await FormuleCreditModel.find()
-      .sort({ createdAt: -1 }) // aligné avec MySQL (ordre descendant)
-      .lean();
+    const docs = await FormuleCreditModel.find().sort({ createdAt: -1 }).lean();
 
     return docs.map(FormuleMapper.mapDocToFormule);
   }

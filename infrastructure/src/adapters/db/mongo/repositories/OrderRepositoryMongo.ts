@@ -11,7 +11,6 @@ import { Money } from "@domain/values/Money";
 import { IBAN } from "@domain/values/IBAN";
 import { ISIN } from "@domain/values/ISIN";
 import { AccountModel } from "../models/AccountModel";
-import { AccountEntity } from "@domain/entities/AccountEntity";
 import { AccountMapper } from "../../mappers/AccountMapper";
 
 export class OrderRepositoryMongo implements OrderRepository {
@@ -38,7 +37,6 @@ export class OrderRepositoryMongo implements OrderRepository {
 
   async save(order: OrderEntity): Promise<void> {
     await this.client.connect();
-
     await OrderModel.create({
       _id: order.id,
       IBAN: order.IBAN.value,

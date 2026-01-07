@@ -3,7 +3,7 @@ import { ThreadInterface } from "../interface/ThreadInterface";
 
 export const ThreadSchema = new Schema<ThreadInterface>(
   {
-    _id: { type: Types.UUID, required: true, unique: true, index: true },
+    _id: { type: Types.UUID, required: true },
     participantsId: [{ type: Types.UUID, ref: "User", required: true }],
     title: { type: String, required: true, maxlength: 50 },
     isClose: { type: Boolean, required: true, default: false },

@@ -3,7 +3,7 @@ import { UserInterface } from "../interface/UserInterface";
 
 export const UserSchema = new Schema<UserInterface>(
   {
-    _id: { type: Types.UUID, required: true, unique: true, index: true },
+    _id: { type: Types.UUID, required: true },
     firstname: { type: String, required: true, maxlength: 50 },
     lastname: { type: String, required: true, maxlength: 50 },
     email: { type: String, required: true, unique: true, maxlength: 100 },
@@ -31,6 +31,5 @@ export const UserSchema = new Schema<UserInterface>(
   }
 );
 
-UserSchema.index({ email: 1 });
 UserSchema.index({ role: 1 });
 UserSchema.index({ isActive: 1 });

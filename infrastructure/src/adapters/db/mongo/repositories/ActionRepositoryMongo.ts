@@ -30,9 +30,9 @@ export class ActionRepositoryMongo implements ActionRepository {
 
   async save(action: ActionEntity): Promise<void> {
     await this.client.connect();
-
+    console.log(action);
     await ActionModel.create({
-      ISIN: action.ISIN.getValue(),
+      _id: action.ISIN.getValue(),
       name: action.name,
       symbol: action.symbol,
       market: action.market,
@@ -51,7 +51,7 @@ export class ActionRepositoryMongo implements ActionRepository {
   async findByISIN(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
     await this.client.connect();
 
-    const doc = await ActionModel.findOne({ ISIN: ISIN.getValue() }).lean();
+    const doc = await ActionModel.findById(ISIN.getValue()).lean();
     if (!doc) return null;
 
     return this.mapDocToAction(doc);
@@ -77,42 +77,36 @@ export class ActionRepositoryMongo implements ActionRepository {
   async setAvailability(action: ActionEntity): Promise<void> {
     await this.client.connect();
 
-    await ActionModel.updateOne(
-      { ISIN: action.ISIN.getValue() },
-      {
-        $set: {
-          isAvailable: action.isAvailable,
-          updatedAt: action.updatedAt ?? new Date(),
-        },
-      }
-    );
+    await ActionModel.findByIdAndUpdate(action.ISIN.getValue(), {
+      $set: {
+        isAvailable: action.isAvailable,
+        updatedAt: action.updatedAt ?? new Date(),
+      },
+    });
   }
 
   async update(action: ActionEntity): Promise<void> {
     await this.client.connect();
 
-    await ActionModel.updateOne(
-      { ISIN: action.ISIN.getValue() },
-      {
-        $set: {
-          name: action.name,
-          symbol: action.symbol,
-          market: action.market,
-          activitySector: action.activitySector,
-          price: {
-            amount: action.price.amount,
-            currency: action.price.currency,
-          },
-          isAvailable: action.isAvailable,
-          updatedAt: action.updatedAt ?? new Date(),
-          defaultQuantity: action.defaultQuantity,
+    await ActionModel.findByIdAndUpdate(action.ISIN.getValue(), {
+      $set: {
+        name: action.name,
+        symbol: action.symbol,
+        market: action.market,
+        activitySector: action.activitySector,
+        price: {
+          amount: action.price.amount,
+          currency: action.price.currency,
         },
-      }
-    );
+        isAvailable: action.isAvailable,
+        updatedAt: action.updatedAt ?? new Date(),
+        defaultQuantity: action.defaultQuantity,
+      },
+    });
   }
 
   async delete(ISIN: ActionEntity["ISIN"]): Promise<void> {
     await this.client.connect();
-    await ActionModel.deleteOne({ ISIN: ISIN.getValue() });
+    await ActionModel.findByIdAndDelete(ISIN.getValue());
   }
 }

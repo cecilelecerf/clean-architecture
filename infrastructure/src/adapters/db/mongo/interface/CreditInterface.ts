@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 
 export interface CreditInterface {
   _id: Types.UUID;
-  accountId: Types.UUID;
+  accountId: String;
   formuleCreditId: Types.UUID;
   initialAmount: {
     amount: number;

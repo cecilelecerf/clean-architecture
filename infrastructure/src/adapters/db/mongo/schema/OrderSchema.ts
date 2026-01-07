@@ -3,9 +3,9 @@ import { OrderInterface } from "../interface/OrderInterface";
 
 export const OrderSchema = new Schema<OrderInterface>(
   {
-    _id: { type: Types.UUID, required: true, unique: true, index: true },
-    accountIban: { type: String, ref: "Account", required: true },
-    actionId: { type: String, ref: "Action", required: true },
+    _id: { type: Types.UUID, required: true },
+    IBAN: { type: String, ref: "Account", required: true },
+    ISIN: { type: String, ref: "Action", required: true },
     type: { type: String, enum: ["buy", "sell"], required: true },
     quantity: { type: Number, required: true },
     price: {

@@ -3,7 +3,7 @@ import { TagInterface } from "../interface/TagInterface";
 
 export const TagSchema = new Schema<TagInterface>(
   {
-    _id: { type: Types.UUID, required: true, unique: true, index: true },
+    _id: { type: Types.UUID, required: true },
     label: { type: String, required: true, maxlength: 50 },
     color: {
       type: String,

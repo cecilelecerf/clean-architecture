@@ -25,6 +25,7 @@ export async function seedCredits(
     for (const [index, creditType] of allCreditTypes.entries()) {
       try {
         const randomCredit = generateRandomCredit();
+        console.log(randomCredit);
 
         const formule = selectFormuleCredit(
           formuleCredits,
@@ -38,7 +39,15 @@ export async function seedCredits(
           );
           continue;
         }
-
+        console.log({
+          userId,
+          advisorId: null,
+          formuleCreditId: formule.id,
+          initialAmount: randomCredit.initialAmount,
+          currency: randomCredit.currency,
+          durationMonths: randomCredit.durationMonths,
+          creditType,
+        });
         const credit = await seedCreditUseCase.execute({
           userId,
           advisorId: null,
@@ -48,7 +57,7 @@ export async function seedCredits(
           durationMonths: randomCredit.durationMonths,
           creditType,
         });
-
+        console.log(credit);
         const typeLabel = formatCreditTypeLabel(creditType);
 
         console.log(

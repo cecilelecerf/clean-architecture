@@ -3,8 +3,8 @@ import { CreditInterface } from "../interface/CreditInterface";
 
 export const CreditSchema = new Schema<CreditInterface>(
   {
-    _id: { type: Types.UUID, required: true, unique: true, index: true },
-    accountId: { type: Types.UUID, ref: "Account", required: true },
+    _id: { type: String, required: true },
+    accountId: { type: String, ref: "Account", required: true },
     formuleCreditId: { type: Types.UUID, ref: "Formule", required: true },
     initialAmount: {
       amount: { type: Number, required: true },

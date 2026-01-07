@@ -221,12 +221,12 @@ const all = async () => {
 
   await generateOrders(clients, actions, seedOrderUseCase, clockService);
 
-  await generateNotifications(
-    advisors,
-    clients,
-    seedNotificationUseCase,
-    clockService
-  );
+  // await generateNotifications(
+  //   advisors,
+  //   clients,
+  //   seedNotificationUseCase,
+  //   clockService
+  // );
 };
 
 all()

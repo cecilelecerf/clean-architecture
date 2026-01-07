@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 
 export interface AccountInterface {
-  _id: Types.UUID;
-  userId?: string | null;
+  _id: string;
+  userId?: Types.UUID | null;
   name: string;
   type: "courant" | "epargne";
   color:
@@ -14,8 +14,10 @@ export interface AccountInterface {
     | "pink"
     | "red"
     | "green";
-  balance: number;
-  currency: string;
+  balance: {
+    amount: number;
+    currency: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }

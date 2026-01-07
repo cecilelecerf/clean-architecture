@@ -8,7 +8,7 @@ export interface FormuleCreditInterface {
   label: string;
   description: string;
   isActive: boolean;
-  accountId: Types.UUID;
+  accountId: string;
   createdAt: Date;
   minAmount?: {
     amount: number;

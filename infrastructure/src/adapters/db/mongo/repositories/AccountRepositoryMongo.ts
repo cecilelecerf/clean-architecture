@@ -21,13 +21,13 @@ export class AccountRepositoryMongo implements AccountRepository {
     const docs = await AccountModel.find({ userId })
       .sort({ createdAt: -1 })
       .lean();
-    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
+    return docs.map(AccountMapper.mapDocToAccount);
   }
 
   /** Trouver un compte par IBAN */
   async findByIBAN(iban: IBAN): Promise<AccountEntity | null> {
     await this.client.connect();
-    const doc = await AccountModel.findOne({ iban: iban.value }).lean();
+    const doc = await AccountModel.findById(iban.value).lean();
     return doc ? AccountMapper.mapDocToAccount(doc) : null;
   }
 
@@ -96,7 +96,7 @@ export class AccountRepositoryMongo implements AccountRepository {
   async save(account: AccountEntity): Promise<void> {
     await this.client.connect();
     await AccountModel.create({
-      iban: account.iban.value,
+      _id: account.iban.value,
       userId: account.userId,
       name: account.name,
       type: account.type,
@@ -114,28 +114,25 @@ export class AccountRepositoryMongo implements AccountRepository {
   /** Mettre à jour un compte */
   async update(account: AccountEntity): Promise<void> {
     await this.client.connect();
-    await AccountModel.updateOne(
-      { iban: account.iban.value },
-      {
-        $set: {
-          userId: account.userId,
-          name: account.name,
-          type: account.type,
-          color: account.color.getValue(),
-          balance: {
-            amount: account.balance.amount,
-            currency: account.balance.currency,
-          },
-          currency: account.currency,
-          updatedAt: account.updatedAt,
+    await AccountModel.findByIdAndUpdate(account.iban.value, {
+      $set: {
+        userId: account.userId,
+        name: account.name,
+        type: account.type,
+        color: account.color.getValue(),
+        balance: {
+          amount: account.balance.amount,
+          currency: account.balance.currency,
         },
-      }
-    );
+        currency: account.currency,
+        updatedAt: account.updatedAt,
+      },
+    });
   }
 
   /** Supprimer un compte */
   async delete(iban: IBAN): Promise<void> {
     await this.client.connect();
-    await AccountModel.deleteOne({ iban: iban.value });
+    await AccountModel.findByIdAndDelete(iban.value);
   }
 }
