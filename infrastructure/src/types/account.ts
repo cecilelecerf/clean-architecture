@@ -53,3 +53,9 @@ export const newAccountSchema = accountSchema
   })
   .extend({ currency: z.string() });
 export type NewAccount = z.infer<typeof newAccountSchema>;
+
+export const deleteAccountSchema = z.object({
+  transferToAccountId: accountIdSchema,
+});
+
+export const updateAccountSchema = accountSchema.pick({ name: true });

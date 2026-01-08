@@ -22,7 +22,7 @@ export default function NewAccountPage() {
 
   const onSubmit = (values: NewAccount) => {
     mutation.mutate(values, {
-      onSuccess: () => router.push("/accounts"),
+      onSuccess: (account) => router.push(`/accounts/${account.IBAN}`),
     });
   };
 

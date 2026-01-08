@@ -14,9 +14,15 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { EmailService } from "@application/ports/services/EmailService";
 import { findActiveUser } from "@application/utils/userValidators";
+import { AccountDTO } from "@domain/entities/AccountEntity";
 import { InvalidAccountNameError } from "@domain/errors/account";
 import { IBAN } from "@domain/values/IBAN";
 
+type Props = {
+  iban: string;
+  requestUserId: string;
+  newName: string;
+};
 export class RenameAccountUseCase {
   public constructor(
     private readonly accountRepository: AccountRepository,
@@ -24,11 +30,11 @@ export class RenameAccountUseCase {
     private readonly clockService: ClockService,
     private readonly userRepository: UserRepository
   ) {}
-  public async execute(
-    iban: string,
-    requestUserId: string,
-    newName: string
-  ): Promise<
+  public async execute({
+    iban,
+    requestUserId,
+    newName,
+  }: Props): Promise<
     | MissingIBANError
     | MissingOrInvalidNameError
     | AccountNotFoundError
@@ -38,7 +44,7 @@ export class RenameAccountUseCase {
     | UserNotActiveError
     | InvalidAccountAccessError
     | UnauthorizedAccessAccountError
-    | void
+    | AccountDTO
   > {
     if (!iban || iban.trim().length === 0) {
       return new MissingIBANError();
@@ -72,5 +78,6 @@ export class RenameAccountUseCase {
       subject: "Compte modifié",
       text: `Le nom de votre compte a été modifié en "${account.name}".`,
     });
+    return account.toDTO();
   }
 }

@@ -48,6 +48,6 @@ export function get<T>(path: string) {
 export function patch<T, B = unknown>(path: string, body: B) {
   return request<T>(path, { method: 'PATCH', body });
 }
-export function deleteEntity<T>(path: string) {
-  return request<T>(path, { method: 'DELETE' });
+export function deleteEntity<T, B = unknown>(path: string, body?: B) {
+  return request<T>(path, { method: 'DELETE', body });
 }

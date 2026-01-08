@@ -2,7 +2,12 @@ import { Response, NextFunction } from "express";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { accountFactory } from "@infrastructure/adapters/db/mongo/factories/account";
 import { transactionFactory } from "@infrastructure/adapters/db/mongo/factories/transaction";
-import { accountSchema, newAccountSchema } from "@infrastructure/types/account";
+import {
+  accountSchema,
+  deleteAccountSchema,
+  newAccountSchema,
+  updateAccountSchema,
+} from "@infrastructure/types/account";
 import { newTransactionSchema } from "@infrastructure/types/transaction";
 import { querySchema } from "@infrastructure/types/pagination";
 
@@ -127,11 +132,13 @@ export class AccountsController {
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
       const { accountIban } = req.params;
+      const payload = deleteAccountSchema.parse(req.body);
 
-      const result = await accountFactory().deleteAccount.execute(
+      const result = await accountFactory().deleteAccount.execute({
         accountIban,
-        userId
-      );
+        requestUserId: userId,
+        transferTargetIban: payload.transferToAccountId,
+      });
 
       if (result instanceof Error) {
         return res.status(result.statusCode ?? 400).json({
@@ -198,8 +205,7 @@ export class AccountsController {
       const result = await accountFactory().transfertBetweenAccount.execute({
         requestUserId: userId,
         fromAccountIban: accountIban,
-        amountCurrency: payload.amount.currency,
-        amountValue: payload.amount.amount,
+        amountValue: payload.amount,
         ...payload,
       });
 
@@ -280,13 +286,13 @@ export class AccountsController {
 
       const { accountIban } = req.params;
 
-      const payload = accountSchema.pick({ name: true }).parse(req.body);
+      const payload = updateAccountSchema.parse(req.body);
 
-      const result = await accountFactory().renameAccount.execute(
-        accountIban,
-        userId,
-        payload.name
-      );
+      const result = await accountFactory().renameAccount.execute({
+        iban: accountIban,
+        requestUserId: userId,
+        newName: payload.name,
+      });
 
       if (result instanceof Error) {
         return res.status(result.statusCode ?? 400).json({
