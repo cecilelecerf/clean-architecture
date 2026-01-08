@@ -9,10 +9,71 @@ let pool: Pool;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// JADE
-// const envPath = resolve(__dirname, "../../../../../.env");
-// CECILE
-const envPath = resolve(__dirname, "../../../../.env");
+
+/**
+ * Trouve le fichier .env en remontant l'arborescence depuis le fichier courant
+ * jusqu'à trouver la racine du monorepo (contenant package.json avec workspaces)
+ */
+function findEnvFile(): string {
+  let currentDir = __dirname;
+  const maxDepth = 10; // Sécurité pour éviter une boucle infinie
+
+  for (let i = 0; i < maxDepth; i++) {
+    const envPath = path.join(currentDir, ".env");
+    const packageJsonPath = path.join(currentDir, "package.json");
+
+    // Vérifier si le .env existe
+    if (fs.existsSync(envPath)) {
+      // Vérifier si on est bien à la racine du monorepo
+      if (fs.existsSync(packageJsonPath)) {
+        try {
+          const packageJson = JSON.parse(
+            fs.readFileSync(packageJsonPath, "utf-8")
+          );
+          // Si le package.json contient "workspaces", c'est la racine du monorepo
+          if (packageJson.workspaces) {
+            console.log(`✅ Found .env at: ${envPath}`);
+            return envPath;
+          }
+        } catch (error) {
+          // Ignorer les erreurs de parsing et continuer
+        }
+      }
+    }
+
+    // Remonter d'un niveau
+    const parentDir = path.dirname(currentDir);
+
+    // Si on est arrivé à la racine du système de fichiers, arrêter
+    if (parentDir === currentDir) {
+      break;
+    }
+
+    currentDir = parentDir;
+  }
+
+  // Fallback: essayer des chemins relatifs courants
+  const fallbackPaths = [
+    resolve(__dirname, "../../../../.env"), // 4 niveaux (Cécile)
+    resolve(__dirname, "../../../../../.env"), // 5 niveaux (Jade)
+    resolve(__dirname, "../../.env"), // 2 niveaux
+    resolve(__dirname, "../../../.env"), // 3 niveaux
+  ];
+
+  for (const fallbackPath of fallbackPaths) {
+    if (fs.existsSync(fallbackPath)) {
+      console.log(`✅ Found .env at fallback path: ${fallbackPath}`);
+      return fallbackPath;
+    }
+  }
+
+  throw new Error(
+    "Could not find .env file. Please ensure it exists at the monorepo root."
+  );
+}
+
+// Charger le .env automatiquement
+const envPath = findEnvFile();
 const result = dotenv.config({ path: envPath });
 
 if (result.error) {
@@ -46,13 +107,14 @@ function getPool(): Pool {
       port: config.port,
       user: config.user,
       database: config.database,
-      password: config.password,
+      password: config.password ? "***" : undefined,
     });
 
     pool = mysql.createPool(config);
   }
   return pool;
 }
+
 /**
  * Wrapper générique autour de mysql2/promise
  * pour centraliser la connexion et exécuter des requêtes SQL typées.
@@ -63,6 +125,7 @@ export class MySQLClient {
   private user = process.env.MYSQL_USER;
   private password = process.env.MYSQL_PASSWORD;
   private db = process.env.MYSQL_DATABASE;
+
   constructor() {
     this.pool = getPool();
   }
@@ -134,27 +197,31 @@ export class MySQLClient {
       });
 
       await tempConn.execute(`DROP DATABASE IF EXISTS \`${this.db}\``);
-      console.log(`Database ${this.db} dropped successfully.`);
+      console.log(`✅ Database ${this.db} dropped successfully.`);
 
       await tempConn.execute(`CREATE DATABASE \`${this.db}\``);
-      console.log(`Database ${this.db} created successfully.`);
+      console.log(`✅ Database ${this.db} created successfully.`);
 
       await tempConn.end();
 
       // Maintenant, utiliser le pool existant pour exécuter les fichiers SQL
-      for (const file of fs
+      const sqlFiles = fs
         .readdirSync(SQL_FOLDER)
-        .filter((f) => f.endsWith(".sql"))) {
+        .filter((f) => f.endsWith(".sql"))
+        .sort(); // Trier pour garantir l'ordre d'exécution
+
+      for (const file of sqlFiles) {
         const filePath = path.join(SQL_FOLDER, file);
         const sql = fs.readFileSync(filePath, "utf-8");
         await this.pool.execute(sql);
-        console.log(`Executed ${file}`);
+        console.log(`✅ Executed ${file}`);
       }
 
       await this.close();
-      console.log("All SQL files executed successfully.");
+      console.log("✅ All SQL files executed successfully.");
     } catch (error) {
-      console.error("Error resetting database:", error);
+      console.error("❌ Error resetting database:", error);
+      throw error;
     }
   }
 }

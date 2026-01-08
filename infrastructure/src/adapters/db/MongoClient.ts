@@ -2,12 +2,88 @@ import mongoose, { Mongoose, connect } from "mongoose";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, resolve } from "path";
+import fs from "fs";
+import path from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-dotenv.config({ path: resolve(__dirname, "../../../../.env") });
+/**
+ * Trouve le fichier .env en remontant l'arborescence depuis le fichier courant
+ * jusqu'à trouver la racine du monorepo (contenant package.json avec workspaces)
+ */
+function findEnvFile(): string {
+  let currentDir = __dirname;
+  const maxDepth = 10; // Sécurité pour éviter une boucle infinie
 
+  for (let i = 0; i < maxDepth; i++) {
+    const envPath = path.join(currentDir, ".env");
+    const packageJsonPath = path.join(currentDir, "package.json");
+
+    // Vérifier si le .env existe
+    if (fs.existsSync(envPath)) {
+      // Vérifier si on est bien à la racine du monorepo
+      if (fs.existsSync(packageJsonPath)) {
+        try {
+          const packageJson = JSON.parse(
+            fs.readFileSync(packageJsonPath, "utf-8")
+          );
+          // Si le package.json contient "workspaces", c'est la racine du monorepo
+          if (packageJson.workspaces) {
+            console.log(`✅ Found .env at: ${envPath}`);
+            return envPath;
+          }
+        } catch (error) {
+          // Ignorer les erreurs de parsing et continuer
+        }
+      }
+    }
+
+    // Remonter d'un niveau
+    const parentDir = path.dirname(currentDir);
+
+    // Si on est arrivé à la racine du système de fichiers, arrêter
+    if (parentDir === currentDir) {
+      break;
+    }
+
+    currentDir = parentDir;
+  }
+
+  // Fallback: essayer des chemins relatifs courants
+  const fallbackPaths = [
+    resolve(__dirname, "../../../../.env"), // 4 niveaux (Cécile)
+    resolve(__dirname, "../../../../../.env"), // 5 niveaux (Jade)
+    resolve(__dirname, "../../.env"), // 2 niveaux
+    resolve(__dirname, "../../../.env"), // 3 niveaux
+  ];
+
+  for (const fallbackPath of fallbackPaths) {
+    if (fs.existsSync(fallbackPath)) {
+      console.log(`✅ Found .env at fallback path: ${fallbackPath}`);
+      return fallbackPath;
+    }
+  }
+
+  throw new Error(
+    "Could not find .env file. Please ensure it exists at the monorepo root."
+  );
+}
+
+// Charger le .env automatiquement
+const envPath = findEnvFile();
+const result = dotenv.config({ path: envPath });
+
+if (result.error) {
+  console.warn(`⚠️  Could not load .env file from ${envPath}`);
+  console.warn("Using environment variables from system");
+} else {
+  console.log(
+    `✅ Loaded ${
+      Object.keys(result.parsed || {}).length
+    } environment variables from ${envPath}`
+  );
+}
 let instance: Mongoose | null = null;
 
 export class MongoClient {
