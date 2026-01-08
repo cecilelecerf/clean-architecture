@@ -2,14 +2,15 @@ import { UserEntity } from "./UserEntity";
 
 export class NotificationEntity {
   private constructor(
-    public readonly id: string,
-    public readonly advisorId: UserEntity["id"],
-    public readonly clientId: UserEntity["id"],
+    public id: string,
+    public advisorId: UserEntity["id"],
+    public clientId: UserEntity["id"],
     public title: string,
     public content: string,
-    public readonly createdAt: Date,
     public isRead: boolean = false,
-    public readonly type: "info" | "alert" | "reminder"
+    public type: "info" | "alert" | "reminder",
+    public createdAt: Date,
+    public updatedAt: Date
   ) {}
 
   public static from({
@@ -18,9 +19,10 @@ export class NotificationEntity {
     clientId,
     title,
     content,
-    createdAt,
     isRead,
     type,
+    createdAt,
+    updatedAt,
   }: Pick<
     NotificationEntity,
     | "id"
@@ -28,9 +30,10 @@ export class NotificationEntity {
     | "clientId"
     | "title"
     | "content"
-    | "createdAt"
     | "isRead"
     | "type"
+    | "createdAt"
+    | "updatedAt"
   >) {
     return new NotificationEntity(
       id,
@@ -38,18 +41,19 @@ export class NotificationEntity {
       clientId,
       title,
       content,
-      createdAt,
       isRead,
-      type
+      type,
+      createdAt,
+      updatedAt
     );
   }
 
-  /** ✅ Marquer la notification comme lue */
+  /** Marquer la notification comme lue */
   public markAsRead(): void {
     this.isRead = true;
   }
 
-  /** 🔔 Modifier le contenu (ex: si le conseiller met à jour le message) */
+  /** Modifier le contenu (ex: si le conseiller met à jour le message) */
   public updateContent(title: string, content: string): void {
     this.title = title;
     this.content = content;

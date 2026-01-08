@@ -1,7 +1,18 @@
 import { ActionEntity } from "@domain/entities/ActionEntity";
 
+export interface ActionStatistics {
+  priceChange: number;
+  change24h: number;
+  change7d: number;
+  change30d: number;
+  minPrice: number;
+  maxPrice: number;
+  averagePrice: number;
+  totalVolume: number;
+  transactionCount: number;
+}
 export interface ActionRepository {
-  findById(isin: ActionEntity["ISIN"]): Promise<ActionEntity | null>;
+  findByISIN(isin: ActionEntity["ISIN"]): Promise<ActionEntity | null>;
   findAll(): Promise<ActionEntity[]>;
   findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]>;
   setAvailability(action: ActionEntity): Promise<void>;

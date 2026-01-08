@@ -1,12 +1,15 @@
-import { PostNotFoundError } from "@application/errors/posts/PostNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+import { PostNotFoundError } from "@application/errors/posts";
 import {
-  PostRepository,
-  PostWithTagsAndUser,
-} from "@application/ports/repositories/PostRepository";
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
+import { PostRepository } from "@application/ports/repositories/PostRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
+import {
+  PostDTOMapper,
+  PostWithTagsAndUsersDTO,
+} from "@application/dto/PostDTOMapper";
 import { findActiveUser } from "@application/utils/userValidators";
 import { PostEntity } from "@domain/entities/PostEntity";
 type Props = {
@@ -22,7 +25,7 @@ export class AdminFindPostByIdWithTagsUsecase {
     userId,
     id: postId,
   }: Props): Promise<
-    | PostWithTagsAndUser
+    | PostWithTagsAndUsersDTO
     | UserNotFoundError
     | UserNotActiveError
     | PostNotFoundError
@@ -37,6 +40,6 @@ export class AdminFindPostByIdWithTagsUsecase {
     const post = await this.feedRepository.findWithTagsAndUserById(postId);
     if (!post) return new PostNotFoundError();
 
-    return post;
+    return PostDTOMapper.tagsAndUserMap(post);
   }
 }

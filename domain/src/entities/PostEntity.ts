@@ -1,7 +1,9 @@
-import { InvalidPostTitleError as InvalidPostTitleError } from "../errors/posts/InvalidPostTitleError";
+import {
+  InvalidPostTitleError,
+  InvalidPostContentError,
+} from "@domain/errors/posts";
 import { TagEntity } from "./TagEntity";
 import { UserEntity } from "./UserEntity";
-import { InvalidPostContentError } from "../errors/posts/InvalidPostContentError";
 
 export class PostEntity {
   private constructor(
@@ -12,10 +14,28 @@ export class PostEntity {
     public tagsId: TagEntity["id"][],
     public createdAt: Date,
     public readBy: UserEntity["id"][] = [],
-    public modifiedAt?: Date,
+    public updatedAt: Date,
     public publishedAt?: Date,
     public clientId?: UserEntity["id"]
   ) {}
+
+  private static validateContent(
+    content: string
+  ): string | InvalidPostContentError {
+    const trimmed = content.trim();
+    if (trimmed.length < 10 || trimmed.length > 5000) {
+      return new InvalidPostContentError(trimmed.length);
+    }
+    return trimmed;
+  }
+
+  private static validateTitle(title: string): string | InvalidPostTitleError {
+    const trimmed = title.trim();
+    if (trimmed.length < 5 || trimmed.length > 100) {
+      return new InvalidPostTitleError(trimmed.length);
+    }
+    return trimmed;
+  }
 
   public static create({
     id,
@@ -24,7 +44,6 @@ export class PostEntity {
     content,
     tagsId,
     createdAt,
-    modifiedAt,
     publishedAt,
     clientId,
   }: Pick<
@@ -35,24 +54,24 @@ export class PostEntity {
     | "content"
     | "tagsId"
     | "createdAt"
-    | "modifiedAt"
     | "publishedAt"
     | "clientId"
   >): PostEntity | InvalidPostContentError | InvalidPostTitleError {
-    const verifiedContent = this.verifyContent(content);
-    if (verifiedContent instanceof Error) return verifiedContent;
+    const validatedTitle = this.validateTitle(title);
+    if (validatedTitle instanceof Error) return validatedTitle;
 
-    const verifiedTitle = this.verifyTitle(title);
-    if (verifiedTitle instanceof Error) return verifiedTitle;
+    const validatedContent = this.validateContent(content);
+    if (validatedContent instanceof Error) return validatedContent;
+
     return new PostEntity(
       id,
       advisorId,
-      verifiedTitle,
-      verifiedContent,
+      validatedTitle,
+      validatedContent,
       tagsId,
       createdAt,
       [],
-      modifiedAt,
+      createdAt,
       publishedAt,
       clientId
     );
@@ -65,7 +84,7 @@ export class PostEntity {
     content,
     tagsId,
     createdAt,
-    modifiedAt,
+    updatedAt,
     publishedAt,
     readBy,
     clientId,
@@ -77,7 +96,7 @@ export class PostEntity {
     | "content"
     | "tagsId"
     | "createdAt"
-    | "modifiedAt"
+    | "updatedAt"
     | "publishedAt"
     | "readBy"
     | "clientId"
@@ -90,7 +109,7 @@ export class PostEntity {
       tagsId,
       createdAt,
       readBy,
-      modifiedAt,
+      updatedAt,
       publishedAt,
       clientId
     );
@@ -100,10 +119,10 @@ export class PostEntity {
     newContent: PostEntity["content"],
     now: Date
   ): PostEntity | InvalidPostContentError {
-    const verifiedContent = PostEntity.verifyContent(newContent);
+    const verifiedContent = PostEntity.validateContent(newContent);
     if (verifiedContent instanceof Error) return verifiedContent;
     this.content = verifiedContent;
-    this.modifiedAt = now;
+    this.updatedAt = now;
     return this;
   }
 
@@ -111,32 +130,24 @@ export class PostEntity {
     newTitle: PostEntity["title"],
     now: Date
   ): PostEntity | InvalidPostTitleError {
-    const verifiedTitle = PostEntity.verifyTitle(newTitle);
+    const verifiedTitle = PostEntity.validateTitle(newTitle);
     if (verifiedTitle instanceof Error) return verifiedTitle;
     this.title = verifiedTitle;
-    this.modifiedAt = now;
+    this.updatedAt = now;
     return this;
   }
 
-  public static verifyContent(
-    content: PostEntity["content"]
-  ): InvalidPostContentError | PostEntity["content"] {
-    const trimedContent = content.trim();
-    if (trimedContent.length < 10 || trimedContent.length > 200)
-      return new InvalidPostContentError();
-    return trimedContent;
-  }
-  public static verifyTitle(
-    title: PostEntity["title"]
-  ): InvalidPostTitleError | PostEntity["title"] {
-    const trimedTitle = title.trim();
-    if (trimedTitle.length < 10 || trimedTitle.length > 100)
-      return new InvalidPostTitleError();
-    return trimedTitle;
-  }
+  public updateStatus(status: boolean, now: Date) {
+    if (status) {
+      if (!this.publishedAt) {
+        this.publishedAt = now;
+      }
+    } else {
+      this.publishedAt = undefined;
+    }
 
-  public published(now: Date) {
-    this.publishedAt = now;
+    this.updatedAt = now;
+    return this;
   }
 
   public permissionToModify(user: UserEntity): boolean {
@@ -156,4 +167,28 @@ export class PostEntity {
   public isReadBy(userId: UserEntity["id"]): boolean {
     return this.readBy.includes(userId);
   }
+
+  public toDTO(): PostDTO {
+    return {
+      id: this.id,
+      advisorId: this.advisorId,
+      title: this.title,
+      content: this.content,
+      tagsId: this.tagsId,
+      readBy: this.readBy,
+      clientId: this.clientId,
+      updatedAt: this.updatedAt.toISOString(),
+      createdAt: this.createdAt.toISOString(),
+      publishedAt: this.publishedAt?.toISOString(),
+    };
+  }
 }
+
+export type PostDTO = {
+  updatedAt: string;
+  createdAt: string;
+  publishedAt?: string;
+} & Pick<
+  PostEntity,
+  "id" | "advisorId" | "title" | "content" | "tagsId" | "readBy" | "clientId"
+>;

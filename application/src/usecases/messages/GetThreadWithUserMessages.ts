@@ -1,7 +1,15 @@
-import { InvalidThreadAccessError } from "@application/errors/threads/InvalidThreadAccessError";
-import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import {
+  MessageDTOMapper,
+  MessageEntityWithUsersDTO,
+} from "@application/dto/MessageDTOMapper";
+import {
+  InvalidThreadAccessError,
+  ThreadNotFoundError,
+} from "@application/errors/threads";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import {
   MessageRepository,
   MessageWithUser,
@@ -9,10 +17,9 @@ import {
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
-import { MessageEntity } from "@domain/entities/MessageEntity";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
+import { ThreadClosedError } from "@domain/errors/thread";
 
 type Props = { userId: UserEntity["id"] } & Pick<ThreadEntity, "id">;
 
@@ -26,7 +33,7 @@ export class GetThreadMessages {
     userId,
     id,
   }: Props): Promise<
-    | MessageWithUser[]
+    | MessageEntityWithUsersDTO[]
     | UserNotFoundError
     | ThreadNotFoundError
     | InvalidThreadAccessError
@@ -43,6 +50,6 @@ export class GetThreadMessages {
     const messages = await this.messageRepository.findAllWithUserByThread(
       thread.id
     );
-    return messages;
+    return MessageDTOMapper.maps(messages);
   }
 }

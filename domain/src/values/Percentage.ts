@@ -1,10 +1,14 @@
-import { InvalidPercentageError } from "../errors/percentage/InvalidPercentageError";
+import { InvalidPercentageError } from "@domain/errors/percentage";
 
 export class Percentage {
   private constructor(public readonly value: number) {}
 
   public static from({ value }: Pick<Percentage, "value">): Percentage {
-    return new Percentage(value);
+    return new Percentage(Number(value));
+  }
+
+  public getValue(): Percentage["value"] {
+    return this.value;
   }
 
   /**
@@ -14,7 +18,6 @@ export class Percentage {
     if (isNaN(value) || value < 0 || value > 100) {
       return new InvalidPercentageError(value);
     }
-
     return new Percentage(Number(value.toFixed(4))); // 4 décimales max
   }
 

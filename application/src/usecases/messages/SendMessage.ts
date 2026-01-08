@@ -1,7 +1,12 @@
-import { InvalidThreadAccessError } from "@application/errors/threads/InvalidThreadAccessError";
-import { ThreadNotFoundError } from "@application/errors/threads/ThreadNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { MessageEntityWithUsersDTO } from "@application/dto/MessageDTOMapper";
+import {
+  InvalidThreadAccessError,
+  ThreadNotFoundError,
+} from "@application/errors/threads";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import {
   MessageRepository,
   MessageWithUser,
@@ -12,8 +17,8 @@ import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { findActiveUser } from "@application/utils/userValidators";
 import { MessageEntity } from "@domain/entities/MessageEntity";
-import { ContentEmptyError } from "@domain/errors/message/ContentEmptyError";
-import { ThreadClosedError } from "@domain/errors/thread/ThreadClosedError";
+import { ContentEmptyError, ContentTooLongError } from "@domain/errors/message";
+import { ThreadClosedError } from "@domain/errors/thread";
 
 type Props = {} & Pick<MessageEntity, "content" | "senderId" | "threadId">;
 
@@ -30,39 +35,37 @@ export class SendMessage {
     senderId,
     threadId,
   }: Props): Promise<
-    | MessageWithUser
+    | MessageEntityWithUsersDTO
     | UserNotFoundError
+    | UserNotActiveError
     | ThreadNotFoundError
     | InvalidThreadAccessError
-    | ContentEmptyError
     | ThreadClosedError
-    | UserNotActiveError
+    | ContentEmptyError
+    | ContentTooLongError
   > {
     const user = await findActiveUser(this.userRepository, senderId);
     if (user instanceof Error) return user;
-
     const thread = await this.threadRepository.findById(threadId);
     if (!thread) return new ThreadNotFoundError();
     if (thread.isClose) return new ThreadClosedError(thread.id);
-
     if (!thread.hasAccess(user.id))
       return new InvalidThreadAccessError(user.id, thread.id);
 
     const id = this.uuidService.generate();
     const sentAt = this.clockService.now();
 
-    const message = MessageEntity.from({
+    const message = MessageEntity.create({
       id,
       threadId,
       senderId,
       sentAt,
       content,
-      readBy: [user.id],
     });
-    const validateContent = message.validateContent();
-    if (validateContent instanceof Error) return validateContent;
-    await this.messageRepository.save(message);
 
-    return Object.assign(message, { sender: user });
+    if (message instanceof Error) return message;
+
+    this.messageRepository.save(message);
+    return Object.assign(message, { sender: user.toDTO() });
   }
 }

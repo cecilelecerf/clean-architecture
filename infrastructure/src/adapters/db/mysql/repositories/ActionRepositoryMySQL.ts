@@ -1,123 +1,110 @@
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
-import { ActionRepository } from "@application/ports/repositories/ActionRepository";
+import {
+  ActionRepository,
+  ActionStatistics,
+} from "@application/ports/repositories/ActionRepository";
 import { ActionEntity } from "@domain/entities/ActionEntity";
 import { Money } from "@domain/values/Money";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { ISIN } from "@domain/values/ISIN";
 
 export class ActionRepositoryMySQL implements ActionRepository {
   constructor(private readonly client: MySQLClient) {}
 
+  private mapRowToAction(row: RowDataPacket): ActionEntity {
+    const price = Money.from({
+      amount: row.price,
+      currency: row.currency,
+    }) as Money;
+    console.log(row);
+    return ActionEntity.from({
+      ISIN: ISIN.from(row.isin),
+      name: row.name,
+      symbol: row.symbol,
+      market: row.market,
+      activitySector: row.activity_sector,
+      price,
+      isAvailable: !!row.is_available,
+      createdAt: new Date(row.created_at),
+      updatedAt: new Date(row.updated_at),
+      defaultQuantity: row.default_quantity,
+    });
+  }
+
   async save(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO actions 
-        (isin, name, symbol, market, activity_sector, current_price, currency, is_available, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (isin, name, symbol, market, activity_sector, price, currency, is_available, created_at, updated_at, default_quantity)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        action.ISIN,
+        action.ISIN.getValue(),
         action.name,
         action.symbol,
         action.market,
         action.activitySector,
-        action.currentPrice.amount,
-        action.currentPrice.currency,
+        action.price.amount,
+        action.price.currency,
         action.isAvailable ? 1 : 0,
         action.createdAt,
-        action.updatedAt || null,
+        action.updatedAt,
+        action.defaultQuantity,
       ]
     );
   }
 
-  async findById(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+  async findByISIN(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
+    const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM actions WHERE isin = ?`,
-      [ISIN]
+      [ISIN.getValue()]
     );
-    if (rows.length === 0) return null;
-    const row = rows[0];
-    return ActionEntity.from({
-      ISIN: row.ISIN,
-      name: row.name,
-      symbol: row.symbol,
-      market: row.market,
-      activitySector: row.activitySector,
-      currentPrice: Money.from({
-        amount: row.currentPrice,
-        currency: row.currency,
-      }),
-      isAvailable: !!row.isAvailable,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    });
+
+    if (!rows.length) return null;
+    return this.mapRowToAction(rows[0]);
   }
 
   async findAll(): Promise<ActionEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM actions`
+      `SELECT * FROM actions ORDER BY name ASC`
     );
-    return rows.map((row) =>
-      ActionEntity.from({
-        ISIN: row.ISIN,
-        name: row.name,
-        symbol: row.symbol,
-        market: row.market,
-        activitySector: row.activitySector,
-
-        currentPrice: Money.from({
-          amount: row.currentPrice,
-          currency: row.currency,
-        }),
-        isAvailable: !!row.isAvailable,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-      })
-    );
+    return rows.map(this.mapRowToAction);
   }
 
   async findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM actions WHERE is_available = ?`,
+      `SELECT * FROM actions WHERE is_available = ? ORDER BY name ASC`,
       [isAvailable ? 1 : 0]
     );
-    return rows.map((row) =>
-      ActionEntity.from({
-        ISIN: row.ISIN,
-        name: row.name,
-        symbol: row.symbol,
-        market: row.market,
-        activitySector: row.activitySector,
-        currentPrice: Money.from({
-          amount: row.currentPrice,
-          currency: row.currency,
-        }),
-        isAvailable: !!row.isAvailable,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-      })
-    );
+    return rows.map(this.mapRowToAction);
   }
 
   async setAvailability(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE actions SET is_available = ?, updated_at = ? WHERE isin = ?`,
-      [action.isAvailable ? 1 : 0, action.updatedAt || new Date(), action.ISIN]
+      [
+        action.isAvailable ? 1 : 0,
+        action.updatedAt || new Date(),
+        action.ISIN.getValue(),
+      ]
     );
   }
 
   async update(action: ActionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE actions 
-       SET name = ?, symbol = ?, market = ?, activity_sector = ?, current_price = ?, currency = ?, is_available = ?, updated_at = ? 
+       SET name = ?, symbol = ?, market = ?, activity_sector = ?, 
+           price = ?, currency = ?, is_available = ?, updated_at = ?, default_quantity = ?
        WHERE isin = ?`,
       [
         action.name,
         action.symbol,
         action.market,
         action.activitySector,
-        action.currentPrice.amount,
-        action.currentPrice.currency,
+        action.price.amount,
+        action.price.currency,
         action.isAvailable ? 1 : 0,
         action.updatedAt || new Date(),
-        action.ISIN,
+        action.defaultQuantity,
+        action.ISIN.getValue(),
       ]
     );
   }
@@ -125,7 +112,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async delete(ISIN: ActionEntity["ISIN"]): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `DELETE FROM actions WHERE isin = ?`,
-      [ISIN]
+      [ISIN.getValue()]
     );
   }
 }

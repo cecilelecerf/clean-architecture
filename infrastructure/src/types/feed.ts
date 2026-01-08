@@ -10,9 +10,16 @@ export const tagSchema = z.object({
   label: z.string(),
   color: colorSchema,
   createdAt: z.iso.datetime(),
-  modifiedAt: z.iso.datetime().nullable(),
+  updatedAt: z.iso.datetime(),
 });
 export type Tag = z.infer<typeof tagSchema>;
+
+export const tagToFrontSchema = tagSchema.pick({
+  id: true,
+  label: true,
+  color: true,
+});
+export type TagToFront = z.infer<typeof tagToFrontSchema>;
 
 export const postIdSchema = z.uuid().brand("post");
 export type PostId = z.infer<typeof postIdSchema>;
@@ -25,8 +32,24 @@ export const postSchema = z.object({
   tagsId: tagIdSchema.array(),
   createdAt: z.iso.datetime(),
   readBy: userIdSchema.array(),
-  modifiedAt: z.iso.datetime().optional(),
+  updatedAt: z.iso.datetime(),
   publishedAt: z.iso.datetime().optional(),
-  clientIt: userIdSchema.optional(),
+  clientId: userIdSchema.optional(),
 });
 export type Post = z.infer<typeof postSchema>;
+
+export const postWithTagsSchema = postSchema.extend({
+  tags: tagToFrontSchema.array(),
+});
+
+export const newPostSchema = postSchema
+  .pick({
+    title: true,
+    content: true,
+  })
+  .extend({ tagsId: z.string().array() });
+export type NewPost = z.infer<typeof newPostSchema>;
+
+export const publishActionSchema = z.object({
+  status: z.enum(['publish', 'unpublish']),
+});

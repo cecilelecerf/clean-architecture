@@ -1,4 +1,4 @@
-import { ContentEmptyError } from "../errors/message/ContentEmptyError";
+import { ContentEmptyError, ContentTooLongError } from "@domain/errors/message";
 import { ThreadEntity } from "./ThreadEntity";
 import { UserEntity } from "./UserEntity";
 
@@ -11,6 +11,41 @@ export class MessageEntity {
     public sentAt: Date,
     public readBy: UserEntity["id"][]
   ) {}
+
+  private static validateContent(
+    content: string
+  ): string | ContentEmptyError | ContentTooLongError {
+    const trimmed = content.trim();
+
+    if (trimmed.length === 0) {
+      return new ContentEmptyError();
+    }
+
+    const maxLength = 5000;
+    if (trimmed.length > maxLength) {
+      return new ContentTooLongError(trimmed.length, maxLength);
+    }
+
+    return trimmed;
+  }
+
+  public static create({
+    id,
+    threadId,
+    senderId,
+    content,
+    sentAt,
+  }: Pick<
+    MessageEntity,
+    "id" | "threadId" | "senderId" | "content" | "sentAt"
+  >): MessageEntity | ContentEmptyError | ContentTooLongError {
+    const validatedContent = this.validateContent(content);
+    if (validatedContent instanceof Error) return validatedContent;
+
+    return new MessageEntity(id, threadId, senderId, validatedContent, sentAt, [
+      senderId,
+    ]);
+  }
 
   public static from({
     id,

@@ -1,133 +1,91 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { useState } from 'react';
-import { v4 as uuid } from 'uuid';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Check } from 'lucide-react';
-import { Color, colorSchema } from '@infrastructure/types/color';
-import { AccountId } from '@infrastructure/types/account';
-import { bgColorClasses } from '@/utils/color';
-import clsx from 'clsx';
+import { useRouter } from "next/navigation";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { endpoints } from "@/utils/endpoint";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import FormWrapper, { Section } from "@/components/FormWrapper";
+import { NewAccount, newAccountSchema } from "@infrastructure/types/account";
+import { CreditCard, Palette } from "lucide-react";
 
-const newAccountSchema = z.object({
-  name: z.string().min(2, 'Le nom du compte est obligatoire'),
-  balance: z.number(),
-  color: z.enum(['blue', 'green', 'purple', 'gray']),
-  icon: z
-    .string()
-    .min(1, 'L’icône est obligatoire')
-    .max(2, 'Une seule icône (emoji) est autorisée'),
-});
-
-type NewAccountForm = z.infer<typeof newAccountSchema>;
 
 export default function NewAccountPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [color, setColor] = useState<Color | null>(null);
+  const currenciesQuery = useQuery(endpoints.currencies.getAll());
 
-  const form = useForm<NewAccountForm>({
+  const form = useForm<NewAccount>({
     resolver: zodResolver(newAccountSchema),
-    defaultValues: {
-      name: '',
-      balance: 0,
-      color: null,
-      icon: '💰',
-    },
   });
 
-  const onSubmit = async (data: NewAccountForm) => {
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000)); // Simule un appel réseau
-    console.log('✅ Nouveau compte créé :', { id: uuid() as AccountId, ...data, color });
-    router.push('/accounts');
+  const mutation = useMutation(endpoints.accounts.create());
+
+  const onSubmit = (values: NewAccount) => {
+    mutation.mutate(values, {
+      onSuccess: () => router.push("/accounts"),
+    });
   };
 
+  const sections: Section<NewAccount>[] = [
+    {
+      title: "Informations générales",
+      description: "Détails principaux du compte",
+      icon: CreditCard,
+      data: {
+        name: {
+          label: "Nom du compte",
+          type: "text",
+        },
+        type: {
+          label: "Type de compte",
+          type: "radio",
+          options: [
+            { label: "Courant", value: "courant" },
+            { label: "Épargne", value: "epargne" },
+          ],
+        },
+        currency: {
+          label: "Devise",
+          type: "select",
+          options:
+            currenciesQuery.status === "success" ?
+              currenciesQuery.data.map((d) => ({ label: ` ${d.code} - ${d.name}(${d.symbol})`, value: d.code, })) : [],
+        }
+      },
+    },
+    {
+      title: "Apparence",
+      description: "Personnalisation visuelle du compte",
+      icon: Palette,
+      data: {
+        color: {
+          label: "Couleur",
+          type: "icon",
+          options: [
+            { icon: "🔴", label: "", value: "red" },
+            { icon: "🔵", label: "", value: "blue" },
+            { icon: "🟡", label: "", value: "yellow" },
+            { icon: "🟢", label: "", value: "green" },
+            { icon: "🟠", label: "", value: "orange" },
+            { icon: "🟣", label: "", value: "purple" },
+          ],
+        },
+      }
+
+
+    },
+  ];
+
   return (
-    <>
-      {/* Header */}
-
-      {/* Card */}
-      <Card className="rounded-2xl shadow-lg border-0 bg-linear-to-br from-gray-50 to-gray-100">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1>Nouveau compte</h1>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 text-gray-700">
-            {/* Nom */}
-            <div>
-              <Label htmlFor="name">Nom du compte</Label>
-              <Input id="name" placeholder="Ex : Compte courant" {...form.register('name')} />
-              {form.formState.errors.name && (
-                <p className="text-sm text-red-600 mt-1">{form.formState.errors.name.message}</p>
-              )}
-            </div>
-
-            {/* Solde */}
-            <div>
-              <Label htmlFor="balance">Solde initial (€)</Label>
-              <Input
-                id="balance"
-                type="number"
-                step="0.01"
-                placeholder="Ex : 1250.50"
-                {...form.register('balance', { valueAsNumber: true })}
-              />
-              {form.formState.errors.balance && (
-                <p className="text-sm text-red-600 mt-1">{form.formState.errors.balance.message}</p>
-              )}
-            </div>
-
-            {/* Couleur */}
-            <div>
-              <Label>Couleur du compte</Label>
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-                {colorSchema.options.map((c, i) => (
-                  <div
-                    key={i}
-                    className={clsx(
-                      `h-9 flex justify-center items-center rounded-xl  border-gray-900 ${bgColorClasses[300][c]}`,
-                      c === color && 'border',
-                    )}
-                    onClick={() => setColor((prev) => (prev === c ? null : c))}
-                  >
-                    {c === color && <Check />}{' '}
-                  </div>
-                ))}
-              </div>
-              {form.formState.errors.color && (
-                <p className="text-sm text-red-600 mt-1">{form.formState.errors.color.message}</p>
-              )}
-            </div>
-
-            {/* Icône */}
-            <div>
-              <Label htmlFor="icon">Icône (emoji)</Label>
-              <Input id="icon" placeholder="💳" {...form.register('icon')} maxLength={2} />
-              {form.formState.errors.icon && (
-                <p className="text-sm text-red-600 mt-1">{form.formState.errors.icon.message}</p>
-              )}
-            </div>
-
-            {/* Bouton */}
-            <Button type="submit" className="w-full mt-4" disabled={loading}>
-              {loading ? 'Création en cours...' : 'Créer le compte'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </>
+    <FormWrapper<NewAccount>
+      title="Créer un nouveau compte"
+      description="Ajoutez un nouveau compte bancaire"
+      form={form}
+      data={sections}
+      labelButton="Créer"
+      loading={mutation.isPending}
+      onSubmit={onSubmit}
+      showBackButton
+    />
   );
 }

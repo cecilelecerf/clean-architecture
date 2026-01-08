@@ -8,7 +8,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "mysql:seed": "tsx ./src/adapters/db/mysql/seeds/index.ts",
-    "mysql:restart": "tsx ./src/adapters/db/mysql/seeds/drop-and-create-db.ts"
+    "mysql:restart": "tsx ./src/adapters/db/mysql/seeds/drop-and-create-db.ts",
+    "mongo:seed": "tsx ./src/adapters/db/mongo/seeds/index.ts",
+    "mongo:restart": "tsx ./src/adapters/db/mongo/seeds/drop-and-create-db.ts"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
@@ -17,11 +19,12 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "domain": "workspace:*",
     "application": "workspace:*",
     "bcryptjs": "^3.0.2",
-    "domain": "workspace:*",
     "dotenv": "^17.2.3",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.0.1",
     "mysql2": "^3.15.3",
     "nodemailer": "^7.0.10",
     "socket.io": "^4.8.1",

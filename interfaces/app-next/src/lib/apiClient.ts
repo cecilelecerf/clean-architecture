@@ -1,6 +1,6 @@
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth';
 import { getSession } from 'next-auth/react';
-import { toast } from 'sonner';
-
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
@@ -11,7 +11,6 @@ async function request<T>(
 ): Promise<T> {
   const session = await getSession();
   const token = session?.user?.accessToken;
-
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
@@ -24,33 +23,31 @@ async function request<T>(
       headers,
       body: options.body ? JSON.stringify(options.body) : undefined,
     });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ message: 'Erreur réseau' }));
+      throw new Error(error.message || `Erreur HTTP ${res.status}`);
+    }
 
     const data = await res.json();
-
-    if (!res.ok) throw new Error(data.message || 'Une erreur est survenue');
-
+    console.log('Response data:', data);
     return data as T;
   } catch (err) {
-    toast.error(err.message);
+    console.error('API Error:', err);
+    throw err;
   }
 }
 
-type Scope = 'client' | 'director' | 'advisor' | 'other';
-export function post<T, B = unknown>(path: string, body: B, scope?: Scope) {
-  const userScope = scope ? `/${scope}` : '';
-  return request<T>(`${userScope}${path}`, { method: 'POST', body });
+export function post<T, B = unknown>(path: string, body: B) {
+  return request<T>(path, { method: 'POST', body });
 }
 
-export function get<T>(path: string, scope?: Scope) {
-  const userScope = scope ? `/${scope}` : '';
-  return request<T>(`${userScope}${path}`, { method: 'GET' });
+export function get<T>(path: string) {
+  return request<T>(path, { method: 'GET' });
 }
 
-export function patch<T, B = unknown>(path: string, body: B, scope?: Scope) {
-  const userScope = scope ? `/${scope}` : '';
-  return request<T>(`${userScope}${path}`, { method: 'PATCH', body });
+export function patch<T, B = unknown>(path: string, body: B) {
+  return request<T>(path, { method: 'PATCH', body });
 }
-export function deleteEntity<T, B = unknown>(path: string, scope?: Scope) {
-  const userScope = scope ? `/${scope}` : '';
-  return request<T>(`${userScope}${path}`, { method: 'DELETE' });
+export function deleteEntity<T>(path: string) {
+  return request<T>(path, { method: 'DELETE' });
 }

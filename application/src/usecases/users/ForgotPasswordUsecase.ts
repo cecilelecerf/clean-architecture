@@ -1,7 +1,7 @@
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EmailService } from "@application/ports/services/EmailService";
 import { TokenService } from "@application/ports/services/TokenService";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import { UserNotFoundError } from "@application/errors/users";
 import { Email } from "@domain/values/Email";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 
@@ -30,16 +30,11 @@ export class ForgotPasswordUsecase {
       userId: user.id,
     });
 
-    // Préparer le lien de reset (exemple : frontend)
     const resetLink = `${confirmationUrl}/reset-password?token=${token}`;
 
-    // Envoyer l'email
-    await this.emailService.sendEmail({
-      to: user.email,
-      subject: "Réinitialisation de votre mot de passe",
-      text: `<p>Bonjour ${user.firstname} ${user.lastname},</p>
-       <p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p>
-       <a href="${resetLink}">${resetLink}</a>`,
+    await this.emailService.sendPasswordResetEmail(user.email, {
+      firstname: user.firstname,
+      resetLink,
     });
   }
 }

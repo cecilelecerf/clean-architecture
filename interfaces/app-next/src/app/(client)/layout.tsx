@@ -4,8 +4,8 @@ import { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
-import { MenuDrawer } from './MenuDrawer';
-import { MenuPopover } from './MenuPopover';
+import { MenuDrawer } from './_components/MenuDrawer';
+import { MenuPopover } from './_components/MenuPopover';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -21,7 +21,6 @@ export default async function RootLayout({
 
   if (!session) redirect('/login');
   if (session.user.role !== 'client') redirect('/unauthorized');
-  const unreadCount = 100
   return (
     <main className="px-4 py-6 xl:py-8 md:px-13 xl:px-30">
       <div className="flex items-center justify-between mb-4 xl:mb-6">

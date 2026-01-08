@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { userSchema } from '@infrastructure/types/user';
+import { RegisterPayload, reqRegisterSchema } from '@infrastructure/types/user';
 import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
-import z from 'zod';
 
 const clientUrl = process.env.NEXT_PUBLIC_CLIENT_URL;
 
-const reqSchema = userSchema
-  .pick({ firstname: true, lastname: true, email: true })
-  .extend({ plainedPassword: z.string() });
-export type RegisterPayload = z.infer<typeof reqSchema>;
-
-export type RegisterResponse = z.infer<typeof userSchema>;
 export async function POST(req: NextRequest) {
   try {
     const json = await req.json();
-    const data: RegisterPayload = reqSchema.parse(json);
+    const data: RegisterPayload = reqRegisterSchema.parse(json);
     const result = await usersFactory().register.execute({
       ...data,
       confirmationUrl: clientUrl,

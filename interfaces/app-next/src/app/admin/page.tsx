@@ -1,12 +1,54 @@
-import { Flex } from "@radix-ui/themes";
-import { menuItems } from "./menu-item";
+import { menuItems, menuItemsClients } from "./menu-item";
 import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function AdminHomePage() {
-    return (<Flex gap="8" className="flex-wrap w-full" justify="center" align="center">
-        {menuItems.slice(1).map((item) =>
-            <Link href={item.href} key={item.label} className="flex flex-col justify-center items-center gap-2 p-5 w-50 h-50 shadow rounded-lg hover:shadow-xl transition-all font-semibold text-center  text-xl">{item.icon} <p >{item.label}</p>
-            </Link>)}
-    </Flex>)
+    return (
+        <div className="space-y-8">
+            {/* Header */}
+            <div>
+                <h1 className="text-3xl font-bold mb-2">Tableau de bord</h1>
+                <p className="text-gray-500">Bienvenue sur votre espace conseiller</p>
+            </div>
 
+            {/* Section Général */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-gray-700">Général</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {menuItems.slice(1).map((item) => (
+                        <Link href={item.href} key={item.label}>
+                            <Card className="hover:shadow-lg transition-all hover:scale-105 cursor-pointer h-full">
+                                <CardContent className="flex flex-col items-center justify-center gap-3 p-6 text-center">
+                                    <div className="text-gray-700">
+                                        {item.icon}
+                                    </div>
+                                    <p className="font-semibold text-lg">{item.label}</p>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    ))}
+                </div>
+            </section>
+
+            {/* Section Relation Client */}
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-gray-700">Relation Client</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {menuItemsClients.map((item) => (
+                        <Link href={item.href} key={item.label}>
+                            <Card className="hover:shadow-lg transition-all hover:scale-105 cursor-pointer h-full">
+                                <CardContent className="flex flex-col items-center justify-center gap-3 p-6 text-center">
+                                    <div className="text-gray-700">
+                                        {item.icon}
+                                    </div>
+
+                                    <p className="font-semibold text-lg">{item.label}</p>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    ))}
+                </div>
+            </section>
+        </div>
+    );
 }

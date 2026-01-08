@@ -1,13 +1,16 @@
 import { TagNotFoundError } from "@application/errors/tags/TagNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { TagRepository } from "@application/ports/repositories/TagRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
+import { ClockService } from "@application/ports/services/ClockService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { TagEntity } from "@domain/entities/TagEntity";
+import { TagDTO, TagEntity } from "@domain/entities/TagEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { ColorInvalidFormatError } from "@domain/errors/color/ColorInvalidFormatError";
+import { ColorInvalidFormatError } from "@domain/errors/color";
 import { Color } from "@domain/values/Color";
 
 interface Props {
@@ -20,7 +23,8 @@ interface Props {
 export class UpdateTagUseCase {
   constructor(
     private readonly tagRepository: TagRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly clockService: ClockService
   ) {}
 
   async execute({
@@ -29,7 +33,7 @@ export class UpdateTagUseCase {
     administratorId,
     id,
   }: Props): Promise<
-    | TagEntity
+    | TagDTO
     | UserRoleMismatchError
     | UserNotFoundError
     | UserNotActiveError
@@ -47,15 +51,15 @@ export class UpdateTagUseCase {
     }
     let colorVo;
     if (color) {
-      colorVo = Color.from(color);
+      colorVo = Color.create(color);
       if (colorVo instanceof ColorInvalidFormatError)
         return new ColorInvalidFormatError(color);
     }
-
-    if (label) tag.rename(label);
-    if (colorVo) tag.changeColor(colorVo);
+    const now = this.clockService.now();
+    if (label) tag.rename({ newLabel: label, now });
+    if (colorVo) tag.changeColor({ newColor: colorVo, now });
 
     await this.tagRepository.update(tag);
-    return tag;
+    return tag.toDTO();
   }
 }

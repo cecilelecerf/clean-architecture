@@ -1,77 +1,182 @@
 import { Money } from "../values/Money";
 import { UserEntity } from "./UserEntity";
-import { MoneyAmountNegativeError } from "../errors/money/MoneyAmountNegativeError";
-import { CreditAlreadyPaidError } from "../errors/credit/CreditAlreadyPaidError";
-import { Percentage } from "../values/Percentage";
-import { MoneyCurrencyMissingError } from "../errors/money/MoneyCurrencyMissingError";
-import { MoneyAmountInvalidError } from "../errors/money/MoneyAmountInvalidError";
-import { MoneyCurrencyMismatchError } from "../errors/money/MoneyCurrencyMismatchError";
+import { Percentage } from "@domain/values/Percentage";
+import {
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
+import {
+  CreditAlreadyPaidError,
+  CreditStatusMismatchError,
+  InvalidCreditDurationError,
+  InvalidCreditStatusError,
+} from "@domain/errors/credit";
+import { AccountEntity } from "./AccountEntity";
+import { FormuleCreditEntity } from "./FormuleCreditEntity";
+import { InsufficientFundsError } from "@domain/errors/account";
+
 export type MonthlySchedule = {
   capitalPaid: Money;
   month: number;
   before: Money;
   after: Money;
 };
+
+export enum CreditStatus {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  REFUSED = "REFUSED",
+  COMPLETED = "COMPLETED",
+}
+
 export class CreditEntity {
   private constructor(
     public id: string,
-    public userId: UserEntity["id"],
+    public accountId: AccountEntity["iban"],
+    // La formule du prêt choisie par le client et créé par le directeur de la banque
+    public formuleCreditId: FormuleCreditEntity["id"],
     public initialAmount: Money,
-    // ? taux d'interet annuel
-    public interestRate: Percentage,
-    // ? sur le total;
-    public insuranceRate: Percentage,
     public durationMonths: number,
     public startDate: Date,
     public monthlyPayment: Money,
-    public remainingBalance: Money
+    public remainingBalance: Money,
+    public status: CreditStatus,
+    public createdAt: Date,
+    public updatedAt: Date,
+    public advisorId: UserEntity["id"] | null,
+    // Raison du refus ou acceptation du conseiller
+    public reason?: string | null
   ) {}
+
   public static from({
     id,
-    userId,
+    accountId,
+    formuleCreditId,
     initialAmount,
-    insuranceRate,
-    interestRate,
     startDate,
     monthlyPayment,
     durationMonths,
     remainingBalance,
+    status,
+    createdAt,
+    updatedAt,
+    advisorId,
+    reason,
   }: Pick<
     CreditEntity,
     | "id"
-    | "userId"
+    | "accountId"
+    | "formuleCreditId"
     | "initialAmount"
-    | "insuranceRate"
-    | "interestRate"
     | "startDate"
     | "monthlyPayment"
     | "durationMonths"
     | "remainingBalance"
+    | "status"
+    | "createdAt"
+    | "updatedAt"
+    | "advisorId"
+    | "reason"
   >) {
     return new CreditEntity(
       id,
-      userId,
+      accountId,
+      formuleCreditId,
       initialAmount,
-      interestRate,
-      insuranceRate,
       durationMonths,
       startDate,
       monthlyPayment,
-      remainingBalance
+      remainingBalance,
+      status,
+      createdAt,
+      updatedAt,
+      advisorId,
+      reason
     );
   }
 
-  /** 🧮 Calcule la mensualité */
-  public calculateMonthlyPayment():
+  public static create(
+    {
+      id,
+      advisorId,
+      accountId,
+      formuleCreditId,
+      initialAmount,
+      durationMonths,
+      startDate,
+      status,
+      createdAt,
+      reason,
+    }: Pick<
+      CreditEntity,
+      | "id"
+      | "advisorId"
+      | "accountId"
+      | "formuleCreditId"
+      | "initialAmount"
+      | "durationMonths"
+      | "startDate"
+      | "status"
+      | "createdAt"
+      | "reason"
+    >,
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
+    | CreditEntity
+    | InvalidCreditDurationError
+    | MoneyCurrencyMissingError
+    | MoneyAmountInvalidError
+    | MoneyAmountNegativeError {
+    if (
+      !Number.isInteger(durationMonths) ||
+      durationMonths <= 0 ||
+      durationMonths > 400
+    ) {
+      return new InvalidCreditDurationError(durationMonths);
+    }
+
+    const temp = new CreditEntity(
+      id,
+      accountId,
+      formuleCreditId,
+      initialAmount,
+      durationMonths,
+      startDate,
+      initialAmount,
+      initialAmount,
+      status,
+      createdAt,
+      createdAt,
+      advisorId,
+      reason
+    );
+
+    const monthlyPayment = temp.calculateMonthlyPayment(
+      interestRate,
+      insuranceRate
+    );
+    if (monthlyPayment instanceof Error) return monthlyPayment;
+
+    temp.monthlyPayment = monthlyPayment;
+    return temp;
+  }
+
+  /** Calcule la mensualité */
+  public calculateMonthlyPayment(
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | Money
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError {
     const P = this.initialAmount.amount;
     const n = this.durationMonths;
-    const r = this.interestRate.value / 12 / 100;
+    const r = interestRate.value / 12 / 100;
     const basePayment = (P * r) / (1 - Math.pow(1 + r, -n));
-    const insurance = ((this.insuranceRate.value / 100) * P) / n;
+    const insurance = ((insuranceRate.value / 100) * P) / n;
 
     const paymentOrError = Money.create({
       amount: basePayment + insurance,
@@ -87,18 +192,21 @@ export class CreditEntity {
    * 💸 Effectue le paiement d’une mensualité.
    * Retourne soit le crédit mis à jour, soit une erreur métier.
    */
-  public payMonthly():
+  public payMonthly(
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | CreditEntity
     | CreditAlreadyPaidError
     | MoneyCurrencyMissingError
-    | MoneyCurrencyMismatchError
     | MoneyAmountInvalidError
-    | MoneyAmountNegativeError {
+    | MoneyAmountNegativeError
+    | InsufficientFundsError {
     if (this.isFullyPaid()) {
       return new CreditAlreadyPaidError(this.id);
     }
 
-    const payment = this.calculateMonthlyPayment();
+    const payment = this.calculateMonthlyPayment(interestRate, insuranceRate);
     if (payment instanceof Error) {
       return payment;
     }
@@ -121,21 +229,24 @@ export class CreditEntity {
     return this.remainingBalance;
   }
 
-  /** 📆 Calcule le plan d’amortissement complet */
-  public calculateAmortizationSchedule():
+  /** Calcule le plan d’amortissement complet */
+  public calculateAmortizationSchedule(
+    interestRate: Percentage,
+    insuranceRate: Percentage
+  ):
     | MonthlySchedule[]
     | MoneyCurrencyMissingError
     | CreditAlreadyPaidError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | MoneyCurrencyMismatchError {
+    | InsufficientFundsError {
     const schedule: MonthlySchedule[] = [];
 
     const simulated = CreditEntity.from({ ...this });
 
     for (let month = 1; month <= simulated.durationMonths; month++) {
       const before = simulated.getRemainingBalance();
-      const payResult = simulated.payMonthly();
+      const payResult = simulated.payMonthly(interestRate, insuranceRate);
       if (payResult instanceof Error) return payResult;
       const after = simulated.getRemainingBalance();
 
@@ -147,4 +258,93 @@ export class CreditEntity {
 
     return schedule;
   }
+
+  public assignAdvisor({
+    advisorId,
+    now,
+  }: {
+    advisorId: string;
+    now: Date;
+  }): CreditEntity {
+    this.advisorId = advisorId;
+    this.updatedAt = now;
+    return this;
+  }
+
+  public accept({
+    now,
+  }: {
+    now: Date;
+  }): CreditEntity | CreditStatusMismatchError {
+    if (this.status !== CreditStatus.PENDING) {
+      return new CreditStatusMismatchError(this.status);
+    }
+    this.status = CreditStatus.ACCEPTED;
+    this.updatedAt = now;
+    return this;
+  }
+
+  public refuse({
+    now,
+    reason,
+  }: {
+    now: Date;
+    reason?: string;
+  }): CreditEntity | CreditStatusMismatchError {
+    if (this.status !== CreditStatus.PENDING) {
+      return new CreditStatusMismatchError(this.status);
+    }
+    this.status = CreditStatus.REFUSED;
+    if (reason) this.reason = reason;
+    this.updatedAt = now;
+    return this;
+  }
+
+  public toDTO(): CreditDTO {
+    return {
+      id: this.id,
+      createdAt: this.createdAt.toISOString(),
+      durationMonths: this.durationMonths,
+      status: this.status,
+      startDate: this.startDate.toISOString(),
+      monthlyPayment: this.monthlyPayment,
+      remainingBalance: this.remainingBalance,
+      initialAmount: this.initialAmount,
+      accountId: this.accountId.value,
+      formuleCreditId: this.formuleCreditId,
+      updatedAt: this.updatedAt.toISOString(),
+      advisorId: this.advisorId,
+      reason: this.reason,
+    };
+  }
+
+  static isValidCreditStatus(status: string): status is CreditStatus {
+    return Object.values(CreditStatus).includes(status as CreditStatus);
+  }
+  static validateCreditStatus(
+    status: string
+  ): CreditStatus | InvalidCreditStatusError {
+    if (this.isValidCreditStatus(status)) {
+      return status;
+    }
+    return new InvalidCreditStatusError(status);
+  }
 }
+
+export type CreditDTO = {
+  accountId: string;
+  createdAt: string;
+  updatedAt: string;
+  startDate: string;
+} & Pick<
+  CreditEntity,
+  | "id"
+  | "durationMonths"
+  | "status"
+  | "monthlyPayment"
+  | "remainingBalance"
+  | "initialAmount"
+  | "formuleCreditId"
+  | "advisorId"
+  | "reason"
+>;

@@ -11,6 +11,12 @@ export default withAuth(
       }
     }
 
+    if (req.nextUrl.pathname.startsWith('/director')) {
+      if (token?.role !== 'directeur') {
+        return NextResponse.redirect(new URL('/unauthorized', req.url));
+      }
+    }
+
     return NextResponse.next();
   },
   {
@@ -28,8 +34,12 @@ export const config = {
     '/accounts/:path*',
     '/credits/:path*',
     '/investments/:path*',
+    '/feeds/:path*',
+    '/formules/:path*',
+    '/profile/:path*',
+    '/savings-rate/:path*',
     '/threads/:path*',
     '/admin/:path*',
-    '/advisor/:path*',
+    '/director/:path*',
   ],
 };

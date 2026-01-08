@@ -1,14 +1,13 @@
-import { OrderEntity } from "../../entities/OrderEntity";
-
 export class InvalidOrderStatusTransitionError extends Error {
-  public readonly statusCode = 409;
+  public readonly statusCode = 400;
+
   constructor(
-    public readonly orderId: OrderEntity["id"],
-    public readonly currentStatus: OrderEntity["status"],
-    public readonly expectedStatus: OrderEntity["status"]
+    public readonly orderId: string,
+    public readonly currentStatus: string,
+    public readonly requiredStatus: string
   ) {
     super(
-      `Cannot change order status from "${currentStatus}" (expected "${expectedStatus}").`
+      `Cannot transition order ${orderId} from status "${currentStatus}". Required status is "${requiredStatus}".`
     );
     this.name = "InvalidOrderStatusTransitionError";
   }

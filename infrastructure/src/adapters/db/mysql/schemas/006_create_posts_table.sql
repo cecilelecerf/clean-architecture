@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS posts (
     title VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,
     created_at DATETIME NOT NULL,
-    modified_at DATETIME,
+    updated_at DATETIME NOT NULL,
     published_at DATETIME,
     client_id VARCHAR(36),
     FOREIGN KEY (advisor_id) REFERENCES users(id),

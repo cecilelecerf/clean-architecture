@@ -1,6 +1,12 @@
-import { ButtonLink } from "@/components/ButtonLink";
+import { CreditsSkeleton } from "@/components/credits/CreditArraySkeleton";
+import { Suspense } from "react";
+import { CreditsContent } from "./_components/CreditsContent";
 
 export default function AdminHomePage() {
-    return (<>ljennefjz <ButtonLink path="/admin/users">Users </ButtonLink></>)
+    return (
+        <Suspense fallback={<CreditsSkeleton />}>
+            <CreditsContent />
+        </Suspense>
+    );
 
 }

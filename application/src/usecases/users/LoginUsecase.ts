@@ -1,9 +1,12 @@
-import { InvalidCredentialsError } from "@application/errors/users/InvalidCredentialsError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
+import {
+  InvalidCredentialsError,
+  UserNotActiveError,
+  UserNotFoundError,
+} from "@application/errors/users";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { TokenService } from "@application/ports/services/TokenService";
-import { UserEntity } from "@domain/entities/UserEntity";
+import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import { Email } from "@domain/values/Email";
 
@@ -23,15 +26,17 @@ export class LoginUsecase {
     email,
     plainedPassword,
   }: Props): Promise<
-    | { user: UserEntity; token: string }
+    | { user: UserToDTO; token: string }
     | UserNotFoundError
     | InvalidCredentialsError
     | EmailInvalidFormatError
+    | UserNotActiveError
   > {
     const emailVo = Email.create(email);
     if (emailVo instanceof Error) return emailVo;
     const user = await this.userRepository.findByEmail(emailVo);
     if (!user) return new UserNotFoundError();
+    if (!user.isActive()) return new UserNotActiveError(user.id);
     const isValidPassword = await this.encryptionService.compare(
       plainedPassword,
       user.passwordHash
@@ -40,6 +45,6 @@ export class LoginUsecase {
     const token = await this.tokenService.generateAuthToken({
       userId: user.id,
     });
-    return { user, token };
+    return { user: user.toDTO(), token };
   }
 }

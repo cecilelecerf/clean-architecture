@@ -1,5 +1,7 @@
 "use client"
-import { ButtonLoading } from "@/components/ButtonLoading";
+import { SkeletonPost } from "@/app/(client)/feeds/[postId]/PostQuery";
+import { ButtonLoading } from "@/components/buttons/ButtonLoading";
+import { TagsFilters } from "@/components/feeds/TagsFilters";
 import { SwitchComponent } from "@/components/SwitchComponent";
 import { Tag } from "@/components/Tag";
 import { Badge } from "@/components/ui/badge";
@@ -7,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { socket } from "@/lib/socket";
-import { advisorEndpoint } from "@/utils/endpoint/advisor";
-import { NewPost, PostWithTagsAndUser } from "@/utils/endpoint/advisor/feedsEndpoint";
+import { formatDateFrench } from "@/utils/date/formatDateFrench";
+import { endpoints } from "@/utils/endpoint";
+import { NewPost, PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint";
 import { PostId } from "@infrastructure/types/feed";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Edit, Save, X } from "lucide-react";
@@ -19,39 +22,49 @@ import { match } from "ts-pattern";
 type Props = { postId: PostId }
 
 export const PostQuery = ({ postId }: Props) => {
-
-    const query = useQuery(advisorEndpoint.feeds.posts.get({ id: postId }));
+    const query = useQuery(endpoints.feeds.posts.get({ id: postId }));
 
     return match(query)
         .with({ status: "error" }, () => "error")
-        .with({ status: "pending" }, () => "pending")
-        .with({ status: "success" }, ({ data: post }) => <PostDisplay postData={post} />
-        ).exhaustive()
-
+        .with({ status: "pending" }, () => <SkeletonPost />)
+        .with({ status: "success" }, ({ data: post }) => <PostDisplay postData={post} />)
+        .exhaustive()
 }
 
 const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
-    const [post, setPost] = useState<PostWithTagsAndUser>(postData)
     const [editValues, setEditValues] = useState<NewPost | null>(null);
 
-    const editMutation = useMutation(advisorEndpoint.feeds.posts.edit({ id: post.id }));
-    const actionMutation = useMutation(advisorEndpoint.feeds.posts.status({ id: post.id }));
+    const editMutation = useMutation(endpoints.feeds.posts.edit({ id: postData.id }));
+    const actionMutation = useMutation(endpoints.feeds.posts.status({ id: postData.id }));
 
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
-    const isMine = session.user.id === post.advisor.id;
+
+    const isMine = session.user.id === postData.advisor.id;
+
+    useEffect(() => {
+        if (editValues) {
+            console.log("✏️ Sync editValues avec postData");
+            setEditValues({
+                title: postData.title,
+                content: postData.content,
+                tagsId: postData.tagsId
+            });
+        }
+    }, [postData.title, postData.content, postData.tagsId]);
 
     useEffect(() => {
         if (!socket) return;
-        const eventNameUpdate = `post:${post.id}:update`;
-        socket.on(eventNameUpdate, (socketPost: PostWithTagsAndUser) => {
-            console.log("💬 Post mis à jour:", socketPost);
-            setPost(socketPost);
+        const eventNameUpdate = `post:${postData.id}:update`;
+
+        socket.on(eventNameUpdate, () => {
+            console.log("💬 Post mis à jour via socket - query va se refetch");
         });
+
         return () => {
             socket.off(eventNameUpdate);
         };
-    }, []);
+    }, [postData.id]);
 
     const handleChange = (field: keyof NewPost, value: string) => {
         if (!editValues) return;
@@ -59,91 +72,137 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
     };
 
     const handleSave = () => {
-        console.log(editValues)
-        editMutation.mutate(editValues, { onSuccess: () => socket.emit("post:update", { post: { ...post, ...editValues } }) });
+        if (!editValues) return;
+        editMutation.mutate(editValues, {
+            onSuccess: (data) => {
+                console.log("✅ Mutation réussie, data:", data);
+                socket.emit("post:update", { post: data });
+                setEditValues(null);
+            }
+        });
     };
 
     const handleEditToggle = () => {
         setEditValues((prev) => {
-            if (prev) return null
-            return { title: post.title, content: post.content, tagsId: post.tagsId }
+            if (prev) return null;
+            return {
+                title: postData.title,
+                content: postData.content,
+                tagsId: postData.tagsId
+            };
         });
     };
 
     const toogleStatus = () => {
         actionMutation.mutate({
-            status: post.publishedAt ? "unpublish" : "publish"
-        }, { onSuccess: (dataSuccess) => socket.emit(`post:status`, { post: { ...post, publishedAt: dataSuccess.publishedAt } }) })
-    }
+            status: postData.publishedAt ? "unpublish" : "publish"
+        }, {
+            onSuccess: (dataSuccess) => {
+                console.log("✅ Status changé:", dataSuccess);
+                socket.emit("post:status", { post: dataSuccess });
+            }
+        });
+    };
 
-    const currentValues = editValues ?? { title: post.title, content: post.content };
+    const currentValues = editValues ?? {
+        title: postData.title,
+        content: postData.content
+    };
 
-    return <>
-        <div className="flex justify-between items-center gap-3">
-            {editValues && isMine ? (
-                <Input
-                    value={currentValues.title}
-                    onChange={(e) => handleChange('title', e.target.value)}
-                    className="text-md font-bold"
-                />
-            ) : (
-                <h1 className="text-2xl font-bold">{post.title}</h1>
-            )}
-            {isMine &&
-                <div className="flex gap-2">
-                    {editValues ? (
-                        <>
-                            <ButtonLoading loading={editMutation.isPending} onClick={handleSave} >
-                                <Save />
-                            </ButtonLoading>
-                            <Button variant="outline" onClick={handleEditToggle} size="icon">
-                                <X />
+    return (
+        <>
+            <div className="flex justify-between items-center gap-3">
+                {editValues && isMine ? (
+                    <Input
+                        value={currentValues.title}
+                        onChange={(e) => handleChange('title', e.target.value)}
+                        className="text-md font-bold"
+                    />
+                ) : (
+                    <h1 className="text-2xl font-bold">{postData.title}</h1>
+                )}
+                {isMine && (
+                    <div className="flex gap-2">
+                        {editValues ? (
+                            <>
+                                <ButtonLoading
+                                    loading={editMutation.isPending}
+                                    onClick={handleSave}
+                                >
+                                    <Save />
+                                </ButtonLoading>
+                                <Button variant="outline" onClick={handleEditToggle} size="icon">
+                                    <X />
+                                </Button>
+                            </>
+                        ) : (
+                            <Button onClick={handleEditToggle} size="icon">
+                                <Edit />
                             </Button>
-                        </>
-                    ) : (
-                        <Button onClick={handleEditToggle} size="icon">
-                            <Edit />
-                        </Button>
-                    )}
-                </div>}
-        </div>
-
-        <div className="space-y-6 mt-4">
-            <div className="space-y-2">
-                <div className="flex gap-3">
-                    {post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                            {post.tags.map((tag) => (
-                                <Tag tag={tag} key={tag.id} />
-                            ))}
-                        </div>
-                    )}
-                    {isMine ?
-                        <SwitchComponent id="publie" label="Publié" checked={!!post.publishedAt} onChange={toogleStatus} />
-                        : <Badge variant={post.publishedAt ? "secondary" : "outline"} className="h-fit ml-2">
-                            {post.publishedAt ? "Publié" : "Brouillon"}
-                        </Badge>}
-                </div>
-                <p className="text-sm text-gray-500">
-                    Par <strong>{post.advisor.firstname} {post.advisor.lastname}</strong> ·{' '}
-                    {post.publishedAt
-                        ? `Publié le ${new Date(post.publishedAt).toLocaleDateString()}`
-                        : `Brouillon créé le ${new Date(post.createdAt).toLocaleDateString()}`}
-                </p>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {editValues && isMine ? (
-                <Textarea
-                    value={currentValues.content}
-                    onChange={(e) => handleChange('content', e.target.value)}
-                    className="min-h-[200px]"
-                />
-            ) : (
-                <p> {post.content}
-                </p>
-            )}
+            <div className="space-y-6 mt-4">
+                <div className="space-y-2">
+                    <div className="flex gap-3">
+                        {editValues ? (
+                            <TagsFilters
+                                setSelectedTagsId={(value) => setEditValues((prev) => {
+                                    if (!prev) return null;
+                                    return {
+                                        ...prev,
+                                        tagsId: typeof value === 'function'
+                                            ? value(prev.tagsId)
+                                            : value
+                                    };
+                                })}
+                                selectedTagsId={editValues.tagsId}
+                            />
+                        ) : postData.tags && postData.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                {postData.tags.map((tag) => (
+                                    <Tag tag={tag} key={tag.id} />
+                                ))}
+                            </div>
+                        )}
 
+                        {isMine ? (
+                            <SwitchComponent
+                                id="publie"
+                                label="Publié"
+                                checked={!!postData.publishedAt}
+                                onChange={toogleStatus}
+                            />
+                        ) : (
+                            <Badge
+                                variant={postData.publishedAt ? "secondary" : "outline"}
+                                className="h-fit ml-2"
+                            >
+                                {postData.publishedAt ? "Publié" : "Brouillon"}
+                            </Badge>
+                        )}
+                    </div>
 
-        </div>
-    </>
-}
+                    <p className="text-sm text-gray-500">
+                        Par <strong>{postData.advisor.firstname} {postData.advisor.lastname}</strong> ·{' '}
+                        {postData.publishedAt
+                            ? `Publié le ${formatDateFrench(postData.publishedAt)}`
+                            : `Brouillon créé le ${formatDateFrench(postData.createdAt)}`}
+                    </p>
+                </div>
+
+                {editValues && isMine ? (
+                    <Textarea
+                        value={currentValues.content}
+                        onChange={(e) => handleChange('content', e.target.value)}
+                        className="min-h-[200px]"
+                    />
+                ) : (
+                    <p className="whitespace-pre-wrap">{postData.content}</p>
+                )}
+            </div>
+        </>
+    );
+};

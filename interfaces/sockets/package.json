@@ -16,6 +16,7 @@
     "@types/socket.io": "^3.0.2",
     "body-parser": "^2.2.0",
     "express": "^5.1.0",
+    "infrastructure": "workspace:*",
     "socket.io": "^4.8.1",
     "ts-pattern": "^5.9.0",
     "tsconfig-paths": "^4.2.0",

@@ -1,19 +1,26 @@
-import { CreditNotBelongsToClientError } from "@application/errors/credits/CreditNotBelongsToClientError";
-import { CreditNotFoundError } from "@application/errors/credits/CreditNotFoundError";
-import { UserNotActiveError } from "@application/errors/users/UserNotActiveError";
-import { UserNotFoundError } from "@application/errors/users/UserNotFoundError";
-import { UserRoleMismatchError } from "@application/errors/users/UserRoleMismatchError";
+import {
+  CreditNotBelongsToClientError,
+  CreditNotFoundError,
+} from "@application/errors/credits";
+import { FormuleCreditNotFoundError } from "@application/errors/formules-credit";
+import {
+  UserNotActiveError,
+  UserNotFoundError,
+  UserRoleMismatchError,
+} from "@application/errors/users";
 import { CreditRepository } from "@application/ports/repositories/CreditRepository";
+import { FormuleCreditRepository } from "@application/ports/repositories/FormuleCreditRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
 import { CreditEntity, MonthlySchedule } from "@domain/entities/CreditEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
-import { CreditAlreadyPaidError } from "@domain/errors/credit/CreditAlreadyPaidError";
-import { MoneyAmountInvalidError } from "@domain/errors/money/MoneyAmountInvalidError";
-import { MoneyAmountNegativeError } from "@domain/errors/money/MoneyAmountNegativeError";
-import { MoneyCurrencyMismatchError } from "@domain/errors/money/MoneyCurrencyMismatchError";
-import { MoneyCurrencyMissingError } from "@domain/errors/money/MoneyCurrencyMissingError";
-import { Money } from "@domain/values/Money";
+import { InsufficientFundsError } from "@domain/errors/account";
+import { CreditAlreadyPaidError } from "@domain/errors/credit";
+import {
+  MoneyAmountInvalidError,
+  MoneyAmountNegativeError,
+  MoneyCurrencyMissingError,
+} from "@domain/errors/money";
 
 type Props = {
   clientId: UserEntity["id"];
@@ -23,15 +30,16 @@ type Props = {
 export class CreditScheduleUsecase {
   constructor(
     private readonly creditRepository: CreditRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly formuleRepository: FormuleCreditRepository
   ) {}
   public async execute({
     clientId,
     creditId,
   }: Props): Promise<
+    | MonthlySchedule[]
     | UserNotFoundError
     | UserNotActiveError
-    | MonthlySchedule[]
     | UserRoleMismatchError
     | CreditNotFoundError
     | CreditNotBelongsToClientError
@@ -39,7 +47,8 @@ export class CreditScheduleUsecase {
     | CreditAlreadyPaidError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | MoneyCurrencyMismatchError
+    | FormuleCreditNotFoundError
+    | InsufficientFundsError
   > {
     const client = await findActiveUser(this.userRepository, clientId);
     if (client instanceof Error) return client;
@@ -47,12 +56,23 @@ export class CreditScheduleUsecase {
       return new UserRoleMismatchError(["client"], client.role);
 
     const credit = await this.creditRepository.findById(creditId);
-
     if (!credit) return new CreditNotFoundError();
-    if (credit.userId !== client.id)
+
+    const creditUser = await this.userRepository.findByIban(credit.accountId);
+    if (!creditUser) return new UserNotFoundError();
+
+    if (creditUser.id !== client.id)
       return new CreditNotBelongsToClientError(credit.id, client.id);
 
-    const monthlySchedule = credit.calculateAmortizationSchedule();
+    const formuleCredit = await this.formuleRepository.findById(
+      credit.formuleCreditId
+    );
+    if (!formuleCredit) return new FormuleCreditNotFoundError();
+
+    const monthlySchedule = credit.calculateAmortizationSchedule(
+      formuleCredit.interestRate,
+      formuleCredit.insuranceRate
+    );
     return monthlySchedule;
   }
 }

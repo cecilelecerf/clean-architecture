@@ -1,9 +1,9 @@
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
-import { UserDTO, UserEntity } from "@domain/entities/UserEntity";
+import { UserEntity } from "@domain/entities/UserEntity";
 
 export type ThreadEntityWithUsers = ThreadEntity & {
-  administrator: UserDTO | null;
-  participants: UserDTO[];
+  administrator: UserEntity | null;
+  participants: UserEntity[];
 };
 
 export interface ThreadRepository {
@@ -15,16 +15,19 @@ export interface ThreadRepository {
   findAllByAdministratorId(
     administratorId: UserEntity["id"]
   ): Promise<ThreadEntity[]>;
+  countByAdvisor(advisorId: UserEntity["id"]): Promise<number>;
 
   // With user
   findWithUserById(
     id: ThreadEntity["id"]
   ): Promise<ThreadEntityWithUsers | null>;
-  findAllWithUserByAdministratorId(
-    administratorId: UserEntity["id"]
+  findAllWithUserByAdministratorIdAndType(
+    administratorId: UserEntity["id"],
+    type?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]>;
   findAllWithUserByAdministratorNullable(): Promise<ThreadEntityWithUsers[]>;
-  findAllExternalThreadWithUserByUserId(
-    participantId: UserEntity["id"]
+  findAllWithUserByParticipantIdAndType(
+    participantId: UserEntity["id"],
+    type?: ThreadEntity["type"]
   ): Promise<ThreadEntityWithUsers[]>;
 }

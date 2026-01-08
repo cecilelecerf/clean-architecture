@@ -1,48 +1,48 @@
-"use client"
-import { NewThread } from "@/app/api/client/threads/route";
-import FormWrapper, { Field } from "@/components/FromWrapper";
-import { ButtonBack } from "@/components/ButtonBack";
-import { Thread } from "@infrastructure/types/thread";
-import { useMutation } from "@tanstack/react-query";
+'use client';
+
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
-import { clientEndpoints } from "@/utils/endpoint/client";
+import { useSession } from "next-auth/react";
+import { useMutation } from "@tanstack/react-query";
+import FormWrapper, { DataInfo } from "@/components/FormWrapper";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { endpoints } from "@/utils/endpoint";
+import { NewExternalThread, newExternalThreadSchema } from "@infrastructure/types/thread";
+
 
 export default function NewThreadPage() {
-    const router = useRouter()
-    const [field, setField] = useState<NewThread>({ title: "", messageContent: "" });
-    const fields: Field[] = [
-        {
-            label: 'Titre de la conversation',
-            get: field.title,
-            set: (e) => setField((prev) => ({ ...prev, title: e })),
-        },
-        {
-            label: 'Message',
-            get: field.messageContent,
-            set: (e) => setField((prev) => ({ ...prev, messageContent: e })),
-            type: "textarea"
-        },
-    ];
+    const router = useRouter();
+    const { data: session } = useSession();
 
-    const mutate = useMutation<Thread, Error, NewThread>(clientEndpoints.threads.post())
+    if (!session?.user?.id) return <div>Unauthorized</div>;
 
-    const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        mutate.mutate(field, { onSuccess: () => router.push("/threads") })
-    }
+    const form = useForm<Omit<NewExternalThread, "participantsId">>({
+        resolver: zodResolver(newExternalThreadSchema.omit({ participantsId: true })),
+        defaultValues: { title: "", messageContent: "" },
+    });
+
+    const mutate = useMutation(endpoints.threads.create({ type: "external" }));
+
+    const onSubmit = (values: Omit<NewExternalThread, "participantsId">) => {
+        mutate.mutate(
+            { ...values, participantsId: [session.user.id] },
+            { onSuccess: () => router.push("/threads") }
+        );
+    };
+
+    const data: DataInfo<Omit<NewExternalThread, "participantsId">> = {
+        title: { label: "Titre de la conversation", type: "text" },
+        messageContent: { label: "Message", type: "textarea" },
+    };
 
     return (
-        <>
-            <ButtonBack />
-            <form onSubmit={(e) => onSubmit(e)} className="max-w-lg mx-auto mt-10" >
-                <FormWrapper
-                    title="Nouvelle conversation"
-                    fields={fields}
-                    button="Contacter"
-                    loading={mutate.isPending}
-                />
-            </form >
-        </>
+        <FormWrapper<Omit<NewExternalThread, "participantsId">>
+            title="Nouvelle conversation"
+            form={form}
+            data={data}
+            onSubmit={onSubmit}
+            labelButton="Contacter"
+            loading={mutate.isPending}
+        />
     );
 }
