@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import router from "next/router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormWrapper, { DataInfo } from "@/components/erfer";
+import FormWrapper, { DataInfo } from "@/components/FormWrapper";
 
 export default function NewSavingsRatePage() {
     const form = useForm<NewSavingsrate>({

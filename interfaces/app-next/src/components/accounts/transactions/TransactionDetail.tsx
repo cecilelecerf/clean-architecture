@@ -57,7 +57,7 @@ export function TransactionDetail({
                                 </div>
                                 <div>
                                     <p className="text-xs opacity-75 mb-1">Montant</p>
-                                    <p className="text-3xl font-bold">    {transaction.amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                                    <p className="text-3xl font-bold">    {transaction.amount.amount.toLocaleString('fr-FR', { style: 'currency', currency: transaction.amount.currency })}
                                     </p>
                                 </div>
                                 <div className="mt-4 pt-4 border-t border-white/20">

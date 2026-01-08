@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { UserDto, } from "@infrastructure/types/user";
 import { match } from "ts-pattern";
 import { Skeleton } from "@/components/ui/skeleton";
-import FormWrapper, { DataInfo } from "@/components/erfer";
+import FormWrapper, { DataInfo } from "@/components/FormWrapper";
 import { NewThread, newThreadSchema } from "@infrastructure/types/thread";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

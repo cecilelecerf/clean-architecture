@@ -133,11 +133,8 @@ export const creditsEndpoint = createEndpointsNodes({
       mutationFn: ({ payload }: { payload: CreditResponse }) =>
         patch(`/credits/${creditId}/grant`, payload),
       onSuccess: (data, variables) => {
-        // Invalide le crédit spécifique
         queryClient.invalidateQueries({ queryKey: ['credits', creditId] });
-        // Invalide toutes les listes de crédits
         queryClient.invalidateQueries({ queryKey: ['credits', 'list'] });
-        // Si le crédit est accepté, invalide les comptes car le montant sera débloqué
         if (variables.payload.accept) {
           queryClient.invalidateQueries({ queryKey: ['accounts'] });
           queryClient.invalidateQueries({ queryKey: ['transactions'] });

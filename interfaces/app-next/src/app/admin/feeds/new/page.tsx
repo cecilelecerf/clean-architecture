@@ -1,6 +1,6 @@
 'use client';
 
-import FormWrapper, { DataInfo } from "@/components/erfer";
+import FormWrapper, { DataInfo } from "@/components/FormWrapper";
 import { socket } from "@/lib/socket";
 import { endpoints } from "@/utils/endpoint";
 import { postSchema, Tag } from "@infrastructure/types/feed";

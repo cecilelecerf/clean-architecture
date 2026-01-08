@@ -43,7 +43,7 @@ export const GetAllTransactions = ({ accountIban, filters, onPaginationChange, h
                                     match(t).with({ type: "credit" }, () => 'text-emerald-500').with({ type: "debit" }, () => 'text-red-500').otherwise(() => 'text-gray-600')
                                 )}
                             >
-                                {t.type === "debit" && "-"}   {t.amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                                {t.type === "debit" && "-"}   {t.amount.amount.toLocaleString('fr-FR', { style: 'currency', currency: t.amount.currency })}
                             </div>
                         </Link>
                     ))}

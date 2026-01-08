@@ -1,5 +1,11 @@
 import { usersFactory } from "@infrastructure/adapters/db/mongo/factories/users";
-import { loginSchema, tokenSchema, RegisterPayload, reqRegisterSchema, resetPasswordSchema } from "@infrastructure/types/user";
+import {
+  loginSchema,
+  tokenSchema,
+  RegisterPayload,
+  reqRegisterSchema,
+  resetPasswordSchema,
+} from "@infrastructure/types/user";
 import { Request, Response, NextFunction } from "express";
 
 export class AuthController {
@@ -19,8 +25,12 @@ export class AuthController {
     }
   }
 
-  static async confirmRegistration(req: Request, res: Response, next: NextFunction){
-    try{
+  static async confirmRegistration(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
       const data = tokenSchema.parse(req.body);
 
       const result = await usersFactory().confirmRegistration.execute(data);
@@ -37,8 +47,8 @@ export class AuthController {
     }
   }
 
-  static async forgotPassword(req: Request, res: Response, next: NextFunction){
-    try{
+  static async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
       const { email } = req.body;
 
       if (!email) {
@@ -66,8 +76,8 @@ export class AuthController {
     }
   }
 
-  static async register(req: Request, res: Response, next: NextFunction){
-    try{
+  static async register(req: Request, res: Response, next: NextFunction) {
+    try {
       const data: RegisterPayload = reqRegisterSchema.parse(req.body);
 
       const result = await usersFactory().register.execute({
@@ -87,8 +97,8 @@ export class AuthController {
     }
   }
 
-  static async resetPassword(req: Request, res: Response, next: NextFunction){
-    try{
+  static async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
       const { token, password } = resetPasswordSchema.parse(req.body);
 
       const result = await usersFactory().resetPassword.execute({

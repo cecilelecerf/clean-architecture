@@ -48,8 +48,8 @@ export async function POST(req: NextRequest) {
       name: payload.name,
       type: payload.type,
       color: payload.color,
-      initialBalance: payload.balance,
-      currency: payload.currency,
+      initialBalance: payload.balance.amount,
+      currency: payload.balance.currency,
     });
     if (result instanceof Error) {
       return NextResponse.json(

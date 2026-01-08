@@ -1,6 +1,6 @@
 import { IBAN } from "@domain/values/IBAN";
 import { UserEntity } from "./UserEntity";
-import { Money } from "@domain/values/Money";
+import { Money, MoneyToDTO } from "@domain/values/Money";
 import { Color } from "@domain/values/Color";
 import {
   FactorNegativeError,
@@ -23,7 +23,6 @@ export class AccountEntity {
     public type: "courant" | "epargne",
     public color: Color,
     public balance: Money,
-    public currency: string,
     public createdAt: Date,
     public updatedAt: Date,
     public userId?: UserEntity["id"] | null,
@@ -35,13 +34,12 @@ export class AccountEntity {
     name,
     type,
     balance,
-    currency,
     color,
     createdAt,
     userId,
   }: Pick<
     AccountEntity,
-    "iban" | "name" | "color" | "balance" | "currency" | "createdAt" | "userId"
+    "iban" | "name" | "color" | "balance" | "createdAt" | "userId"
   > & { type: string }):
     | AccountEntity
     | InvalidAccountNameError
@@ -58,7 +56,6 @@ export class AccountEntity {
       validateType,
       color,
       balance,
-      currency,
       createdAt,
       createdAt,
       userId,
@@ -71,7 +68,6 @@ export class AccountEntity {
     name,
     type,
     balance,
-    currency,
     color,
     createdAt,
     userId,
@@ -84,7 +80,6 @@ export class AccountEntity {
     | "type"
     | "color"
     | "balance"
-    | "currency"
     | "createdAt"
     | "userId"
     | "updatedAt"
@@ -96,7 +91,6 @@ export class AccountEntity {
       type,
       color,
       balance,
-      currency,
       createdAt,
       updatedAt,
       userId,
@@ -201,9 +195,8 @@ export class AccountEntity {
       IBAN: this.iban.value,
       name: this.name,
       type: this.type,
-      currency: this.currency,
       color: this.color.getValue(),
-      amount: this.balance.amount,
+      balance: this.balance.toJSON(),
       userId: this.userId,
     };
   }
@@ -212,5 +205,5 @@ export class AccountEntity {
 export type AccountDTO = {
   IBAN: string;
   color: string;
-  amount: number;
-} & Pick<AccountEntity, "name" | "type" | "currency" | "userId">;
+  balance: MoneyToDTO;
+} & Pick<AccountEntity, "name" | "type" | "userId">;

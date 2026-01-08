@@ -1,17 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormWrapper, { Section } from "@/components/erfer";
+import FormWrapper, { Section } from "@/components/FormWrapper";
 import { NewAccount, newAccountSchema } from "@infrastructure/types/account";
 import { CreditCard, Palette } from "lucide-react";
 
 
 export default function NewAccountPage() {
   const router = useRouter();
+  const currenciesQuery = useQuery(endpoints.currencies.getAll());
 
   const form = useForm<NewAccount>({
     resolver: zodResolver(newAccountSchema),
@@ -43,6 +44,13 @@ export default function NewAccountPage() {
             { label: "Épargne", value: "epargne" },
           ],
         },
+        currency: {
+          label: "Devise",
+          type: "select",
+          options:
+            currenciesQuery.status === "success" ?
+              currenciesQuery.data.map((d) => ({ label: ` ${d.code} - ${d.name}(${d.symbol})`, value: d.code, })) : [],
+        }
       },
     },
     {
@@ -54,12 +62,12 @@ export default function NewAccountPage() {
           label: "Couleur",
           type: "icon",
           options: [
-            { label: "🔴", value: "red" },
-            { label: "🔵", value: "blue" },
-            { label: "🟡", value: "yellow" },
-            { label: "🟢", value: "green" },
-            { label: "🟠", value: "orange" },
-            { label: "🟣", value: "purple" },
+            { icon: "🔴", label: "", value: "red" },
+            { icon: "🔵", label: "", value: "blue" },
+            { icon: "🟡", label: "", value: "yellow" },
+            { icon: "🟢", label: "", value: "green" },
+            { icon: "🟠", label: "", value: "orange" },
+            { icon: "🟣", label: "", value: "purple" },
           ],
         },
       }

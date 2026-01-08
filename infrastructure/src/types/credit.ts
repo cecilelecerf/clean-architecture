@@ -25,7 +25,7 @@ export const creditSchema = z.object({
   createdAt: z.iso.datetime(),
   advisorId: userIdSchema.nullable().optional(),
   updatedAt: z.iso.datetime(),
-  reason: z.string().optional(),
+  reason: z.string().nullable(),
 });
 
 export const creditResponseSchema = z.object({

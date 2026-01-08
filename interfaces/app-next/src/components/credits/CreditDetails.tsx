@@ -493,9 +493,9 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                         <div>
                                             <p className="text-sm text-gray-600">Balance actuelle</p>
                                             <p className="text-lg font-semibold">
-                                                {account.amount.toLocaleString("fr-FR", {
+                                                {account.balance.amount.toLocaleString("fr-FR", {
                                                     style: "currency",
-                                                    currency: account.currency,
+                                                    currency: account.balance.currency,
                                                 })}
                                             </p>
                                         </div>

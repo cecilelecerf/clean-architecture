@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { User, MapPin, Mail, Calendar, Phone } from 'lucide-react';
 import { RegisterPayload } from '@/app/api/auth/register/route';
 import { endpoints } from '@/utils/endpoint';
-import FormWrapper, { Section } from '@/components/erfer';
+import FormWrapper, { Section } from '@/components/FormWrapper';
 import { useForm } from 'react-hook-form';
 import { CreateClientPayload, createClientSchema } from '@infrastructure/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';

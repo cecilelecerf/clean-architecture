@@ -253,10 +253,10 @@ const ActionSell = ({
                                                     <div className="flex items-center justify-between w-full gap-4">
                                                         <span className="font-medium">{account.name}</span>
                                                         <span className="text-sm text-gray-600">
-                                                            {account.amount.toLocaleString("fr-FR", {
+                                                            {account.balance.amount.toLocaleString("fr-FR", {
                                                                 minimumFractionDigits: 2,
                                                             })}{" "}
-                                                            {account.currency}
+                                                            {account.balance.currency}
                                                         </span>
                                                     </div>
                                                 </SelectItem>

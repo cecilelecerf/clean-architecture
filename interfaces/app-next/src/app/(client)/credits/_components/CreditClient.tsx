@@ -45,7 +45,7 @@ export const ClientCredits = () => {
                                             Vous n'avez pas encore de demande de crédit
                                         </p>
                                     </div>
-                                    <Button onClick={() => router.push("/formules")}>
+                                    <Button onClick={() => router.push("/credits/formules")}>
                                         Voir les formules de crédits
                                     </Button>
                                 </CardContent>

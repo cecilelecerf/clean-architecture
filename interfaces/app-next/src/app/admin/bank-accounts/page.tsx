@@ -37,7 +37,6 @@ export default function AccountsPage() {
                                     onClick={() => router.push(`/admin/bank-accounts/${acc.IBAN}`)}
                                 >
                                     <CardContent className="p-4 space-y-3">
-                                        {/* Nom du compte */}
                                         <div>
                                             <h3 className="font-semibold text-lg">{acc.name}</h3>
                                             <p className="text-xs text-gray-500">
@@ -49,15 +48,14 @@ export default function AccountsPage() {
                                         <div className="py-3 px-4 bg-gray-50 rounded-lg">
                                             <p className="text-xs text-gray-500 mb-1">Solde</p>
                                             <p className="text-2xl font-bold">
-                                                {acc.amount.toLocaleString("fr-FR", {
+                                                {acc.balance.amount.toLocaleString("fr-FR", {
                                                     style: "currency",
-                                                    currency: acc.currency,
+                                                    currency: acc.balance.currency,
                                                 })}
                                             </p>
                                         </div>
 
 
-                                        {/* Actions */}
                                         <div className="flex flex-col gap-2">
                                             <Button
                                                 size="sm"

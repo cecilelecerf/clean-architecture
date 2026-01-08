@@ -18,8 +18,14 @@ export class TransactionRepositoryMongo implements TransactionRepository {
   private mapDocToTransaction(doc: any): TransactionEntity {
     return TransactionEntity.from({
       id: doc._id.toString(),
-      fromAccountId: IBAN.from(doc.fromAccountId),
-      toAccountId: IBAN.from(doc.toAccountId),
+      fromAccountId:
+        typeof doc.fromAccountId === "string"
+          ? IBAN.from(doc.fromAccountId)
+          : IBAN.from(doc.fromAccountId._id),
+      toAccountId:
+        typeof doc.toAccountId === "string"
+          ? IBAN.from(doc.toAccountId)
+          : IBAN.from(doc.toAccountId._id),
       amount: Money.from(doc.amount),
       label: doc.label,
       icon: doc.icon,
@@ -95,7 +101,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     })
       .sort({ date: -1 })
       .lean();
-
     return docs.map(this.mapDocToTransaction);
   }
 
@@ -171,7 +176,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
       .skip(skip)
       .limit(limit)
       .lean();
-
     return { transactions: docs.map(this.mapDocToTransaction), total };
   }
 }

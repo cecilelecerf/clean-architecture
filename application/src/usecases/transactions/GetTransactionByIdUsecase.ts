@@ -56,7 +56,6 @@ export class GetTransactionByIdUseCase {
           admin.role
         );
     }
-
     const client = await findActiveUser(this.userRepository, userId);
     if (client instanceof Error) return client;
 
@@ -65,7 +64,6 @@ export class GetTransactionByIdUseCase {
         transactionId
       );
     if (!transaction) return new TransactionNotFoundError(transactionId);
-
     let contextIban: IBAN | undefined;
 
     const isFromAccount = transaction.fromAccount?.isClientAccount(client);

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 import { Building2, DollarSign, FileText, Settings } from "lucide-react";
-import FormWrapper, { Section } from "@/components/erfer";
+import FormWrapper, { Section } from "@/components/FormWrapper";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ActionId, NewAction, newActionSchema, UpdateAction, updateActionSchema } from "@infrastructure/types/action";

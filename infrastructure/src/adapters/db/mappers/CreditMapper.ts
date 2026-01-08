@@ -40,11 +40,16 @@ export class CreditMapper {
     const initialAmount = Money.from(doc.initialAmount);
     const monthlyPayment = Money.from(doc.monthlyPayment);
     const remainingBalance = Money.from(doc.remainingBalance);
-
+    const formuleCreditId = doc.formuleCreditId._id
+      ? doc.formuleCreditId._id.toString()
+      : doc.formuleCreditId.toString();
+    const accountId = doc.accountId._id
+      ? doc.accountId._id.toString()
+      : doc.accountId.toString();
     return CreditEntity.from({
       id: doc._id.toString(),
-      accountId: doc.accountId,
-      formuleCreditId: doc.formuleCreditId,
+      accountId: IBAN.from(accountId),
+      formuleCreditId: formuleCreditId,
       initialAmount,
       durationMonths: doc.durationMonths,
       startDate: doc.startDate,
