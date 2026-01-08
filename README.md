@@ -1,6 +1,6 @@
 # Clean Architecture Project
 
-## 1️⃣ Configuration des variables d’environnement
+## 1 Configuration des variables d’environnement
 
 Crée un fichier `.env` à la racine du projet avec le contenu suivant :
 
@@ -27,7 +27,7 @@ BCRYPT_SALT=10
 
 💡 Assure-toi que ce fichier est à la racine du monorepo pour qu’il soit utilisé par Docker et tous les workspaces.
 
-## 2️⃣ Installer les dépendances
+## 2 Installer les dépendances
 
 Installe toutes les dépendances avec pnpm :
 
@@ -35,7 +35,7 @@ Installe toutes les dépendances avec pnpm :
 
 Cela installera les packages pour tous les workspaces (domain, application, infrastructure, interfaces/web/app-next).
 
-## 3️⃣ Compiler les packages
+## 3 Compiler les packages
 
 Construit chaque workspace dans le bon ordre :
 
@@ -45,11 +45,15 @@ Construit chaque workspace dans le bon ordre :
 
 🔹 L’ordre est important car application dépend de domain et infrastructure dépend des deux précédents.
 
-## 4️⃣ Démarrer MySQL et phpMyAdmin & MongoDB
+## 4 Démarrer MySQL et phpMyAdmin & MongoDB
+
+## Docker
 
 Lance les conteneurs Docker :
 
 `docker compose up -d`
+
+## MySQL
 
 MySQL sera disponible sur localhost:3306
 
@@ -67,7 +71,10 @@ Pour drop et recréer la db avec les tables :
 Pour ajouter un jeu de fausse donnée :
 `pnpm run mysql:seed`
 
+## MongoDB
+
 MongoDB sera disponible sur localhost:27400
+
 Utilisateur : root
 
 Mot de passe : true5ecur3
@@ -78,7 +85,16 @@ Pour drop et recréer la db avec les tables :
 Pour ajouter un jeu de fausse donnée :
 `pnpm run mongo:seed`
 
-## 5️⃣ Démarrer l’application Next.js (API + Web)
+## 5 Démarrer l’application Next.js (API + Web)
+
+Créer le fichier .env.local dans /interfaces/app-next
+
+```env
+NEXTAUTH_SECRET=une_chaine_ultra_secrete
+NEXTAUTH_URL=http://localhost:3000/
+NEXT_PUBLIC_API_URL=http://localhost:3000/
+NEXT_PUBLIC_CLIENT_URL=http://localhost:3000/
+```
 
 Dans le workspace web, lance le serveur de développement :
 
@@ -95,7 +111,20 @@ Un client :
 Email : client@example.com
 Mdp : password123
 
-## 6️⃣ Bonnes pratiques
+## 6 Démarrer l’API Express
+
+Modifier le fichier .env.local dans /interfaces/app-next
+
+```env
+NEXTAUTH_SECRET=une_chaine_ultra_secrete
+NEXTAUTH_URL=http://localhost:3000/
+NEXT_PUBLIC_API_URL=http://localhost:3000/
+NEXT_PUBLIC_CLIENT_URL=http://localhost:3000/
+```
+
+`pnpm run express`
+
+## 6 Bonnes pratiques
 
 Toujours utiliser le .env global pour partager les variables entre workspaces et Docker.
 
