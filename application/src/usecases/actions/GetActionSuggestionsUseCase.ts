@@ -26,7 +26,6 @@ export class GetActionSuggestionsUseCase {
     if (allActions.length === 0) {
       return [];
     }
-
     const suggestionsWithStats = await Promise.all(
       allActions.map((action) => this.enrichWithStats(action))
     );

@@ -38,7 +38,7 @@ import { AvatarFallback } from "@radix-ui/react-avatar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { useRouter } from "next/navigation"
 import { ButtonLoading } from "./buttons/ButtonLoading"
-import { Switch } from "@radix-ui/react-switch"
+import { Switch } from "./ui/switch"
 
 type FieldType = "text" | "number" | "select" | "checkbox" | "radio" | "textarea" | "phone" | "email" | "password" | "date" | 'icon' | "tag" | "command" | "switch";
 
@@ -288,7 +288,6 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                             {info.options?.map((option, idx) => {
                                                 const isSelected = Array.isArray(field.value) && field.value.includes(option.value);
                                                 const valueArray = (field.value as string[]) ?? [];
-                                                console.log(valueArray)
                                                 return (
                                                     <Badge
                                                         key={idx}
@@ -310,7 +309,6 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                                             } else {
                                                                 newValue = valueArray.filter((v) => v !== option.value);
                                                             }
-                                                            console.log(newValue)
                                                             field.onChange(newValue);
                                                         }}
                                                     >
@@ -397,8 +395,13 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                             </Button>
                                         </>
                                     ))
-                                    .with(("switch"), () => <Switch {...globalProps} id="airplane-mode" />
-                                    )
+                                    .with(("switch"), () =>
+                                        <Switch
+                                            id={name}
+                                            checked={field.value as boolean}
+                                            onCheckedChange={field.onChange}
+                                            disabled={globalProps.disabled}
+                                        />)
                                     .otherwise(() =>
                                         <Input
                                             type={info.type}

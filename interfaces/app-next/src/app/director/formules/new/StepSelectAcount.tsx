@@ -21,17 +21,17 @@ export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext }: { sel
                     return (
                         <Card
                             key={account.IBAN}
-                            onClick={() => onSelect(account.IBAN, account.currency)}
+                            onClick={() => onSelect(account.IBAN, account.balance.currency)}
                             className={`cursor-pointer transition-all ${selected
-                                    ? "border-blue-500 ring-2 ring-blue-500"
-                                    : "hover:shadow-md"
+                                ? "border-blue-500 ring-2 ring-blue-500"
+                                : "hover:shadow-md"
                                 }`}
                         >
                             <CardContent className="flex items-center justify-between p-4">
                                 <div>
                                     <p className="font-medium">{account.name}</p>
                                     <p className="text-sm text-gray-500">
-                                        Solde : {account.amount} {account.currency}
+                                        Solde : {account.balance.amount} {account.balance.currency}
                                     </p>
                                 </div>
 

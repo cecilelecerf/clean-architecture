@@ -24,10 +24,12 @@ export const newActionSchema = actionSchema
     symbol: true,
     market: true,
     activitySector: true,
-    price: true,
+    // price: true,
     isAvailable: true,
   })
   .extend({
+    priceAmount: moneySchema.shape.amount,
+    priceCurrency: moneySchema.shape.currency,
     quantity: orderSchema.shape.quantity,
   });
 export type NewAction = z.infer<typeof newActionSchema>;

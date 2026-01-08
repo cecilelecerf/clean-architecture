@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { accountSchema } from '@infrastructure/types/account';
+import { accountSchema, newAccountSchema } from '@infrastructure/types/account';
 import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
 
 export async function GET(req: NextRequest) {
@@ -41,15 +41,13 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const payload = accountSchema.parse(body);
+    const payload = newAccountSchema.parse(body);
     const result = await accountFactory().createAccount.execute({
-      iban: payload.IBAN,
       userId: session.user.id,
       name: payload.name,
       type: payload.type,
       color: payload.color,
-      initialBalance: payload.balance.amount,
-      currency: payload.balance.currency,
+      currency: payload.currency,
     });
     if (result instanceof Error) {
       return NextResponse.json(

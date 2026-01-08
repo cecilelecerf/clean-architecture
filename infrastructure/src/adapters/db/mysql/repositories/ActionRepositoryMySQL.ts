@@ -12,11 +12,11 @@ export class ActionRepositoryMySQL implements ActionRepository {
   constructor(private readonly client: MySQLClient) {}
 
   private mapRowToAction(row: RowDataPacket): ActionEntity {
-    const price = Money.create({
+    const price = Money.from({
       amount: row.price,
       currency: row.currency,
     }) as Money;
-
+    console.log(row);
     return ActionEntity.from({
       ISIN: ISIN.from(row.isin),
       name: row.name,
@@ -53,7 +53,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
   }
 
   async findByISIN(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM actions WHERE isin = ?`,
       [ISIN.getValue()]
     );
@@ -63,18 +63,18 @@ export class ActionRepositoryMySQL implements ActionRepository {
   }
 
   async findAll(): Promise<ActionEntity[]> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM actions ORDER BY name ASC`
     );
-    return rows.map(this.mapRowToAction.bind(this));
+    return rows.map(this.mapRowToAction);
   }
 
   async findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM actions WHERE is_available = ? ORDER BY name ASC`,
       [isAvailable ? 1 : 0]
     );
-    return rows.map(this.mapRowToAction.bind(this));
+    return rows.map(this.mapRowToAction);
   }
 
   async setAvailability(action: ActionEntity): Promise<void> {

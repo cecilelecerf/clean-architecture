@@ -53,8 +53,8 @@ export class ActionsController {
       const result = await actionFactory().admin.createAction.execute({
         userId,
         ...payload,
-        priceAmount: payload.price.amount,
-        priceCurrency: payload.price.currency,
+        priceAmount: payload.priceAmount,
+        priceCurrency: payload.priceCurrency,
         totalNb: payload.quantity,
       });
 

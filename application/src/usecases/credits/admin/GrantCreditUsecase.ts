@@ -39,7 +39,6 @@ export class GrantCreditUsecase {
     | CreditNotFoundError
     | CreditStatusMismatchError
   > {
-    console.log(reason);
     const advisor = await findActiveUser(this.userRepository, advisorId);
     if (advisor instanceof Error) return advisor;
     if (!advisor.hasRole({ role: "conseiller" }))
@@ -53,7 +52,6 @@ export class GrantCreditUsecase {
       ? credit.accept({ now })
       : credit.refuse({ now, reason });
     if (actionCredit instanceof Error) return actionCredit;
-    console.log(credit);
     await this.creditRepository.update(actionCredit);
     return actionCredit.toDTO();
   }

@@ -17,7 +17,7 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
         formule.id,
         formule.interestRate.value,
         formule.insuranceRate.value,
-        formule.type.value,
+        formule.type.getValue(),
         formule.label,
         formule.description,
         formule.isActive,
@@ -40,7 +40,7 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
       [
         formule.interestRate.value,
         formule.insuranceRate.value,
-        formule.type.value,
+        formule.type.getValue(),
         formule.label,
         formule.description,
         formule.isActive,
@@ -73,6 +73,7 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM formules"
     );
+    console.log(rows);
 
     return rows.map((row) => FormuleMapper.mapRowToFormule(row));
   }
@@ -82,13 +83,14 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM formules WHERE is_active = 1"
     );
+    console.log(rows);
 
     return rows.map((row) => FormuleMapper.mapRowToFormule(row));
   }
 
   /** Savoir s'il existe une formule avec le label */
   async existsByLabel(label: string): Promise<boolean> {
-    const [rows] = await this.client.query<RowDataPacket[]>(
+    const rows = await this.client.query<RowDataPacket[]>(
       "SELECT 1 FROM formules WHERE label = ? LIMIT 1",
       [label]
     );

@@ -243,7 +243,6 @@ export class UserEntity {
     address?: Partial<Address>;
     now: Date;
   }) {
-    console.log(sexe);
     if (firstname !== undefined) {
       const v = UserEntity.validateFirstname(firstname);
       if (v instanceof Error) return v;

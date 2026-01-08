@@ -47,9 +47,7 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
                 isAvailable:
                 {
                     label: "Disponibilité",
-                    type: "radio",
-                    options: [{ label: "Disponible à la vente", value: "true" },
-                    { label: "Indisponible", value: "false" },],
+                    type: "switch",
                 },
             },
         },];
@@ -57,35 +55,11 @@ export const ActionForm = ({ isin }: { isin?: ActionId }) => {
 
 };
 const CreateActionForm = ({ sections }: { sections: Section<NewAction>[] }) => {
-    const router = useRouter();
 
     const form = useForm<NewAction>({
         resolver: zodResolver(newActionSchema),
+        mode: "onChange",
     });
-
-    const createMutation = useMutation(endpoints.actions.create());
-
-    return (
-        <FormWrapper<NewAction>
-            title="Nouvelle action"
-            form={form}
-            data={sections}
-            labelButton="Créer une nouvelle action"
-            loading={createMutation.isPending}
-            onSubmit={(values) => createMutation.mutate({ payload: values })}
-        />
-    );
-};
-const EditActionForm = ({ isin, sections }: { isin: ActionId, sections: Section<UpdateAction>[] }) => {
-    const router = useRouter();
-
-    const form = useForm<z.infer<typeof updateActionSchema>>({
-        resolver: zodResolver(updateActionSchema),
-    });
-
-    const updateMutation = useMutation(
-        endpoints.actions.update({ actionIsin: isin })
-    );
     const currenciesQuery = useQuery(endpoints.currencies.getAll());
 
     const updateSection = [{
@@ -103,6 +77,31 @@ const EditActionForm = ({ isin, sections }: { isin: ActionId, sections: Section<
             },
         },
     }]
+    console.log(form)
+    console.log("Form values:", form.watch());
+    console.log("Form errors:", form.formState.errors);
+    console.log("Form is valid:", form.formState.isValid);
+    const createMutation = useMutation(endpoints.actions.create());
+    return (
+        <FormWrapper<NewAction>
+            title="Nouvelle action"
+            form={form}
+            data={[...updateSection, ...sections,] as Section<UpdateAction>[]}
+            labelButton="Créer une nouvelle action"
+            loading={createMutation.isPending}
+            onSubmit={(values) => createMutation.mutate({ payload: values })}
+        />
+    );
+};
+const EditActionForm = ({ isin, sections }: { isin: ActionId, sections: Section<UpdateAction>[] }) => {
+
+    const form = useForm<z.infer<typeof updateActionSchema>>({
+        resolver: zodResolver(updateActionSchema),
+    });
+
+    const updateMutation = useMutation(
+        endpoints.actions.update({ actionIsin: isin })
+    );
 
     return (
         <FormWrapper<UpdateAction>
@@ -110,7 +109,7 @@ const EditActionForm = ({ isin, sections }: { isin: ActionId, sections: Section<
             form={form}
             labelButton="Modifier"
             loading={updateMutation.isPending}
-            data={[...sections, ...updateSection] as Section<UpdateAction>[]}
+            data={sections}
             onSubmit={(values) => updateMutation.mutate({ payload: values })}
         />
     );
