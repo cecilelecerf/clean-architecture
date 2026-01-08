@@ -7,7 +7,6 @@ import {
   accountWithUserSchemaDTO,
   NewAccount,
 } from '@infrastructure/types/account';
-import { threadSchema } from '@infrastructure/types/thread';
 import z from 'zod';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { queryClient } from '@/lib/queryClient';
@@ -72,14 +71,10 @@ export const accountsEndpoint = createEndpointsNodes({
       },
     }),
 
-  // DELETE /api/accounts/:accountIban
-  // Supprtion d'un participant
-  remove: ({ accountIban }: { accountIban: AccountId }) =>
+  delete: ({ accountIban }: { accountIban: AccountId }) =>
     mutationOptions({
-      mutationFn: () =>
-        deleteEntity(`/accounts/${accountIban}`).then((data) =>
-          safeParseWithLog(threadSchema, data),
-        ),
+      mutationFn: ({ transferToAccountId }: { transferToAccountId: AccountId }) =>
+        deleteEntity(`/accounts/${accountIban}`, { transferToAccountId }),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['accounts', accountIban] });
         queryClient.invalidateQueries({ queryKey: ['accounts', 'list'] });

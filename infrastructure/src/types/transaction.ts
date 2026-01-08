@@ -59,8 +59,7 @@ export type TransactionWithAccountDTO = z.infer<
 export const newTransactionSchema = transactionSchema
   .pick({
     label: true,
-    amount: true,
     icon: true,
   })
-  .extend({ toAccountIban: z.string() });
+  .extend({ toAccountIban: z.string(), amount: moneySchema.shape.amount });
 export type NewTransaction = z.infer<typeof newTransactionSchema>;

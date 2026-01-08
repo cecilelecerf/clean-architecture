@@ -5,9 +5,6 @@
     "rootDir": "./src",
     "composite": true
   },
-  "include": [
-    "src/**/*",
-    "../domain/src/errors/transaction/SameAccountError.ts"
-  ],
+  "include": ["src/**/*"],
   "references": [{ "path": "../domain" }]
 }

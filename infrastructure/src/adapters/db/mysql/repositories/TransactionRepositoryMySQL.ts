@@ -60,6 +60,7 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
   }
 
   async save(transaction: TransactionEntity): Promise<void> {
+    console.log(transaction);
     await this.client.query<ResultSetHeader>(
       `
       INSERT INTO transactions (

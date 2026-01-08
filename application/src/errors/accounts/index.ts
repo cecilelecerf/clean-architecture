@@ -3,3 +3,4 @@ export * from "./MissingIBANError";
 export * from "./MissingOrInvalidNameError";
 export * from "./UnauthorizedAccessAccountError";
 export * from "./InvalidAccountTypSectioneError";
+export * from "./AccountHasActiveCreditError";
