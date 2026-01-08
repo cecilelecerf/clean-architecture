@@ -133,13 +133,14 @@ export class PlaceOrderUseCase {
       price: moneyPrice,
       createdAt: this.clockService.now(),
     });
-
     if (order instanceof Error) return order;
-
-    if (type === "buy" && action.defaultQuantity > 0) {
+    await this.orderRepository.save(order);
+    if (
+      type === "buy" &&
+      action.defaultQuantity > 0 &&
+      moneyPrice.isGreaterThan(action.price)
+    ) {
       const primaryQty = Math.min(quantity, action.defaultQuantity);
-
-      // Exécuter l'achat primaire
       const primaryResult = await this.executePrimaryMarketTrade(
         order,
         primaryQty,
@@ -147,7 +148,6 @@ export class PlaceOrderUseCase {
       );
 
       if (primaryResult instanceof Error) return primaryResult;
-
       const remainingQty = quantity - primaryQty;
       if (remainingQty > 0) {
         const secondaryOrder = OrderEntity.create({
@@ -169,8 +169,6 @@ export class PlaceOrderUseCase {
 
       return primaryResult.executedOrder.toDTO();
     }
-
-    await this.orderRepository.save(order);
     const matchResult = await this.matchRecursively(order, action);
 
     return matchResult?.executedOrder?.toDTO() ?? order.toDTO();
@@ -231,17 +229,15 @@ export class PlaceOrderUseCase {
 
     const fee = OrderEntity.defaultFee();
     const totalAmount = baseAmount.add(fee);
-
     const buyerAccount = await this.accountRepository.findByIBAN(buyOrder.IBAN);
     const bankAccount = await this.accountRepository.findBankInterestAccount();
-
     if (!buyerAccount || !bankAccount) {
       return new AccountNotFoundError();
     }
 
     const buyAmount = await this.moneyService.convert(
       totalAmount,
-      buyerAccount.currency
+      buyerAccount.balance.currency
     );
     if (buyAmount instanceof Error) return buyAmount;
 
@@ -251,7 +247,6 @@ export class PlaceOrderUseCase {
     }
 
     bankAccount.credit(buyAmount);
-
     const tx = TransactionEntity.create({
       id: this.uuidService.generate(),
       fromAccountId: buyerAccount.iban,
@@ -261,7 +256,6 @@ export class PlaceOrderUseCase {
       date: now,
       icon: "🏦",
     });
-
     if (tx instanceof Error) return tx;
 
     await this.transactionRepository.save(tx);
@@ -332,12 +326,12 @@ export class PlaceOrderUseCase {
 
     const buyAmount = await this.moneyService.convert(
       buyTotalAmount,
-      buyAccount.currency
+      buyAccount.balance.currency
     );
 
     const sellAmount = await this.moneyService.convert(
       sellNetAmount,
-      sellAccount.currency
+      sellAccount.balance.currency
     );
 
     if (buyAmount instanceof Error) return buyAmount;

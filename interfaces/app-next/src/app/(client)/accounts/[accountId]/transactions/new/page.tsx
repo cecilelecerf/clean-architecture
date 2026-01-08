@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import FormWrapper, { DataInfo } from '@/components/erfer';
+import FormWrapper, { DataInfo } from '@/components/FormWrapper';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AccountId } from '@infrastructure/types/account';
 import { NewTransaction, newTransactionSchema } from '@infrastructure/types/transaction';
@@ -70,6 +70,7 @@ export default function NewTransactionPage() {
       onSubmit={handleSubmit}
       labelButton="Créer la transaction"
       loading={mutation.isPending || accountsQuery.isPending}
+      showBackButton
     />
 
   );

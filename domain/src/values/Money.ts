@@ -130,7 +130,7 @@ export class Money {
     return `${this.amount.toFixed(Money.SCALE)} ${this.currency}`;
   }
 
-  public toJSON() {
+  public toJSON(): MoneyToDTO {
     return {
       amount: this.amount,
       currency: this.currency,
@@ -161,3 +161,8 @@ export class Money {
     return `${symbol}${formattedAmount}`;
   }
 }
+
+export type MoneyToDTO = {
+  amount: number;
+  currency: string;
+};

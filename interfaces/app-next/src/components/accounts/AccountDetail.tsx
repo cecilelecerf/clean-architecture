@@ -48,7 +48,7 @@ export const AccountDetail = ({ accountIban, basePath, withUserInfo, withTransfe
                                 <div>
                                     <p className="text-xs opacity-75 mb-1">{account.type}</p>
                                     <p className="text-3xl font-bold">
-                                        {account.amount.toLocaleString('fr-FR', { style: 'currency', currency: account.currency })}
+                                        {account.balance.amount.toLocaleString('fr-FR', { style: 'currency', currency: account.balance.currency })}
                                     </p>
                                 </div>
                             </CardContent>

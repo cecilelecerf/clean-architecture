@@ -47,6 +47,7 @@ export class AccountRepositoryMongo implements AccountRepository {
       type: "epargne",
       userId: null,
     }).lean();
+    const account = AccountMapper.mapDocToAccount(doc);
     return doc ? AccountMapper.mapDocToAccount(doc) : null;
   }
 
@@ -105,7 +106,6 @@ export class AccountRepositoryMongo implements AccountRepository {
         amount: account.balance.amount,
         currency: account.balance.currency,
       },
-      currency: account.currency,
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,
     });
@@ -124,7 +124,6 @@ export class AccountRepositoryMongo implements AccountRepository {
           amount: account.balance.amount,
           currency: account.balance.currency,
         },
-        currency: account.currency,
         updatedAt: account.updatedAt,
       },
     });

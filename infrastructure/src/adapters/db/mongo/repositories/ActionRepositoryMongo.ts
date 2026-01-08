@@ -15,7 +15,7 @@ export class ActionRepositoryMongo implements ActionRepository {
     });
 
     return ActionEntity.from({
-      ISIN: ISIN.from(doc.ISIN),
+      ISIN: ISIN.from(doc._id),
       name: doc.name,
       symbol: doc.symbol,
       market: doc.market,

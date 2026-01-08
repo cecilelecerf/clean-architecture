@@ -41,10 +41,8 @@ export class GetAccountByIBANUseCase {
 
     const ibanVO = IBAN.create(iban);
     if (ibanVO instanceof Error) return ibanVO;
-
     const account = await this.accountRepository.findByIBAN(ibanVO);
     if (!account) return new AccountNotFoundError();
-
     return account.toDTO();
   }
 }

@@ -48,7 +48,7 @@ export const ActionBuy = ({
     const selectedAccount: AccountDTO | undefined = query.data?.find((acc) => acc.IBAN === buyAmount.IBAN);
     const unitPrice = action.price.amount;
     const effectivePrice = unitPrice;
-    const totalPrice = effectivePrice * buyAmount.quantity;
+    const totalPrice = buyAmount.price.amount * buyAmount.quantity;
 
 
     const handleBuy = () => {
@@ -212,15 +212,15 @@ export const ActionBuy = ({
                                                     <div className="flex items-center justify-between w-full gap-4">
                                                         <span className="font-medium">{account.name}</span>
                                                         <span
-                                                            className={`text-sm ${account.amount >= totalPrice
+                                                            className={`text-sm ${account.balance.amount >= totalPrice
                                                                 ? "text-green-600"
                                                                 : "text-red-600"
                                                                 }`}
                                                         >
-                                                            {account.amount.toLocaleString("fr-FR", {
+                                                            {account.balance.amount.toLocaleString("fr-FR", {
                                                                 minimumFractionDigits: 2,
                                                             })}{" "}
-                                                            {account.currency}
+                                                            {account.balance.currency}
                                                         </span>
                                                     </div>
                                                 </SelectItem>
@@ -242,14 +242,14 @@ export const ActionBuy = ({
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">
-                                        {buyAmount.quantity} × {effectivePrice.toFixed(2)}{" "}
-                                        {action.price.currency}
+                                        {buyAmount.quantity} × {buyAmount.price.amount.toFixed(2)}{" "}
+                                        {buyAmount.price.currency}
                                     </span>
                                     <span className="font-medium">
                                         {totalPrice.toLocaleString("fr-FR", {
                                             minimumFractionDigits: 2,
                                         })}{" "}
-                                        {action.price.currency}
+                                        {buyAmount.price.currency}
                                     </span>
                                 </div>
 
@@ -261,19 +261,19 @@ export const ActionBuy = ({
                                         {totalPrice.toLocaleString("fr-FR", {
                                             minimumFractionDigits: 2,
                                         })}{" "}
-                                        {action.price.currency}
+                                        {buyAmount.price.currency}
                                     </span>
                                 </div>
                             </div>
 
-                            {selectedAccount && totalPrice - selectedAccount.amount > 0 && (
+                            {selectedAccount && totalPrice - selectedAccount.balance.amount > 0 && (
                                 <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg mt-3">
                                     <AlertCircle className="w-4 h-4 text-red-600 mt-0.5" />
                                     <div className="text-xs text-red-600">
                                         <p className="font-semibold">Solde insuffisant</p>
                                         <p className="mt-1">
                                             Il vous manque{" "}
-                                            {(totalPrice - selectedAccount.amount).toLocaleString("fr-FR", {
+                                            {(totalPrice - selectedAccount.balance.amount).toLocaleString("fr-FR", {
                                                 minimumFractionDigits: 2,
                                             })}{" "}
                                             {action.price.currency}

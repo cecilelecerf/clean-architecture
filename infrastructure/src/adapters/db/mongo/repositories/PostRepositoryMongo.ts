@@ -8,10 +8,7 @@ import { PostEntity } from "@domain/entities/PostEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { TagEntity } from "@domain/entities/TagEntity";
 import { PostModel } from "../models/PostModel";
-import { UserModel } from "../models/UserModel";
-import { TagModel } from "../models/TagModel";
 import { Color } from "@domain/values/Color";
-import { ColorInvalidFormatError } from "@domain/errors/color";
 import { UserMapper } from "../../mappers/UserMapper";
 
 export class PostRepositoryMongo implements PostRepository {
@@ -20,21 +17,25 @@ export class PostRepositoryMongo implements PostRepository {
   private mapDocToPost(doc: any): PostEntity {
     return PostEntity.from({
       id: doc._id.toString(),
-      advisorId: doc.advisorId?.toString() || doc.advisorId,
+      advisorId: doc.advisorId._id
+        ? doc.advisorId._id.toString()
+        : doc.advisorId?.toString(),
       title: doc.title,
       content: doc.content,
-      tagsId: doc.tagsId?.map((t: any) => t.toString()) || [],
+      tagsId:
+        doc.tagsId?.map((t: any) =>
+          t._id ? t._id.toString() : t.toString()
+        ) || [],
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt ?? null,
       publishedAt: doc.publishedAt ?? null,
       readBy: doc.readBy?.map((r: any) => r.toString()) || [],
-      clientId: doc.clientId ?? null,
+      clientId: doc.clientId ? doc.clientId.toString() : undefined,
     });
   }
 
   private mapDocToTag(doc: any): TagEntity | undefined {
     const color = Color.from(doc.color);
-    if (color instanceof ColorInvalidFormatError) return;
     return TagEntity.from({
       id: doc._id.toString(),
       label: doc.label,
@@ -195,7 +196,6 @@ export class PostRepositoryMongo implements PostRepository {
       .skip(skip)
       .limit(limit)
       .lean();
-
     const total = await PostModel.countDocuments(match);
 
     const posts: PostWithTagsAndUser[] = docs
@@ -226,7 +226,6 @@ export class PostRepositoryMongo implements PostRepository {
       .populate({ path: "tagsId" })
       .sort({ publishedAt: -1 })
       .lean();
-
     const posts: PostWithTagsAndUser[] = docs
       .map((doc) => {
         if (!doc.advisorId) return null;

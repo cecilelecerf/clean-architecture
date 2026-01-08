@@ -1,219 +1,244 @@
 import { Response, NextFunction } from "express";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { creditFactory } from "@infrastructure/adapters/db/mongo/factories/credit";
-import { creditSchema, creditResponseSchema } from '@infrastructure/types/credit';
+import {
+  creditSchema,
+  creditResponseSchema,
+} from "@infrastructure/types/credit";
 
 export class CreditsController {
-    static async getAllByUser(req: AuthRequest, res: Response, next: NextFunction){
-        try {
-            const userId = req.user?.userId;
-            if (!userId) return res.status(401).json({ message: "Unauthorized" });
+  static async getAllByUser(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
+      const result = await creditFactory().getCreditsByUser.execute({
+        clientId: userId,
+      });
 
-            const result = await creditFactory().getCreditsByUser.execute({clientId: userId});
+      if (result instanceof Error) {
+        return res.status(result.statusCode ?? 400).json({
+          name: result.name,
+          message: result.message,
+        });
+      }
 
-            if (result instanceof Error) {
-                return res.status(result.statusCode ?? 400).json({
-                    name: result.name,
-                    message: result.message,
-                });
-            }
-
-            res.json(result);
-        } catch (error) {
-            next(error);
-        }
+      res.json(result);
+    } catch (error) {
+      next(error);
     }
+  }
 
-    static async request(req: AuthRequest, res: Response, next: NextFunction){
-        try {
-            const userId = req.user?.userId;
-            if (!userId) return res.status(401).json({ message: "Unauthorized" });
+  static async request(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-            const payload = creditSchema
-                .pick({
-                    accountId: true,
-                    formuleCreditId: true,
-                    initialAmount: true,
-                    durationMonths: true,
-                    startDate: true
-                })
-                .parse(req.body);
-            
-            const result = await creditFactory().requestCredit.execute({
-                clientId: userId,
-                accountId: payload.accountId,
-                formuleCreditId: payload.formuleCreditId,
-                amount: payload.initialAmount.amount,
-                currency: payload.initialAmount.currency,
-                durationMonths: payload.durationMonths,
-                startDate: payload.startDate,
-            });
+      const payload = creditSchema
+        .pick({
+          accountId: true,
+          formuleCreditId: true,
+          initialAmount: true,
+          durationMonths: true,
+          startDate: true,
+        })
+        .parse(req.body);
 
-            if (result instanceof Error) {
-                return res.status(result.statusCode ?? 400).json({
-                    name: result.name,
-                    message: result.message,
-                });
-            }
+      const result = await creditFactory().requestCredit.execute({
+        clientId: userId,
+        accountId: payload.accountId,
+        formuleCreditId: payload.formuleCreditId,
+        amount: payload.initialAmount.amount,
+        currency: payload.initialAmount.currency,
+        durationMonths: payload.durationMonths,
+        startDate: payload.startDate,
+      });
 
-            return res.status(201).json(result);
-        } catch (error) {
-            next(error);
-        }
+      if (result instanceof Error) {
+        return res.status(result.statusCode ?? 400).json({
+          name: result.name,
+          message: result.message,
+        });
+      }
+
+      return res.status(201).json(result);
+    } catch (error) {
+      next(error);
     }
+  }
 
-    static async getOneByUser(req: AuthRequest, res: Response, next: NextFunction){
-        try {
-            const session = req.user?.userId;
-            if (!session) return res.status(401).json({ message: "Unauthorized" });
+  static async getOneByUser(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const session = req.user?.userId;
+      if (!session) return res.status(401).json({ message: "Unauthorized" });
 
-            const { userId } = req.params;
+      const { userId } = req.params;
 
-            const result = await creditFactory().getCreditsByUser.execute({
-                clientId: userId,
-                adminId: session,
-            });
+      const result = await creditFactory().getCreditsByUser.execute({
+        clientId: userId,
+        adminId: session,
+      });
 
-            if (result instanceof Error) {
-                return res.status(result.statusCode ?? 400).json({
-                    name: result.name,
-                    message: result.message,
-                });
-            }
+      if (result instanceof Error) {
+        return res.status(result.statusCode ?? 400).json({
+          name: result.name,
+          message: result.message,
+        });
+      }
 
-            res.json(result);
-        } catch (error) {
-            next(error);
-        }
+      res.json(result);
+    } catch (error) {
+      next(error);
     }
+  }
 
-    static async getAllByStatus(req: AuthRequest, res: Response, next: NextFunction){
-        try {
-            const userId = req.user?.userId;
-            if (!userId) return res.status(401).json({ message: "Unauthorized" });
+  static async getAllByStatus(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
+      const status = req.query.label as string | undefined;
 
-            const { searchParams } = new URL(req.url);
-            const status = searchParams.get('label');
+      const result = await creditFactory().getAllByStatus.execute({
+        actorId: userId,
+        status: status ?? null,
+      });
 
-            const result = await creditFactory().getAllByStatus.execute({
-                actorId: userId,
-                status
-            });
+      if (result instanceof Error) {
+        return res.status(result.statusCode ?? 400).json({
+          name: result.name,
+          message: result.message,
+        });
+      }
 
-            if (result instanceof Error) {
-                return res.status(result.statusCode ?? 400).json({
-                    name: result.name,
-                    message: result.message,
-                });
-            }
-
-            res.json(result);
-        } catch (error) {
-            next(error);
-        }
+      res.json(result);
+    } catch (error) {
+      next(error);
     }
+  }
 
-    static async getAllByFormule(req: AuthRequest, res: Response, next: NextFunction){
-        try {
-            const userId = req.user?.userId;
-            if (!userId) return res.status(401).json({ message: "Unauthorized" });
+  static async getAllByFormule(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-            const { formuleId } = req.params;
+      const { formuleId } = req.params;
 
-            const result = await creditFactory().getAllByFormule.execute({
-                actorId: userId,
-                formuleId,
-            });
+      const result = await creditFactory().getAllByFormule.execute({
+        actorId: userId,
+        formuleId,
+      });
 
-            if (result instanceof Error) {
-                return res.status(result.statusCode ?? 400).json({
-                    name: result.name,
-                    message: result.message,
-                });
-            }
+      if (result instanceof Error) {
+        return res.status(result.statusCode ?? 400).json({
+          name: result.name,
+          message: result.message,
+        });
+      }
 
-            res.json(result);
-
-        } catch (error) {
-            next(error);
-        }
+      res.json(result);
+    } catch (error) {
+      next(error);
     }
+  }
 
-    static async getCredit(req: AuthRequest, res: Response, next: NextFunction){
-        try{
-            const userId = req.user?.userId;
-            if (!userId) return res.status(401).json({ message: "Unauthorized" });
+  static async getCredit(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-            const { creditId } = req.params;
+      const { creditId } = req.params;
 
-            const result = await creditFactory().getCredit.execute({
-                creditId: creditId,
-                actorId: userId,
-            });
+      const result = await creditFactory().getCredit.execute({
+        creditId: creditId,
+        actorId: userId,
+      });
 
-            if (result instanceof Error) {
-                return res.status(result.statusCode ?? 400).json({
-                    name: result.name,
-                    message: result.message,
-                });
-            }
+      if (result instanceof Error) {
+        return res.status(result.statusCode ?? 400).json({
+          name: result.name,
+          message: result.message,
+        });
+      }
 
-            res.json(result);
-        } catch (error) {
-            next(error);
-        }
+      res.json(result);
+    } catch (error) {
+      next(error);
     }
+  }
 
-    static async applyMonthlyPaiement(req: AuthRequest, res: Response, next: NextFunction){
-        try {
-            const userId = req.user?.userId;
-            if (!userId) return res.status(401).json({ message: "Unauthorized" });
+  static async applyMonthlyPaiement(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-            const { creditId } = req.params;
+      const { creditId } = req.params;
 
-            const result = await creditFactory().applyMonthlyPaiementCredit.execute({
-                clientId: userId,
-                id: creditId,
-            });
+      const result = await creditFactory().applyMonthlyPaiementCredit.execute({
+        clientId: userId,
+        id: creditId,
+      });
 
-            if (result instanceof Error) {
-                return res.status(result.statusCode ?? 400).json({
-                    name: result.name,
-                    message: result.message,
-                });
-            }
-    
-            return res.status(201).json(result);
-        } catch (error) {
-            next(error);
-        }
+      if (result instanceof Error) {
+        return res.status(result.statusCode ?? 400).json({
+          name: result.name,
+          message: result.message,
+        });
+      }
+
+      return res.status(201).json(result);
+    } catch (error) {
+      next(error);
     }
+  }
 
-    static async grantCredit(req: AuthRequest, res: Response, next: NextFunction){
-        try{
-            const userId = req.user?.userId;
-            if (!userId) return res.status(401).json({ message: "Unauthorized" });
+  static async grantCredit(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-            const { creditId } = req.params;
-            const payload = creditResponseSchema.parse(req.body);
+      const { creditId } = req.params;
+      const payload = creditResponseSchema.parse(req.body);
 
-            const result = await creditFactory().grantCredit.execute({
-                advisorId: userId,
-                creditId: creditId,
-                accept: payload.accept,
-                reason: payload.reason ?? "",
-            });
+      const result = await creditFactory().grantCredit.execute({
+        advisorId: userId,
+        creditId: creditId,
+        accept: payload.accept,
+        reason: payload.reason ?? "",
+      });
 
-            if (result instanceof Error) {
-                return res.status(result.statusCode ?? 400).json({
-                    name: result.name,
-                    message: result.message,
-                });
-            }
-    
-            return res.status(201).json(result);
-        } catch (error) {
-            next(error);
-        }
+      if (result instanceof Error) {
+        return res.status(result.statusCode ?? 400).json({
+          name: result.name,
+          message: result.message,
+        });
+      }
+
+      return res.status(201).json(result);
+    } catch (error) {
+      next(error);
     }
+  }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { registerAdminPayload, RegisterAdminPayload } from "@/app/api/users/new/route";
-import FormWrapper, { Section } from "@/components/erfer";
+import FormWrapper, { Section } from "@/components/FormWrapper";
 import { endpoints } from "@/utils/endpoint";
 import { User } from "@infrastructure/types/user";
 import { useMutation } from "@tanstack/react-query";

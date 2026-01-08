@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { match } from 'ts-pattern';
 import Link from 'next/link';
-import FormWrapper, { DataInfo } from '@/components/erfer';
+import FormWrapper, { DataInfo } from '@/components/FormWrapper';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { createClientSchema } from '@infrastructure/types/user';

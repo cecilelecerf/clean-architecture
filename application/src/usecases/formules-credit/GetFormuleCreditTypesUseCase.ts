@@ -26,7 +26,6 @@ export class GetFormuleCreditTypesUseCase {
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
-    console.log(FormuleType.getValidTypesWithLabels());
     return FormuleType.getValidTypesWithLabels();
   }
 }

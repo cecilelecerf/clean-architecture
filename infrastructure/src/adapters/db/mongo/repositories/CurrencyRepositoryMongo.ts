@@ -21,15 +21,12 @@ export class CurrencyRepositoryMongo implements CurrencyRepository {
   async update(currency: CurrencyEntity): Promise<void> {
     await this.client.connect();
 
-    await CurrencyModel.updateOne(
-      { code: currency.code },
-      {
-        $set: {
-          exchangeRate: currency.exchangeRate,
-          updatedAt: currency.updatedAt || new Date(),
-        },
-      }
-    );
+    await CurrencyModel.findByIdAndUpdate(currency.code, {
+      $set: {
+        exchangeRate: currency.exchangeRate,
+        updatedAt: currency.updatedAt,
+      },
+    });
   }
 
   async delete(code: string): Promise<void> {
@@ -41,9 +38,7 @@ export class CurrencyRepositoryMongo implements CurrencyRepository {
   async findByCode(code: string): Promise<CurrencyEntity | null> {
     await this.client.connect();
 
-    const doc = await CurrencyModel.findOne({
-      code: code.toUpperCase(),
-    }).lean();
+    const doc = await CurrencyModel.findById(code.toUpperCase()).lean();
 
     if (!doc) return null;
 
@@ -60,7 +55,7 @@ export class CurrencyRepositoryMongo implements CurrencyRepository {
 
   private mapDocToEntity(doc: any): CurrencyEntity {
     return CurrencyEntity.from({
-      code: doc.code,
+      code: doc._id.toString(),
       exchangeRate: doc.exchangeRate,
       createdAt: new Date(doc.createdAt),
       updatedAt: new Date(doc.updatedAt),

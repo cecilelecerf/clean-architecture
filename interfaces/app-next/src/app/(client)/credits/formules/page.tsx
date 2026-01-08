@@ -95,7 +95,7 @@ export default function ClientFormulesPage() {
                                                     <Card
                                                         key={formule.id}
                                                         className="hover:shadow-md transition-shadow cursor-pointer"
-                                                        onClick={() => router.push(`/formules/${formule.id}`)}
+                                                        onClick={() => router.push(`/credits/formules/${formule.id}`)}
                                                     >
                                                         <CardContent className="p-4 space-y-3">
                                                             {/* En-tête */}
@@ -143,7 +143,7 @@ export default function ClientFormulesPage() {
                                                                 size="sm"
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
-                                                                    router.push(`/formules/${formule.id}`);
+                                                                    router.push(`/credits/formules/${formule.id}`);
                                                                 }}
                                                             >
                                                                 Voir détails

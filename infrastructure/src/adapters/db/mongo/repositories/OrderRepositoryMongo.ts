@@ -12,6 +12,7 @@ import { IBAN } from "@domain/values/IBAN";
 import { ISIN } from "@domain/values/ISIN";
 import { AccountModel } from "../models/AccountModel";
 import { AccountMapper } from "../../mappers/AccountMapper";
+import { cp } from "fs";
 
 export class OrderRepositoryMongo implements OrderRepository {
   constructor(private readonly client: MongoClient) {}
@@ -71,9 +72,14 @@ export class OrderRepositoryMongo implements OrderRepository {
 
   async findAllByUserId(userId: UserEntity["id"]): Promise<OrderEntity[]> {
     await this.client.connect();
-    const docs = await OrderModel.find({ "IBAN.userId": userId })
+
+    const accounts = await AccountModel.find({ userId }).select("_id").lean();
+    const userIBANs = accounts.map((acc) => acc._id);
+
+    const docs = await OrderModel.find({ IBAN: { $in: userIBANs } })
       .sort({ createdAt: -1 })
       .lean();
+
     return docs.map(this.mapDocToOrder);
   }
 
@@ -125,12 +131,16 @@ export class OrderRepositoryMongo implements OrderRepository {
     status: OrderEntity["status"]
   ): Promise<OrderEntity[]> {
     await this.client.connect();
+
+    const accounts = await AccountModel.find({ userId }).select("_id").lean();
+    const userIBANs = accounts.map((acc) => acc._id);
     const docs = await OrderModel.find({
-      "IBAN.userId": userId,
+      IBAN: { $in: userIBANs },
       status,
     })
       .sort({ createdAt: 1 })
       .lean();
+
     return docs.map(this.mapDocToOrder);
   }
 
@@ -167,8 +177,16 @@ export class OrderRepositoryMongo implements OrderRepository {
     status?: OrderEntity["status"]
   ): Promise<OrderEntity[]> {
     await this.client.connect();
-    const filter: any = { ISIN: actionId.getValue(), "IBAN.userId": userId };
+
+    const accounts = await AccountModel.find({ userId }).select("_id").lean();
+    const userIBANs = accounts.map((acc) => acc._id);
+
+    const filter: any = {
+      ISIN: actionId.getValue(),
+      IBAN: { $in: userIBANs },
+    };
     if (status) filter.status = status;
+
     const docs = await OrderModel.find(filter).sort({ createdAt: 1 }).lean();
     return docs.map(this.mapDocToOrder);
   }
@@ -209,13 +227,9 @@ export class OrderRepositoryMongo implements OrderRepository {
 
     const orderDoc = await OrderModel.findById(id).lean();
     if (!orderDoc) return null;
-
-    const accountDoc = await AccountModel.findOne({
-      iban: orderDoc.IBAN,
-    }).lean();
-    const account = AccountMapper.mapRowToAccount(accountDoc);
+    const accountDoc = await AccountModel.findById(orderDoc.IBAN).lean();
+    const account = AccountMapper.mapDocToAccount(accountDoc);
     const order = this.mapDocToOrder(orderDoc);
-
     return Object.assign(order, { account });
   }
 }

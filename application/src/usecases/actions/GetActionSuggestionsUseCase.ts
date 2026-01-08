@@ -23,7 +23,6 @@ export class GetActionSuggestionsUseCase {
 
   async execute({ limit = 5 }: Props): Promise<ActionSuggestion[] | Error> {
     const allActions = await this.actionRepository.findAllAvailable(true);
-
     if (allActions.length === 0) {
       return [];
     }

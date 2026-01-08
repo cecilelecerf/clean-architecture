@@ -20,7 +20,7 @@ export interface CreditInterface {
   };
   status: "PENDING" | "ACCEPTED" | "REFUSED" | "COMPLETED";
   createdAt: Date;
-  advisor?: Types.UUID | null;
+  advisorId?: Types.UUID | null;
   updatedAt: Date;
   reason?: string;
 }
