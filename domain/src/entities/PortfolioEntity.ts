@@ -28,16 +28,22 @@ export class PortfolioPositionEntity {
   >) {
     let totalQuantity = 0;
     let totalInvested = 0;
+    console.log("-------------------------------");
+    console.log(orders);
     for (const order of orders) {
       if (order.status !== "executed") continue;
       if (order.type === "buy") {
         totalQuantity += order.quantity;
         totalInvested = totalInvested + order.price.amount * order.quantity;
       } else if (order.type === "sell") {
+        console.log(totalInvested);
         totalQuantity -= order.quantity;
         const avgPrice = totalInvested / (totalQuantity + order.quantity);
         totalInvested -= avgPrice * order.quantity;
       }
+
+      console.log(order.id);
+      console.log(totalInvested);
     }
     if (totalQuantity <= 0) {
       return new PortfolioPositionEntity(
@@ -54,7 +60,7 @@ export class PortfolioPositionEntity {
         0
       );
     }
-
+    console.log(totalInvested, totalQuantity);
     const averagePrice = totalInvested / totalQuantity;
     const currentPrice = amount;
     const currentValue = totalQuantity * currentPrice;

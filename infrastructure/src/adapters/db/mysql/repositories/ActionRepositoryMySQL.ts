@@ -16,7 +16,6 @@ export class ActionRepositoryMySQL implements ActionRepository {
       amount: row.price,
       currency: row.currency,
     }) as Money;
-    console.log(row);
     return ActionEntity.from({
       ISIN: ISIN.from(row.isin),
       name: row.name,

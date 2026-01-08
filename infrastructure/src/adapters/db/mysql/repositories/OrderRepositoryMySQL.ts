@@ -173,7 +173,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
        LEFT JOIN accounts a ON o.account_iban = a.iban
        LEFT JOIN users u ON a.user_id = u.id 
        WHERE o.status = ? AND u.id = ?
-       ORDER BY o.created_at ASC`,
+       ORDER BY o.type ASC`,
       [status, userId]
     );
     return rows.map((row) => this.mapRowToOrder(row));
@@ -232,7 +232,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
     const query = `SELECT o.* FROM orders o
                 LEFT JOIN accounts a ON o.account_iban = a.iban
                  WHERE ${conditions.join(" AND ")} 
-                 ORDER BY o.created_at ASC`;
+                 ORDER BY o.type ASC`;
 
     const rows = await this.client.query<RowDataPacket[]>(query, params);
 

@@ -138,7 +138,7 @@ export class OrderRepositoryMongo implements OrderRepository {
       IBAN: { $in: userIBANs },
       status,
     })
-      .sort({ createdAt: 1 })
+      .sort({ type: 1 })
       .lean();
 
     return docs.map(this.mapDocToOrder);
@@ -187,7 +187,7 @@ export class OrderRepositoryMongo implements OrderRepository {
     };
     if (status) filter.status = status;
 
-    const docs = await OrderModel.find(filter).sort({ createdAt: 1 }).lean();
+    const docs = await OrderModel.find(filter).sort({ type: 1 }).lean();
     return docs.map(this.mapDocToOrder);
   }
 
