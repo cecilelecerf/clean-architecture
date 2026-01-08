@@ -1,4 +1,4 @@
-import { UserEntity } from "@domain/entities/UserEntity";
+import { UserEntity } from "../../entities/UserEntity";
 
 export class ThreadParticipantAlreadyExistError extends Error {
   public readonly statusCode = 409;

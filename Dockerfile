@@ -1,8 +1,6 @@
-# Multi-stage Dockerfile pour monorepo pnpm
-
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.24.0 --activate
 WORKDIR /app
 
 # Copier les fichiers de configuration pnpm et workspace
@@ -13,20 +11,25 @@ COPY pnpm-lock.yaml ./
 COPY domain/package.json ./domain/package.json
 COPY application/package.json ./application/package.json
 COPY infrastructure/package.json ./infrastructure/package.json
-COPY interfaces/app-next/package.json ./interfaces/app-next/package.json
-COPY interfaces/express/package.json ./interfaces/express/package.json
-COPY interfaces/sockets/package.json ./interfaces/sockets/package.json
+COPY interfaces/app-next/package.json ./interfaces/app-next/package.json 
+# COPY interfaces/sockets/package.json ./interfaces/sockets/package.json
 
 # Installer toutes les dépendances
 RUN pnpm install --frozen-lockfile
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.24.0 --activate
 WORKDIR /app
 
-# Copier les node_modules depuis deps
+# Copier les node_modules depuis deps 
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/domain/node_modules ./domain/node_modules
+COPY --from=deps /app/application/node_modules ./application/node_modules
+COPY --from=deps /app/infrastructure/node_modules ./infrastructure/node_modules
+COPY --from=deps /app/interfaces/app-next/node_modules ./interfaces/app-next/node_modules
+# COPY --from=deps /app/interfaces/sockets/node_modules ./interfaces/sockets/node_modules
+
 COPY --from=deps /app/pnpm-lock.yaml ./
 
 # Copier tout le code source
@@ -37,7 +40,7 @@ RUN pnpm build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.24.0 --activate
 WORKDIR /app
 
 ENV NODE_ENV=production

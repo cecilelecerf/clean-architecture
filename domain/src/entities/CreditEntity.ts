@@ -1,4 +1,4 @@
-import { Money } from "@domain/values/Money";
+import { Money } from "../values/Money";
 import { UserEntity } from "./UserEntity";
 import { Percentage } from "@domain/values/Percentage";
 import {

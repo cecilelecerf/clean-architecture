@@ -1,5 +1,5 @@
-import { ThreadEntity } from "@domain/entities/ThreadEntity";
-import { UserEntity } from "@domain/entities/UserEntity";
+import { ThreadEntity } from "../../entities/ThreadEntity";
+import { UserEntity } from "../../entities/UserEntity";
 
 export class InvalidThreadAccessError extends Error {
   public readonly statusCode = 403;

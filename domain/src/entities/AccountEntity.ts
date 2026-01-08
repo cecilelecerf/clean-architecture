@@ -1,4 +1,4 @@
-import { IBAN } from "@domain/values/IBAN";
+import { IBAN } from "../values/IBAN";
 import { UserEntity } from "./UserEntity";
 import { Money, MoneyToDTO } from "@domain/values/Money";
 import { Color } from "@domain/values/Color";

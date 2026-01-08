@@ -1,4 +1,4 @@
-import { Money } from "@domain/values/Money";
+import { Money } from "../values/Money";
 import { ActionEntity } from "./ActionEntity";
 import {
   FactorNegativeError,
