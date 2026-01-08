@@ -23,7 +23,7 @@ import { IBAN } from "@domain/values/IBAN";
 import {
   InvalidTransactionAmountError,
   InvalidTransactionLabelError,
-  SameAccountError,
+  InvalidTransaction,
 } from "@domain/errors/transaction";
 import { MoneyConverter } from "@domain/services/MoneyConverter";
 import { TransactionEntity } from "@domain/entities/TransactionEntity";
@@ -70,7 +70,7 @@ export class DeleteAccountUseCase {
     | MoneyCurrencyMissingError
     | MoneyAmountInvalidError
     | MoneyAmountNegativeError
-    | SameAccountError
+    | InvalidTransaction
     | InvalidTransactionLabelError
     | InsufficientFundsError
     | InvalidTransactionAmountError
@@ -99,7 +99,6 @@ export class DeleteAccountUseCase {
       accountToDelete.iban
     );
     if (credits.length) return new AccountHasActiveCreditError();
-    console.log(accountToDelete);
     if (accountToDelete.balance.amount > 0) {
       if (!transferTargetIban || transferTargetIban.trim().length === 0) {
         return new MissingIBANError();
@@ -109,7 +108,7 @@ export class DeleteAccountUseCase {
       if (targetIban instanceof Error) return targetIban;
 
       if (iban.value === targetIban.value) {
-        return new SameAccountError(iban.value);
+        return new InvalidTransaction();
       }
 
       const targetAccount = await this.accountRepository.findByIBAN(targetIban);
@@ -134,9 +133,7 @@ export class DeleteAccountUseCase {
         date: this.clockService.now(),
         icon: "",
       });
-
       if (transaction instanceof Error) return transaction;
-
       const debitResult = accountToDelete.debit(accountToDelete.balance);
       if (debitResult instanceof Error) return debitResult;
 

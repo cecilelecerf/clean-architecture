@@ -4,9 +4,6 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": [
-    "src/**/*",
-    "../domain/src/errors/transaction/SameAccountError.ts"
-  ],
+  "include": ["src/**/*"],
   "references": [{ "path": "../domain" }]
 }

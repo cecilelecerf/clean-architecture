@@ -27,6 +27,7 @@ import {
   UserNotFoundError,
 } from "@application/errors/users";
 import {
+  InvalidTransaction,
   InvalidTransactionAmountError,
   InvalidTransactionLabelError,
 } from "@domain/errors/transaction";
@@ -74,6 +75,7 @@ export class TransfertBetweenAccountUseCase {
     | InvalidTransactionAmountError
     | InsufficientFundsError
     | TransactionEntity
+    | InvalidTransaction
   > {
     const fromIbanResult = IBAN.create(fromIbanString);
     if (fromIbanResult instanceof Error) return fromIbanResult;
