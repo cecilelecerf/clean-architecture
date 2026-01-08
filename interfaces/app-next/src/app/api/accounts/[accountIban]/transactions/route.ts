@@ -61,8 +61,7 @@ export async function POST(
     const transaction = await accountFactory().transfertBetweenAccount.execute({
       requestUserId: session.user.id,
       fromAccountIban: accountIban,
-      amountCurrency: data.amount.currency,
-      amountValue: data.amount.amount,
+      amountValue: data.amount,
       ...data,
     });
 

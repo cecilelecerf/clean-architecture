@@ -2,9 +2,9 @@ import { Money, MoneyToDTO } from "@domain/values/Money";
 import { AccountEntity } from "./AccountEntity";
 import { IBAN } from "@domain/values/IBAN";
 import {
+  InvalidTransaction,
   InvalidTransactionAmountError,
   InvalidTransactionLabelError,
-  SameAccountError,
 } from "@domain/errors/transaction";
 
 export class TransactionEntity {
@@ -43,9 +43,9 @@ export class TransactionEntity {
   private static validateAccounts(
     fromAccountId: IBAN,
     toAccountId: IBAN
-  ): void | SameAccountError {
+  ): void | InvalidTransaction {
     if (fromAccountId.is(toAccountId)) {
-      return new SameAccountError(fromAccountId.value);
+      return new InvalidTransaction();
     }
   }
 
@@ -68,7 +68,7 @@ export class TransactionEntity {
     | "date"
   >):
     | TransactionEntity
-    | SameAccountError
+    | InvalidTransaction
     | InvalidTransactionLabelError
     | InvalidTransactionAmountError {
     const accountsValidation = this.validateAccounts(

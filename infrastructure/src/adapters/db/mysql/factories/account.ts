@@ -15,6 +15,9 @@ import { TransfertBetweenAccountUseCase } from "@application/usecases/accounts/T
 import { GetAllAccountsByTypeUserCase } from "@application/usecases/accounts/GetAllAccountsByTypeUseCase";
 import { RenameAccountUseCase } from "@application/usecases/accounts/RenameAccountUseCasee";
 import { TransactionRepositoryMySQL } from "../repositories/TransactionRepositoryMySQL";
+import { CreditRepositoryMySQL } from "../repositories/CreditRepositoryMySQL";
+import { MoneyConverterService } from "@infrastructure/adapters/services/MoneyConverterService";
+import { CurrencyRepositoryMySQL } from "../repositories/CurrencyRepositoryMySQL";
 
 export const accountFactory = () => {
   const client = new MySQLClient();
@@ -22,9 +25,13 @@ export const accountFactory = () => {
   const accountRepository = new AccountRepositoryMySQL(client);
   const transactionRepository = new TransactionRepositoryMySQL(client);
   const configRepository = new SavingsRateRepositoryMySQL(client);
+  const creditRepo = new CreditRepositoryMySQL(client);
+  const currencyRepo = new CurrencyRepositoryMySQL(client);
+
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
   const emailService = new NodeEmailService();
+  const moneyService = new MoneyConverterService(currencyRepo);
 
   const applyDailyInterest = new ApplyDailyInterestUseCase(
     accountRepository,
@@ -41,8 +48,13 @@ export const accountFactory = () => {
   );
   const deleteAccount = new DeleteAccountUseCase(
     accountRepository,
+    transactionRepository,
     emailService,
-    userRepository
+    userRepository,
+    moneyService,
+    clockService,
+    uuidService,
+    creditRepo
   );
   const getAccountByIBAN = new GetAccountByIBANUseCase(
     accountRepository,
@@ -64,7 +76,8 @@ export const accountFactory = () => {
     transactionRepository,
     clockService,
     uuidService,
-    userRepository
+    userRepository,
+    moneyService
   );
 
   return {

@@ -1,7 +1,7 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { PostWithTagsAndUser } from "@application/ports/repositories/PostRepository";
-import { MessageWithUserDTO } from "@infrastructure/types/message";
+import { MessageWithUserDTO } from "@infrastructure/types/thread";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {

@@ -14,6 +14,9 @@ import { GetAccountsUseCase } from "@application/usecases/accounts/GetAccountsUs
 import { RenameAccountUseCase } from "@application/usecases/accounts/RenameAccountUseCasee";
 import { TransfertBetweenAccountUseCase } from "@application/usecases/accounts/TransfertBetweenAccountUseCasee";
 import { GetAllAccountsByTypeUserCase } from "@application/usecases/accounts/GetAllAccountsByTypeUseCase";
+import { MoneyConverterService } from "@infrastructure/adapters/services/MoneyConverterService";
+import { CurrencyRepositoryMongo } from "../repositories/CurrencyRepositoryMongo";
+import { CreditRepositoryMongo } from "../repositories/CreditRepositoryMongo";
 
 export const accountFactory = () => {
   const client = new MongoClient();
@@ -21,9 +24,12 @@ export const accountFactory = () => {
   const accountRepository = new AccountRepositoryMongo(client);
   const transactionRepository = new TransactionRepositoryMongo(client);
   const configRepository = new SavingsRateRepositoryMongo(client);
+  const currencyRepo = new CurrencyRepositoryMongo(client);
+  const creditRepo = new CreditRepositoryMongo(client);
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
   const emailService = new NodeEmailService();
+  const moneyService = new MoneyConverterService(currencyRepo);
 
   const applyDailyInterest = new ApplyDailyInterestUseCase(
     accountRepository,
@@ -40,8 +46,13 @@ export const accountFactory = () => {
   );
   const deleteAccount = new DeleteAccountUseCase(
     accountRepository,
+    transactionRepository,
     emailService,
-    userRepository
+    userRepository,
+    moneyService,
+    clockService,
+    uuidService,
+    creditRepo
   );
   const getAccountByIBAN = new GetAccountByIBANUseCase(
     accountRepository,
@@ -63,7 +74,8 @@ export const accountFactory = () => {
     transactionRepository,
     clockService,
     uuidService,
-    userRepository
+    userRepository,
+    moneyService
   );
 
   return {
