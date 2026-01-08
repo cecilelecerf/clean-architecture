@@ -40,7 +40,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
   /** Tous les comptes épargne */
   async findAllSavingsAccounts(): Promise<AccountEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM accounts WHERE type = 'epargne' ORDER BY created_at DESC"
+      "SELECT * FROM accounts WHERE type = 'epargne' AND user_id IS NOT NULL ORDER BY created_at DESC"
     );
 
     return rows.map((row) => AccountMapper.mapRowToAccount(row));

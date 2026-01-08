@@ -77,10 +77,6 @@ const CreateActionForm = ({ sections }: { sections: Section<NewAction>[] }) => {
             },
         },
     }]
-    console.log(form)
-    console.log("Form values:", form.watch());
-    console.log("Form errors:", form.formState.errors);
-    console.log("Form is valid:", form.formState.isValid);
     const createMutation = useMutation(endpoints.actions.create());
     return (
         <FormWrapper<NewAction>

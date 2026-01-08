@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
+    "@types/node-cron": "^3.0.11",
     "typescript": "^5.6.3"
   },
   "dependencies": {
@@ -20,6 +21,7 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "infrastructure": "workspace:*",
+    "node-cron": "^4.2.1",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.6"
   }

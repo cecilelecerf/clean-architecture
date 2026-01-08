@@ -36,17 +36,14 @@ export class ApplyDailyInterestUseCase {
     );
     if (!rateConfig) return new SavingsRateNotFoundError();
 
-    // Calculer le taux journalier
     const dailyRate = rateConfig.rate.getValue() / 100 / 365;
 
-    // Récupérer le compte de la banque
     const bankAccount = await this.accountRepository.findBankInterestAccount();
     if (!bankAccount) return new BankInterestAccountNotFoundError();
-
-    // Récupérer tous les comptes épargne
+    console.log(bankAccount);
     const savingAccounts =
       await this.accountRepository.findAllSavingsAccounts();
-
+    console.log(savingAccounts);
     const today = this.clockService.now();
     const todayStart = new Date(today);
     todayStart.setHours(0, 0, 0, 0);
@@ -56,7 +53,6 @@ export class ApplyDailyInterestUseCase {
     let skipped = 0;
 
     for (const savingAccount of savingAccounts) {
-      // Vérifier si une transaction d'intérêts existe déjà aujourd'hui
       if (savingAccount.lastInterestTransactionId) {
         const lastTransaction = await this.transactionRepository.findById(
           savingAccount.lastInterestTransactionId
@@ -66,31 +62,25 @@ export class ApplyDailyInterestUseCase {
           const lastTransactionDate = new Date(lastTransaction.date);
           lastTransactionDate.setHours(0, 0, 0, 0);
 
-          // Si la dernière transaction est aujourd'hui, on skip
-          if (lastTransactionDate.getTime() === todayStart.getTime()) {
-            skipped++;
-            continue;
-          }
+          // if (lastTransactionDate.getTime() === todayStart.getTime()) {
+          //   skipped++;
+          //   continue;
+          // }
         }
       }
 
-      // Calculer les intérêts
       const interest = savingAccount.applyDailyInterest(dailyRate);
       if (interest instanceof Error) return interest;
 
-      // Si pas d'intérêts, passer au suivant
       if (interest.amount <= 0) {
         skipped++;
         continue;
       }
 
-      // Créditer le compte épargne
       savingAccount.credit(interest);
 
-      // Débiter le compte de la banque
       const withdrawResult = bankAccount.debit(interest);
       if (withdrawResult instanceof Error) {
-        // Rollback du dépôt si le retrait échoue
         savingAccount.debit(interest);
         return withdrawResult;
       }
@@ -105,7 +95,7 @@ export class ApplyDailyInterestUseCase {
         icon: "💰",
         date: today,
       });
-
+      console.log(transaction);
       if (transaction instanceof Error) return transaction;
 
       await this.transactionRepository.save(transaction);
@@ -118,7 +108,7 @@ export class ApplyDailyInterestUseCase {
     }
 
     await this.accountRepository.update(bankAccount);
-
+    console.log(distributed);
     return { distributed, totalAmount, skipped };
   }
 }

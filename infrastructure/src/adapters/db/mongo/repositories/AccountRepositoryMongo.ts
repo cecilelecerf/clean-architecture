@@ -34,7 +34,10 @@ export class AccountRepositoryMongo implements AccountRepository {
   /** Tous les comptes épargne */
   async findAllSavingsAccounts(): Promise<AccountEntity[]> {
     await this.client.connect();
-    const docs = await AccountModel.find({ type: "epargne" })
+    const docs = await AccountModel.find({
+      type: "epargne",
+      userId: { $ne: null },
+    })
       .sort({ createdAt: -1 })
       .lean();
     return docs.map((doc) => AccountMapper.mapDocToAccount(doc));

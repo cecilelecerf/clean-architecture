@@ -45,9 +45,8 @@ export class SeedAccountUseCase {
       iban,
       userId: request.userId,
       name: request.name,
-      type: request.userId ? "courant" : "bank",
+      type: request.accountType,
       balance,
-      currency: request.currency,
       color,
       createdAt: request.createdAt ?? this.clockService.now(),
     });
