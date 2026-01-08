@@ -134,7 +134,12 @@ export class PlaceOrderUseCase {
       createdAt: this.clockService.now(),
     });
     if (order instanceof Error) return order;
-    if (type === "buy" && action.defaultQuantity > 0) {
+    await this.orderRepository.save(order);
+    if (
+      type === "buy" &&
+      action.defaultQuantity > 0 &&
+      moneyPrice.isGreaterThan(action.price)
+    ) {
       const primaryQty = Math.min(quantity, action.defaultQuantity);
       const primaryResult = await this.executePrimaryMarketTrade(
         order,
@@ -164,7 +169,6 @@ export class PlaceOrderUseCase {
 
       return primaryResult.executedOrder.toDTO();
     }
-    await this.orderRepository.save(order);
     const matchResult = await this.matchRecursively(order, action);
 
     return matchResult?.executedOrder?.toDTO() ?? order.toDTO();

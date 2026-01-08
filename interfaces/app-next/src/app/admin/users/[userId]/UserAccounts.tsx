@@ -46,9 +46,9 @@ export const UserAccounts = ({ userId }: { userId: UserId }) => {
                                         <p>
                                             Solde :{" "}
                                             <span className="font-semibold">
-                                                {acc.amount.toLocaleString("fr-FR", {
+                                                {acc.balance.amount.toLocaleString("fr-FR", {
                                                     style: "currency",
-                                                    currency: acc.currency,
+                                                    currency: acc.balance.currency,
                                                 })}
                                             </span>
                                         </p>

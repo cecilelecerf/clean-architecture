@@ -15,7 +15,6 @@ export class CreditsController {
     try {
       const userId = req.user?.userId;
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
-
       const result = await creditFactory().getCreditsByUser.execute({
         clientId: userId,
       });
@@ -108,13 +107,11 @@ export class CreditsController {
     try {
       const userId = req.user?.userId;
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
-
-      const { searchParams } = new URL(req.url);
-      const status = searchParams.get("label");
+      const status = req.query.label as string | undefined;
 
       const result = await creditFactory().getAllByStatus.execute({
         actorId: userId,
-        status,
+        status: status ?? null,
       });
 
       if (result instanceof Error) {

@@ -145,7 +145,6 @@ export class OrdersController {
           price: true,
         })
         .parse(req.body);
-
       const result = await orderFactory().placeOrder.execute({
         userId,
         IBAN,
@@ -178,7 +177,7 @@ export class OrdersController {
       if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
       const { orderId } = req.params;
-
+      console.log(orderId);
       const result = await orderFactory().cancelledOrder.execute({
         userId,
         orderId,

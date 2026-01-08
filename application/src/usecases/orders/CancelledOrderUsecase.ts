@@ -42,7 +42,6 @@ export class CancelledOrderUsecase {
     if (!order) return new OrderNotFoundError();
     if (order.account.userId !== user.id)
       return new InvalidOrderAccessError(user.id, order.id);
-
     order.markCancelled({ now: this.clockService.now() });
     await this.orderRepository.update(order);
     return order.toDTO();

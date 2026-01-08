@@ -53,7 +53,7 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
 
     const confirmAction = () => {
         grantMutation.mutate({
-            payload: { accept: dialogAction === "accept" },
+            payload: { accept: dialogAction === "accept", reason: refusalReason },
         }, {
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ["credits", userId] });

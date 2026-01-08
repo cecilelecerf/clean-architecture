@@ -67,11 +67,6 @@ export const StepCreditForm = ({ formule, info }: StepCreditFormProps) => {
         durationMonths: values.durationMonths,
         startDate: effectiveDateISO
       },
-      {
-        onSuccess: (data) => {
-          router.push(`/credits/${data.id}`);
-        },
-      }
     );
   };
 

@@ -18,6 +18,6 @@ ordersRouter.get(
   OrdersController.getAllByActionStatusAndUser
 );
 
-ordersRouter.patch("/:orderId/cancel", OrdersController.cancelOrder);
+ordersRouter.patch("/:orderId/cancelled", OrdersController.cancelOrder);
 
 export default ordersRouter;

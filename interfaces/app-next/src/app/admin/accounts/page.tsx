@@ -51,9 +51,9 @@ export default function AccountsPage() {
                                         <div className="py-3 px-4 bg-gray-50 rounded-lg">
                                             <p className="text-xs text-gray-500 mb-1">Solde</p>
                                             <p className="text-2xl font-bold">
-                                                {acc.amount.toLocaleString("fr-FR", {
+                                                {acc.balance.amount.toLocaleString("fr-FR", {
                                                     style: "currency",
-                                                    currency: acc.currency,
+                                                    currency: acc.balance.currency,
                                                 })}
                                             </p>
                                         </div>

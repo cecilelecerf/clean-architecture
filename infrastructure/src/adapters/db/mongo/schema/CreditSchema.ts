@@ -26,7 +26,12 @@ export const CreditSchema = new Schema<CreditInterface>(
       required: true,
     },
     createdAt: { type: Date, required: true },
-    advisor: { type: Types.UUID, ref: "User", required: false, default: null },
+    advisorId: {
+      type: Types.UUID,
+      ref: "User",
+      required: false,
+      default: null,
+    },
     updatedAt: { type: Date, required: true },
     reason: { type: String, required: false },
   },

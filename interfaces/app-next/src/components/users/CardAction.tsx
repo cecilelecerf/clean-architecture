@@ -18,7 +18,12 @@ export const CardUserAction = ({ user, }: { user: UserDto }) => {
         <Card className="p-6">
             <h2 className="font-semibold">Actions</h2>
             <div className="flex gap-2 flex-col lg:flex-row">
-                <ButtonLoading variant="outline" loading={newThread.isPending} onClick={() => newThread.mutate({ title: `Conversation avec ${user.firstname} ${user.lastname}`, participantsId: [user.id], messageContent: user.role === "client" ? "Débuter la conversation" : undefined }, { onSuccess: (data) => { router.push(`/director/threads/${data.id}`) } })}>
+                <ButtonLoading
+                    variant="outline"
+                    loading={newThread.isPending}
+                    onClick={() => newThread.mutate({
+                        title: `Conversation avec ${user.firstname} ${user.lastname}`, participantsId: [user.id], messageContent: user.role === "client" ? "Débuter la conversation" : undefined
+                    }, { onSuccess: (data) => { router.push(`/${user.role === "client" ? "admin" : "director"}/threads/${data.id}`) } })}>
                     Envoyer un message
                 </ButtonLoading>
                 <ButtonLoading loading={forgotPassword.isPending} onClick={() => forgotPassword.mutate(user.email)} variant="outline">

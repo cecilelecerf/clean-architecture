@@ -288,7 +288,7 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                             {info.options?.map((option, idx) => {
                                                 const isSelected = Array.isArray(field.value) && field.value.includes(option.value);
                                                 const valueArray = (field.value as string[]) ?? [];
-
+                                                console.log(valueArray)
                                                 return (
                                                     <Badge
                                                         key={idx}
@@ -305,11 +305,12 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                                         )}
                                                         onClick={() => {
                                                             let newValue: string[];
-                                                            if (isSelected) {
+                                                            if (!isSelected) {
                                                                 newValue = [...valueArray, option.value];
                                                             } else {
                                                                 newValue = valueArray.filter((v) => v !== option.value);
                                                             }
+                                                            console.log(newValue)
                                                             field.onChange(newValue);
                                                         }}
                                                     >

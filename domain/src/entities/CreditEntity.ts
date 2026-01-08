@@ -273,16 +273,13 @@ export class CreditEntity {
 
   public accept({
     now,
-    reason,
   }: {
     now: Date;
-    reason?: string;
   }): CreditEntity | CreditStatusMismatchError {
     if (this.status !== CreditStatus.PENDING) {
       return new CreditStatusMismatchError(this.status);
     }
     this.status = CreditStatus.ACCEPTED;
-    if (reason) this.reason = reason;
     this.updatedAt = now;
     return this;
   }
@@ -317,6 +314,7 @@ export class CreditEntity {
       formuleCreditId: this.formuleCreditId,
       updatedAt: this.updatedAt.toISOString(),
       advisorId: this.advisorId,
+      reason: this.reason,
     };
   }
 
@@ -348,4 +346,5 @@ export type CreditDTO = {
   | "initialAmount"
   | "formuleCreditId"
   | "advisorId"
+  | "reason"
 >;

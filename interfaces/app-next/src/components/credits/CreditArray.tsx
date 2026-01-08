@@ -11,7 +11,6 @@ export const CreditArray = ({ credits, title, isAdmin, basePath }: Props) => {
     if (!session?.user?.id) return <div>Unauthorized</div>;
 
     return <>
-        {/* Mobile: Cards */}
         <div className="lg:hidden ">
             <h2 className="text-lg font-bold mb-2">{title} ({credits.length})</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -26,7 +25,6 @@ export const CreditArray = ({ credits, title, isAdmin, basePath }: Props) => {
             </div>
         </div>
 
-        {/* Desktop: Table */}
         <Card className="hidden lg:block">
             <CardHeader>
                 <CardTitle>{title} ({credits.length})</CardTitle>

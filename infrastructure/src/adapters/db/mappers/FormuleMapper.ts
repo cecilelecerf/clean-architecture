@@ -71,7 +71,7 @@ export class FormuleMapper {
             currency: doc.maxAmount.currency,
           })
         : undefined;
-
+    const iban = IBAN.from(doc.accountId);
     return FormuleCreditEntity.from({
       id: doc._id.toString(),
       interestRate,
@@ -80,7 +80,7 @@ export class FormuleMapper {
       label: doc.label,
       description: doc.description,
       isActive: doc.isActive,
-      accountId: IBAN.from(doc.accountId),
+      accountId: iban,
       createdAt: doc.createdAt,
       minAmount,
       maxAmount,

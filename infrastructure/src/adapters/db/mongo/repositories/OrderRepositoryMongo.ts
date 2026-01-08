@@ -227,13 +227,9 @@ export class OrderRepositoryMongo implements OrderRepository {
 
     const orderDoc = await OrderModel.findById(id).lean();
     if (!orderDoc) return null;
-
-    const accountDoc = await AccountModel.findOne({
-      iban: orderDoc.IBAN,
-    }).lean();
-    const account = AccountMapper.mapRowToAccount(accountDoc);
+    const accountDoc = await AccountModel.findById(orderDoc.IBAN).lean();
+    const account = AccountMapper.mapDocToAccount(accountDoc);
     const order = this.mapDocToOrder(orderDoc);
-
     return Object.assign(order, { account });
   }
 }

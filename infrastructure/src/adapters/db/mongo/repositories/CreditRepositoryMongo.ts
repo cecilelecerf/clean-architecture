@@ -44,7 +44,6 @@ export class CreditRepositoryMongo implements CreditRepository {
         model: "Account",
       })
       .lean();
-
     if (!doc) return null;
 
     const credit = CreditMapper.mapDocToCredit(doc);
@@ -174,11 +173,9 @@ export class CreditRepositoryMongo implements CreditRepository {
   ): Promise<CreditEntityWithFormule[]> {
     await this.client.connect();
 
-    // Trouver d'abord tous les comptes de l'utilisateur
     const accounts = await AccountModel.find({ userId }).lean();
-    const accountIbans = accounts.map((acc) => acc.iban);
+    const accountIbans = accounts.map((acc) => acc._id);
 
-    // Trouver tous les crédits liés à ces comptes
     const docs = await CreditModel.find({
       accountId: { $in: accountIbans },
     })
@@ -188,7 +185,6 @@ export class CreditRepositoryMongo implements CreditRepository {
       })
       .sort({ startDate: -1 })
       .lean();
-
     return docs.map((doc) => {
       const credit = CreditMapper.mapDocToCredit(doc);
       const formule = FormuleMapper.mapDocToFormule(doc.formuleCreditId);
