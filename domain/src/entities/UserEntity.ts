@@ -14,12 +14,8 @@ import {
   DateOfBirthInFutureError,
   DateOfBirthRequiredError,
   DateOfBirthTooOldError,
-  InvalidAddressError,
-  InvalidCityError,
-  InvalidCountryError,
   InvalidDateOfBirthError,
   InvalidPhoneNumberError,
-  InvalidPostalCodeError,
   InvalidSexeError,
   PhoneNumberRequiredError,
   PostalCodeInvalidCharactersError,
@@ -38,7 +34,7 @@ import { UserCannotUnbanDirectorError } from "@domain/errors/user/UserCannotUnba
 import { UserNotBannedError } from "@domain/errors/user/UserNotBannedError";
 import { Email } from "@domain/values/Email";
 
-type Address = {
+export type Address = {
   city: string;
   country: string;
   address: string;
@@ -247,6 +243,7 @@ export class UserEntity {
     address?: Partial<Address>;
     now: Date;
   }) {
+    console.log(sexe);
     if (firstname !== undefined) {
       const v = UserEntity.validateFirstname(firstname);
       if (v instanceof Error) return v;
@@ -378,6 +375,7 @@ export class UserEntity {
       confirmedAt: this.confirmedAt?.toISOString(),
       isActiveField: this.isActiveField,
       dateOfBirth: this.dateOfBirth?.toISOString(),
+      phoneNumber: this.phoneNumber,
       address: this.address,
       sexe: this.sexe,
     };

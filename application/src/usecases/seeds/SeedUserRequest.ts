@@ -2,7 +2,7 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { EncryptionService } from "@application/ports/services/EncryptionService";
 import { UuidService } from "@application/ports/services/UuidService";
-import { UserEntity } from "@domain/entities/UserEntity";
+import { Address, UserEntity } from "@domain/entities/UserEntity";
 import { Email } from "@domain/values/Email";
 
 export interface SeedUserRequest {
@@ -11,6 +11,9 @@ export interface SeedUserRequest {
   firstName: string;
   lastName: string;
   phoneNumber?: string;
+  sexe?: UserEntity["sexe"];
+  address?: Address;
+  dateOfBirth?: Date;
   role: "client" | "conseiller" | "directeur";
   createdAt?: Date;
   confirmedAt?: Date;
@@ -41,7 +44,10 @@ export class SeedUserUseCase {
       passwordHash,
       firstname: request.firstName,
       lastname: request.lastName,
-      // phoneNumber: request.phoneNumber,
+      phoneNumber: request.phoneNumber,
+      address: request.address,
+      dateOfBirth: request.dateOfBirth,
+      sexe: request.sexe,
       role: request.role,
       createdAt: request.createdAt ?? now,
       confirmedAt: request.confirmedAt ?? now,

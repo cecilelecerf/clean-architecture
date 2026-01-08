@@ -4,6 +4,7 @@ import {
   baseUserSchema,
   RegisterAdminPayload,
   ReqBanUser,
+  UpdateClientPayload,
   User,
   UserDto,
   userDtoSchema,
@@ -39,10 +40,7 @@ export const usersEndpoint = createEndpointsNodes({
   me: () =>
     queryOptions({
       queryKey: ['me'],
-      queryFn: () =>
-        get(`/users/me`).then((data) =>
-          safeParseWithLog(baseUserSchema.omit({ passwordHash: true }), data),
-        ),
+      queryFn: () => get(`/users/me`).then((data) => safeParseWithLog(userSchema, data)),
     }),
   stats: ({ id }: { id: UserId }) =>
     queryOptions({
@@ -75,7 +73,7 @@ export const usersEndpoint = createEndpointsNodes({
     }),
   update: ({ id }: { id: UserId }) =>
     mutationOptions({
-      mutationFn: ({ payload }: { payload: UserDto }) =>
+      mutationFn: ({ payload }: { payload: UpdateClientPayload }) =>
         patch(`/users/me`, { ...payload }).then((data) => userDtoSchema.parse(data)),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['users', id] });

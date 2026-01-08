@@ -4,7 +4,7 @@ export const rawClients = [
     lastname: "client",
     email: "client@example.com",
     password: "password123",
-    sexe: "boy",
+    sexe: "boy" as const,
     dateOfBirth: new Date("1990-05-15"),
     phoneNumber: "+33612345678",
     address: {
@@ -63,7 +63,7 @@ export const rawClients = [
     lastname: "Martin",
     email: "benjamin.martin@example.com",
     password: "password123",
-    sexe: "boy",
+    sexe: "boy" as const,
     dateOfBirth: new Date("1985-08-20"),
     phoneNumber: "+33623456789",
     address: {
@@ -105,7 +105,7 @@ export const rawClients = [
     lastname: "Leroy",
     email: "claire.leroy@example.com",
     password: "password123",
-    sexe: "girl",
+    sexe: "girl" as const,
     dateOfBirth: new Date("1992-03-12"),
     phoneNumber: "+33634567890",
     address: {
@@ -147,7 +147,7 @@ export const rawClients = [
     lastname: "Moreau",
     email: "david.moreau@example.com",
     password: "password123",
-    sexe: "boy",
+    sexe: "boy" as const,
     dateOfBirth: new Date("1988-11-05"),
     phoneNumber: "+33645678901",
     address: {
@@ -189,7 +189,7 @@ export const rawClients = [
     lastname: "Bernard",
     email: "emma.bernard@example.com",
     password: "password123",
-    sexe: "girl",
+    sexe: "girl" as const,
     dateOfBirth: new Date("1995-06-18"),
     phoneNumber: "+33656789012",
     address: {
@@ -231,7 +231,7 @@ export const rawClients = [
     lastname: "Girard",
     email: "florent.girard@example.com",
     password: "password123",
-    sexe: "boy",
+    sexe: "boy" as const,
     dateOfBirth: new Date("1991-09-10"),
     phoneNumber: "+33667890123",
     address: {
@@ -273,7 +273,7 @@ export const rawClients = [
     lastname: "Mercier",
     email: "julie.mercier@example.com",
     password: "password123",
-    sexe: "girl",
+    sexe: "girl" as const,
     dateOfBirth: new Date("1993-12-01"),
     phoneNumber: "+33678901234",
     address: {
@@ -315,7 +315,7 @@ export const rawClients = [
     lastname: "Renaud",
     email: "kevin.renaud@example.com",
     password: "password123",
-    sexe: "boy",
+    sexe: "boy" as const,
     dateOfBirth: new Date("1989-07-22"),
     phoneNumber: "+33689012345",
     address: {
@@ -357,7 +357,7 @@ export const rawClients = [
     lastname: "Petit",
     email: "lucie.petit@example.com",
     password: "password123",
-    sexe: "girl",
+    sexe: "girl" as const,
     dateOfBirth: new Date("1994-04-30"),
     phoneNumber: "+33690123456",
     address: {
@@ -399,7 +399,7 @@ export const rawClients = [
     lastname: "Robert",
     email: "maxime.robert@example.com",
     password: "password123",
-    sexe: "boy",
+    sexe: "boy" as const,
     dateOfBirth: new Date("1990-02-14"),
     phoneNumber: "+33601234567",
     address: {

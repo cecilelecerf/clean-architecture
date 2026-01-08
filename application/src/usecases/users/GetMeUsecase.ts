@@ -18,6 +18,7 @@ export class GetMeUsecase {
   }: Props): Promise<UserToMe | UserNotFoundError | UserNotActiveError> {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
+    console.log(user);
     return user.toMe();
   }
 }

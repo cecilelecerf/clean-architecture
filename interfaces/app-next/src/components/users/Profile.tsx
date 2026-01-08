@@ -18,23 +18,25 @@ import {
     Save,
     X,
     LogOut,
+    Phone,
+    MapPin,
+    Cake,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { signOut } from "next-auth/react";
 import { match } from "ts-pattern";
-import { PayloadUserUpdateSchema, UserId } from "@infrastructure/types/user";
+import { UpdateClientPayload, UserId } from "@infrastructure/types/user";
 import { ClientStatistics } from "./_components/ClientStatistics";
 import { AdvisorStatistics } from "./_components/AdvisorStatistics";
 import { DirectorStatistics } from "./_components/DirectorStatistics";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const ProfileComponent = () => {
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
     return <Wrapper userId={session.user.id} />
-
 }
-
 
 function ProfileSkeleton() {
     return (
@@ -53,7 +55,7 @@ function ProfileSkeleton() {
             <Card className="p-4 md:p-6">
                 <Skeleton className="h-6 w-48 mb-4" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Array.from({ length: 4 }).map((_, i) => (
+                    {Array.from({ length: 6 }).map((_, i) => (
                         <Skeleton key={i} className="h-16 w-full" />
                     ))}
                 </div>
@@ -73,29 +75,49 @@ function ProfileSkeleton() {
 
 const Wrapper = ({ userId }: { userId: UserId }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState<PayloadUserUpdateSchema>({
+    const [formData, setFormData] = useState<UpdateClientPayload>({
         firstname: "",
         lastname: "",
-        email: ""
+        email: "",
+        dateOfBirth: "",
+        phoneNumber: "",
+        address: {
+            address: "",
+            city: "",
+            postalCode: "",
+            country: "",
+        },
+        sexe: undefined
     });
-    const query = useQuery(endpoints.users.me(),
-    );
+
+    const query = useQuery(endpoints.users.me());
 
     const handleCancel = () => {
         setIsEditing(false);
         setFormData({
             firstname: "",
             lastname: "",
-            email: ""
+            email: "",
+            dateOfBirth: "",
+            phoneNumber: "",
+            address: {
+                address: "",
+                city: "",
+                postalCode: "",
+                country: "",
+            },
+            sexe: undefined
         });
     };
-    const updateMutation = useMutation(endpoints.users.update({ id: userId }),
-    );
+
+    const updateMutation = useMutation(endpoints.users.update({ id: userId }));
+
     const handleSave = () => {
-        updateMutation.mutate({ payload: formData }, {
+        updateMutation.mutate({ payload: { ...formData, dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : undefined } }, {
             onSuccess: () => {
                 toast.success("Profil mis à jour avec succès");
                 setIsEditing(false);
+                query.refetch();
             },
             onError: (error: any) => {
                 toast.error(error.message || "Erreur lors de la mise à jour");
@@ -104,7 +126,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
     };
 
     return match(query)
-        .with(({ status: "error" }), () => "errpr")
+        .with(({ status: "error" }), () => <div>Erreur lors du chargement du profil</div>)
         .with(({ status: "pending" }), () => <ProfileSkeleton />)
         .with(({ status: "success" }), ({ data: user }) => {
             const handleEdit = () => {
@@ -112,7 +134,16 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                     setFormData({
                         firstname: user.firstname,
                         lastname: user.lastname,
-                        email: user.email
+                        email: user.email,
+                        dateOfBirth: user.role === "client" ? user.dateOfBirth : undefined,
+                        phoneNumber: user.role === "client" ? user.phoneNumber : undefined,
+                        address: user.role === "client" ? user.address || {
+                            address: "",
+                            city: "",
+                            postalCode: "",
+                            country: "",
+                        } : undefined,
+                        sexe: user.role === "client" ? user.sexe : undefined
                     });
                     setIsEditing(true);
                 }
@@ -120,7 +151,6 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
 
             return (
                 <div className="p-4 md:p-6 space-y-4 md:space-y-6 max-w-5xl mx-auto">
-                    {/* Header avec Avatar */}
                     <Card className="p-4 md:p-6">
                         <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6">
                             <Avatar className="h-20 w-20 md:h-24 md:w-24">
@@ -218,15 +248,88 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                             onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                                         />
                                     </div>
-                                    {/* <div className="md:col-span-2">
-                                <Label htmlFor="phoneNumber">Téléphone</Label>
-                                <Input
-                                    id="phoneNumber"
-                                    value={formData.phoneNumber}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                                    placeholder="+33 6 12 34 56 78"
-                                />
-                            </div> */}
+                                    <div>
+                                        <Label htmlFor="phoneNumber" className="mb-2">Téléphone</Label>
+                                        <Input
+                                            id="phoneNumber"
+                                            value={formData.phoneNumber}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                                            placeholder="+33 6 12 34 56 78"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="dateOfBirth" className="mb-2">Date de naissance</Label>
+                                        <Input
+                                            id="dateOfBirth"
+                                            type="date"
+                                            value={formData.dateOfBirth}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="sexe" className="mb-2">Sexe</Label>
+                                        <Select
+                                            value={formData.sexe}
+                                            onValueChange={(value) => setFormData(prev => ({ ...prev, sexe: value as "girl" | "boy" | "other" }))}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Sélectionner" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="boy">Homme</SelectItem>
+                                                <SelectItem value="girl">Femme</SelectItem>
+                                                <SelectItem value="other">Autre</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <Label htmlFor="address" className="mb-2">Adresse</Label>
+                                        <Input
+                                            id="address"
+                                            value={formData.address?.address || ""}
+                                            onChange={(e) => setFormData(prev => ({
+                                                ...prev,
+                                                address: { ...prev.address, address: e.target.value }
+                                            }))}
+                                            placeholder="Rue"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="city" className="mb-2">Ville</Label>
+                                        <Input
+                                            id="city"
+                                            value={formData.address?.city || ""}
+                                            onChange={(e) => setFormData(prev => ({
+                                                ...prev,
+                                                address: { ...prev.address, city: e.target.value }
+                                            }))}
+                                            placeholder="Ville"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="postalCode" className="mb-2">Code postal</Label>
+                                        <Input
+                                            id="postalCode"
+                                            value={formData.address?.postalCode || ""}
+                                            onChange={(e) => setFormData(prev => ({
+                                                ...prev,
+                                                address: { ...prev.address, postalCode: e.target.value }
+                                            }))}
+                                            placeholder="75001"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="country" className="mb-2">Pays</Label>
+                                        <Input
+                                            id="country"
+                                            value={formData.address?.country || ""}
+                                            onChange={(e) => setFormData(prev => ({
+                                                ...prev,
+                                                address: { ...prev.address, country: e.target.value }
+                                            }))}
+                                            placeholder="France"
+                                        />
+                                    </div>
                                 </>
                             ) : (
                                 <>
@@ -253,14 +356,55 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                             <p className="font-medium">{user.email}</p>
                                         </div>
                                     </div>
+                                    {user.role === "client" &&
+                                        <> <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                            <Phone className="h-5 w-5 text-gray-500" />
+                                            <div>
+                                                <p className="text-xs text-gray-500">Téléphone</p>
+                                                <p className="font-medium">{user.phoneNumber || "Non renseigné"}</p>
+                                            </div>
+                                        </div>
 
-                                    {/* <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                <Phone className="h-5 w-5 text-gray-500" />
-                                <div>
-                                    <p className="text-xs text-gray-500">Téléphone</p>
-                                    <p className="font-medium">{user.phoneNumber || "Non renseigné"}</p>
-                                </div>
-                            </div> */}
+                                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                                <Cake className="h-5 w-5 text-gray-500" />
+                                                <div>
+                                                    <p className="text-xs text-gray-500">Date de naissance</p>
+                                                    <p className="font-medium">
+                                                        {user.dateOfBirth
+                                                            ? new Date(user.dateOfBirth).toLocaleDateString('fr-FR')
+                                                            : "Non renseignée"}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                                <User className="h-5 w-5 text-gray-500" />
+                                                <div>
+                                                    <p className="text-xs text-gray-500">Sexe</p>
+                                                    <p className="font-medium">
+                                                        {user.sexe === "boy" ? "Homme" : user.sexe === "girl" ? "Femme" : user.sexe || "Non renseigné"}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {user.address && (
+                                                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg md:col-span-2">
+                                                    <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
+                                                    <div>
+                                                        <p className="text-xs text-gray-500">Adresse</p>
+                                                        <p className="font-medium">
+                                                            {user.address.address && `${user.address.address}, `}
+                                                            {user.address.postalCode && `${user.address.postalCode} `}
+                                                            {user.address.city}
+                                                            {user.address.country && `, ${user.address.country}`}
+                                                        </p>
+                                                        {!user.address.address && !user.address.city && (
+                                                            <p className="font-medium">Non renseignée</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}</>}
+
                                 </>
                             )}
                         </div>
@@ -331,7 +475,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
 
                     {/* Déconnexion */}
                     <Card className="p-4 md:p-6">
-                        <div className="flex flex-col   gap-4">
+                        <div className="flex flex-col gap-4">
                             <div>
                                 <h3 className="font-semibold">Déconnexion</h3>
                                 <p className="text-sm text-gray-500">
@@ -348,7 +492,8 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                             </Button>
                         </div>
                     </Card>
-                </div>)
+                </div>
+            );
         })
-        .exhaustive()
+        .exhaustive();
 }

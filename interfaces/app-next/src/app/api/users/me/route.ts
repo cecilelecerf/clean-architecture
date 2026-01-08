@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
-import { userDtoSchema } from '@infrastructure/types/user';
+import { updateClientSchema } from '@infrastructure/types/user';
 
 export async function GET() {
   try {
@@ -32,7 +32,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const json = await req.json();
-    const data = userDtoSchema.parse(json);
+    const data = updateClientSchema.parse(json);
     const result = await usersFactory().updateUser.execute({
       ...data,
       userId: session.user.id,

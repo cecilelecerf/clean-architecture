@@ -6,7 +6,7 @@ import {
 } from "@application/errors/users";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
-import { UserEntity, UserToDTO } from "@domain/entities/UserEntity";
+import { Address, UserEntity, UserToDTO } from "@domain/entities/UserEntity";
 import { EmailInvalidFormatError } from "@domain/errors/email/EmailInvalidFormatError";
 import {
   DateOfBirthInFutureError,
@@ -21,13 +21,15 @@ import {
 } from "@domain/errors/user";
 import { InvalidFirstnameError } from "@domain/errors/user/InvalidFirstnameError";
 import { InvalidLastnameError } from "@domain/errors/user/InvalidLastnameError";
-import { Email } from "@domain/values/Email";
 
 type Props = {
   userId: string;
   actorId: string;
-  email: string;
-} & Partial<Pick<UserEntity, "firstname" | "lastname">>;
+  dateOfBirth?: string;
+  address?: Partial<Address>;
+} & Partial<
+  Pick<UserEntity, "firstname" | "lastname" | "phoneNumber" | "sexe">
+>;
 
 export class UpdateUserUsecase {
   public constructor(
@@ -40,7 +42,10 @@ export class UpdateUserUsecase {
     actorId,
     firstname,
     lastname,
-    email,
+    dateOfBirth,
+    address,
+    phoneNumber,
+    sexe,
   }: Props): Promise<
     | UserToDTO
     | UserNotFoundError
@@ -77,24 +82,14 @@ export class UpdateUserUsecase {
       return new UserRoleMismatchError(["directeur", "self"], actor.role);
     }
 
-    let emailVO: Email | undefined;
-    if (email && email !== user.email.value) {
-      const emailResult = Email.create(email);
-      if (emailResult instanceof Error) return emailResult;
-
-      const existingUser = await this.userRepository.findByEmail(emailResult);
-      if (existingUser && existingUser.id !== userId) {
-        return new EmailAlreadyExistsError(emailResult);
-      }
-
-      emailVO = emailResult;
-    }
-
     const now = this.clockService.now();
     const updateResult = user.update({
       firstname,
       lastname,
-      email: emailVO,
+      sexe,
+      dateOfBirth,
+      phoneNumber,
+      address,
       now,
     });
 

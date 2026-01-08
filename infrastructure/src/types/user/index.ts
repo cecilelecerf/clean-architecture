@@ -49,13 +49,17 @@ export const clientSchema = baseUserSchema.extend({
 });
 
 export const userSchema = z.discriminatedUnion("role", [
-  clientSchema,
-  baseUserSchema.extend({
-    role: z.literal("conseiller"),
-  }),
-  baseUserSchema.extend({
-    role: z.literal("directeur"),
-  }),
+  clientSchema.omit({ passwordHash: true }),
+  baseUserSchema
+    .extend({
+      role: z.literal("conseiller"),
+    })
+    .omit({ passwordHash: true }),
+  baseUserSchema
+    .extend({
+      role: z.literal("directeur"),
+    })
+    .omit({ passwordHash: true }),
 ]);
 
 export type User = z.infer<typeof userSchema>;

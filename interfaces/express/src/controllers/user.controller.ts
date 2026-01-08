@@ -4,6 +4,7 @@ import { AuthRequest } from "../middlewares/auth.middleware";
 import {
   banUserSchema,
   registerAdminPayload,
+  updateClientSchema,
   userDtoSchema,
 } from "@infrastructure/types/user";
 import { UserToDTO } from "@domain/entities/UserEntity";
@@ -123,7 +124,7 @@ export class UserController {
   static async updateMe(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       if (!req.user) return res.sendStatus(401);
-      const payload = userDtoSchema.parse(req.body);
+      const payload = updateClientSchema.parse(req.body);
       const result = await usersFactory().updateUser.execute({
         userId: req.user.userId,
         actorId: req.user.userId,
