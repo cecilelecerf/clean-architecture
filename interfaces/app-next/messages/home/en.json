@@ -39,5 +39,10 @@
     "title": "Ready to start your financial journey?",
     "description": "Open your account in minutes and enjoy all our services",
     "button": "Open a free account"
+  },
+  "meta": {
+    "title": "Modern Bank - Manage your finances smartly",
+    "description": "Discover a modern banking experience with high-yield savings accounts, dedicated advisors and real-time tracking of your finances.",
+    "keywords": "bank, savings, credit, bank account, financial advisor, finance management"
   }
 }

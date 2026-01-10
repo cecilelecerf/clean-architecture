@@ -39,5 +39,10 @@
     "title": "Prêt à commencer votre parcours financier ?",
     "description": "Ouvrez votre compte en quelques minutes et bénéficiez de tous nos services",
     "button": "Ouvrir un compte gratuitement"
+  },
+  "meta": {
+    "title": "Banque Moderne - Gérez vos finances intelligemment",
+    "description": "Découvrez une expérience bancaire moderne avec des comptes d'épargne à haut rendement, des conseillers dédiés et un suivi en temps réel de vos finances.",
+    "keywords": "banque, épargne, crédit, compte bancaire, conseiller financier, gestion finances"
   }
 }

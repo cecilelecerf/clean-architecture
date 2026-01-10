@@ -6,10 +6,85 @@ import { ArrowRight, Building2, ChartLine, Lock, PiggyBank, Shield, Smartphone, 
 import { DevSection } from "@/components/homepage/DevSection";
 import { CTA } from "@/components/homepage/CTA";
 import { LangageSwitcher } from "@/components/LangageSwitcher";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Metadata } from "next";
+import { routing } from "@/lib/i18n/routing";
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'home' });
+  const tCommon = await getTranslations({ locale, namespace: 'common' });
 
-export default function HomePage() {
-  const t = useTranslations('home');
-  const tCommon = useTranslations('common');
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://votre-banque.com';
+
+  return {
+    title: t('meta.title'),
+    description: t('meta.description'),
+    keywords: t('meta.keywords'),
+
+    openGraph: {
+      title: t('meta.title'),
+      description: t('meta.description'),
+      url: `${baseUrl}/${locale}`,
+      siteName: tCommon('siteName'),
+      locale: locale === 'fr' ? 'fr_FR' : 'en_US',
+      type: 'website',
+      images: [
+        {
+          url: `${baseUrl}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: t('meta.title'),
+        },
+      ],
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title: t('meta.title'),
+      description: t('meta.description'),
+      images: [`${baseUrl}/og-image.png`],
+    },
+
+    alternates: {
+      canonical: `${baseUrl}/${locale}`,
+      languages: {
+        'fr': `${baseUrl}/fr`,
+        'en': `${baseUrl}/en`,
+        'x-default': `${baseUrl}/fr`,
+      },
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+
+    authors: [{ name: tCommon('siteName') }],
+    creator: tCommon('siteName'),
+    publisher: tCommon('siteName'),
+  };
+}
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+export default async function HomePage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const t = await getTranslations('home');
+  const tCommon = await getTranslations('common');
+
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
 
