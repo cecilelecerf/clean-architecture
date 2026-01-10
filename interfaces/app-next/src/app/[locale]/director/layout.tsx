@@ -16,6 +16,7 @@ import {
 import { menuItems } from "./menu-item";
 import Link from "next/link";
 import { LangageSwitcher } from "@/components/LangageSwitcher";
+import { useTranslations } from "next-intl";
 
 export default function AdminLayout({
   children,
@@ -23,12 +24,13 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const t = useTranslations("director");
 
   return (
     <div className="flex min-h-screen">
       {/* === Desktop Sidebar === */}
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 bg-pink-950 text-white flex-col justify-between">
-        <SidebarContent pathname={pathname} />
+        <SidebarContent pathname={pathname} t={t} />
       </aside>
 
       {/* === Mobile Drawer Menu === */}
@@ -43,7 +45,7 @@ export default function AdminLayout({
             </div>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 bg-pink-950 text-white w-64">
-            <SidebarContent pathname={pathname} />
+            <SidebarContent pathname={pathname} t={t} />
           </SheetContent>
         </Sheet>
       </div>
@@ -56,16 +58,16 @@ export default function AdminLayout({
   );
 }
 
-function SidebarContent({ pathname }: { pathname: string }) {
+function SidebarContent({ pathname, t }: { pathname: string, t: ReturnType<typeof useTranslations>; }) {
   return (
     <div className="p-6 flex flex-col justify-between h-full">
       <div className="space-y-6">
         <Link href="/director">
-          <h1 className="text-xl font-bold">Directeur</h1>
+          <h1 className="text-xl font-bold">{t("menu.title")}</h1>
         </Link>
         <div>
           <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
-            Général
+            {t("menu.section.general")}
           </h2>
 
           <LangageSwitcher />
@@ -74,7 +76,7 @@ function SidebarContent({ pathname }: { pathname: string }) {
               <MenuLink
                 key={item.href}
                 icon={item.icon}
-                label={item.label}
+                label={t(item.labelKey)}
                 href={item.href}
                 active={
                   pathname === item.href ||
