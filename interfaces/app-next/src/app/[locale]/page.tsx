@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Building2, ChartLine, Lock, PiggyBank, Shield, Smartphone, TrendingUp, Users } from "lucide-react";
 import { DevSection } from "@/components/homepage/DevSection";
-import { Test } from "@/components/test";
+import { CTA } from "@/components/homepage/CTA";
 import { LangageSwitcher } from "@/components/LangageSwitcher";
 
 export default function HomePage() {
@@ -35,7 +35,7 @@ export default function HomePage() {
             {t('hero.description')}
           </p>
 
-          <Test />
+          <CTA />
         </div>
       </section>
 
