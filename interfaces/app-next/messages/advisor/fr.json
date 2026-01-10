@@ -1,0 +1,19 @@
+{
+  "menu": {
+    "title": "Cnseiller",
+    "section": {
+      "general": "General"
+    },
+    "home": "Accueil",
+    "profile": "Profil",
+    "messaging": "Messageries",
+    "news": "Actualités",
+    "bank": "Compte de la banque",
+    "loan": "Demandes de crédits",
+
+    "users": "Utilisateurs",
+    "conversations": "Conversations clients",
+    "account": "Comptes clients",
+    "logout": "Déconnexion"
+  }
+}

@@ -1,8 +1,11 @@
 import { menuItems, menuItemsClients } from "./menu-item";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslations } from "next-intl";
 
 export default function AdminHomePage() {
+    const t = useTranslations("advisor.menu");
+
     return (
         <div className="space-y-8">
             {/* Header */}
@@ -16,13 +19,13 @@ export default function AdminHomePage() {
                 <h2 className="text-xl font-semibold mb-4 text-gray-700">Général</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {menuItems.slice(1).map((item) => (
-                        <Link href={item.href} key={item.label}>
+                        <Link href={item.href} key={item.labelKey}>
                             <Card className="hover:shadow-lg transition-all hover:scale-105 cursor-pointer h-full">
                                 <CardContent className="flex flex-col items-center justify-center gap-3 p-6 text-center">
                                     <div className="text-gray-700">
                                         {item.icon}
                                     </div>
-                                    <p className="font-semibold text-lg">{item.label}</p>
+                                    <p className="font-semibold text-lg">{t(item.labelKey)}</p>
                                 </CardContent>
                             </Card>
                         </Link>
@@ -35,14 +38,14 @@ export default function AdminHomePage() {
                 <h2 className="text-xl font-semibold mb-4 text-gray-700">Relation Client</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {menuItemsClients.map((item) => (
-                        <Link href={item.href} key={item.label}>
+                        <Link href={item.href} key={item.labelKey}>
                             <Card className="hover:shadow-lg transition-all hover:scale-105 cursor-pointer h-full">
                                 <CardContent className="flex flex-col items-center justify-center gap-3 p-6 text-center">
                                     <div className="text-gray-700">
                                         {item.icon}
                                     </div>
 
-                                    <p className="font-semibold text-lg">{item.label}</p>
+                                    <p className="font-semibold text-lg">{t(item.labelKey)}</p>
                                 </CardContent>
                             </Card>
                         </Link>

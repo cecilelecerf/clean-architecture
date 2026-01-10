@@ -13,6 +13,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       home: (await import(`../../../messages/home/${locale}.json`)).default,
       auth: (await import(`../../../messages/auth/${locale}.json`)).default,
       director: (await import(`../../../messages/director/${locale}.json`)).default,
+      advisor: (await import(`../../../messages/advisor/${locale}.json`)).default,
     },
   };
 });

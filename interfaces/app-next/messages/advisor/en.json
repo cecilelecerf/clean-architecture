@@ -1,0 +1,19 @@
+{
+  "menu": {
+    "title": "Advisor",
+    "section": {
+      "general": "General"
+    },
+    "home": "Dashboard",
+    "profile": "Profile",
+    "messaging": "Messaging",
+    "news": "News",
+    "bank": "Bank Accounts",
+    "loan": "Loan applications",
+
+    "users": "Users",
+    "conversations": "Customer conversations",
+    "account": "Customer accounts",
+    "logout": "Logout"
+  }
+}
