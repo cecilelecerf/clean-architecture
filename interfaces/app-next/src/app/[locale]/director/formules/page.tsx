@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 import Link from "next/link";
 import { Plus, Percent } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function FormulesPage() {
     const router = useRouter();
@@ -21,6 +22,8 @@ export default function FormulesPage() {
         ]
     });
 
+    const t = useTranslations("director.credits");
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -28,7 +31,7 @@ export default function FormulesPage() {
                 <Link href="/director/formules/new">
                     <Button>
                         <Plus className="w-4 h-4 mr-2" />
-                        Créer une nouvelle formule
+                        {t("new")}
                     </Button>
                 </Link>
             </div>
@@ -49,15 +52,15 @@ export default function FormulesPage() {
                                         <CardContent className="py-12 text-center">
                                             <Percent className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                                             <p className="text-lg font-medium mb-2">
-                                                Aucune formule disponible
+                                                {t("nothing")}
                                             </p>
                                             <p className="text-sm text-muted-foreground mb-6">
-                                                Créez votre première formule de prêt
+                                                {t("first")}
                                             </p>
                                             <Link href="/director/formules/new">
                                                 <Button>
                                                     <Plus className="w-4 h-4 mr-2" />
-                                                    Créer une formule
+                                                    {t("new")}
                                                 </Button>
                                             </Link>
                                         </CardContent>
@@ -100,16 +103,16 @@ export default function FormulesPage() {
                                             <div className="flex items-center justify-between">
                                                 <div>
                                                     <p className="text-sm text-muted-foreground">
-                                                        Total des formules
+                                                        {t("total")}
                                                     </p>
                                                     <p className="text-2xl font-bold">{formules.length}</p>
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <Badge variant="outline">
-                                                        {formules.filter((f) => f.isActive).length} actives
+                                                        {formules.filter((f) => f.isActive).length} {t("active")}
                                                     </Badge>
                                                     <Badge variant="secondary">
-                                                        {formules.filter((f) => !f.isActive).length} inactives
+                                                        {formules.filter((f) => !f.isActive).length} {t("inactive")}
                                                     </Badge>
                                                 </div>
                                             </div>
@@ -122,7 +125,7 @@ export default function FormulesPage() {
                                             <div className="flex items-center justify-between">
                                                 <h2 className="text-xl font-bold">{type.label}</h2>
                                                 <Badge variant="outline">
-                                                    {formulesByType[type.value].length} formule
+                                                    {formulesByType[type.value].length} {t("formula")}
                                                     {formulesByType[type.value].length > 1 ? "s" : ""}
                                                 </Badge>
                                             </div>
@@ -156,11 +159,11 @@ export default function FormulesPage() {
                                                             {/* Taux */}
                                                             <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t">
                                                                 <div className="space-y-1">
-                                                                    <p className="text-xs text-muted-foreground">Intérêt</p>
+                                                                    <p className="text-xs text-muted-foreground">{t("interest")}</p>
                                                                     <p className="font-semibold">{formule.interestRate}%</p>
                                                                 </div>
                                                                 <div className="space-y-1">
-                                                                    <p className="text-xs text-muted-foreground">Assurance</p>
+                                                                    <p className="text-xs text-muted-foreground">{t("insurance")}</p>
                                                                     <p className="font-semibold">{formule.insuranceRate}%</p>
                                                                 </div>
                                                             </div>
@@ -183,7 +186,7 @@ export default function FormulesPage() {
                                                                     router.push(`/director/formules/${formule.id}`);
                                                                 }}
                                                             >
-                                                                Voir détails
+                                                                {t("details")}
                                                             </Button>
                                                         </CardContent>
                                                     </Card>

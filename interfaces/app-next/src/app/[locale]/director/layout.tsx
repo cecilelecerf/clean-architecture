@@ -1,5 +1,3 @@
-import { getTranslations } from 'next-intl/server';
-import { setRequestLocale } from 'next-intl/server';
 import { DirectorLayoutClient } from './layout-client';
 
 type Props = {

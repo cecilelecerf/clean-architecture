@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import z from "zod";
 import { UpdateFormule, updateFormuleSchema } from "@/utils/endpoint/formuleEndpoints";
+import { useTranslations } from "next-intl";
 
 
 export const UpdateFormuleForm = ({
@@ -40,6 +41,8 @@ export const UpdateFormuleForm = ({
   const mutation = useMutation(
     endpoints.formules.update({ formuleId: formule.id })
   );
+
+  const t = useTranslations("director.credits.formulas.update");
 
   /** 🔁 Hydratation */
   useEffect(() => {
@@ -70,71 +73,71 @@ export const UpdateFormuleForm = ({
 
   const sections: Section<UpdateFormule>[] = [
     {
-      title: "Taux",
-      description: "Paramètres financiers de la formule",
+      title: t("rates.title"),
+      description: t("rates.description"),
       icon: Percent,
       data: {
         interestRate: {
-          label: "Taux d'intérêt",
+          label: t("rates.fields.interestRate"),
           type: "number",
         },
         insuranceRate: {
-          label: "Taux d'assurance",
+          label: t("rates.fields.insuranceRate"),
           type: "number",
         },
       },
     },
     {
-      title: "Informations",
-      description: "Identification de la formule",
+      title: t("information.title"),
+      description: t("information.description"),
       icon: FileText,
       data: {
         type: {
-          label: "Type de prêt",
+          label: t("information.fields.type"),
           type: "select",
           options: typeOptions,
         },
         label: {
-          label: "Label",
+          label: t("information.fields.label"),
           type: "text",
         },
         description: {
-          label: "Description",
+          label: t("information.fields.description"),
           type: "textarea",
         },
       },
     },
     {
-      title: "Montants",
-      description: "Plage de montants autorisés",
+      title: t("amounts.title"),
+      description: t("amounts.description"),
       icon: Coins,
       data: {
         minAmount: {
-          label: "Montant minimum",
+          label: t("amounts.fields.minAmount"),
           type: "number",
         },
         maxAmount: {
-          label: "Montant maximum",
+          label: t("amounts.fields.maxAmount"),
           type: "number",
         },
         currency: {
-          label: "Devise",
+          label: t("amounts.fields.currency"),
           type: "select",
           options: [
-            { label: "Euro", value: "EUR" },
-            { label: "Dollar américain", value: "USD" },
-            { label: "Livre sterling", value: "GBP" },
+            { label: t("options.currencies.EUR"), value: "EUR" },
+            { label: t("options.currencies.USD"), value: "USD" },
+            { label: t("options.currencies.GBP"), value: "GBP" },
           ],
         },
       },
     },
     {
-      title: "Paramètres",
-      description: "État de la formule",
+      title: t("settings.title"),
+      description: t("settings.description"),
       icon: Settings,
       data: {
         isActive: {
-          label: "Formule active",
+          label: t("settings.fields.isActive"),
           type: "switch",
         },
       },
@@ -143,11 +146,11 @@ export const UpdateFormuleForm = ({
 
   return (
     <FormWrapper<UpdateFormule>
-      title="Modifier la formule"
-      description="Mettre à jour la formule de prêt"
+      title={t("title")}
+      description={t("description")}
       form={form}
       data={sections}
-      labelButton="Enregistrer"
+      labelButton={t("button")}
       loading={mutation.isPending}
       onSubmit={handleSubmit}
       showBackButton

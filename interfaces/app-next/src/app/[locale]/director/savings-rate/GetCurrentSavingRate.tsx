@@ -15,11 +15,13 @@ import {
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { useRouter } from "next/navigation";
 import { SavingRate } from "@infrastructure/types/savingsrate";
+import { useTranslations } from "next-intl";
 
 export function AdminSavingsRateHeroBanner({ query }: {
     query: UseQueryResult<SavingRate, Error>
 }) {
     const router = useRouter();
+    const t = useTranslations("director.saving.current");
 
     return match(query)
         .with({ status: "pending" }, () => <AdminHeroBannerSkeleton />)
@@ -29,9 +31,9 @@ export function AdminSavingsRateHeroBanner({ query }: {
                     <div className="w-16 h-16 mx-auto bg-white/20 rounded-full flex items-center justify-center">
                         <Settings className="w-8 h-8" />
                     </div>
-                    <h2 className="text-2xl font-bold">Aucun taux configuré</h2>
+                    <h2 className="text-2xl font-bold">{t("nothingTitle")}</h2>
                     <p className="text-white/80">
-                        Aucun taux d'épargne n'est actuellement configuré dans le système.
+                        {t("nothingText")}
                     </p>
                     <Button
                         size="lg"
@@ -39,7 +41,7 @@ export function AdminSavingsRateHeroBanner({ query }: {
                         onClick={() => router.push("/admin/savings-rates")}
                     >
                         <Plus className="w-5 h-5 mr-2" />
-                        Configurer un taux
+                        {t("configure")}
                     </Button>
                 </div>
             </div>
@@ -52,9 +54,9 @@ export function AdminSavingsRateHeroBanner({ query }: {
                             <div className="w-16 h-16 mx-auto bg-white/20 rounded-full flex items-center justify-center">
                                 <Settings className="w-8 h-8" />
                             </div>
-                            <h2 className="text-2xl font-bold">Aucun taux en vigueur</h2>
+                            <h2 className="text-2xl font-bold">{t("noEffectTitle")}</h2>
                             <p className="text-white/80">
-                                Aucun taux d'épargne n'est actuellement en vigueur.
+                                {t("noEffectText")}
                             </p>
                             <Button
                                 size="lg"
@@ -62,7 +64,7 @@ export function AdminSavingsRateHeroBanner({ query }: {
                                 onClick={() => router.push("/admin/savings-rates")}
                             >
                                 <Plus className="w-5 h-5 mr-2" />
-                                Ajouter un taux
+                                {t("add")}
                             </Button>
                         </div>
                     </div>
@@ -87,7 +89,7 @@ export function AdminSavingsRateHeroBanner({ query }: {
 
                                 <Badge className="bg-white/20 hover:bg-white/25 text-white border-white/30 backdrop-blur-sm text-base px-4 py-1.5 w-fit">
                                     <CheckCircle className="w-4 h-4 mr-2" />
-                                    Taux actuellement en vigueur
+                                    {t("effectTitle")}
                                 </Badge>
 
 
@@ -105,7 +107,7 @@ export function AdminSavingsRateHeroBanner({ query }: {
                                                 </span>
                                             </div>
                                             <p className="text-lg md:text-xl text-white/90 mt-2 font-medium">
-                                                Taux d'intérêt annuel
+                                                {t("annualRate")}
                                             </p>
                                         </div>
                                     </div>
@@ -114,7 +116,7 @@ export function AdminSavingsRateHeroBanner({ query }: {
                                     <div className="flex items-center gap-2 text-white/80">
                                         <Calendar className="w-5 h-5" />
                                         <span className="text-sm md:text-base">
-                                            Effectif depuis le {formatDateFrench(currentRate.effectiveDate)}
+                                            {t("effectiveDate")} {formatDateFrench(currentRate.effectiveDate)}
                                         </span>
                                     </div>
                                 </div>
@@ -122,9 +124,7 @@ export function AdminSavingsRateHeroBanner({ query }: {
                                 {/* Description admin */}
                                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                                     <p className="text-sm md:text-base text-white/90 leading-relaxed">
-                                        <strong>💡 Impact :</strong> Ce taux s'applique automatiquement à tous
-                                        les comptes d'épargne. Les intérêts sont calculés quotidiennement et
-                                        versés chaque jour via le système automatisé.
+                                        <strong>💡 {t("impact")} :</strong> {t("impactText")}
                                     </p>
                                 </div>
                             </div>
@@ -132,24 +132,27 @@ export function AdminSavingsRateHeroBanner({ query }: {
                             {/* Droite : Statistiques d'impact */}
                             <div className="space-y-4">
                                 <h3 className="text-xl md:text-2xl font-bold text-white mb-4">
-                                    Impact sur les clients
+                                    {t("clientImpact")}
                                 </h3>
                                 <div className="grid grid-cols-1 gap-3">
                                     <ImpactCard
-                                        label="Client avec 1 000 €"
+                                        label={t("impactCard.one")}
                                         amount={1000}
                                         rate={currentRate.rate}
+                                        t={t}
                                     />
                                     <ImpactCard
-                                        label="Client avec 10 000 €"
+                                        label={t("impactCard.ten")}
                                         amount={10000}
                                         rate={currentRate.rate}
                                         highlighted
+                                        t={t}
                                     />
                                     <ImpactCard
-                                        label="Client avec 50 000 €"
+                                        label={t("impactCard.fifty")}
                                         amount={50000}
                                         rate={currentRate.rate}
+                                        t={t}
                                     />
                                 </div>
 
@@ -161,7 +164,7 @@ export function AdminSavingsRateHeroBanner({ query }: {
                                         onClick={() => router.push("/director/savings-rate/new")}
                                     >
                                         <Plus className="w-5 h-5 mr-2" />
-                                        Nouveau taux
+                                        {t("new")}
                                     </Button>
                                 </div>
                             </div>
@@ -178,11 +181,13 @@ const ImpactCard = ({
     amount,
     rate,
     highlighted = false,
+    t
 }: {
     label: string;
     amount: number;
     rate: number;
     highlighted?: boolean;
+    t: ReturnType<typeof useTranslations>;
 }) => {
     const yearlyGain = (amount * rate) / 100;
     const monthlyGain = yearlyGain / 12;
@@ -201,7 +206,7 @@ const ImpactCard = ({
                     <p className="text-sm text-white/80 font-medium">{label}</p>
                     {highlighted && (
                         <Badge className="bg-yellow-400/20 text-yellow-200 border-yellow-300/30 text-xs">
-                            Populaire
+                            {t("impactCard.popular")}
                         </Badge>
                     )}
                 </div>
@@ -209,7 +214,7 @@ const ImpactCard = ({
                 {/* Gains */}
                 <div className="grid grid-cols-3 gap-2">
                     <div>
-                        <p className="text-xs text-white/60">Annuel</p>
+                        <p className="text-xs text-white/60">{t("impactCard.annual")}</p>
                         <p className="text-lg font-bold text-white">
                             {yearlyGain.toLocaleString("fr-FR", {
                                 style: "currency",
@@ -219,7 +224,7 @@ const ImpactCard = ({
                         </p>
                     </div>
                     <div>
-                        <p className="text-xs text-white/60">Mensuel</p>
+                        <p className="text-xs text-white/60">{t("impactCard.monthly")}</p>
                         <p className="text-lg font-bold text-white">
                             {monthlyGain.toLocaleString("fr-FR", {
                                 style: "currency",
@@ -229,7 +234,7 @@ const ImpactCard = ({
                         </p>
                     </div>
                     <div>
-                        <p className="text-xs text-white/60">Journalier</p>
+                        <p className="text-xs text-white/60">{t("impactCard.daily")}</p>
                         <p className="text-lg font-bold text-white">
                             {dailyGain.toLocaleString("fr-FR", {
                                 style: "currency",

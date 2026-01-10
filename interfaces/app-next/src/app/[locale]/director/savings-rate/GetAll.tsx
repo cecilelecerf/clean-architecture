@@ -8,11 +8,13 @@ import { endpoints } from "@/utils/endpoint"
 import { SavingRate } from "@infrastructure/types/savingsrate"
 import { useQuery } from "@tanstack/react-query"
 import { Calendar, Clock, History, Percent, Plus, TrendingUp } from "lucide-react"
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { match } from "ts-pattern"
 
 export const GetAllSavingsRate = ({ current }: { current: SavingRate | null }) => {
-    const query = useQuery(endpoints.savingsRates.getAll())
+    const query = useQuery(endpoints.savingsRates.getAll());
+    const t = useTranslations("director.saving");
 
     return match(query)
         .with({ status: "error" }, () => "error")
@@ -24,12 +26,12 @@ export const GetAllSavingsRate = ({ current }: { current: SavingRate | null }) =
                         <CardContent>
                             <TrendingUp className="w-16 h-16 mx-auto text-gray-400 mb-4" />
                             <p className="text-gray-500 mb-4">
-                                Aucun taux d'épargne configuré
+                                {t("nothing")}
                             </p>
                             <Link href="/director/savings-rate/new">
                                 <Button >
                                     <Plus className="w-4 h-4 mr-2" />
-                                    Créer un taux
+                                    {t("create")}
                                 </Button>
                             </Link>
                         </CardContent>
@@ -41,13 +43,14 @@ export const GetAllSavingsRate = ({ current }: { current: SavingRate | null }) =
                 <div className="space-y-4">
                     <h2 className="text-lg font-semibold flex items-center gap-2">
                         <History className="w-5 h-5" />
-                        Historique des taux ({rates.length})
+                        {t("history")} ({rates.length})
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {rates.filter((rate) => rate.id !== current.id).map((rate) => (
                             <SavingsRateCard
                                 key={rate.id}
                                 rate={rate}
+                                t={t}
                             />
                         ))}
                     </div>
@@ -62,8 +65,10 @@ export const GetAllSavingsRate = ({ current }: { current: SavingRate | null }) =
 
 const SavingsRateCard = ({
     rate,
+    t
 }: {
     rate: SavingRate;
+    t: ReturnType<typeof useTranslations>;
 }) => {
     const effectiveDate = new Date(rate.effectiveDate);
     const now = new Date();
@@ -73,14 +78,14 @@ const SavingsRateCard = ({
             return (
                 <Badge variant="secondary">
                     <Clock className="w-3 h-3 mr-1" />
-                    À venir
+                    {t("badge.coming")}
                 </Badge>
             );
         } else
             return (
                 <Badge variant="outline">
                     <History className="w-3 h-3 mr-1" />
-                    Historique
+                    {t("badge.history")}
                 </Badge>
             );
     };
@@ -99,7 +104,7 @@ const SavingsRateCard = ({
                         <p className={`text-4xl font-bold text-gray-700`}>
                             {rate.rate}%
                         </p>
-                        <p className="text-sm text-gray-500">par an</p>
+                        <p className="text-sm text-gray-500">{t("card.year")}</p>
                     </div>
                 </div>
 
@@ -108,21 +113,21 @@ const SavingsRateCard = ({
                     <div className="flex items-center gap-2 text-sm">
                         <Calendar className="w-4 h-4 text-gray-400" />
                         <span className="text-gray-600">
-                            <span className="font-medium">Effectif le :</span>{" "}
+                            <span className="font-medium">{t("card.effectiveDate")} :</span>{" "}
                             {formatDateFrench(rate.effectiveDate)}
                         </span>
                     </div>
                     <div className="text-xs text-gray-500">
-                        Créé le {formatDateFrench(rate.createdAt)}
+                        {t("card.createdAt")} {formatDateFrench(rate.createdAt)}
                     </div>
                 </div>
 
                 {/* Message contextuel */}
                 {isFuture && (
                     <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
-                        Ce taux sera appliqué dans{" "}
+                        {t("card.rate")}{" "}
                         {Math.ceil((effectiveDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))}{" "}
-                        jour(s)
+                        {t("card.day")}
                     </div>
                 )}
             </CardContent>

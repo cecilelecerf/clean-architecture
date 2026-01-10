@@ -6,9 +6,11 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "../ui/skeleton";
+import { useTranslations } from "next-intl";
 
 
 export const CardUserDetail = ({ user }: { user: UserDto }) => {
+    const t = useTranslations("director.user.card");
     return (
         <Card className="p-6">
             <div className="flex items-start gap-6 flex-col sm:flex-row">
@@ -47,12 +49,12 @@ export const CardUserDetail = ({ user }: { user: UserDto }) => {
                             {user.confirmedAt ? (
                                 <>
                                     <CheckCircle className="h-4 w-4 text-green-500" />
-                                    <span className="text-green-700">Email confirmé</span>
+                                    <span className="text-green-700">{t("corfirm")}</span>
                                 </>
                             ) : (
                                 <>
                                     <XCircle className="h-4 w-4 text-orange-500" />
-                                    <span className="text-orange-700">Email non confirmé</span>
+                                    <span className="text-orange-700">{t("not")}</span>
                                 </>
                             )}
                         </div>

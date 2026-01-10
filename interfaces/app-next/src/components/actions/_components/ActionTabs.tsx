@@ -21,30 +21,32 @@ import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { MyOrders } from "./MyOrder";
 import { ChartTab } from "./ChartTab";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 
 export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: boolean }) => {
     const statsQuery = useQuery(endpoints.actions.getStats({ isin: action.ISIN }));
+    const t = useTranslations("director.stocks.details");
 
     return (
         <Tabs defaultValue="overview" className="w-full">
             <TabsList className={clsx(`grid w-full mb-4`, isAdmin ? "grid-cols-3" : "grid-cols-4")}>
                 <TabsTrigger value="overview" className="text-xs sm:text-sm">
                     <Activity className="w-4 h-4 mr-1 hidden sm:inline" />
-                    Vue d'ensemble
+                    {t("tabs.overview")}
                 </TabsTrigger>
                 {!isAdmin && (
                     <TabsTrigger value="my-order" className="text-xs sm:text-sm">
                         <LineChartIcon className="w-4 h-4 mr-1 hidden sm:inline" />
-                        Mes actions
+                        {t("tabs.mine")}
                     </TabsTrigger>
                 )}
                 <TabsTrigger value="chart" className="text-xs sm:text-sm">
                     <LineChartIcon className="w-4 h-4 mr-1 hidden sm:inline" />
-                    Graphiques
+                    {t("tabs.graph")}
                 </TabsTrigger>
                 <TabsTrigger value="stats" className="text-xs sm:text-sm">
                     <BarChart3 className="w-4 h-4 mr-1 hidden sm:inline" />
-                    Statistiques
+                    {t("tabs.stats")}
                 </TabsTrigger>
             </TabsList>
 
@@ -53,13 +55,13 @@ export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: bool
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     <MobileInfoCard
                         icon={Building2}
-                        label="Marché"
+                        label={t("overview.market")}
                         value={action.market}
                         color="blue"
                     />
                     <MobileInfoCard
                         icon={Layers}
-                        label="Secteur"
+                        label={t("overview.sector")}
                         value={action.activitySector}
                         color="purple"
                     />
@@ -68,29 +70,29 @@ export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: bool
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-base">
-                            Informations détaillées
+                            {t("overview.title")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <MobileDetailRow label="ISIN" value={action.ISIN} />
                         <Separator />
-                        <MobileDetailRow label="Symbole" value={action.symbol} />
+                        <MobileDetailRow label={t("overview.symbol")} value={action.symbol} />
                         <Separator />
                         <MobileDetailRow
-                            label="Prix unitaire"
+                            label={t("overview.price")}
                             value={`${action.price.amount} ${action.price.currency}`}
                         />
                         <Separator />
                         <Separator />
                         <MobileDetailRow
-                            label="Créée le"
+                            label={t("overview.createdAt")}
                             value={formatDateFrench(action.createdAt)}
                         />
                         {action.updatedAt && (
                             <>
                                 <Separator />
                                 <MobileDetailRow
-                                    label="Maj le"
+                                    label={t("overview.updatedAt")}
                                     value={formatDateFrench(action.updatedAt)}
                                 />
                             </>
@@ -114,7 +116,7 @@ export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: bool
                         <Card>
                             <CardContent className="p-4">
                                 <p className="text-sm text-gray-500 text-center">
-                                    Impossible de charger les statistiques
+                                    {t("stats.unableLoading")}
                                 </p>
                             </CardContent>
                         </Card>
@@ -124,24 +126,24 @@ export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: bool
                             <Card>
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-base">
-                                        Performance
+                                        {t("stats.perf")}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
                                     <PerformanceRow
-                                        label="Variation 24h"
+                                        label={t("stats.variation.24")}
                                         value={stats.priceChange24h}
                                         isPercentage
                                     />
                                     <Separator />
                                     <PerformanceRow
-                                        label="Variation 7j"
+                                        label={t("stats.variation.7")}
                                         value={stats.priceChange7d}
                                         isPercentage
                                     />
                                     <Separator />
                                     <PerformanceRow
-                                        label="Variation 30j"
+                                        label={t("stats.variation.30")}
                                         value={stats.priceChange30d}
                                         isPercentage
                                     />
@@ -150,13 +152,13 @@ export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: bool
 
                             <div className="grid grid-cols-2 gap-3">
                                 <StatCard
-                                    label="Prix min (30j)"
+                                    label={t("stats.minPrice")}
                                     value={`${stats.minPrice7d} ${action.price.currency}`}
                                     icon={TrendingDown}
                                     color="red"
                                 />
                                 <StatCard
-                                    label="Prix max (30j)"
+                                    label={t("stats.maxPrice")}
                                     value={`${stats.maxPrice7d} ${action.price.currency}`}
                                     icon={TrendingUp}
                                     color="green"
@@ -166,22 +168,22 @@ export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: bool
                             <Card>
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-base">
-                                        Trading
+                                        {t("stats.trade")}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
                                     <MobileDetailRow
-                                        label="Volume total (7j)"
+                                        label={t("stats.totalVolume")}
                                         value={stats.totalVolume7d}
                                     />
                                     <Separator />
                                     <MobileDetailRow
-                                        label="Prix moyen (7j)"
+                                        label={t("stats.averagePrice")}
                                         value={`${stats.averagePrice7d} ${action.price.currency}`}
                                     />
                                     <Separator />
                                     <MobileDetailRow
-                                        label="Transactions (7j)"
+                                        label={t("stats.transactions")}
                                         value={stats.transactionCount7d}
                                     />
                                 </CardContent>

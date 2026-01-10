@@ -9,11 +9,13 @@ import { Calendar, Clock, CreditCardIcon, Euro, User } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreditDTO } from "@infrastructure/types/credit";
+import { useTranslations } from "next-intl";
 
 
 export const CreditByFormule = ({ formuleId }: { formuleId: FormuleId }) => {
     const query = useQuery(endpoints.credits.getAllByFormuleId({ formuleId }))
-    const router = useRouter()
+    const router = useRouter();
+    const t = useTranslations("director.credits.formulas");
 
     return match(query)
         .with({ status: "error" }, () => "error")
@@ -25,13 +27,13 @@ export const CreditByFormule = ({ formuleId }: { formuleId: FormuleId }) => {
                         <CardContent className="py-12 text-center">
                             <CreditCardIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                             <h3 className="text-lg font-semibold mb-2">
-                                Aucun crédit trouvé
+                                {t("none")}
                             </h3>
                             <p className="text-muted-foreground mb-6">
-                                Cette formule n'a pas encore de crédits associés.
+                                {t("nothingAssociate")}
                             </p>
                             <Button onClick={() => router.push('/director/formules')}>
-                                Retour aux formules
+                                {t("back")}
                             </Button>
                         </CardContent>
                     </Card>
@@ -42,7 +44,7 @@ export const CreditByFormule = ({ formuleId }: { formuleId: FormuleId }) => {
                 < div className="grid grid-cols-1 sm:grid-cols-2 gap-5" >
                     {
                         credits.map((credit) => (
-                            <CreditCard key={credit.id} credit={credit} />
+                            <CreditCard key={credit.id} credit={credit} t={t} />
                         ))
                     }
                 </div >
@@ -69,12 +71,12 @@ const CreditListSkeleton = () => (
     </div>
 );
 
-const StatusBadge = ({ status }: { status: CreditDTO["status"] }) => {
+const StatusBadge = ({ status, t }: { status: CreditDTO["status"], t: ReturnType<typeof useTranslations>; }) => {
     const variants = {
-        PENDING: { variant: "outline" as const, label: "En attente" },
-        ACCEPTED: { variant: "default" as const, label: "Accepté" },
-        REFUSED: { variant: "destructive" as const, label: "Refusé" },
-        COMPLETED: { variant: "secondary" as const, label: "Terminé" },
+        PENDING: { variant: "outline" as const, label: t("badge.accept") },
+        ACCEPTED: { variant: "default" as const, label: t("badge.refuse") },
+        REFUSED: { variant: "destructive" as const, label: t("badge.waiting") },
+        COMPLETED: { variant: "secondary" as const, label: t("badge.end") },
     };
 
     const config = variants[status];
@@ -87,14 +89,14 @@ const StatusBadge = ({ status }: { status: CreditDTO["status"] }) => {
 };
 
 
-const CreditCard = ({ credit }: { credit: CreditDTO }) => (
+const CreditCard = ({ credit, t }: { credit: CreditDTO, t: ReturnType<typeof useTranslations>; }) => (
     <Card className="hover:shadow-md transition-shadow">
         <CardHeader>
             <div className="flex items-start justify-between">
                 <CardTitle className="text-lg font-semibold">
-                    Crédit #{credit.id.slice(0, 8)}
+                    {t("loan")} #{credit.id.slice(0, 8)}
                 </CardTitle>
-                <StatusBadge status={credit.status} />
+                <StatusBadge status={credit.status} t={t}/>
             </div>
         </CardHeader>
 
@@ -104,7 +106,7 @@ const CreditCard = ({ credit }: { credit: CreditDTO }) => (
                 <div className="flex items-center gap-2 text-sm">
                     <Euro className="h-4 w-4 text-muted-foreground" />
                     <div>
-                        <p className="text-muted-foreground">Montant initial</p>
+                        <p className="text-muted-foreground">{t("info.amount")}</p>
                         <p className="font-semibold">
                             {credit.initialAmount.amount.toLocaleString('fr-FR')}€
                         </p>
@@ -114,7 +116,7 @@ const CreditCard = ({ credit }: { credit: CreditDTO }) => (
                 <div className="flex items-center gap-2 text-sm">
                     <CreditCardIcon className="h-4 w-4 text-muted-foreground" />
                     <div>
-                        <p className="text-muted-foreground">Mensualité</p>
+                        <p className="text-muted-foreground">{t("info.monthly")}</p>
                         <p className="font-semibold">
                             {credit.monthlyPayment.amount.toLocaleString('fr-FR')}€
                         </p>
@@ -124,15 +126,15 @@ const CreditCard = ({ credit }: { credit: CreditDTO }) => (
                 <div className="flex items-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <div>
-                        <p className="text-muted-foreground">Durée</p>
-                        <p className="font-semibold">{credit.durationMonths} mois</p>
+                        <p className="text-muted-foreground">{t("info.duration")}</p>
+                        <p className="font-semibold">{credit.durationMonths} {t("info.month")}</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm">
                     <Euro className="h-4 w-4 text-muted-foreground" />
                     <div>
-                        <p className="text-muted-foreground">Solde restant</p>
+                        <p className="text-muted-foreground">{t("info.balance")}</p>
                         <p className="font-semibold">
                             {credit.remainingBalance.amount.toLocaleString('fr-FR')}€
                         </p>
@@ -145,20 +147,20 @@ const CreditCard = ({ credit }: { credit: CreditDTO }) => (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
                     <span>
-                        Début : {new Date(credit.startDate).toLocaleDateString('fr-FR')}
+                        {t("info.start")} : {new Date(credit.startDate).toLocaleDateString('fr-FR')}
                     </span>
                 </div>
 
                 {credit.advisorId && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <User className="h-4 w-4" />
-                        <span>Conseiller : {credit.advisorId.slice(0, 8)}</span>
+                        <span>{t("info.advisor")} : {credit.advisorId.slice(0, 8)}</span>
                     </div>
                 )}
 
                 {credit.reason && (
                     <div className="text-sm text-muted-foreground">
-                        <p className="font-medium">Motif :</p>
+                        <p className="font-medium">{t("info.reason")} :</p>
                         <p className="italic">{credit.reason}</p>
                     </div>
                 )}

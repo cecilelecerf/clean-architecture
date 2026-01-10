@@ -15,11 +15,13 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { GoToAddPage } from "@/components/GoToAddPage";
 import { ActionCard, ActionCardSkeleton } from "./ActionCard";
+import { useTranslations } from "next-intl";
 
 export const ActionsList = ({ isAdmin, baseHref }: { isAdmin?: boolean, baseHref: string }) => {
     const router = useRouter();
     const query = useQuery(endpoints.actions.getAll());
     const [searchTerm, setSearchTerm] = useState("");
+    const t = useTranslations("director.stocks.list");
 
     const filteredActions = query.data?.filter(
         (action) =>
@@ -36,7 +38,7 @@ export const ActionsList = ({ isAdmin, baseHref }: { isAdmin?: boolean, baseHref
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
-                        placeholder="Rechercher une action..."
+                        placeholder={t("search")}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10"
@@ -54,8 +56,8 @@ export const ActionsList = ({ isAdmin, baseHref }: { isAdmin?: boolean, baseHref
                                 <CardContent className="p-8 text-center space-y-4">
                                     <p className="text-sm text-gray-500">
                                         {searchTerm
-                                            ? "Aucune action trouvée"
-                                            : "Aucune action enregistrée"}
+                                            ? t("notfound")
+                                            : t("notsave")}
                                     </p>
 
                                     {!searchTerm && isAdmin && (
@@ -65,7 +67,7 @@ export const ActionsList = ({ isAdmin, baseHref }: { isAdmin?: boolean, baseHref
                                             size="sm"
                                         >
                                             <Plus className="w-4 h-4 mr-2" />
-                                            Ajouter la première action
+                                            {t("add")}
                                         </Button>
                                     )}
                                 </CardContent>

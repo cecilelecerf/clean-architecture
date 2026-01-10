@@ -9,8 +9,6 @@ import { TitleAdminPage } from "@/components/TitleAdminPage";
 import { CardUserDetail, SkeletonCardUserDetail } from "@/components/users/CardUserDetail";
 import { CardUserAction, SkeletonCardUserAction } from "@/components/users/CardAction";
 
-
-
 export default function ClientPage({ params }: { params: Promise<{ userId: UserId }> }) {
     const { userId } = use(params)
     const query = useQuery(endpoints.users.get({ id: userId }));

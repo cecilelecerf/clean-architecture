@@ -16,6 +16,7 @@ import {
     Percent
 } from "lucide-react";
 import { match } from "ts-pattern";
+import { useTranslations } from "next-intl";
 
 interface FormuleStatisticsProps {
     formuleId: FormuleId;
@@ -23,6 +24,7 @@ interface FormuleStatisticsProps {
 
 export function FormuleStatistics({ formuleId }: FormuleStatisticsProps) {
     const query = useQuery(endpoints.formules.stats({ id: formuleId }));
+    const t = useTranslations("director.credits.stats");
 
     return match(query)
         .with({ status: "pending" }, () => <StatsSkeleton />)
@@ -32,30 +34,30 @@ export function FormuleStatistics({ formuleId }: FormuleStatisticsProps) {
                 <Card className="p-6">
                     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                         <TrendingUp className="h-5 w-5" />
-                        Vue d'ensemble
+                        {t("overview")}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <StatCard
                             icon={CreditCard}
-                            label="Crédits actifs"
+                            label={t("active")}
                             value={stats.activeCreditsCount}
                             color="blue"
                         />
                         <StatCard
                             icon={Users}
-                            label="Clients"
+                            label={t("customer")}
                             value={stats.totalClients}
                             color="green"
                         />
                         <StatCard
                             icon={CheckCircle}
-                            label="Taux d'acceptation"
+                            label={t("accept")}
                             value={`${stats.acceptanceRate}%`}
                             color="purple"
                         />
                         <StatCard
                             icon={Clock}
-                            label="En attente"
+                            label={t("wait")}
                             value={stats.pendingCreditsCount}
                             color="orange"
                         />
@@ -65,30 +67,30 @@ export function FormuleStatistics({ formuleId }: FormuleStatisticsProps) {
                 <Card className="p-6">
                     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                         <DollarSign className="h-5 w-5" />
-                        Statistiques financières
+                        {t("finance")}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <FinancialStatCard
                             icon={TrendingUp}
-                            label="Capital prêté total"
+                            label={t("capital")}
                             value={stats.totalLoanedAmount}
                             color="blue"
                         />
                         <FinancialStatCard
                             icon={DollarSign}
-                            label="Intérêts générés"
+                            label={t("interest")}
                             value={stats.totalInterestEarned}
                             color="green"
                         />
                         <FinancialStatCard
                             icon={Percent}
-                            label="Revenus assurance"
+                            label={t("income")}
                             value={stats.totalInsuranceEarned}
                             color="purple"
                         />
                         <FinancialStatCard
                             icon={TrendingUp}
-                            label="Revenus totaux"
+                            label={t("totalIncome")}
                             value={stats.totalRevenue}
                             color="orange"
                         />
@@ -97,25 +99,25 @@ export function FormuleStatistics({ formuleId }: FormuleStatisticsProps) {
 
                 {/* Détails des crédits */}
                 <Card className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">Répartition des crédits</h3>
+                    <h3 className="text-lg font-semibold mb-4">{t("details.title")}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <DetailCard
                             icon={CheckCircle}
-                            label="Acceptés"
+                            label={t("details.accept")}
                             value={stats.acceptedCreditsCount}
                             total={stats.totalCreditsCount}
                             color="green"
                         />
                         <DetailCard
                             icon={XCircle}
-                            label="Refusés"
+                            label={t("details.refuse")}
                             value={stats.refusedCreditsCount}
                             total={stats.totalCreditsCount}
                             color="red"
                         />
                         <DetailCard
                             icon={Clock}
-                            label="En attente"
+                            label={t("details.waiting")}
                             value={stats.pendingCreditsCount}
                             total={stats.totalCreditsCount}
                             color="orange"

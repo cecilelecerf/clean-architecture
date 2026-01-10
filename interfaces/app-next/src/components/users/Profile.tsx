@@ -31,11 +31,13 @@ import { ClientStatistics } from "./_components/ClientStatistics";
 import { AdvisorStatistics } from "./_components/AdvisorStatistics";
 import { DirectorStatistics } from "./_components/DirectorStatistics";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 export const ProfileComponent = () => {
+    const t = useTranslations("director.profile");
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
-    return <Wrapper userId={session.user.id} />
+    return <Wrapper userId={session.user.id} t={t}/>
 }
 
 function ProfileSkeleton() {
@@ -73,7 +75,7 @@ function ProfileSkeleton() {
     );
 }
 
-const Wrapper = ({ userId }: { userId: UserId }) => {
+const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTranslations>; }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState<UpdateClientPayload>({
         firstname: "",
@@ -217,14 +219,14 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                     <Card className="p-4 md:p-6">
                         <h2 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2">
                             <User className="h-5 w-5" />
-                            Informations personnelles
+                            {t("personal.title")}
                         </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {isEditing ? (
                                 <>
                                     <div>
-                                        <Label htmlFor="firstname" className="mb-2">Prénom</Label>
+                                        <Label htmlFor="firstname" className="mb-2">{t("personal.firstname")}</Label>
                                         <Input
                                             id="firstname"
                                             value={formData.firstname}
@@ -232,7 +234,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                         />
                                     </div>
                                     <div>
-                                        <Label htmlFor="lastname" className="mb-2">Nom</Label>
+                                        <Label htmlFor="lastname" className="mb-2">{t("personal.lastname")}</Label>
                                         <Input
                                             id="lastname"
                                             value={formData.lastname}
@@ -240,7 +242,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                         />
                                     </div>
                                     <div>
-                                        <Label htmlFor="email" className="mb-2">Email</Label>
+                                        <Label htmlFor="email" className="mb-2">{t("personal.email")}</Label>
                                         <Input
                                             id="email"
                                             type="email"
@@ -249,7 +251,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                         />
                                     </div>
                                     <div>
-                                        <Label htmlFor="phoneNumber" className="mb-2">Téléphone</Label>
+                                        <Label htmlFor="phoneNumber" className="mb-2">{t("personal.phone")}</Label>
                                         <Input
                                             id="phoneNumber"
                                             value={formData.phoneNumber}
@@ -258,7 +260,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                         />
                                     </div>
                                     <div>
-                                        <Label htmlFor="dateOfBirth" className="mb-2">Date de naissance</Label>
+                                        <Label htmlFor="dateOfBirth" className="mb-2">{t("personal.dateOfBirth")}</Label>
                                         <Input
                                             id="dateOfBirth"
                                             type="date"
@@ -267,7 +269,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                         />
                                     </div>
                                     <div>
-                                        <Label htmlFor="sexe" className="mb-2">Sexe</Label>
+                                        <Label htmlFor="sexe" className="mb-2">{t("personal.sexe")}</Label>
                                         <Select
                                             value={formData.sexe}
                                             onValueChange={(value) => setFormData(prev => ({ ...prev, sexe: value as "girl" | "boy" | "other" }))}
@@ -283,7 +285,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                         </Select>
                                     </div>
                                     <div className="md:col-span-2">
-                                        <Label htmlFor="address" className="mb-2">Adresse</Label>
+                                        <Label htmlFor="address" className="mb-2">{t("personal.address")}</Label>
                                         <Input
                                             id="address"
                                             value={formData.address?.address || ""}
@@ -295,7 +297,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                         />
                                     </div>
                                     <div>
-                                        <Label htmlFor="city" className="mb-2">Ville</Label>
+                                        <Label htmlFor="city" className="mb-2">{t("personal.city")}</Label>
                                         <Input
                                             id="city"
                                             value={formData.address?.city || ""}
@@ -307,7 +309,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                         />
                                     </div>
                                     <div>
-                                        <Label htmlFor="postalCode" className="mb-2">Code postal</Label>
+                                        <Label htmlFor="postalCode" className="mb-2">{t("personal.postalCode")}</Label>
                                         <Input
                                             id="postalCode"
                                             value={formData.address?.postalCode || ""}
@@ -319,7 +321,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                         />
                                     </div>
                                     <div>
-                                        <Label htmlFor="country" className="mb-2">Pays</Label>
+                                        <Label htmlFor="country" className="mb-2">{t("personal.country")}</Label>
                                         <Input
                                             id="country"
                                             value={formData.address?.country || ""}
@@ -336,7 +338,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                         <User className="h-5 w-5 text-gray-500" />
                                         <div>
-                                            <p className="text-xs text-gray-500">Prénom</p>
+                                            <p className="text-xs text-gray-500">{t("personal.firstname")}</p>
                                             <p className="font-medium">{user.firstname}</p>
                                         </div>
                                     </div>
@@ -344,7 +346,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                         <User className="h-5 w-5 text-gray-500" />
                                         <div>
-                                            <p className="text-xs text-gray-500">Nom</p>
+                                            <p className="text-xs text-gray-500">{t("personal.lastname")}</p>
                                             <p className="font-medium">{user.lastname}</p>
                                         </div>
                                     </div>
@@ -352,7 +354,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                         <Mail className="h-5 w-5 text-gray-500" />
                                         <div>
-                                            <p className="text-xs text-gray-500">Email</p>
+                                            <p className="text-xs text-gray-500">{t("personal.email")}</p>
                                             <p className="font-medium">{user.email}</p>
                                         </div>
                                     </div>
@@ -360,7 +362,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                         <> <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                             <Phone className="h-5 w-5 text-gray-500" />
                                             <div>
-                                                <p className="text-xs text-gray-500">Téléphone</p>
+                                                <p className="text-xs text-gray-500">{t("personal.phonr")}</p>
                                                 <p className="font-medium">{user.phoneNumber || "Non renseigné"}</p>
                                             </div>
                                         </div>
@@ -368,7 +370,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                                 <Cake className="h-5 w-5 text-gray-500" />
                                                 <div>
-                                                    <p className="text-xs text-gray-500">Date de naissance</p>
+                                                    <p className="text-xs text-gray-500">{t("personal.dateOfBirth")}</p>
                                                     <p className="font-medium">
                                                         {user.dateOfBirth
                                                             ? new Date(user.dateOfBirth).toLocaleDateString('fr-FR')
@@ -380,7 +382,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                                 <User className="h-5 w-5 text-gray-500" />
                                                 <div>
-                                                    <p className="text-xs text-gray-500">Sexe</p>
+                                                    <p className="text-xs text-gray-500">{t("personal.sexe")}</p>
                                                     <p className="font-medium">
                                                         {user.sexe === "boy" ? "Homme" : user.sexe === "girl" ? "Femme" : user.sexe || "Non renseigné"}
                                                     </p>
@@ -391,7 +393,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg md:col-span-2">
                                                     <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
                                                     <div>
-                                                        <p className="text-xs text-gray-500">Adresse</p>
+                                                        <p className="text-xs text-gray-500">{t("personal.address")}</p>
                                                         <p className="font-medium">
                                                             {user.address.address && `${user.address.address}, `}
                                                             {user.address.postalCode && `${user.address.postalCode} `}
@@ -404,7 +406,6 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                                     </div>
                                                 </div>
                                             )}</>}
-
                                 </>
                             )}
                         </div>
@@ -421,7 +422,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                     <Card className="p-4 md:p-6">
                         <h2 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2">
                             <Shield className="h-5 w-5" />
-                            Informations du compte
+                            {t("account.title")}
                         </h2>
 
                         <div className="space-y-3">
@@ -429,7 +430,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                 <div className="flex items-center gap-3">
                                     <Calendar className="h-5 w-5 text-gray-500" />
                                     <div>
-                                        <p className="text-sm font-medium">Date de création</p>
+                                        <p className="text-sm font-medium">{t("account.createdAt")}</p>
                                         <p className="text-xs text-gray-500">
                                             {new Date(user.createdAt).toLocaleDateString('fr-FR', {
                                                 day: 'numeric',
@@ -445,7 +446,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                 <div className="flex items-center gap-3">
                                     <Calendar className="h-5 w-5 text-gray-500" />
                                     <div>
-                                        <p className="text-sm font-medium">Dernière modification</p>
+                                        <p className="text-sm font-medium">{t("account.updatedAt")}</p>
                                         <p className="text-xs text-gray-500">
                                             {new Date(user.updatedAt).toLocaleDateString('fr-FR', {
                                                 day: 'numeric',
@@ -462,7 +463,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                     <div className="flex items-center gap-3">
                                         <Mail className="h-5 w-5 text-green-600" />
                                         <div>
-                                            <p className="text-sm font-medium text-green-700">Email confirmé</p>
+                                            <p className="text-sm font-medium text-green-700">{t("account.confirmedEmail")}</p>
                                             <p className="text-xs text-green-600">
                                                 Le {new Date(user.confirmedAt).toLocaleDateString('fr-FR')}
                                             </p>
@@ -477,9 +478,9 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                     <Card className="p-4 md:p-6">
                         <div className="flex flex-col gap-4">
                             <div>
-                                <h3 className="font-semibold">Déconnexion</h3>
+                                <h3 className="font-semibold">{t("logout.title")}</h3>
                                 <p className="text-sm text-gray-500">
-                                    Se déconnecter de votre compte
+                                    {t("logout.text")}
                                 </p>
                             </div>
                             <Button
@@ -488,7 +489,7 @@ const Wrapper = ({ userId }: { userId: UserId }) => {
                                 className="w-full md:w-auto"
                             >
                                 <LogOut className="mr-2 h-4 w-4" />
-                                Se déconnecter
+                                {t("logout.button")}
                             </Button>
                         </div>
                     </Card>

@@ -9,11 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CurrencyCode } from "@infrastructure/types/currency";
+import { useTranslations } from "next-intl";
 
 export default function CurrenciesPage() {
     const query = useQuery(endpoints.currencies.getAll());
     const [editingCode, setEditingCode] = useState<CurrencyCode | null>(null);
     const [newRate, setNewRate] = useState("");
+
+    const t = useTranslations("director.currency");
 
     const updateMutation = useMutation(
         endpoints.currencies.update({ currencyCode: editingCode })
@@ -31,12 +34,12 @@ export default function CurrenciesPage() {
             { exchangeRate: parseFloat(newRate) },
             {
                 onSuccess: () => {
-                    toast.success("Taux de change mis à jour");
+                    toast.success(t("success"));
                     setEditingCode(null);
                     query.refetch();
                 },
                 onError: (error) => {
-                    toast.error(error.message || "Erreur lors de la mise à jour");
+                    toast.error(error.message || t("error"));
                 },
             }
         );
@@ -45,9 +48,9 @@ export default function CurrenciesPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold">Devises</h1>
+                <h1 className="text-2xl font-bold">{t("title")}</h1>
                 <p className="text-sm text-gray-600">
-                    Taux de change par rapport au Dollar USD (USD = 1.0)
+                    {t("text")}
                 </p>
             </div>
 
@@ -64,7 +67,7 @@ export default function CurrenciesPage() {
                                     </div>
                                 </div>
                                 {currency.code === "USD" && (
-                                    <Badge variant="secondary">Référence</Badge>
+                                    <Badge variant="secondary">{t("ref")}</Badge>
                                 )}
                             </div>
                         </CardHeader>
@@ -76,18 +79,18 @@ export default function CurrenciesPage() {
                                         step="0.000001"
                                         value={newRate}
                                         onChange={(e) => setNewRate(e.target.value)}
-                                        placeholder="Nouveau taux"
+                                        placeholder={t("new")}
                                     />
                                     <div className="flex gap-2">
                                         <Button onClick={handleSave} size="sm" className="flex-1">
-                                            Sauvegarder
+                                            {t("save")}
                                         </Button>
                                         <Button
                                             onClick={() => setEditingCode(null)}
                                             variant="outline"
                                             size="sm"
                                         >
-                                            Annuler
+                                            {t("cancel")}
                                         </Button>
                                     </div>
                                 </div>
@@ -97,7 +100,7 @@ export default function CurrenciesPage() {
                                         {currency.exchangeRate.toFixed(6)}
                                     </div>
                                     <p className="text-xs text-gray-600">
-                                        1 USD = {currency.exchangeRate.toFixed(6)} {currency.code}
+                                        {t("usd")} {currency.exchangeRate.toFixed(6)} {currency.code}
                                     </p>
                                     {currency.code !== "USD" && (
                                         <Button
@@ -108,7 +111,7 @@ export default function CurrenciesPage() {
                                             size="sm"
                                             className="w-full"
                                         >
-                                            Modifier le taux
+                                            {t("update")}
                                         </Button>
                                     )}
                                 </div>

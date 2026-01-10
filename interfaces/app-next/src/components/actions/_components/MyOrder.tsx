@@ -8,6 +8,7 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 import { match } from "ts-pattern";
 import { PendingOrderCard } from "./PendingOrderCard";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 export function MyOrders({ action }: { action: Action }) {
     const positionsQuery = useQuery(
@@ -18,6 +19,8 @@ export function MyOrders({ action }: { action: Action }) {
         endpoints.orders.actions.getAllMeByAction({ ISIN: action.ISIN, status: "pending" })
     );
 
+    const t = useTranslations("director.stocks.details.mine");
+
     return (
         <Card>
             <CardContent className="p-6 space-y-4">
@@ -27,7 +30,7 @@ export function MyOrders({ action }: { action: Action }) {
                             return (
                                 <Card>
                                     <CardContent className="p-6 text-center text-muted-foreground">
-                                        Vous ne possédez pas d'actions {action.symbol}
+                                        {t("none")} {action.symbol}
                                     </CardContent>
                                 </Card>
                             );
@@ -40,11 +43,11 @@ export function MyOrders({ action }: { action: Action }) {
                             <>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-sm text-muted-foreground">Actions détenues</p>
+                                        <p className="text-sm text-muted-foreground">{t("held")}</p>
                                         <p className="text-2xl font-bold">{position.quantity}</p>
                                     </div>
                                     <div>
-                                        <p className="text-sm text-muted-foreground">Prix moyen d'achat</p>
+                                        <p className="text-sm text-muted-foreground">{t("averagePrice")}</p>
                                         <p className="text-2xl font-bold">{position.averagePrice}€</p>
                                     </div>
                                 </div>
@@ -52,18 +55,18 @@ export function MyOrders({ action }: { action: Action }) {
                                 <div className="border-t pt-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-sm text-muted-foreground">Investi</p>
+                                            <p className="text-sm text-muted-foreground">{t("invest")}</p>
                                             <p className="text-lg font-semibold">{position.totalInvested}€</p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-muted-foreground">Valeur actuelle</p>
+                                            <p className="text-sm text-muted-foreground">{t("actualValue")}</p>
                                             <p className="text-lg font-semibold">{position.currentValue}€</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="border-t pt-4">
-                                    <p className="text-sm text-muted-foreground mb-2">Plus/Moins-value</p>
+                                    <p className="text-sm text-muted-foreground mb-2">{t("value")}</p>
                                     <div className={`flex items-center gap-2 ${profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                         {profitLoss >= 0 ? <TrendingUp /> : <TrendingDown />}
                                         <span className="text-3xl font-bold">
@@ -80,10 +83,10 @@ export function MyOrders({ action }: { action: Action }) {
                     .otherwise(() => <Skeleton className="h-64" />)}
                 {match(orderQuery)
                     .with({ status: "success" }, ({ data: orders }) => {
-                        if (orders.length === 0) return <>Pas d'ordre en attente</>
+                        if (orders.length === 0) return <>{t("noneWaiting")}</>
                         return (
                             <>
-                                <h1 className=" mt-16 font-semibold text-2xl text-gray-900">Action en attente</h1>
+                                <h1 className=" mt-16 font-semibold text-2xl text-gray-900">{t("waiting")}</h1>
                                 <div className="space-y-6">
                                     {orders.map((order, i) =>
                                         <React.Fragment key={i} >
@@ -96,6 +99,4 @@ export function MyOrders({ action }: { action: Action }) {
             </CardContent>
         </Card>
     )
-
-
 }
