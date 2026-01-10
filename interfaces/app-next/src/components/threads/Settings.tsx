@@ -18,11 +18,14 @@ import { match } from "ts-pattern"
 import { Skeleton } from "../ui/skeleton"
 import { useRouter } from "next/navigation"
 import { queryClient } from "@/lib/queryClient"
+import { useTranslations } from "next-intl"
 
 type Props = {} & ThreadWithUser
 
 export const Settings = ({ administrator, participants, participantsId, isClose, id, type }: Props) => {
     const { data: session } = useSession();
+    const t = useTranslations("director.message");
+    
     if (!session?.user?.id) return <div>Unauthorized</div>;
     const transfer = useMutation(endpoints.threads.transfer({ threadId: id }))
     const removeParticipant = useMutation(endpoints.threads.participants.remove({ threadId: id }))
@@ -37,11 +40,11 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Paramètre de discution</DialogTitle>
+                    <DialogTitle>{t("setting.title")}</DialogTitle>
                     <DialogDescription>
                         {administrator && (
                             <>
-                                Administrateur : {administrator.firstname}{" "}{administrator.lastname}
+                                {t("setting.admin")} : {administrator.firstname}{" "}{administrator.lastname}
                             </>
                         )}
                     </DialogDescription>
@@ -80,7 +83,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                                                     })} className="text-gray-500
                                             ">
                                                     <UserStar />
-                                                    Désigner admin
+                                                    {t("setting.choseAdmin")}
                                                 </ButtonLoading>
                                             )}
 
@@ -90,7 +93,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                                                 onClick={() => removeParticipant.mutate({ userId: participant.id })} className="text-gray-500
                                             ">
                                                 <UserRoundX />
-                                                Supprimer
+                                                {t("setting.delete")}
                                             </ButtonLoading>
                                         </>
                                     </PopoverContent>
@@ -100,15 +103,15 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                     )}
                 </Flex>
                 {isAdmin && type === "internal" && !isClose && (
-                    <AddParticipant administratorId={administrator.id} participantsId={participantsId} id={id} />
+                    <AddParticipant administratorId={administrator.id} participantsId={participantsId} id={id} t={t}/>
                 )}
                 {isAdmin && type === 'external' && !isClose && (
-                    <TransferToAdvisor id={id} />
+                    <TransferToAdvisor id={id} t={t}/>
                 )}
                 <DialogFooter >
                     {isAdmin && !isClose && (
                         <ButtonLoading loading={false} variant="destructive" onClick={() => closeThread.mutate()}>
-                            <Trash2 /> Cloturer la conversation ?
+                            <Trash2 /> {t("setting.close")}
                         </ButtonLoading>
 
                     )}</DialogFooter>
@@ -117,8 +120,11 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
     )
 }
 
+type AddParticipantProps = Pick<Props, "administratorId" | "participantsId" | "id"> & {
+  t: ReturnType<typeof useTranslations<"director.message">>;
+};
 
-const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "administratorId" | "participantsId" | "id">) => {
+const AddParticipant = ({ participantsId, administratorId, id, t }: AddParticipantProps) => {
     const [selectedUserId, setSelectedUserId] = useState<UserId | null>(null);
     const [open, setOpen] = useState(false);
 
@@ -147,7 +153,7 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
                 return (
                     <Button variant="secondary" disabled>
                         <Plus className="mr-2 h-4 w-4" />
-                        Aucun participant disponible
+                        {t("setting.noneAvailable")}
                     </Button>
                 );
             }
@@ -157,14 +163,14 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
                     <PopoverTrigger asChild>
                         <Button variant="secondary">
                             <Plus className="mr-2 h-4 w-4" />
-                            Ajouter un participant
+                            {t("setting.add")}
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[300px] p-0" align="start">
                         <Command>
                             <CommandInput placeholder="Rechercher un utilisateur..." />
                             <CommandList>
-                                <CommandEmpty>Aucun utilisateur trouvé.</CommandEmpty>
+                                <CommandEmpty>{t("setting.noneFind")}</CommandEmpty>
                                 <CommandGroup heading="Conseillers">
                                     {availableUsers
                                         .filter((user) => user.role === "conseiller")
@@ -235,7 +241,7 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
                                     })}
                                     className="w-full"
                                 >
-                                    Ajouter
+                                    {t("add")}
                                 </ButtonLoading>
                             </div>
                         )}
@@ -248,9 +254,12 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
 
 }
 
+type TransferToAdvisorProps = Pick<Props, "id"> & {
+  t: ReturnType<typeof useTranslations<"director.message">>;
+};
 
 
-const TransferToAdvisor = ({ id }: Pick<Props, "id">) => {
+const TransferToAdvisor = ({ id, t }: TransferToAdvisorProps) => {
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
     const [selectedUserId, setSelectedUserId] = useState<UserId | null>(null);
@@ -269,7 +278,7 @@ const TransferToAdvisor = ({ id }: Pick<Props, "id">) => {
                 return (
                     <Button variant="secondary" disabled>
                         <Plus className="mr-2 h-4 w-4" />
-                        Aucun participant disponible
+                        {t("setting.noneAvailable")}
                     </Button>
                 );
             }
@@ -279,14 +288,14 @@ const TransferToAdvisor = ({ id }: Pick<Props, "id">) => {
                     <PopoverTrigger asChild>
                         <Button variant="secondary">
                             <Plus className="mr-2 h-4 w-4" />
-                            Transférer la conversation
+                            {t("setting.transfer")}
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[300px] p-0" align="start">
                         <Command>
                             <CommandInput placeholder="Rechercher un utilisateur..." />
                             <CommandList>
-                                <CommandEmpty>Aucun utilisateur trouvé.</CommandEmpty>
+                                <CommandEmpty>{t("setting.noneFind")}</CommandEmpty>
                                 <CommandGroup heading="Conseillers">
                                     {users
                                         .filter((user) => user.id !== session.user.id)
@@ -336,17 +345,15 @@ const TransferToAdvisor = ({ id }: Pick<Props, "id">) => {
                                     })}
                                     className="w-full"
                                 >
-                                    Transférer
+                                    {t("setting.buttonTransfer")}
                                 </ButtonLoading>
                             </div>
                         )}
                     </PopoverContent>
                 </Popover >
-
             )
         })
         .exhaustive()
-
 }
 
 const SkeletonAddParticipant = () => {

@@ -452,6 +452,19 @@
         "director": "Director"
     },
     "new": "New conversation",
-    "button": "Start"
+    "button": "Start",
+    "add": "Add",
+    "setting": {
+        "title": "Discussion settings",
+        "admin": "Administrator",
+        "choseAdmin": "Designate admin",
+        "delete": "Delete",
+        "close": "End the conversation?",
+        "noneAvailable": "No participants available",
+        "add": "Add a participant",
+        "noneFind": "No users found.",
+        "transfer": "Transfer the conversation",
+        "buttonTransfer": "Transfer"
+    }
   }
 }
