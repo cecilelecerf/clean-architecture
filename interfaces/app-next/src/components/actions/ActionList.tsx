@@ -30,7 +30,7 @@ export const ActionsList = ({ isAdmin, baseHref }: { isAdmin?: boolean, baseHref
 
     return (
         <div className="space-y-4 pb-20">
-            <div className="sticky top-0 z-10 bg-white pb-4 space-y-4">
+            <div className="pb-4 space-y-4">
                 <TitleAdminPage title="Actions" />
 
                 <div className="relative">
@@ -77,6 +77,7 @@ export const ActionsList = ({ isAdmin, baseHref }: { isAdmin?: boolean, baseHref
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                             {filteredActions.map((action) => (
                                 <ActionCard
+                                    withIsDispo={isAdmin}
                                     key={action.ISIN}
                                     action={action}
                                     onClick={() => router.push(`${baseHref}/actions/${action.ISIN}`)}

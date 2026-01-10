@@ -89,7 +89,6 @@ export function PendingOrderCard({
                 </CardHeader>
 
                 <CardContent className="space-y-3">
-                    {/* Détails de l'ordre */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="bg-muted/50 rounded-lg p-3">
                             <p className="text-xs text-muted-foreground mb-1">Type</p>
@@ -107,18 +106,20 @@ export function PendingOrderCard({
                         </div>
                     </div>
 
-                    {/* Prix */}
-                    <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                                 <DollarSign className="w-4 h-4" />
                                 Prix {isBuy ? "maximum" : "minimum"}
                             </div>
-                            <div className="text-right flex-col  md:flex-row flex  md:items-baseline md:gap-2">
-                                <p className="text-2xl font-bold text-blue-700">
+
+                            <div className="text-right flex-col md:flex-row flex md:items-baseline md:gap-2">
+                                <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
                                     {order.price.amount}
                                 </p>
-                                <p className="text-xs text-gray-500">{order.price.currency}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    {order.price.currency}
+                                </p>
                             </div>
                         </div>
                     </div>

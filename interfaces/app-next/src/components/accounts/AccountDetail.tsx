@@ -57,7 +57,6 @@ export const AccountDetail = ({
     const [editedName, setEditedName] = useState('');
     const [transferTargetAccount, setTransferTargetAccount] = useState('');
 
-    // Query pour récupérer les autres comptes (pour le transfert)
     const otherAccountsQuery = useQuery({
         ...endpoints.accounts.getAllByMe(),
         enabled: isCloseDialogOpen,
@@ -175,7 +174,7 @@ export const AccountDetail = ({
                                     <h2 className="font-semibold text-lg">Dernières transactions</h2>
                                     <Button
                                         variant="link"
-                                        onClick={() => router.push(`/accounts/${account.IBAN}/transactions`)}
+                                        onClick={() => router.push(`${basePath}/${account.IBAN}/transactions`)}
                                     >
                                         {'Voir +'}
                                     </Button>
@@ -224,7 +223,6 @@ export const AccountDetail = ({
                                 </DialogContent>
                             </Dialog>
 
-                            {/* Dialog de fermeture de compte */}
                             <Dialog open={isCloseDialogOpen} onOpenChange={setIsCloseDialogOpen}>
                                 <DialogContent>
                                     <DialogHeader>

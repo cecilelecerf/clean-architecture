@@ -12,9 +12,10 @@ import {
 interface ActionCardProps {
     action: any;
     onClick: () => void;
+    withIsDispo?: boolean
 }
 
-export const ActionCard = ({ action, onClick }: ActionCardProps) => {
+export const ActionCard = ({ action, onClick, withIsDispo }: ActionCardProps) => {
     return (
         <Card
             className="cursor-pointer hover:shadow-md transition-all active:scale-[0.98] hover:scale-105"
@@ -27,20 +28,22 @@ export const ActionCard = ({ action, onClick }: ActionCardProps) => {
                             <h3 className="font-bold text-blue-600 text-lg">
                                 {action.symbol}
                             </h3>
-                            {action.isAvailable ? (
-                                <Badge className="bg-green-100 text-green-800 text-xs px-2 py-0">
-                                    <CheckCircle className="w-3 h-3 mr-1" />
-                                    Dispo
-                                </Badge>
-                            ) : (
-                                <Badge className="bg-red-100 text-red-800 text-xs px-2 py-0">
-                                    <XCircle className="w-3 h-3 mr-1" />
-                                    Indispo
-                                </Badge>
+                            {withIsDispo && (
+                                action.isAvailable ? (
+                                    <Badge className="bg-green-100 text-green-800 text-xs px-2 py-0">
+                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                        Dispo
+                                    </Badge>
+                                ) : (
+                                    <Badge className="bg-red-100 text-red-800 text-xs px-2 py-0">
+                                        <XCircle className="w-3 h-3 mr-1" />
+                                        Indispo
+                                    </Badge>
+                                )
                             )}
                         </div>
 
-                        <p className="font-medium text-gray-900 text-sm mb-2 truncate">
+                        <p className="font-medium text-sm mb-2 truncate">
                             {action.name}
                         </p>
 
@@ -57,7 +60,7 @@ export const ActionCard = ({ action, onClick }: ActionCardProps) => {
 
                     <div className="flex flex-col items-end gap-2">
                         <div className="text-right">
-                            <p className="text-xl font-bold text-gray-900">
+                            <p className="text-xl font-bold  ">
                                 {action.price.amount.toLocaleString("fr-FR", {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,

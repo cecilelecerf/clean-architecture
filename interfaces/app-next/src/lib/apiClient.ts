@@ -29,7 +29,6 @@ async function request<T>(
     }
 
     const data = await res.json();
-    console.log('Response data:', data);
     return data as T;
   } catch (err) {
     console.error('API Error:', err);

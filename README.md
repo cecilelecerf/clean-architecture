@@ -1,7 +1,7 @@
 # 🏦 Banking App - Clean Architecture
 
- Application bancaire moderne construite avec une architecture clean, Next.js et un monorepo pnpm.
- 
+Application bancaire moderne construite avec une architecture clean, Next.js et un monorepo pnpm.
+
 ---
 
 ## 📋 Table des matières

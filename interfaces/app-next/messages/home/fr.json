@@ -1,0 +1,48 @@
+{
+  "hero": {
+    "badge": "Banque 100% sécurisée",
+    "title": {
+      "line1": "Votre argent,",
+      "line2": "simplement géré"
+    },
+    "description": "Une banque moderne qui vous accompagne dans la gestion de votre épargne avec des outils intelligents et un conseil personnalisé."
+  },
+  "features": {
+    "title": "Pourquoi nous choisir ?",
+    "subtitle": "Des services bancaires pensés pour votre quotidien",
+    "savings": {
+      "title": "Comptes d'épargne",
+      "description": "Faites fructifier votre argent avec des taux d'intérêt compétitifs"
+    },
+    "realtime": {
+      "title": "Suivi en temps réel",
+      "description": "Consultez vos comptes et transactions où que vous soyez"
+    },
+    "advisors": {
+      "title": "Conseillers dédiés",
+      "description": "Un accompagnement personnalisé pour tous vos projets"
+    },
+    "security": {
+      "title": "Sécurité maximale",
+      "description": "Vos données protégées par les dernières technologies"
+    },
+    "mobile": {
+      "title": "Application mobile",
+      "description": "Gérez vos finances depuis votre smartphone"
+    },
+    "analytics": {
+      "title": "Analyses détaillées",
+      "description": "Comprenez vos habitudes et optimisez votre épargne"
+    }
+  },
+  "cta": {
+    "title": "Prêt à commencer votre parcours financier ?",
+    "description": "Ouvrez votre compte en quelques minutes et bénéficiez de tous nos services",
+    "button": "Ouvrir un compte gratuitement"
+  },
+  "meta": {
+    "title": "Banque Moderne - Gérez vos finances intelligemment",
+    "description": "Découvrez une expérience bancaire moderne avec des comptes d'épargne à haut rendement, des conseillers dédiés et un suivi en temps réel de vos finances.",
+    "keywords": "banque, épargne, crédit, compte bancaire, conseiller financier, gestion finances"
+  }
+}

@@ -33,7 +33,7 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
 
     return (
         <div className="space-y-4 pb-20 md:pb-8">
-            <div className="flex items-center justify-between sticky top-0 bg-white py-2 z-10 border-b md:border-none">
+            <div className="flex items-center justify-between sticky top-0 py-2 z-10 border-b md:border-none">
                 <Button
                     variant="ghost"
                     size="sm"
@@ -102,13 +102,13 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                                             {!isAdmin && (
                                                 <div className="flex flex-col gap-3">
                                                     <Button
-                                                        className="bg-indigo-800/50 hover:bg-indigo-900/50 transition shadow"
+                                                        className="bg-indigo-800/50 hover:bg-indigo-900/50 dark:text-white transition shadow"
                                                         onClick={(() => setOpen((prev) => prev === "buy" ? null : "buy"))}
                                                     >
                                                         <ShoppingCart className="w-5 h-5" /> Acheter des actions
                                                     </Button>
                                                     <Button
-                                                        className="bg-indigo-800/50 hover:bg-indigo-900/50 transition shadow"
+                                                        className="bg-indigo-800/50 hover:bg-indigo-900/50 transition shadow dark:text-white"
                                                         onClick={(() => setOpen((prev) => prev === "sell" ? null : "sell"))}
                                                     >
                                                         <ShoppingCart className="w-5 h-5" /> Vendre des actions

@@ -8,17 +8,16 @@ type Status = Record<string, {
   bgColor: string,
   borderColor: string,
   message?: { client: string, advisor: string }
-
 }>
 
 export const statusConfig: Status = {
   PENDING: {
     label: 'En attente',
-    variant: 'secondary' as const,
+    variant: 'secondary',
     icon: Clock,
-    color: 'text-yellow-600',
-    bgColor: 'bg-yellow-50',
-    borderColor: 'border-yellow-200',
+    color: 'text-yellow-600 dark:text-yellow-400',
+    bgColor: 'bg-yellow-50 dark:bg-yellow-500/10',
+    borderColor: 'border-yellow-200 dark:border-yellow-700',
     message: {
       client:
         "⏳ Votre demande est en cours d'examen par nos conseillers. Vous recevrez une réponse prochainement.",
@@ -27,44 +26,42 @@ export const statusConfig: Status = {
   },
   ACCEPTED: {
     label: 'Accepté',
-    variant: 'default' as const,
+    variant: 'default',
     icon: CheckCircle,
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
+    color: 'text-green-600 dark:text-green-400',
+    bgColor: 'bg-green-50 dark:bg-green-900/20',
+    borderColor: 'border-green-200 dark:border-green-700',
   },
   REFUSED: {
     label: 'Refusé',
-    variant: 'destructive' as const,
+    variant: 'destructive',
     icon: XCircle,
-    color: 'text-red-600',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
+    color: 'text-red-600 dark:text-red-400',
+    bgColor: 'bg-red-50 dark:bg-red-500/10',
+    borderColor: 'border-red-200 dark:border-red-900',
     message: {
       client: "❌ Votre demande de crédit n'a pas été acceptée. Contactez votre conseiller pour plus d'informations.",
       advisor: "❌ Refus"
-
     }
   },
   COMPLETED: {
     label: 'Terminé',
-    variant: 'outline' as const,
+    variant: 'outline',
     icon: CheckCircle,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
+    color: 'text-blue-600 dark:text-blue-300',
+    bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+    borderColor: 'border-blue-200 dark:border-blue-700',
     message: {
       client: "✅ Félicitations ! Votre crédit est entièrement remboursé.",
       advisor: "✅ Ce crédit est entièrement remboursé."
-
     }
   },
   ACCEPTED_FUTURE: {
     label: 'Accepté - À venir',
-    variant: 'secondary' as const,
+    variant: 'secondary',
     icon: CalendarClock,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
+    color: 'text-blue-600 dark:text-blue-300',
+    bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+    borderColor: 'border-blue-200 dark:border-blue-700',
   },
 };

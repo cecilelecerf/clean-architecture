@@ -59,7 +59,7 @@ export const CreditRow = ({ credit, isAdmin, basePath }: Props) => {
     };
     return (
         <>
-            <tr className="hover:bg-gray-50 transition-colors">
+            <tr className="hover:bg-gray-50 dark:hover:bg-gray-200/10 transition-colors">
                 <td className="p-4">
                     <Badge variant={config.variant} className="flex items-center gap-1 w-fit">
                         <StatusIcon className="w-3 h-3" />
@@ -72,15 +72,15 @@ export const CreditRow = ({ credit, isAdmin, basePath }: Props) => {
                         currency: credit.initialAmount.currency,
                     })}
                 </td>
-                <td className="p-4 text-gray-600">{credit.durationMonths} mois</td>
-                <td className="p-4 text-gray-600">{credit.formule.interestRate}%</td>
+                <td className="p-4 text-gray-600 dark:text-gray-400">{credit.durationMonths} mois</td>
+                <td className="p-4 text-gray-600 dark:text-gray-400">{credit.formule.interestRate}%</td>
                 <td className="p-4 font-medium">
                     {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
                         style: "currency",
                         currency: credit.monthlyPayment.currency,
                     })}
                 </td>
-                <td className="p-4 text-sm text-gray-500">
+                <td className="p-4 text-sm text-gray-500 dark:text-gray-400">
                     {formatDateFrench(credit.createdAt)}
                 </td>
                 <td className="p-4">
