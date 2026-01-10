@@ -15,5 +15,15 @@
     "conversations": "Conversations clients",
     "account": "Comptes clients",
     "logout": "Déconnexion"
+  },
+  "profile": {
+    "activity": {
+        "title": "Mon activité",
+        "loan": {
+            "accepted": "Crédits acceptés",
+            "refused": "Crédits refusés"
+        },
+        "thread": "Threads actifs"
+    }
   }
 }

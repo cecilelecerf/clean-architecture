@@ -15,5 +15,15 @@
     "conversations": "Customer conversations",
     "account": "Customer accounts",
     "logout": "Logout"
+  },
+  "profile": {
+    "activity": {
+        "title": "My activity",
+        "loan": {
+            "accepted": "Loan accepted",
+            "refused": "Loan refused"
+        },
+        "thread": "Active threads"
+    }
   }
 }
