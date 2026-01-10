@@ -11,6 +11,7 @@ import { Providers } from '@/components/Providers';
 import { routing } from '@/lib/i18n/routing';
 import { notFound } from 'next/navigation';
 import { LangageSwitcher } from '@/components/LangageSwitcher';
+import { getMessages } from 'next-intl/server';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -39,11 +40,11 @@ export default async function RootLayout({
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
-
+  const meggases = await getMessages()
   return (
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Providers locale={locale}>
+        <Providers locale={locale} messages={meggases}>
           <Theme>
             <Toaster />
             {children}

@@ -4,13 +4,13 @@
     "section": {
       "general": "General"
     },
-    "home": "Home",
+    "home": "Dashboard",
     "profile": "Profile",
     "advisors": "Advisors",
     "directors": "Directors",
     "messages": "Messages",
-    "rates": "Interest rates",
-    "formulas": "Credit formulas",
+    "rates": "Interest Rates",
+    "formulas": "Credit Formulas",
     "stocks": "Stocks",
     "currencies": "Currencies",
     "logout": "Logout"

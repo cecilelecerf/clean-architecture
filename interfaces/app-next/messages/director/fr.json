@@ -4,15 +4,15 @@
     "section": {
       "general": "Général"
     },
-    "home": "Accueil",
-    "profile": "Profil",
-    "advisors": "Conseillers",
-    "directors": "Directeurs",
-    "messages": "Messageries",
-    "rates": "Taux d’intérêt",
-    "formulas": "Formules de crédits",
-    "stocks": "Actions",
-    "currencies": "Devises",
-    "logout": "Déconnexion"
+    "home": "Dashboard",
+    "profile": "Profile",
+    "advisors": "Advisors",
+    "directors": "Directors",
+    "messages": "Messages",
+    "rates": "Interest Rates",
+    "formulas": "Credit Formulas",
+    "stocks": "Stocks",
+    "currencies": "Currencies",
+    "logout": "Logout"
   }
 }
