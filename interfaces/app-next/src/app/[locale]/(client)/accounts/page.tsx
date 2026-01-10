@@ -5,9 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { match } from 'ts-pattern';
 import { endpoints } from '@/utils/endpoint';
-import { ButtonLink } from '@/components/buttons/ButtonLink';
 import { SavingsRateHeroBanner } from '../savings-rate/GetCurrentSavingRate';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AccountCard } from '@/components/accounts/AccountCard';
+import { GoToAddPage } from '@/components/GoToAddPage';
 
 export default function AccountsPage() {
   const router = useRouter();
@@ -23,35 +24,15 @@ export default function AccountsPage() {
           .with({ "status": "error" }, () => "error")
           .with({ status: "pending" }, () => <SkeletonAccounts />)
           .with({ status: "success" }, ({ data }) => {
-            return data.map((account) => (
-              <Card
-                key={account.IBAN}
-                className={`p-4 flex justify-between items-center rounded-lg border-0 bg-gray-50 hover:bg-gray-100 shadow-none transition-all duration-200 cursor-pointer flex-row`}
-                onClick={() => router.push(`/accounts/${account.IBAN}`)}
-              >
-                {/* Left side */}
-
-                <div>
-                  <p className={`font-semibold text-lg leading-5`}>{account.name}</p>
-                  <p className="text-sm text-gray-500">{account.type}</p>
-                </div>
-
-                {/* Right side */}
-                <div className="text-right">
-                  <p className={`font-bold ${account.balance.amount > 0 ? "text-emerald-700" : "text-red-700"} `}>
-                    {account.balance.amount.toLocaleString('fr-FR', { style: 'currency', currency: account.balance.currency })}
-                  </p>
-                  <p className={`text-xs font-medium mt-0.5`}>Disponible</p>
-                </div>
-              </Card>
+            return data.map((account) =>
+            (
+              <AccountCard key={account.IBAN} account={account} onClickAccount={(iban) => router.push(`/accounts/${account.IBAN}`)} />
             ))
 
           }
           ).exhaustive()}
       </div>
-      <ButtonLink path='/accounts/new'>
-        + Ajouter un compte
-      </ButtonLink>
+      <GoToAddPage path='/accounts/new' />
     </>
   );
 }
