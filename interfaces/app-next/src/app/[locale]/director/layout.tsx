@@ -6,7 +6,5 @@ type Props = {
 };
 
 export default async function DirectorLayout({ children, params }: Props) {
-
-
   return <DirectorLayoutClient >{children}</DirectorLayoutClient>;
 }
