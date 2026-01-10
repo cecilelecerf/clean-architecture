@@ -30,7 +30,7 @@ export const ActionsList = ({ isAdmin, baseHref }: { isAdmin?: boolean, baseHref
 
     return (
         <div className="space-y-4 pb-20">
-            <div className="sticky top-0 z-10 bg-white pb-4 space-y-4">
+            <div className="pb-4 space-y-4">
                 <TitleAdminPage title="Actions" />
 
                 <div className="relative">

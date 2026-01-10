@@ -7,7 +7,7 @@ export const MessageComponent = ({ sender, sentAt, content, isCurrentUser }: Pro
         className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
     >
         <div
-            className={`max-w-xs px-4 py-2 rounded-lg ${isCurrentUser ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-800"
+            className={`max-w-xs px-4 py-2 rounded-lg ${isCurrentUser ? "bg-blue-500 text-white" : "bg-gray-100 dark:bg-gray-500/20 dark:text-gray-300 text-gray-800"
                 }`}
         >
             <div className="flex justify-between">

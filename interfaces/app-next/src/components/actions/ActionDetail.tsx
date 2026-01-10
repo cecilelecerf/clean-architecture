@@ -33,7 +33,7 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
 
     return (
         <div className="space-y-4 pb-20 md:pb-8">
-            <div className="flex items-center justify-between sticky top-0 bg-white py-2 z-10 border-b md:border-none">
+            <div className="flex items-center justify-between sticky top-0 py-2 z-10 border-b md:border-none">
                 <Button
                     variant="ghost"
                     size="sm"

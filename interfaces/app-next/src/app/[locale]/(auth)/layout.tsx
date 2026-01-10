@@ -1,7 +1,5 @@
+import { ThemeToggleSwitch } from '@/components/ThemeToogleButton';
 import { Metadata } from 'next';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../../api/auth/[...nextauth]/route';
-import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -14,11 +12,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  // const session = await getServerSession(authOptions);
-  // console.log(session)
-  // if (session) redirect('/');
   return (
-    <main className="px-4 py-6 xl:py-8 md:px-60 xl:px-120">
+    <main className='px-4 md:px-60 xl:px-120 py-6 xl:py-8' >
+      <div className=" flex  justify-end mb-4">
+        <ThemeToggleSwitch />
+      </div>
       {children}
     </main>
   );

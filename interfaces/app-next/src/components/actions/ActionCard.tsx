@@ -40,7 +40,7 @@ export const ActionCard = ({ action, onClick }: ActionCardProps) => {
                             )}
                         </div>
 
-                        <p className="font-medium text-gray-900 text-sm mb-2 truncate">
+                        <p className="font-medium text-sm mb-2 truncate">
                             {action.name}
                         </p>
 
@@ -57,7 +57,7 @@ export const ActionCard = ({ action, onClick }: ActionCardProps) => {
 
                     <div className="flex flex-col items-end gap-2">
                         <div className="text-right">
-                            <p className="text-xl font-bold text-gray-900">
+                            <p className="text-xl font-bold  ">
                                 {action.price.amount.toLocaleString("fr-FR", {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,

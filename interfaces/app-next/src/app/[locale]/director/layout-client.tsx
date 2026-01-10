@@ -12,6 +12,7 @@ import { LangageSwitcher } from "@/components/LangageSwitcher";
 import { useTranslations, useLocale } from "next-intl";
 import { Pathname } from "@/lib/i18n/routing";
 import { useSearchParams } from "next/navigation";
+import { ThemeToggleSwitch } from "@/components/ThemeToogleButton";
 
 type Props = {
     children: React.ReactNode;
@@ -78,8 +79,9 @@ function SidebarContent({
                     </h1>
                 </Link>
 
-                <div className="border-t border-pink-800 pt-4">
+                <div className="flex justify-between">
                     <LangageSwitcher />
+                    <ThemeToggleSwitch />
                 </div>
 
                 <div>

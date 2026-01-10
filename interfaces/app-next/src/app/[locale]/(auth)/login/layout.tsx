@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { locale } = await params;
     const t = await getTranslations('auth.login');
     const tCommon = await getTranslations("common");
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_CLIENT_URL;
     return {
         title: t('meta.title'),
         description: t('meta.description'),

@@ -9,6 +9,7 @@ import { LangageSwitcher } from "@/components/LangageSwitcher";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Metadata } from "next";
 import { routing } from "@/lib/i18n/routing";
+import { ThemeToggleSwitch } from "@/components/ThemeToogleButton";
 type Props = {
   params: Promise<{ locale: string }>;
 };
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: 'home' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://votre-banque.com';
+  const baseUrl = process.env.NEXT_PUBLIC_CLIENT_URL || 'https://votre-banque.com';
 
   return {
     title: t('meta.title'),
@@ -86,13 +87,13 @@ export default async function HomePage({ params }: Props) {
   const tCommon = await getTranslations('common');
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
+    <div className="min-h-screen">
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto text-center space-y-8">
-
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-15">
+            <ThemeToggleSwitch />
             <LangageSwitcher />
           </div>
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">

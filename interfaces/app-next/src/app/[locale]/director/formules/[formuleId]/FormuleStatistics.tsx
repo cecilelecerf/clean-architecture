@@ -136,10 +136,10 @@ interface StatCardProps {
 
 function StatCard({ icon: Icon, label, value, color }: StatCardProps) {
     const colorClasses = {
-        blue: "bg-blue-50 text-blue-600",
-        green: "bg-green-50 text-green-600",
-        purple: "bg-purple-50 text-purple-600",
-        orange: "bg-orange-50 text-orange-600",
+        blue: "bg-blue-50 text-blue-600 dark:bg-blue-50/10",
+        green: "bg-green-50 text-green-600 dark:bg-green-50/10",
+        purple: "bg-purple-50 text-purple-600 dark:bg-purple-50/10",
+        orange: "bg-orange-50 text-orange-600 dark:bg-orange-50/10",
     };
 
     const textColorClasses = {
@@ -150,7 +150,7 @@ function StatCard({ icon: Icon, label, value, color }: StatCardProps) {
     };
 
     return (
-        <div className="p-4 bg-gray-50 rounded-lg border">
+        <div className="p-4 bg-gray-50 dark:bg-gray-500/10 rounded-lg">
             <div className="flex items-center gap-3 mb-2">
                 <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
                     <Icon className="h-4 w-4" />
@@ -171,10 +171,10 @@ interface FinancialStatCardProps {
 
 function FinancialStatCard({ icon: Icon, label, value, color }: FinancialStatCardProps) {
     const colorClasses = {
-        blue: "bg-blue-50 text-blue-600",
-        green: "bg-green-50 text-green-600",
-        purple: "bg-purple-50 text-purple-600",
-        orange: "bg-orange-50 text-orange-600",
+        blue: "bg-blue-50 text-blue-600 dark:bg-blue-500/10",
+        green: "bg-green-50 text-green-600 dark:bg-green-500/10",
+        purple: "bg-purple-50 text-purple-600 dark:bg-purple-500/10",
+        orange: "bg-orange-50 text-orange-600 dark:bg-orange-500/10",
     };
 
     const textColorClasses = {
@@ -185,7 +185,7 @@ function FinancialStatCard({ icon: Icon, label, value, color }: FinancialStatCar
     };
 
     return (
-        <div className="p-4 bg-gray-50 rounded-lg border">
+        <div className="p-4 bg-gray-50 dark:bg-gray-500/10 rounded-lg border">
             <div className="flex items-center gap-3 mb-2">
                 <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
                     <Icon className="h-4 w-4" />
@@ -211,9 +211,9 @@ function DetailCard({ icon: Icon, label, value, total, color }: DetailCardProps)
     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
 
     const colorClasses = {
-        green: "bg-green-50 text-green-600 border-green-200",
-        red: "bg-red-50 text-red-600 border-red-200",
-        orange: "bg-orange-50 text-orange-600 border-orange-200",
+        green: "bg-green-50 text-green-600 border-green-200 dark:bg-green-500/10 dark:border-green-200/10",
+        red: "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:border-red-200/10",
+        orange: "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-500/10 dark:border-orange-200/10",
     };
 
     const textColorClasses = {
