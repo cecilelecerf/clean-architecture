@@ -4,7 +4,7 @@ import {
   LogOutIcon,
   Menu,
 } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import React from "react";
 import { Button } from "@/components/ui/button";
@@ -58,7 +58,6 @@ export default function AdminLayout({
 }
 
 function SidebarContent({ pathname }: { pathname: string }) {
-  const router = useRouter()
   return (
     <div className="p-6 flex flex-col justify-between h-full">
       <div className="space-y-6">
@@ -118,7 +117,7 @@ function SidebarContent({ pathname }: { pathname: string }) {
       <Button
         variant="ghost"
         className="flex items-center gap-3 w-full justify-start px-3 py-2 rounded-md transition bg-gray-800 hover:bg-gray-700 text-white"
-        onClick={() => { signOut(); router.push("/") }}
+        onClick={() => signOut({ callbackUrl: '/' })}
       >
         <LogOutIcon size={18} />
         <span>Déconnexion</span>
