@@ -1,0 +1,12 @@
+{
+  "buttons": {
+    "learnMore": "En savoir plus",
+    "getStarted": "Commencer"
+  },
+  "footer": {
+    "copyright": "© 2024 Votre Banque. Tous droits réservés.",
+    "privacy": "Confidentialité",
+    "terms": "Conditions générales",
+    "contact": "Contact"
+  }
+}

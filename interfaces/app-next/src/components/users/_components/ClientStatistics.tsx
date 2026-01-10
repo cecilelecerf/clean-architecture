@@ -13,7 +13,7 @@ export const ClientStatistics = ({ userId }: { userId: UserId }) => {
     const { data: accounts } = useQuery(endpoints.accounts.getAllByClient({ userId }));
     const { data: credits } = useQuery(endpoints.credits.getAllByClientId({ userId }));
 
-    const totalBalance = accounts?.reduce((sum, acc) => sum + acc.amount, 0) || 0;
+    const totalBalance = accounts?.reduce((sum, acc) => sum + acc.balance.amount, 0) || 0;
     const activeCredits = credits?.filter(c => c.status === "ACCEPTED").length || 0;
     const pendingCredits = credits?.filter(c => c.status === "PENDING").length || 0;
 

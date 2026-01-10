@@ -7,7 +7,7 @@ import { ThreadWithUser } from "@/utils/endpoint/threadEndpoints";
 import { UserDto } from "@infrastructure/types/user";
 import { match } from "ts-pattern";
 import { PostMessage } from "./PostMessage";
-import { JoinThread } from "@/app/admin/client-threads/[threadId]/Join";
+import { JoinThread } from "@/app/[locale]/admin/client-threads/[threadId]/Join";
 import { ButtonBack } from "../buttons/ButtonBack";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "../ui/skeleton";

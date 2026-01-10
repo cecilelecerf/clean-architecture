@@ -1,5 +1,5 @@
 import { formatDateFrench } from "@/utils/date/formatDateFrench"
-import { MessageWithUserDTO } from "@infrastructure/types/message"
+import { MessageWithUserDTO } from "@infrastructure/types/thread"
 
 type Props = { isCurrentUser: boolean } & MessageWithUserDTO
 export const MessageComponent = ({ sender, sentAt, content, isCurrentUser }: Props) => (

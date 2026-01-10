@@ -1,0 +1,12 @@
+{
+  "buttons": {
+    "learnMore": "Learn more",
+    "getStarted": "Get started"
+  },
+  "footer": {
+    "copyright": "© 2024 Your Bank. All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms of service",
+    "contact": "Contact"
+  }
+}

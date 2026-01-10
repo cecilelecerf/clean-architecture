@@ -1,0 +1,43 @@
+{
+  "hero": {
+    "badge": "100% secure banking",
+    "title": {
+      "line1": "Your money,",
+      "line2": "simply managed"
+    },
+    "description": "A modern bank that supports you in managing your savings with smart tools and personalized advice."
+  },
+  "features": {
+    "title": "Why choose us?",
+    "subtitle": "Banking services designed for your daily life",
+    "savings": {
+      "title": "Savings accounts",
+      "description": "Grow your money with competitive interest rates"
+    },
+    "realtime": {
+      "title": "Real-time tracking",
+      "description": "Check your accounts and transactions wherever you are"
+    },
+    "advisors": {
+      "title": "Dedicated advisors",
+      "description": "Personalized support for all your projects"
+    },
+    "security": {
+      "title": "Maximum security",
+      "description": "Your data protected by the latest technologies"
+    },
+    "mobile": {
+      "title": "Mobile app",
+      "description": "Manage your finances from your smartphone"
+    },
+    "analytics": {
+      "title": "Detailed analytics",
+      "description": "Understand your habits and optimize your savings"
+    }
+  },
+  "cta": {
+    "title": "Ready to start your financial journey?",
+    "description": "Open your account in minutes and enjoy all our services",
+    "button": "Open a free account"
+  }
+}
