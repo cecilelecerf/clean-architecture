@@ -327,3 +327,5 @@ export const routing = defineRouting({
     },
   },
 });
+
+export type Pathname = keyof typeof routing.pathnames;

@@ -1,0 +1,18 @@
+{
+  "menu": {
+    "title": "Director",
+    "section": {
+      "general": "General"
+    },
+    "home": "Dashboard",
+    "profile": "Profile",
+    "advisors": "Advisors",
+    "directors": "Directors",
+    "messages": "Messages",
+    "rates": "Interest Rates",
+    "formulas": "Credit Formulas",
+    "stocks": "Stocks",
+    "currencies": "Currencies",
+    "logout": "Logout"
+  }
+}
