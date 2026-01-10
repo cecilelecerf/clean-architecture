@@ -9,7 +9,7 @@ export const CreditArray = ({ credits, title, isAdmin, basePath }: Props) => {
 
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
-
+    const thProps = "text-left p-4 text-sm font-semibold text-gray-600 dark:text-gray-300"
     return <>
         <div className="lg:hidden ">
             <h2 className="text-lg font-bold mb-2">{title} ({credits.length})</h2>
@@ -32,27 +32,27 @@ export const CreditArray = ({ credits, title, isAdmin, basePath }: Props) => {
             <CardContent className="p-0">
                 <div className="overflow-x-auto">
                     <table className="w-full">
-                        <thead className="bg-gray-50 border-b">
+                        <thead className="bg-gray-50 dark:bg-gray-200/10 border-b">
                             <tr>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                <th className={thProps}>
                                     Statut
                                 </th>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                <th className={thProps}>
                                     Montant
                                 </th>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                <th className={thProps}>
                                     Durée
                                 </th>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                <th className={thProps}>
                                     Taux
                                 </th>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                <th className={thProps}>
                                     Mensualité
                                 </th>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
+                                <th className={thProps}>
                                     Date demande
                                 </th>
-                                <th className="text-right p-4 text-sm font-semibold text-gray-600">
+                                <th className={`text-right ${thProps}`}>
                                     Actions
                                 </th>
                             </tr>

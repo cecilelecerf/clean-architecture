@@ -12,7 +12,6 @@ import {
     TrendingUp,
     TrendingDown,
     Search,
-    ShoppingCart,
     Wallet,
     ArrowRight,
     PackageSearch,
@@ -28,7 +27,7 @@ export default function ClientActionsPage() {
     return (
         <div className="space-y-6 pb-20">
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold text-gray-900">Mon portefeuille</h1>
+                <h1 className="text-2xl font-bold">Mon portefeuille</h1>
                 <p className="text-sm text-gray-600">
                     Gérez vos actions et découvrez de nouvelles opportunités
                 </p>
@@ -54,7 +53,7 @@ export default function ClientActionsPage() {
                                         <PackageSearch className="w-8 h-8 text-blue-600" />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                        <h3 className="text-lg font-semibold mb-2">
                                             Aucune action dans votre portefeuille
                                         </h3>
                                         <p className="text-sm text-gray-600 mb-4">
@@ -128,7 +127,7 @@ export default function ClientActionsPage() {
 
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-lg font-semibold text-gray-900">
+                                    <h2 className="text-lg font-semibold">
                                         Mes actions
                                     </h2>
                                     <Badge variant="outline">
@@ -157,7 +156,7 @@ export default function ClientActionsPage() {
                                                         <p className="text-sm text-gray-600 mb-2">
                                                             {position.name}
                                                         </p>
-                                                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray300">
                                                             <span>
                                                                 Prix moyen: {position.averagePrice.toFixed(2)} {position.currency}
                                                             </span>
@@ -169,7 +168,7 @@ export default function ClientActionsPage() {
                                                     </div>
 
                                                     <div className="text-right">
-                                                        <p className="text-xl font-bold text-gray-900">
+                                                        <p className="text-xl font-bold">
                                                             {position.currentValue.toLocaleString("fr-FR", {
                                                                 minimumFractionDigits: 2,
                                                             })}
@@ -207,11 +206,10 @@ export default function ClientActionsPage() {
 
             <Separator />
 
-            {/* Carousel de suggestions */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-lg font-semibold text-gray-900">
+                        <h2 className="text-lg font-semibold">
                             Actions populaires
                         </h2>
                         <p className="text-sm text-gray-600">
@@ -246,15 +244,15 @@ export default function ClientActionsPage() {
             </div>
 
             {/* CTA Explorer */}
-            <Card className="overflow-hidden bg-linear-to-br from-blue-50 to-indigo-50">
+            <Card className="overflow-hidden bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-500/10 dark:to-indigo-500/10">
                 <CardContent className="p-6 text-center">
                     <div className="w-12 h-12 mx-auto bg-blue-600 rounded-full flex items-center justify-center mb-4">
                         <Search className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold mb-2">
                         Envie d'investir davantage ?
                     </h3>
-                    <p className="text-sm text-gray-600 mb-4">
+                    <p className="text-sm text-gray-600 mb-4 dark:text-gray-400">
                         Explorez notre catalogue complet d'actions et diversifiez votre
                         portefeuille
                     </p>

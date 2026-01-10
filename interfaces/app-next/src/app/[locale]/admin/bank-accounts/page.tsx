@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 import { TitleAdminPage } from "@/components/TitleAdminPage";
+import { AccountCard } from "@/components/accounts/AccountCard";
 
 export default function AccountsPage() {
     const query = useQuery(endpoints.accounts.getAll({ type: "bank" }));
@@ -31,41 +32,11 @@ export default function AccountsPage() {
                     return (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {accounts.map((acc) => (
-                                <Card
+                                <AccountCard
                                     key={acc.IBAN}
-                                    className={`shadow hover:shadow-lg transition-all py-1`}
-                                    onClick={() => router.push(`/admin/bank-accounts/${acc.IBAN}`)}
-                                >
-                                    <CardContent className="p-4 space-y-3">
-                                        <div>
-                                            <h3 className="font-semibold text-lg">{acc.name}</h3>
-                                            <p className="text-xs text-gray-500">
-                                                {acc.type === "courant" ? "Compte courant" : "Compte épargne"}
-                                            </p>
-                                        </div>
-
-                                        {/* Solde */}
-                                        <div className="py-3 px-4 bg-gray-50 rounded-lg">
-                                            <p className="text-xs text-gray-500 mb-1">Solde</p>
-                                            <p className="text-2xl font-bold">
-                                                {acc.balance.amount.toLocaleString("fr-FR", {
-                                                    style: "currency",
-                                                    currency: acc.balance.currency,
-                                                })}
-                                            </p>
-                                        </div>
-
-
-                                        <div className="flex flex-col gap-2">
-                                            <Button
-                                                size="sm"
-                                                onClick={() => router.push(`/admin/bank-accounts/${acc.IBAN}`)}
-                                            >
-                                                Voir compte
-                                            </Button>
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                    account={acc}
+                                    onClickAccount={(iban) => router.push(`/admin/bank-accounts/${iban}`)}
+                                />
                             ))}
                         </div>
                     );

@@ -17,6 +17,7 @@ import { menuItems, menuItemsClients } from "./menu-item";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { LangageSwitcher } from "@/components/LangageSwitcher";
+import { ThemeToggleSwitch } from "@/components/ThemeToogleButton";
 
 export default function AdminLayout({
   children,
@@ -27,12 +28,10 @@ export default function AdminLayout({
 
   return (
     <div className="flex min-h-screen">
-      {/* === Desktop Sidebar === */}
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 bg-gray-900 text-white flex-col justify-between">
         <SidebarContent pathname={pathname} />
       </aside>
 
-      {/* === Mobile Drawer Menu === */}
       <div className="md:hidden fixed z-50 bg-linear-to-b from-gray-50 via-gray-50/90 to-gray-50/10 p-4 w-full">
         <Sheet>
           <SheetTrigger asChild>
@@ -49,7 +48,6 @@ export default function AdminLayout({
         </Sheet>
       </div>
 
-      {/* === Main content === */}
       <main className="flex-1 px-4 pt-20 md:pt-6 py-6 md:px-12 md:ml-64">
         {children}
       </main>
@@ -65,13 +63,14 @@ function SidebarContent({ pathname }: { pathname: string }) {
           <h1 className="text-xl font-bold">Conseiller</h1>
         </Link>
 
-        {/* Section Général */}
         <div>
           <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
             Général
           </h2>
-
-          <LangageSwitcher />
+          <div className="flex justify-between">
+            <LangageSwitcher />
+            <ThemeToggleSwitch />
+          </div>
 
           <nav className="space-y-1">
             {menuItems.map((item, i) => (

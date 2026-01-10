@@ -89,7 +89,6 @@ export const ClientCredits = () => {
                                                         </CardHeader>
 
                                                         <CardContent className="space-y-4">
-                                                            {/* Informations principales */}
                                                             <div className="grid grid-cols-2 gap-4">
                                                                 <div className="space-y-1">
                                                                     <p className="text-xs text-gray-500 flex items-center gap-1">
@@ -100,8 +99,7 @@ export const ClientCredits = () => {
                                                                 </div>
                                                             </div>
 
-                                                            {/* Mensualité */}
-                                                            <div className="p-3 bg-gray-50 rounded-lg">
+                                                            <div className="p-3 bg-gray-50 dark:bg-gray-50/10 rounded-lg">
                                                                 <p className="text-xs text-gray-500 mb-1">Mensualité</p>
                                                                 <p className="text-2xl font-bold">
                                                                     {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
@@ -112,7 +110,7 @@ export const ClientCredits = () => {
                                                             </div>
 
                                                             {isFuture ? (
-                                                                <div className="p-3 bg-blue-50 rounded-lg  ">
+                                                                <div className="p-3 bg-blue-50 dark:bg-blue-500/10 rounded-lg  ">
                                                                     <div className="flex items-center gap-2 mb-1">
                                                                         <CalendarClock className="w-4 h-4 text-blue-600" />
                                                                         <p className="text-xs text-blue-700 font-medium">
