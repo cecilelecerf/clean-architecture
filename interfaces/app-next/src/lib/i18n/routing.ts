@@ -75,40 +75,38 @@ export const routing = defineRouting({
     // Crédits
     '/credits': {
       fr: '/credits',
-      en: '/loans',
+      en: '/credits',
     },
     '/credits/[creditId]': {
       fr: '/credits/[creditId]',
-      en: '/loans/[creditId]',
+      en: '/credits/[creditId]',
     },
     '/credits/[creditId]/monthly-paiement': {
       fr: '/credits/[creditId]/mensualites',
-      en: '/loans/[creditId]/monthly-payment',
+      en: '/credits/[creditId]/monthly-payment',
     },
     '/credits/formules': {
       fr: '/credits/formules',
-      en: '/loans/plans',
+      en: '/credits/plans',
     },
     '/credits/formules/[formuleId]': {
       fr: '/credits/formules/[formuleId]',
-      en: '/loans/plans/[formuleId]',
+      en: '/credits/plans/[formuleId]',
     },
     '/credits/request/[formuleId]': {
       fr: '/credits/demande/[formuleId]',
-      en: '/loans/request/[formuleId]',
+      en: '/credits/request/[formuleId]',
     },
     '/credits/simulate/[formuleId]': {
       fr: '/credits/simuler/[formuleId]',
-      en: '/loans/simulate/[formuleId]',
+      en: '/credits/simulate/[formuleId]',
     },
 
-    // Taux d'épargne
     '/savings-rate': {
       fr: '/taux-epargne',
       en: '/savings-rate',
     },
 
-    // Fils de discussion
     '/threads': {
       fr: '/discussions',
       en: '/threads',
@@ -122,7 +120,6 @@ export const routing = defineRouting({
       en: '/threads/[threadId]',
     },
 
-    // Actualités
     '/feeds': {
       fr: '/actualites',
       en: '/feeds',
@@ -132,13 +129,11 @@ export const routing = defineRouting({
       en: '/feeds/[postId]',
     },
 
-    // Profil
     '/profil': {
       fr: '/profil',
       en: '/profile',
     },
 
-    // ========== ADMIN ==========
     '/admin': {
       fr: '/admin',
       en: '/admin',
@@ -148,7 +143,6 @@ export const routing = defineRouting({
       en: '/admin/profile',
     },
 
-    // Admin - Utilisateurs
     '/admin/users': {
       fr: '/admin/utilisateurs',
       en: '/admin/users',
@@ -158,7 +152,6 @@ export const routing = defineRouting({
       en: '/admin/users/[userId]',
     },
 
-    // Admin - Comptes
     '/admin/accounts': {
       fr: '/admin/comptes',
       en: '/admin/accounts',
@@ -176,7 +169,6 @@ export const routing = defineRouting({
       en: '/admin/accounts/[accountIban]/transactions/[transactionId]',
     },
 
-    // Admin - Comptes bancaires
     '/admin/bank-accounts': {
       fr: '/admin/comptes-bancaires',
       en: '/admin/bank-accounts',
@@ -194,7 +186,6 @@ export const routing = defineRouting({
       en: '/admin/bank-accounts/[accountIban]/transactions/[transactionId]',
     },
 
-    // Admin - Crédits
     '/admin/credits': {
       fr: '/admin/credits',
       en: '/admin/loans',
@@ -204,7 +195,6 @@ export const routing = defineRouting({
       en: '/admin/loans/[creditId]',
     },
 
-    // Admin - Fils de discussion
     '/admin/threads': {
       fr: '/admin/discussions',
       en: '/admin/threads',
@@ -222,7 +212,6 @@ export const routing = defineRouting({
       en: '/admin/client-threads/[threadId]',
     },
 
-    // Admin - Actualités
     '/admin/feeds': {
       fr: '/admin/actualites',
       en: '/admin/feeds',
@@ -236,7 +225,6 @@ export const routing = defineRouting({
       en: '/admin/feeds/[postId]',
     },
 
-    // ========== DIRECTOR ==========
     '/director': {
       fr: '/directeur',
       en: '/director',
@@ -246,7 +234,6 @@ export const routing = defineRouting({
       en: '/director/profile',
     },
 
-    // Director - Utilisateurs
     '/director/users': {
       fr: '/directeur/utilisateurs',
       en: '/director/users',
@@ -260,7 +247,6 @@ export const routing = defineRouting({
       en: '/director/users/[userId]',
     },
 
-    // Director - Actions
     '/director/actions': {
       fr: '/directeur/actions',
       en: '/director/stocks',
@@ -278,13 +264,11 @@ export const routing = defineRouting({
       en: '/director/stocks/[isin]/edit',
     },
 
-    // Director - Devises
     '/director/currencies': {
       fr: '/directeur/devises',
       en: '/director/currencies',
     },
 
-    // Director - Formules de crédit
     '/director/formules': {
       fr: '/directeur/formules',
       en: '/director/plans',
@@ -302,7 +286,6 @@ export const routing = defineRouting({
       en: '/director/plans/[formuleId]/update',
     },
 
-    // Director - Taux d'épargne
     '/director/savings-rate': {
       fr: '/directeur/taux-epargne',
       en: '/director/savings-rate',
@@ -312,7 +295,6 @@ export const routing = defineRouting({
       en: '/director/savings-rate/new',
     },
 
-    // Director - Fils de discussion
     '/director/threads': {
       fr: '/directeur/discussions',
       en: '/director/threads',

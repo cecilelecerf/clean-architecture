@@ -32,7 +32,7 @@ export default function ClientsThreadsPage() {
                 .with({ status: "pending" }, () => <SkeletonThread />)
                 .with({ status: "success" }, ({ data: threads }) => {
                     if (threads.length === 0) return <>{t("not")}</>
-                    return <div className="">
+                    return <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                         {threads.map((thread) => (
                             <ThreadCard
                                 thread={thread}

@@ -22,7 +22,7 @@ export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
         <div
             onClick={() => router.push(`${basePath}/feeds/${post.id}`)
             }
-            className="cursor-pointer border rounded-xl shadow hover:shadow-lg transition p-6 bg-white relative flex justify-between"
+            className="cursor-pointer border rounded-xl shadow hover:shadow-lg transition p-6 relative flex justify-between"
         >
             <div>
 
@@ -36,7 +36,7 @@ export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
                     </h2>
                 </div>
 
-                <p className="text-gray-700 mb-4 line-clamp-3">{post.content}</p>
+                <p className="text-gray-700 dark:text-gray-200 mb-4 line-clamp-3">{post.content}</p>
 
                 <div className="flex flex-wrap gap-2">
                     {post.tags.map((tag) => (

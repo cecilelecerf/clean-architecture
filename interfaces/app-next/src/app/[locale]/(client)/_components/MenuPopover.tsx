@@ -31,7 +31,7 @@ const DisplayPopover = ({ posts }: { posts: PostWithTagsAndUser[] }) => {
             <PopoverTrigger asChild>
                 <div className="relative">
                     <Button variant="ghost">
-                        <Bell className="text-gray-600" />
+                        <Bell className="text-gray-600 dark:text-gray-200" />
                     </Button>
                     {postCount > 0 && (
                         <Badge

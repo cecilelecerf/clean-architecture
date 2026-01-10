@@ -1,80 +1,109 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
-import { match } from 'ts-pattern';
-import Link from 'next/link';
-import FormWrapper, { DataInfo } from '@/components/FormWrapper';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { Link } from '@/lib/i18n/navigation';
+import { User, MapPin, Mail } from 'lucide-react';
+import { endpoints } from '@/utils/endpoint';
+import FormWrapper, { Section } from '@/components/FormWrapper';
 import { useForm } from 'react-hook-form';
-import z from 'zod';
-import { createClientSchema } from '@infrastructure/types/user';
+import { CreateClientPayload, createClientSchema } from '@infrastructure/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 
-const loginSchema = createClientSchema.pick({ email: true, passwordHash: true })
-type Login = z.infer<typeof loginSchema>
+export default function RegisterPage() {
+  const t = useTranslations('auth.register');
+  const mutation = useMutation(endpoints.auth.register());
 
-export default function LoginPage() {
-  const router = useRouter()
-  const form = useForm<Login>({
-    resolver: zodResolver(loginSchema),
-  })
-  const handleSubmit = async (values: Login) => {
-    const res = await signIn('credentials', {
-      redirect: false,
-      email: values.email,
-      password: values.passwordHash,
-    });
+  const form = useForm<CreateClientPayload>({
+    resolver: zodResolver(createClientSchema),
+  });
 
-    if (!res?.ok) {
-      console.error('Erreur de connexion', res?.error);
-      return;
-    }
-    const sessionRes = await fetch('/api/auth/session');
-    const session = await sessionRes.json();
-
-    if (!session?.user?.role) {
-      console.error('Session invalide ou rôle manquant');
-      return;
-    }
-
-    match(session.user.role)
-      .with('client', () => router.push('/accounts'))
-      .with('conseiller', () => router.push('/admin'))
-      .with('directeur', () => router.push('/director'))
-      .otherwise(() => router.push('/unauthorized'));
-
+  const handleSubmit = (values: CreateClientPayload) => {
+    mutation.mutate(
+      { ...values, dateOfBirth: new Date(values.dateOfBirth).toISOString() },
+      {
+        onSuccess: () => toast.success(t('form.success')),
+        onError: () => toast.error(t('form.error')),
+      }
+    );
   };
-  const data: DataInfo<Login> = { email: { label: "Email", type: "email" }, passwordHash: { label: "Mot de passe", type: "password" } }
+
+  const personalSection: Section<CreateClientPayload> = {
+    title: t('sections.personal.title'),
+    description: t('sections.personal.description'),
+    icon: User,
+    data: {
+      firstname: {
+        label: t('form.firstname'),
+        withIcon: true,
+        type: 'text',
+      },
+      lastname: {
+        label: t('form.lastname'),
+        withIcon: true,
+        type: 'text',
+      },
+      sexe: {
+        label: t('form.gender.label'),
+        type: 'radio',
+        options: [
+          { label: t('form.gender.female'), value: 'girl' },
+          { label: t('form.gender.male'), value: 'boy' },
+          { label: t('form.gender.other'), value: 'other' },
+        ],
+      },
+      phoneNumber: {
+        label: t('form.phone'),
+        withIcon: true,
+        type: 'phone',
+      },
+      dateOfBirth: {
+        label: t('form.birthdate'),
+        type: 'date',
+        withIcon: true,
+      },
+    },
+  };
+
+  const addressSection: Section<CreateClientPayload> = {
+    title: t('sections.address.title'),
+    description: t('sections.address.description'),
+    icon: MapPin,
+    data: {
+      address: { label: t('form.address'), type: 'text', notRequired: false },
+      city: { label: t('form.city'), type: 'text', notRequired: false },
+      country: { label: t('form.country'), type: 'text', notRequired: false },
+      postalCode: { label: t('form.postalCode'), type: 'text', notRequired: false },
+    },
+  };
+
+  const accountSection: Section<CreateClientPayload> = {
+    title: t('sections.account.title'),
+    description: t('sections.account.description'),
+    icon: Mail,
+    data: {
+      email: { label: t('form.email'), type: 'email', withIcon: true },
+      passwordHash: { label: t('form.password'), type: 'password', withIcon: true },
+      confirmPassword: { label: t('form.confirmPassword'), type: 'password', withIcon: true },
+    },
+  };
 
   return (
-    <>
-      <Link href="/">ACCUEIL</Link>
-      <FormWrapper<Login>
-        title="Se connecter"
-        form={form}
-        data={data}
-        onSubmit={handleSubmit}
-        labelButton="Connexion"
-        loading={false}
-      >
-        <div className="space-y-2 text-center text-sm">
-          <Link
-            href="/forgot-password"
-            className="text-primary hover:underline block"
-          >
-            Mot de passe oublié ?
-          </Link>
-          <div>
-            <span className="text-muted-foreground">Pas encore de compte ? </span>
-            <Link
-              href="/register"
-              className="text-primary hover:underline font-medium"
-            >
-              S'inscrire
-            </Link>
-          </div>
-        </div>
-      </FormWrapper>
-
-    </>
+    <FormWrapper<CreateClientPayload>
+      title={t('title')}
+      form={form}
+      data={[personalSection, addressSection, accountSection]}
+      labelButton={t('form.submit')}
+      loading={mutation.isPending}
+      onSubmit={handleSubmit}
+      showBackButton
+    >
+      <div className="text-center text-sm pt-4">
+        <span className="text-muted-foreground">{t('hasAccount')} </span>
+        <Link href="/login" className="text-primary hover:underline font-medium">
+          {t('signIn')}
+        </Link>
+      </div>
+    </FormWrapper>
   );
 }

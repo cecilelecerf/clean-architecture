@@ -16,6 +16,8 @@ import { MenuLink } from './MenuLink';
 import { SignOutButton } from '@/components/SignOutButton';
 import { CircleX, Home, Menu, MessageSquare, CreditCard, ClockFading, Newspaper, LucideIcon, User } from 'lucide-react';
 import { LangageSwitcher } from '@/components/LangageSwitcher';
+import { Flex } from '@radix-ui/themes';
+import { ThemeToggleSwitch } from '@/components/ThemeToogleButton';
 
 const menuItems: { icon: LucideIcon, label: string, href: string }[] = [
     { icon: Home, label: "Mes comptes", href: "/accounts" },
@@ -46,7 +48,10 @@ export const MenuDrawer = () => (
                     <DrawerDescription className="text-sm">
                         Menu principal
                     </DrawerDescription>
-                    <LangageSwitcher />
+                    <Flex className='gap-8'>
+                        <LangageSwitcher />
+                        <ThemeToggleSwitch />
+                    </Flex>
 
                 </div>
                 <DrawerClose asChild>

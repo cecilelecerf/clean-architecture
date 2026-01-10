@@ -1,4 +1,5 @@
 'use client';
+import { ThemeProvider } from '@/contexts/theme/ThemeProvide';
 import { queryClient } from '@/lib/queryClient';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
@@ -16,7 +17,9 @@ export const Providers = ({ children, locale, messages }: ProvidersProps) => {
     <NextIntlClientProvider locale={locale} messages={messages}>
       <SessionProvider>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
         </QueryClientProvider>
       </SessionProvider>
     </NextIntlClientProvider>

@@ -5,17 +5,21 @@ import { useTransition } from "react";
 import { Switch } from "./ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 
 export const LangageSwitcher = () => {
     const pathname = usePathname();
     const router = useRouter();
     const locale = useLocale();
+    const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
 
     const handleLocaleChange = (checked: boolean) => {
         const newLocale = checked ? 'en' : 'fr';
         startTransition(() => {
-            router.replace(pathname, { locale: newLocale });
+            const search = searchParams.toString();
+            const url = search ? `${pathname}?${search}` : pathname;
+            router.replace(url as any, { locale: newLocale });
         });
     };
 

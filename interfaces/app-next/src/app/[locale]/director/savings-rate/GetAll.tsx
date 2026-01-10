@@ -94,35 +94,32 @@ const SavingsRateCard = ({
     return (
         <Card className={`hover:shadow-md hover:scale-105 transition-all`}>
             <CardContent className="space-y-4">
-                {/* Header avec badge */}
                 {getBadge()}
 
-                {/* Taux principal */}
                 <div className="flex items-center gap-3">
                     <Percent className={`w-8 h-8 "text-gray-400`} />
                     <div>
-                        <p className={`text-4xl font-bold text-gray-700`}>
+                        <p className={`text-4xl font-bold`}>
                             {rate.rate}%
                         </p>
-                        <p className="text-sm text-gray-500">{t("card.year")}</p>
+                        <p className="text-sm text-gray-400">{t("card.year")}</p>
                     </div>
                 </div>
 
-                {/* Dates */}
                 <div className="space-y-2 pt-3 border-t">
                     <div className="flex items-center gap-2 text-sm">
                         <Calendar className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">
-                            <span className="font-medium">{t("card.effectiveDate")} :</span>{" "}
+                        <span className="dark:text-gray-400 text-gray-600">
+                            <span className="font-medium">{t("card.effectiveDate")}
+                            </span>{" "}
                             {formatDateFrench(rate.effectiveDate)}
                         </span>
                     </div>
-                    <div className="text-xs text-gray-500">
-                        {t("card.createdAt")} {formatDateFrench(rate.createdAt)}
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                        {t("card.createdAt")}{formatDateFrench(rate.createdAt)}
                     </div>
-                </div>
+                </div >
 
-                {/* Message contextuel */}
                 {isFuture && (
                     <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
                         {t("card.rate")}{" "}
@@ -130,8 +127,8 @@ const SavingsRateCard = ({
                         {t("card.day")}
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </CardContent >
+        </Card >
     );
 };
 

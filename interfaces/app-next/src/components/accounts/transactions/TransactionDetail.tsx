@@ -103,7 +103,7 @@ const AccountCard = ({ clickable, account }: { clickable?: boolean, account: Acc
                             onClick={() => clickable && router.push(`/admin/users/${account.user.id}`)}
                         >
                             <Avatar className="h-10 w-10">
-                                <AvatarFallback className="bg-gray-100">
+                                <AvatarFallback className="bg-gray-100 dark:bg-gray-100/10">
                                     {account.user.firstname?.[0]}
                                     {account.user.lastname?.[0]}
                                 </AvatarFallback>
@@ -119,7 +119,7 @@ const AccountCard = ({ clickable, account }: { clickable?: boolean, account: Acc
                         </div>
                         <div
                             className={cn(
-                                `rounded-lg p-3 border-l-4 border-${account.color}-500 bg-gray-50`,
+                                `rounded-lg p-3 border-l-4 border-${account.color}-500 bg-gray-50 dark:bg-gray-50/10`,
                                 clickable && "cursor-pointer hover:bg-gray-100 transition-colors"
                             )}
                             onClick={() => clickable && router.push(`/admin/accounts/${account.IBAN}`)}

@@ -181,7 +181,7 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                                             .exhaustive()}
                                     </Badge>
                                 </div>
-                                <p className="text-sm md:text-base text-gray-600">{user.email}</p>
+                                <p className="text-sm md:text-base text-gray-600 dark:text-gray-500">{user.email}</p>
                             </div>
 
                             <div className="flex gap-2">
@@ -215,7 +215,6 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                         </div>
                     </Card>
 
-                    {/* Informations personnelles */}
                     <Card className="p-4 md:p-6">
                         <h2 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2">
                             <User className="h-5 w-5" />
@@ -335,7 +334,7 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                                 </>
                             ) : (
                                 <>
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-500/10 rounded-lg">
                                         <User className="h-5 w-5 text-gray-500" />
                                         <div>
                                             <p className="text-xs text-gray-500">{t("personal.firstname")}</p>
@@ -343,7 +342,7 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-500/10 rounded-lg">
                                         <User className="h-5 w-5 text-gray-500" />
                                         <div>
                                             <p className="text-xs text-gray-500">{t("personal.lastname")}</p>
@@ -351,7 +350,7 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-500/10 rounded-lg">
                                         <Mail className="h-5 w-5 text-gray-500" />
                                         <div>
                                             <p className="text-xs text-gray-500">{t("personal.email")}</p>
@@ -359,7 +358,7 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                                         </div>
                                     </div>
                                     {user.role === "client" &&
-                                        <> <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                        <> <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-500/10 rounded-lg">
                                             <Phone className="h-5 w-5 text-gray-500" />
                                             <div>
                                                 <p className="text-xs text-gray-500">{t("personal.phonr")}</p>
@@ -411,14 +410,12 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                         </div>
                     </Card>
 
-                    {/* Statistiques selon le rôle */}
                     {match(user.role)
                         .with("client", () => <ClientStatistics userId={user.id} />)
                         .with("conseiller", () => <AdvisorStatistics userId={user.id} />)
                         .with("directeur", () => <DirectorStatistics userId={user.id} />)
                         .exhaustive()}
 
-                    {/* Informations du compte */}
                     <Card className="p-4 md:p-6">
                         <h2 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2">
                             <Shield className="h-5 w-5" />
@@ -426,7 +423,7 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                         </h2>
 
                         <div className="space-y-3">
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-500/10 rounded-lg">
                                 <div className="flex items-center gap-3">
                                     <Calendar className="h-5 w-5 text-gray-500" />
                                     <div>
@@ -442,7 +439,7 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-500/10 rounded-lg">
                                 <div className="flex items-center gap-3">
                                     <Calendar className="h-5 w-5 text-gray-500" />
                                     <div>
@@ -459,7 +456,7 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                             </div>
 
                             {user.confirmedAt && (
-                                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-500/10 rounded-lg">
                                     <div className="flex items-center gap-3">
                                         <Mail className="h-5 w-5 text-green-600" />
                                         <div>
@@ -474,7 +471,6 @@ const Wrapper = ({ userId, t }: { userId: UserId, t: ReturnType<typeof useTransl
                         </div>
                     </Card>
 
-                    {/* Déconnexion */}
                     <Card className="p-4 md:p-6">
                         <div className="flex flex-col gap-4">
                             <div>

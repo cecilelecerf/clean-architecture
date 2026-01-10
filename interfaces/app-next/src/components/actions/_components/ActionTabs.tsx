@@ -50,9 +50,8 @@ export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: bool
                 </TabsTrigger>
             </TabsList>
 
-            {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     <MobileInfoCard
                         icon={Building2}
                         label={t("overview.market")}
@@ -103,12 +102,10 @@ export const ActionTabs = ({ action, isAdmin }: { action: Action, isAdmin?: bool
             {!isAdmin && (
                 <TabsContent value="my-order" className="space-y-4"><MyOrders action={action} /></TabsContent>
             )}
-            {/* Chart Tab */}
             <TabsContent value="chart" className="space-y-4">
                 <ChartTab action={action} />
             </TabsContent>
 
-            {/* Stats Tab */}
             <TabsContent value="stats" className="space-y-4">
                 {match(statsQuery)
                     .with({ status: "pending" }, () => <StatsSkeleton />)
@@ -205,9 +202,9 @@ interface MobileInfoCardProps {
 
 function MobileInfoCard({ icon: Icon, label, value, color }: MobileInfoCardProps) {
     const colorClasses = {
-        blue: "bg-blue-50 text-blue-600 border-blue-200",
-        green: "bg-green-50 text-green-600 border-green-200",
-        purple: "bg-purple-50 text-purple-600 border-purple-200",
+        blue: "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:border-blue-950",
+        green: "bg-green-50 text-green-600 border-green-200 dark:bg-green-500/10 dark:border-green-950",
+        purple: "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-500/10 dark:border-purple-950",
     };
 
     return (
@@ -234,10 +231,9 @@ function MobileDetailRow({
 }) {
     return (
         <div className="flex justify-between items-start gap-3">
-            <span className="text-xs text-gray-600  shrink-0">{label}</span>
+            <span className="text-xs shrink-0">{label}</span>
             <span
-                className={`text-sm text-right font-medium ${highlight ? "text-blue-600" : "text-gray-900"
-                    }`}
+                className="text-sm text-right font-medium  dark:text-gray-300 text-gray-900"
             >
                 {value}
             </span>
@@ -257,7 +253,7 @@ function PerformanceRow({
     const isPositive = value >= 0;
     return (
         <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">{label}</span>
+            <span className="text-sm">{label}</span>
             <div className="flex items-center gap-1">
                 {isPositive ? (
                     <TrendingUp className="w-4 h-4 text-green-600" />
@@ -289,8 +285,8 @@ function StatCard({
     color: "red" | "green";
 }) {
     const colorClasses = {
-        red: "bg-red-50 text-red-600 border-red-200",
-        green: "bg-green-50 text-green-600 border-green-200",
+        red: "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:border-none",
+        green: "bg-green-50 text-green-600 border-green-200 dark:bg-green-500/10 dark:border-none",
     };
 
     return (

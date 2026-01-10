@@ -7,7 +7,6 @@ type Props = {
 
 export default async function DirectorLayout({ children, params }: Props) {
 
-  // const messages = await getTranslations('director');
 
   return <DirectorLayoutClient >{children}</DirectorLayoutClient>;
 }
