@@ -32,7 +32,7 @@ export const DevSection = () => {
         }
 
         match(session.user.role)
-            .with('client', () => router.push('/threads'))
+            .with('client', () => router.push('/accounts'))
             .with('conseiller', () => router.push('/admin'))
             .with('directeur', () => router.push('/director'))
             .otherwise(() => router.push('/unauthorized'));

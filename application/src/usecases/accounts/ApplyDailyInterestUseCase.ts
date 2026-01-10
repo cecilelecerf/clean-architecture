@@ -40,10 +40,8 @@ export class ApplyDailyInterestUseCase {
 
     const bankAccount = await this.accountRepository.findBankInterestAccount();
     if (!bankAccount) return new BankInterestAccountNotFoundError();
-    console.log(bankAccount);
     const savingAccounts =
       await this.accountRepository.findAllSavingsAccounts();
-    console.log(savingAccounts);
     const today = this.clockService.now();
     const todayStart = new Date(today);
     todayStart.setHours(0, 0, 0, 0);
@@ -95,7 +93,6 @@ export class ApplyDailyInterestUseCase {
         icon: "💰",
         date: today,
       });
-      console.log(transaction);
       if (transaction instanceof Error) return transaction;
 
       await this.transactionRepository.save(transaction);
@@ -108,7 +105,6 @@ export class ApplyDailyInterestUseCase {
     }
 
     await this.accountRepository.update(bankAccount);
-    console.log(distributed);
     return { distributed, totalAmount, skipped };
   }
 }

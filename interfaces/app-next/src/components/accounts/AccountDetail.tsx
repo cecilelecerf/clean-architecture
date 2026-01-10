@@ -54,7 +54,6 @@ export const AccountDetail = ({
 
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false);
-    const [isTransactionsExpanded, setIsTransactionsExpanded] = useState(false);
     const [editedName, setEditedName] = useState('');
     const [transferTargetAccount, setTransferTargetAccount] = useState('');
 
@@ -176,28 +175,21 @@ export const AccountDetail = ({
                                     <h2 className="font-semibold text-lg">Dernières transactions</h2>
                                     <Button
                                         variant="link"
-                                        onClick={() => setIsTransactionsExpanded(!isTransactionsExpanded)}
+                                        onClick={() => router.push(`/accounts/${account.IBAN}/transactions`)}
                                     >
-                                        {isTransactionsExpanded ? 'Voir -' : 'Voir +'}
+                                        {'Voir +'}
                                     </Button>
                                 </Flex>
 
-                                {isTransactionsExpanded ? (
-                                    <GetAllTransactions
-                                        accountIban={accountIban}
-                                        filters={{ page: 1 }}
-                                        onPaginationChange={() => { }}
-                                        baseHref={`${basePath}/${accountIban}/transactions`}
-                                    />
-                                ) : (
-                                    <GetAllTransactions
-                                        accountIban={accountIban}
-                                        filters={{ limit: 4, page: 1 }}
-                                        onPaginationChange={() => { }}
-                                        hiddePagination
-                                        baseHref={`${basePath}/${accountIban}/transactions`}
-                                    />
-                                )}
+
+                                <GetAllTransactions
+                                    accountIban={accountIban}
+                                    filters={{ limit: 4, page: 1 }}
+                                    onPaginationChange={() => { }}
+                                    hiddePagination
+                                    baseHref={`${basePath}/${accountIban}/transactions`}
+                                />
+
                             </Flex>
 
                             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

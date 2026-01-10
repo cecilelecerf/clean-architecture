@@ -39,18 +39,18 @@ export function setupCronJobs() {
   });
 
   // Pour le développement : exécuter toutes les minutes (commenté)
-  cron.schedule("* * * * *", async () => {
-    console.log("Test cron - every minute");
-    try {
-      const result =
-        await accountFactoryMysql().admin.applyDailyInterest.execute();
-      if (!(result instanceof Error)) {
-        console.log(`✅ Test: ${result.distributed} accounts`);
-      }
-    } catch (error) {
-      console.error("❌ Test error:", error);
-    }
-  });
+  // cron.schedule("* * * * *", async () => {
+  //   console.log("Test cron - every minute");
+  //   try {
+  //     const result =
+  //       await accountFactoryMysql().admin.applyDailyInterest.execute();
+  //     if (!(result instanceof Error)) {
+  //       console.log(`✅ Test: ${result.distributed} accounts`);
+  //     }
+  //   } catch (error) {
+  //     console.error("❌ Test error:", error);
+  //   }
+  // });
 
   console.log("✅ Cron jobs scheduled");
 }

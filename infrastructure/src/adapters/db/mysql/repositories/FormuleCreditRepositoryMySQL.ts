@@ -73,7 +73,6 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM formules"
     );
-    console.log(rows);
 
     return rows.map((row) => FormuleMapper.mapRowToFormule(row));
   }
@@ -83,7 +82,6 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM formules WHERE is_active = 1"
     );
-    console.log(rows);
 
     return rows.map((row) => FormuleMapper.mapRowToFormule(row));
   }
