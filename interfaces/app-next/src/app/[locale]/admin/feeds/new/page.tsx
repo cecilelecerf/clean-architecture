@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { match } from "ts-pattern";
 import { NewPost, newPostSchema } from "@/utils/endpoint/feedsEndpoint";
+import { useTranslations } from "next-intl";
 
 
 
@@ -28,6 +29,8 @@ export default function NewPostPage() {
 
 const Content = ({ tags }: { tags: Tag[] }) => {
     const router = useRouter();
+
+    const t = useTranslations("advisor.feeds.new");
 
     const form = useForm<NewPost>({
         resolver: zodResolver(newPostSchema),
@@ -50,21 +53,21 @@ const Content = ({ tags }: { tags: Tag[] }) => {
     };
 
     const data: DataInfo<NewPost> = {
-        title: { label: "Titre", type: "text" },
-        content: { label: "Contenu", type: "textarea" },
+        title: { label: t("form.title"), type: "text" },
+        content: { label: t("form.content"), type: "textarea" },
         tagsId: {
-            label: "Tags",
+            label: t("form.tags"),
             type: "tag",
             options: tags.map((tag) => ({ value: tag.id, label: tag.label, tagColor: tag.color }))
         }
     }
     return (
         <FormWrapper<NewPost>
-            title="Nouveau post"
+            title={t("title")}
             form={form}
             data={data}
             onSubmit={onSubmit}
-            labelButton="Publier"
+            labelButton={t("button")}
             loading={mutate.isPending}
         />
     )

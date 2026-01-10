@@ -25,5 +25,42 @@
         },
         "thread": "Threads actifs"
     }
+  },
+  "feeds": {
+    "add": "Ajouter",
+    "filters": {
+        "placeholder": "Rechercher par titre",
+        "publish": "Publié",
+        "all": "Tous",
+        "unpublish": "Brouillon",
+        "calendar": {
+            "from": "Du",
+            "to": "Au"
+        },
+        "page": "Post par page"
+    },
+    "post": {
+        "none": "Aucun post trouvé"
+    },
+    "update": "Modifier",
+    "tags": {
+        "title": "Tags",
+        "clear": "Tout effacer",
+        "loading": "Chargement...",
+        "error": "Erreur lors du chargement des tags",
+        "unavailable": "Aucun tag disponible"
+    },
+    "new": {
+        "form": {
+            "title": "Titre",
+            "content": "Contenu",
+            "tags": "Tags"
+        },
+        "title": "Nouveau post",
+        "button": "Publier"
+    },
+    "by": "Par",
+    "publish": "Publié le",
+    "unpublish": "Brouillon créé le"
   }
 }

@@ -6,9 +6,11 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Posts } from "@/components/feeds/Posts";
 import { PostFilters } from "@/components/feeds/PostFilters";
+import { useTranslations } from "next-intl";
 
 export default function PostsPage() {
-    const router = useRouter()
+    const router = useRouter();
+    const t = useTranslations("advisor.feeds");
     const [filters, setFilters] = useState<TPostFilters>({
         title: undefined,
         fromDate: undefined,
@@ -27,7 +29,7 @@ export default function PostsPage() {
             >
                 <Plus />
                 <span className="opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">
-                    Ajouter
+                    {t("add")}
                 </span>
             </Button>
 

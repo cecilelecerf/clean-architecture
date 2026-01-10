@@ -7,7 +7,7 @@
     "home": "Dashboard",
     "profile": "Profile",
     "messaging": "Messaging",
-    "news": "News",
+    "news": "Feeds",
     "bank": "Bank Accounts",
     "loan": "Loan applications",
 
@@ -25,5 +25,42 @@
         },
         "thread": "Active threads"
     }
+  },
+  "feeds": {
+    "add": "Add",
+    "filters": {
+        "placeholder": "Search by title",
+        "publish": "Publish",
+        "all": "All",
+        "unpublish": "Draft",
+        "calendar": {
+            "from": "From",
+            "to": "To"
+        },
+        "page": "Post per page"
+    },
+    "post": {
+        "none": "No posts found"
+    },
+    "update": "Update",
+    "tags": {
+        "title": "Tags",
+        "clear": "Clear all",
+        "loading": "Loading...",
+        "error": "Error loading tags",
+        "unavailable": "No tags available"
+    },
+    "new": {
+        "form": {
+            "title": "Title",
+            "content": "Content",
+            "tags": "Tags"
+        },
+        "title": "New post",
+        "button": "Publish"
+    },
+    "by": "By",
+    "publish": "Published on",
+    "unpublish": "Draft created on"
   }
 }
