@@ -108,7 +108,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                     })}
                                 </h2>
                             </div>
-                            <p className="text-sm text-gray-600 mb-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-500 mb-1">
                                 Demande créée le {formatDateFrench(credit.createdAt)}
                             </p>
                         </div>
@@ -117,9 +117,8 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                         </Badge>
                     </div>
 
-                    {/* Actions pour les crédits en attente */}
                     {isPending && isAdmin && (
-                        <div className="flex gap-3 mt-4 pt-4 border-t border-yellow-300">
+                        <div className="flex gap-3 mt-4 pt-4 border-t border-yellow-300 dark:border-yellow-600">
                             <Button
                                 className="flex-1"
                                 onClick={handleAccept}
@@ -142,19 +141,19 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
 
                     {/* Messages selon le statut */}
                     {credit.status === "PENDING" && config.message && (
-                        <div className="mt-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg">
-                            <p className="text-sm text-yellow-800">
+                        <div className="mt-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg  dark:bg-yellow-100/10 dark:border-yellow-600">
+                            <p className="text-sm text-yellow-800 dark:text-yellow-600">
                                 {!isAdmin ? config.message.client : config.message.advisor}
                             </p>
                         </div>
                     )}
 
                     {isFuture && credit.status === "ACCEPTED" && (
-                        <div className="mt-4 p-4 bg-blue-100 border border-blue-300 rounded-lg">
-                            <p className="text-sm text-blue-800 font-medium mb-1">
+                        <div className="mt-4 p-4 bg-blue-100 border border-blue-300 rounded-lg dark:bg-blue-300/10 dark:border-blue-900">
+                            <p className="text-sm text-blue-800 font-medium mb-1 dark:text-blue-500">
                                 📅 Ce crédit débutera le {formatDateFrench(credit.startDate)}
                             </p>
-                            <p className="text-xs text-blue-700">
+                            <p className="text-xs text-blue-700 dark:text-blue-500">
                                 Les prélèvements automatiques commenceront à cette date.
                             </p>
                         </div>
@@ -162,7 +161,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
 
                     {
                         credit.status === "REFUSED" && credit.reason && (
-                            <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg">
+                            <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg dark:bg-red-300/10 dark:border-red-900">
                                 <p className="text-sm text-red-800 font-medium mb-1">
                                     {!isAdmin ? config.message.client : config.message.advisor}
                                 </p>
@@ -174,7 +173,8 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                         credit.status === "COMPLETED" && (
                             <div className="mt-4 p-4 bg-green-100 border border-green-300 rounded-lg">
                                 <p className="text-sm text-green-800">
-                                    {!isAdmin ? config.message.client : config.message.advisor}                                </p>
+                                    {!isAdmin ? config.message.client : config.message.advisor}
+                                </p>
                             </div>
                         )
                     }
@@ -193,7 +193,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                         <CardContent className="space-y-4">
                             <div>
                                 <div className="flex justify-between mb-2">
-                                    <span className="text-sm text-gray-600">
+                                    <span className="text-sm text-gray-600 dark:text-gray-500">
                                         {progressPercentage}% remboursé
                                     </span>
                                     <span className="text-sm font-medium">
@@ -212,7 +212,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
                                 <div className="p-4 bg-green-50 rounded-lg">
-                                    <p className="text-xs text-gray-600 mb-1">Montant payé</p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-500 mb-1">Montant payé</p>
                                     <p className="text-xl font-bold text-green-600">
                                         {paidAmount.toLocaleString("fr-FR", {
                                             style: "currency",
@@ -221,7 +221,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                 </div>
 
                                 <div className="p-4 bg-orange-50 rounded-lg">
-                                    <p className="text-xs text-gray-600 mb-1">Reste à payer</p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-500 mb-1">Reste à payer</p>
                                     <p className="text-xl font-bold text-orange-600">
                                         {remainingAmount.toLocaleString("fr-FR", {
                                             style: "currency",
@@ -231,7 +231,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                 </div>
 
                                 <div className="p-4 bg-blue-50 rounded-lg">
-                                    <p className="text-xs text-gray-600 mb-1">Mensualité</p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-500 mb-1">Mensualité</p>
                                     <p className="text-xl font-bold text-blue-600">
                                         {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
                                             style: "currency",
@@ -255,7 +255,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             <div className="flex items-start gap-3">
                                 <Type className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <p className="text-sm text-gray-600">Type du crédit</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-500">Type du crédit</p>
                                     <p className="text-lg font-semibold">
                                         {credit.formule.type}
                                     </p>
@@ -265,7 +265,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             <div className="flex items-start gap-3">
                                 <Tag className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <p className="text-sm text-gray-600">Label du crédit</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-500">Label du crédit</p>
                                     <p className="text-lg font-semibold">
                                         {credit.formule.label}
                                     </p>
@@ -275,7 +275,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             <div className="flex items-start gap-3">
                                 <Percent className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <p className="text-sm text-gray-600">Taux d'intérêt</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-500">Taux d'intérêt</p>
                                     <p className="text-lg font-semibold">{credit.formule.interestRate}%</p>
                                 </div>
                             </div>
@@ -285,7 +285,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             <div className="flex items-start gap-3">
                                 <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <p className="text-sm text-gray-600">Taux d'assurance</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-500">Taux d'assurance</p>
                                     <p className="text-lg font-semibold">{credit.formule.insuranceRate}%</p>
                                 </div>
                             </div>
@@ -293,7 +293,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             <div className="flex items-start gap-3">
                                 <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <p className="text-sm text-gray-600">Montant minimum</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-500">Montant minimum</p>
                                     <p className="text-lg font-semibold">
                                         {credit.formule.minAmount.toLocaleString("fr-FR", {
                                             style: "currency",
@@ -306,7 +306,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             <div className="flex items-start gap-3">
                                 <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <p className="text-sm text-gray-600">Montant maximum</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-500">Montant maximum</p>
                                     <p className="text-lg font-semibold">
                                         {credit.formule.maxAmount.toLocaleString("fr-FR", {
                                             style: "currency",
@@ -334,7 +334,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             <div className="flex items-start gap-3">
                                 <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <p className="text-sm text-gray-600">Montant emprunté</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-500">Montant emprunté</p>
                                     <p className="text-lg font-semibold">
                                         {credit.initialAmount.amount.toLocaleString("fr-FR", {
                                             style: "currency",
@@ -347,7 +347,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             <div className="flex items-start gap-3">
                                 <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <p className="text-sm text-gray-600">Durée du crédit</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-500">Durée du crédit</p>
                                     <p className="text-lg font-semibold">
                                         {credit.durationMonths} mois
                                         ({Math.round(credit.durationMonths / 12)} ans)
@@ -361,7 +361,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             <div className="flex items-start gap-3">
                                 <CalendarClock className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <p className="text-sm text-gray-600">Date de début</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-500">Date de début</p>
                                     <p className="text-lg font-semibold">
                                         {formatDateFrench(credit.startDate)}
                                     </p>
@@ -371,7 +371,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                             <div className="flex items-start gap-3">
                                 <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
                                 <div>
-                                    <p className="text-sm text-gray-600">Mensualité</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-500">Mensualité</p>
                                     <p className="text-lg font-semibold">
                                         {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
                                             style: "currency",
@@ -400,7 +400,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                     <div className="flex items-start gap-3">
                                         <User className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-sm text-gray-600">Nom</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-500">Nom</p>
                                             <p className="text-lg font-semibold">
                                                 {account.user.lastname}
                                             </p>
@@ -410,7 +410,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                     <div className="flex items-start gap-3">
                                         <AtSign className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-sm text-gray-600">Email</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-500">Email</p>
                                             <p className="text-lg font-semibold">
                                                 {account.user.email}
                                             </p>
@@ -422,7 +422,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                     <div className="flex items-start gap-3">
                                         <User className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-sm text-gray-600">Prénom</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-500">Prénom</p>
                                             <p className="text-lg font-semibold">
                                                 {account.user.firstname}
                                             </p>
@@ -432,7 +432,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                     <div className="flex items-start gap-3">
                                         <BriefcaseBusiness className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-sm text-gray-600">Statut professionnel</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-500">Statut professionnel</p>
                                             <p className="text-lg font-semibold">
                                                 Employé
                                                 {/* {account.user.profesionalStatus} */}
@@ -459,7 +459,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                     <div className="flex items-start gap-3">
                                         <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-sm text-gray-600">IBAN</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-500">IBAN</p>
                                             <p className="text-lg font-semibold">
                                                 {account.IBAN}
                                             </p>
@@ -469,7 +469,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                     <div className="flex items-start gap-3">
                                         <ArrowBigRight className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-sm text-gray-600">Nom</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-500">Nom</p>
                                             <p className="text-lg font-semibold">
                                                 {account.name}
                                             </p>
@@ -481,7 +481,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                     <div className="flex items-start gap-3">
                                         <Type className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-sm text-gray-600">Type</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-500">Type</p>
                                             <p className="text-lg font-semibold">
                                                 {account.type}
                                             </p>
@@ -491,7 +491,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                     <div className="flex items-start gap-3">
                                         <DollarSign className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-sm text-gray-600">Balance actuelle</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-500">Balance actuelle</p>
                                             <p className="text-lg font-semibold">
                                                 {account.balance.amount.toLocaleString("fr-FR", {
                                                     style: "currency",

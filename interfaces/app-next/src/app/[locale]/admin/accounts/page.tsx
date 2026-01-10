@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 import { User } from "lucide-react";
 import { TitleAdminPage } from "@/components/TitleAdminPage";
+import { AccountCard } from "@/components/accounts/AccountCard";
 
 export default function AccountsPage() {
     const query = useQuery(endpoints.accounts.getAll({ type: "client" }));
@@ -33,68 +34,13 @@ export default function AccountsPage() {
                     return (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {accounts.map((acc) => (
-                                <Card
+                                <AccountCard
                                     key={acc.IBAN}
-                                    className={`shadow hover:shadow-lg transition-all py-1`}
-                                    onClick={() => router.push(`/admin/accounts/${acc.IBAN}`)}
-                                >
-                                    <CardContent className="p-4 space-y-3">
-                                        {/* Nom du compte */}
-                                        <div>
-                                            <h3 className="font-semibold text-lg">{acc.name}</h3>
-                                            <p className="text-xs text-gray-500">
-                                                {acc.type === "courant" ? "Compte courant" : "Compte épargne"}
-                                            </p>
-                                        </div>
-
-                                        {/* Solde */}
-                                        <div className="py-3 px-4 bg-gray-50 rounded-lg">
-                                            <p className="text-xs text-gray-500 mb-1">Solde</p>
-                                            <p className="text-2xl font-bold">
-                                                {acc.balance.amount.toLocaleString("fr-FR", {
-                                                    style: "currency",
-                                                    currency: acc.balance.currency,
-                                                })}
-                                            </p>
-                                        </div>
-
-                                        {/* Informations client */}
-                                        <div className="flex items-center gap-3 pt-2 border-t">
-                                            <Avatar className="h-8 w-8">
-                                                <AvatarFallback className="bg-gray-100 text-xs">
-                                                    {acc.user?.firstname?.[0]}
-                                                    {acc.user?.lastname?.[0]}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium truncate">
-                                                    {acc.user?.firstname} {acc.user?.lastname}
-                                                </p>
-                                                <p className="text-xs text-gray-500 truncate">
-                                                    {acc.user?.email}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div className="flex flex-col gap-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={(e) => { e.stopPropagation(); router.push(`/admin/users/${acc.user?.id}`) }}
-                                            >
-                                                <User className="w-4 h-4 mr-2" />
-                                                Voir client
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                onClick={() => router.push(`/admin/accounts/${acc.IBAN}`)}
-                                            >
-                                                Voir compte
-                                            </Button>
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                    account={acc}
+                                    showUser
+                                    onClickUser={(userId) => router.push(`/admin/users/${userId}`)}
+                                    onClickAccount={(iban) => router.push(`/admin/accounts/${iban}`)}
+                                />
                             ))}
                         </div>
                     );
