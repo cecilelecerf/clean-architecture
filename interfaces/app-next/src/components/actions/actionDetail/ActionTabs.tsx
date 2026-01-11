@@ -79,7 +79,7 @@ export const ActionTabs = memo(({ action, isAdmin }: ActionTabsProps) => {
 
 ActionTabs.displayName = 'ActionTabs';
 
-const OverviewTab = memo(({ action, t }: { action: Action; t: any }) => (
+const OverviewTab = memo(({ action, t }: { action: Action; t: ReturnType<typeof useTranslations>; }) => (
     <>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
             <MobileInfoCard
@@ -132,7 +132,7 @@ const OverviewTab = memo(({ action, t }: { action: Action; t: any }) => (
 
 OverviewTab.displayName = 'OverviewTab';
 
-const StatsTab = memo(({ statsQuery, action, t }: { statsQuery: UseQueryResult<ActionStats, Error>; action: Action; t: any }) => (
+const StatsTab = memo(({ statsQuery, action, t }: { statsQuery: UseQueryResult<ActionStats, Error>; action: Action; t: ReturnType<typeof useTranslations>; }) => (
     match(statsQuery)
         .with({ status: "pending" }, () => <StatsSkeleton />)
         .with({ status: "error" }, () => (
@@ -152,7 +152,7 @@ const StatsTab = memo(({ statsQuery, action, t }: { statsQuery: UseQueryResult<A
 
 StatsTab.displayName = 'StatsTab';
 
-const StatsContent = memo(({ stats, action, t }: { stats: any; action: Action; t: any }) => (
+const StatsContent = memo(({ stats, action, t }: { stats: ActionStats; action: Action; t: ReturnType<typeof useTranslations>; }) => (
     <>
         <Card>
             <CardHeader className="pb-3">

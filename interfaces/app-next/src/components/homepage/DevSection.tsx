@@ -7,7 +7,6 @@ import { match } from "ts-pattern";
 import { useRouter } from "next/navigation";
 
 export const DevSection = () => {
-    if (process.env.NODE_ENV !== "development") return;
     const router = useRouter();
     const { data: session } = useSession();
 
@@ -33,6 +32,7 @@ export const DevSection = () => {
             .with('directeur', () => router.push('/director'))
             .otherwise(() => router.push('/unauthorized'));
     };
+    if (process.env.NODE_ENV !== "development") return;
 
     return (
         <section className="container mx-auto px-4 py-12 border-t-4 border-yellow-400 bg-yellow-50 dark:bg-yellow-900">
@@ -113,7 +113,7 @@ export const DevSection = () => {
 
                 <div className="mt-6 p-4 bg-yellow-100 border border-yellow-300 rounded-lg dark:bg-yellow-800 dark:border-yellow-700">
                     <p className="text-sm text-yellow-900 dark:text-yellow-300">
-                        <strong>Note :</strong> Cette section n'est visible qu'en mode développement.
+                        <strong>Note :</strong> Cette section n&apos;est visible qu&apos;en mode développement.
                         Elle sera automatiquement masquée en production.
                     </p>
                 </div>

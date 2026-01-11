@@ -1,4 +1,3 @@
-
 import { AccountId } from '@infrastructure/types/account';
 import { use } from 'react';
 import { TitleAdminPage } from '@/components/TitleAdminPage';

@@ -25,7 +25,7 @@ export const PostFilters = ({ filters, onChange, isAdmin }: PostFiltersProps) =>
 
     useEffect(() => {
         onChange(localFilters);
-    }, [localFilters]);
+    }, [localFilters, onChange]);
     return (
         <div className="flex gap-6 mb-6">
             <Input
@@ -44,7 +44,6 @@ export const PostFilters = ({ filters, onChange, isAdmin }: PostFiltersProps) =>
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-65 md:w-90">
                     <div className="flex flex-col gap-4">
-                        {/* Statut publié */}
                         {isAdmin && (
 
                             <div className="flex flex-col gap-1">
@@ -78,7 +77,6 @@ export const PostFilters = ({ filters, onChange, isAdmin }: PostFiltersProps) =>
                             ...prev,
                             tagsId: typeof value === 'function' ? value(prev.tagsId) : value
                         }))} selectedTagsId={localFilters.tagsId} />
-                        {/* Dates */}
                         <div className="flex gap-3 flex-col md:flex-row">
                             <CalendarFilter
                                 dateIso={filters.fromDate}

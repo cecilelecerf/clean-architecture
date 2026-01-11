@@ -1,5 +1,5 @@
 import { TitleAdminPage } from "@/components/TitleAdminPage";
-import { SavingsRateHeroBanner } from "./GetCurrentSavingRate";
+import { SavingsRateHeroBanner } from "./SavingsRateHeroBanner";
 
 export default function SavingsRatePage() {
     return (

@@ -58,7 +58,7 @@ const DisplayPost = ({ dataPost, isAdmin, basePath }: { dataPost: PostWithTagsAn
         return () => {
             socket.off(eventName);
         };
-    }, []);
+    }, [post]);
     useEffect(() => {
         setPost(dataPost)
     }, [dataPost])

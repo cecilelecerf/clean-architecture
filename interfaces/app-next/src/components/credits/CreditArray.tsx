@@ -9,7 +9,6 @@ type Props = { credits: CreditDTOWithFormule[], title: string, isAdmin?: boolean
 export const CreditArray = ({ credits, title, isAdmin, basePath }: Props) => {
     const t = useTranslations("credit.array");
     const { data: session } = useSession();
-    if (!session?.user?.id) return <div>Unauthorized</div>;
     const thProps = "text-left p-4 text-sm font-semibold text-gray-600 dark:text-gray-300"
     return <>
         <div className="lg:hidden ">

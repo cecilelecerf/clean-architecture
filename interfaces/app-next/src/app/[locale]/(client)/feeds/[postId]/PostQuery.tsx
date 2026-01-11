@@ -7,7 +7,6 @@ import { PostId } from "@infrastructure/types/feed";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
-import { Skeleton } from "@/components/ui/skeleton";
 import { SkeletonPost } from "@/components/feeds/Posts";
 
 type Props = { postId: PostId }

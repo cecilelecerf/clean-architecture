@@ -3,7 +3,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { signOut } from "next-auth/react";
 import { match } from "ts-pattern";
 import { UpdateClientPayload, User as TUser, UserId } from "@infrastructure/types/user";
 import { ClientStatistics } from "../../_components/ClientStatistics";
@@ -84,8 +83,6 @@ export const Wrapper = ({ userId }: { userId: UserId, }) => {
         });
         setIsEditing(true);
     }
-
-    const handleLogout = () => signOut({ callbackUrl: '/login' })
 
     return match(query)
         .with(({ status: "error" }), () => <div>Erreur lors du chargement du profil</div>)

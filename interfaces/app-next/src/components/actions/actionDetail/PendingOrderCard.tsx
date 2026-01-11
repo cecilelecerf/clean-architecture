@@ -139,6 +139,7 @@ export const PendingOrderCard = memo(({
         </>
     );
 })
+PendingOrderCard.displayName = "PendingOrderCard";
 
 
 const OrderHeader = memo(({

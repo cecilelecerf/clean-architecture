@@ -1,38 +1,9 @@
 "use client"
-import { useSession } from "next-auth/react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-    User,
-    Mail,
-    Calendar,
-    Shield,
-    Edit,
-    Save,
-    X,
-    LogOut,
-    Phone,
-    MapPin,
-    Cake,
-    LucideIcon,
-} from "lucide-react";
-import { memo, useCallback, useMemo, useState } from "react";
-import { toast } from "sonner";
-import { signOut } from "next-auth/react";
-import { match } from "ts-pattern";
-import { UpdateClientPayload, User as TUser, UserId } from "@infrastructure/types/user";
-import { ClientStatistics } from "../../_components/ClientStatistics";
-import { AdvisorStatistics } from "../../_components/AdvisorStatistics";
-import { DirectorStatistics } from "../../_components/DirectorStatistics";
+import { UpdateClientPayload } from "@infrastructure/types/user";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslations } from "next-intl";
-import { ProfileSkeleton } from "../server-components/ProfileSkeleton";
-import { Wrapper } from "./Wrapper";
-
 
 export const PersonalInfoEditMode = ({
     formData,

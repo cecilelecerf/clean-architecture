@@ -39,7 +39,6 @@ import {
 } from "lucide-react";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { useState } from "react";
-import { UserId } from "@infrastructure/types/user";
 import { statusConfig } from "./constant";
 import { AccountWithUserDTO } from "@infrastructure/types/account";
 import { useSession } from "next-auth/react";
@@ -48,7 +47,6 @@ import { useTranslations } from "next-intl";
 
 export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormule, account: AccountWithUserDTO }) => {
     const { data: session } = useSession();
-    if (!session?.user?.id) return <div>Unauthorized</div>;
 
     const router = useRouter()
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -69,7 +67,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
         setDialogOpen(true);
     };
 
-    const confirmAction = (userId: UserId) => {
+    const confirmAction = () => {
         grantMutation.mutate({
             payload: {
                 accept: dialogAction === "accept",
@@ -546,7 +544,7 @@ export const CreditDetails = ({ credit, account }: { credit: CreditDTOWithFormul
                                 </Button>
                                 <Button
                                     variant={dialogAction === "accept" ? "default" : "destructive"}
-                                    onClick={() => confirmAction(account.userId)}
+                                    onClick={() => confirmAction()}
                                     disabled={
                                         grantMutation.isPending ||
                                         (dialogAction === "refuse" && !reason.trim())

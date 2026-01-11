@@ -191,28 +191,28 @@ export const CloseAccountDialog = ({
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{t("dialog.close.title")}</DialogTitle>
+                    <DialogTitle>{t("close.title")}</DialogTitle>
                     <DialogDescription>
-                        {t("dialog.close.description.start")}                        <strong>
+                        {t("close.description.start")}                        <strong>
                             {currentAccount.balance.amount.toLocaleString('fr-FR', {
                                 style: 'currency',
                                 currency: currentAccount.balance.currency
                             })}
                         </strong>{' '}
-                        {t("dialog.close.description.end")}
+                        {t("close.description.end")}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
                         <Label htmlFor="target-account">
-                            {t("dialog.close.label")}
+                            {t("close.label")}
                         </Label>
                         <Select
                             value={transferTargetAccount}
                             onValueChange={setTransferTargetAccount}
                         >
                             <SelectTrigger id="target-account">
-                                <SelectValue placeholder={t("dialog.close.placeholder")} />
+                                <SelectValue placeholder={t("close.placeholder")} />
                             </SelectTrigger>
                             <SelectContent>
                                 {otherAccounts.map((acc) => (
@@ -225,7 +225,7 @@ export const CloseAccountDialog = ({
                                 ))}
                                 {otherAccounts.length === 0 && (
                                     <SelectItem value="none" disabled>
-                                        {t("dialog.close.none")}
+                                        {t("close.none")}
                                     </SelectItem>
                                 )}
                             </SelectContent>
@@ -234,7 +234,7 @@ export const CloseAccountDialog = ({
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
-                        {t("dialog.button.cancel")}
+                        {t("button.cancel")}
                     </Button>
                     <Button
                         variant="destructive"
@@ -242,7 +242,7 @@ export const CloseAccountDialog = ({
                         disabled={!transferTargetAccount || currentAccount.balance.amount <= 0 || deleteMutation.isPending}
                     >
                         <XCircle className="mr-2 h-4 w-4" />
-                        {t("dialog.button.close")}
+                        {t("button.close")}
                     </Button>
                 </DialogFooter>
             </DialogContent>
