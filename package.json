@@ -8,7 +8,7 @@
     "build:app": "pnpm --filter application build",
     "build:infra": "pnpm --filter infrastructure build",
     "build:express": "pnpm --filter express build",
-    "build:socket": "pnpm --filter socket build",
+    "build:socket": "pnpm --filter sockets build",
     "build:next": "pnpm --filter app-next build",
     "build": "pnpm build:domain && pnpm build:app && pnpm build:infra && pnpm build:next && pnpm build:socket && pnpm build:express",
     "lint": "pnpm -r lint",
@@ -17,7 +17,7 @@
     "mysql:restart": "pnpm --filter infrastructure run mysql:restart",
     "mongo:seed": "pnpm --filter infrastructure run mongo:seed",
     "mongo:restart": "pnpm --filter infrastructure run mongo:restart",
-    "socket": "pnpm --filter sockets run socket",
+    "socket": "pnpm --filter sockets run sockets",
     "express": "pnpm --filter express run express"
   },
   "workspaces": [
