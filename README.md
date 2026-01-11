@@ -122,10 +122,10 @@ Cela démarre :
 
 ```bash
 # Recréer la base de données et les tables
-pnpm --filter infrastructure mysql:restart
+pnpm run mysql:restart
 
 # Ajouter des données de test
-pnpm --filter infrastructure mysql:seed
+pnpm run mysql:seed
 ```
 
 ### MongoDB
