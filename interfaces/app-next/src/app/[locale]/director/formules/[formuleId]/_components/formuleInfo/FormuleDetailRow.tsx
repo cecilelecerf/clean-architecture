@@ -1,13 +1,10 @@
-"use client"
-import { memo } from "react";
-
 interface FormuleDetailRowProps {
     label: string;
     value: string | number;
     icon?: React.ReactNode;
 }
 
-export const FormuleDetailRow = memo(({ label, value, icon }: FormuleDetailRowProps) => (
+export const FormuleDetailRow = ({ label, value, icon }: FormuleDetailRowProps) => (
     <div className="flex items-start justify-between py-2 border-b last:border-0">
         <div className="flex items-center gap-2">
             {icon}
@@ -19,6 +16,4 @@ export const FormuleDetailRow = memo(({ label, value, icon }: FormuleDetailRowPr
             {value}
         </span>
     </div>
-));
-
-FormuleDetailRow.displayName = 'FormuleDetailRow';
+);

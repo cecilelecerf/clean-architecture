@@ -2,7 +2,7 @@
 import { AccountId } from '@infrastructure/types/account';
 import { use } from 'react';
 import { TitleAdminPage } from '@/components/TitleAdminPage';
-import { AccountDetail } from '@/components/accounts/AccountDetail';
+import { AccountDetail } from '@/components/accounts/accountDetail';
 
 
 export default function AccountIdPage({

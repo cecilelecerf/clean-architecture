@@ -43,7 +43,7 @@ export const ordersEndpoint = createEndpointsNodes({
 
   cancelled: ({ orderId }: { orderId: OrderId }) =>
     mutationOptions({
-      mutationFn: async ({}: {}) =>
+      mutationFn: async () =>
         patch(`/orders/${orderId}/cancelled`, {}).then((data) =>
           safeParseWithLog(orderSchema, data),
         ),

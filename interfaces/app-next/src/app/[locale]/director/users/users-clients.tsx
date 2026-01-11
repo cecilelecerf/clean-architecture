@@ -7,7 +7,6 @@ import { endpoints } from "@/utils/endpoint";
 import { User } from "@infrastructure/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 
@@ -22,7 +21,6 @@ type Props = {
 
 export function AdminUsersClient({ roleParam, title, translations }: Props) {
     const { data: session } = useSession();
-    const router = useRouter();
 
     const role = useMemo<User["role"] | undefined>(() => {
         return match(roleParam)
@@ -37,11 +35,6 @@ export function AdminUsersClient({ roleParam, title, translations }: Props) {
         return <div>Unauthorized</div>;
     }
 
-    const filteredUsers = useMemo(() => {
-        if (query.status !== "success" || !session?.user?.id) return [];
-        return query.data.filter((user) => user.id !== session.user.id);
-    }, [query.status, query.data, session?.user?.id]);
-
     return (
         <>
             <TitleAdminPage title={title} />
@@ -52,8 +45,8 @@ export function AdminUsersClient({ roleParam, title, translations }: Props) {
                     </div>
                 ))
                 .with({ status: "pending" }, () => <UsersSkeleton />)
-                .with({ status: "success" }, () => {
-
+                .with({ status: "success" }, ({ data: users }) => {
+                    const filteredUsers = users.filter((user) => user.id !== session.user.id)
                     if (filteredUsers.length === 0) {
                         return (
                             <div className="text-gray-500 text-center border p-6 rounded-lg">
@@ -68,8 +61,7 @@ export function AdminUsersClient({ roleParam, title, translations }: Props) {
                                 <UserCard
                                     key={user.id}
                                     user={user}
-                                    onViewDetails={() => router.push(`/director/users/${user.id}`)}
-                                    moreInfoLabel={translations.moreInfo}
+                                    onViewDetailsHref={`/director/users/${user.id}`}
                                 />
                             ))}
                         </div>

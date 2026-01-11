@@ -20,12 +20,12 @@ export default function CurrenciesPage() {
         endpoints.currencies.update({ currencyCode: editingCode })
     );
 
-    const handleUpdate = useCallback(() => (code: CurrencyCode, currentRate: number) => {
+    const handleUpdate = (code: CurrencyCode, currentRate: number) => {
         setEditingCode(code);
         setNewRate(currentRate.toString());
-    }, []);
+    };
 
-    const handleSave = () => useCallback(() => {
+    const handleSave = () => {
         if (!editingCode) return;
         updateMutation.mutate(
             { exchangeRate: parseFloat(newRate) },
@@ -40,7 +40,7 @@ export default function CurrenciesPage() {
                 },
             }
         );
-    }, [editingCode, newRate, updateMutation]);
+    };
 
     const handleCancel = useCallback(() => {
         setEditingCode(null);

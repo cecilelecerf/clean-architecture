@@ -1,26 +1,13 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { AccountWithUserDTO } from "@infrastructure/types/account";
 
-type Account = {
-    IBAN: string;
-    name: string;
-    type: "courant" | "epargne";
-    balance: { amount: number; currency: string };
-    user?: {
-        id: string;
-        firstname?: string;
-        lastname?: string;
-        email?: string;
-    };
-};
+
 
 type AccountCardProps = {
-    account: Account;
+    account: AccountWithUserDTO;
     showUser?: boolean;
     onClickAccount?: (iban: string) => void;
     onClickUser?: (userId: string) => void;
@@ -32,7 +19,6 @@ export const AccountCard = ({
     onClickAccount,
     onClickUser,
 }: AccountCardProps) => {
-    const router = useRouter();
 
     const handleAccountClick = () => {
         if (onClickAccount) onClickAccount(account.IBAN);

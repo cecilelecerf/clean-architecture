@@ -1,5 +1,3 @@
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getServerSession } from 'next-auth';
 import { getSession } from 'next-auth/react';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 

@@ -1,5 +1,3 @@
-"use client";
-
 import { UserDto } from "@infrastructure/types/user";
 import { Card } from "@/components/ui/card";
 import { useMutation } from "@tanstack/react-query";
@@ -23,23 +21,30 @@ export const CardUserAction = ({ user, }: { user: UserDto }) => {
                 <ButtonLoading
                     variant="outline"
                     loading={newThread.isPending}
-                    onClick={() => newThread.mutate({
-                        title: `Conversation avec ${user.firstname} ${user.lastname}`, participantsId: [user.id], messageContent: user.role === "client" ? "Débuter la conversation" : undefined
-                    }, { onSuccess: (data) => { router.push(`/${user.role === "client" ? "admin" : "director"}/threads/${data.id}`) } })}>
+                    onClick={() =>
+                        newThread.mutate({
+                            title: `Conversation avec ${user.firstname} ${user.lastname}`, participantsId: [user.id],
+                            messageContent: user.role === "client" ? "Débuter la conversation" : undefined
+                        }, {
+                            onSuccess: (data) => {
+                                router.push(`/${user.role === "client" ? "admin" : "director"}/threads/${data.id}`)
+                            }
+                        })}>
                     {t("send")}
                 </ButtonLoading>
-                <ButtonLoading loading={forgotPassword.isPending} onClick={() => forgotPassword.mutate(user.email)} variant="outline">
+                <ButtonLoading loading={forgotPassword.isPending}
+                    onClick={() => forgotPassword.mutate(user.email)} variant="outline">
                     {t("reset")}
                 </ButtonLoading >
                 {
                     user.role !== "directeur" && (
                         user.isActiveField ? (
                             <ButtonLoading loading={onBan.isPending} onClick={() => onBan.mutate({ status: true })} variant="destructive">
-                               {t("deactivate")}
+                                {t("deactivate")}
                             </ButtonLoading>
                         ) : (
                             <ButtonLoading loading={onBan.isPending} onClick={() => onBan.mutate({ status: false })} variant="default">
-                               {t("activate")}
+                                {t("activate")}
                             </ButtonLoading>
                         )
                     )

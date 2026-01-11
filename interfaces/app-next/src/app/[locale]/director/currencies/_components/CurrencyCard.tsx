@@ -25,7 +25,7 @@ interface CurrencyCardProps {
     t: ReturnType<typeof useTranslations>;
 }
 
-export const CurrencyCard = memo(({
+export const CurrencyCard = ({
     currency,
     isEditing,
     newRate,
@@ -74,6 +74,6 @@ export const CurrencyCard = memo(({
             </CardContent>
         </Card>
     );
-});
+};
 
 CurrencyCard.displayName = 'CurrencyCard';

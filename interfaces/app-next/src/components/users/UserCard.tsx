@@ -1,22 +1,17 @@
-"use client";
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { UserDto } from "@infrastructure/types/user";
-import { memo } from "react";
 
 type UserCardProps = {
     user: UserDto;
-    onViewDetails: () => void;
-    moreInfoLabel: string;
+    onViewDetailsHref: string;
 };
 
-export const UserCard = memo(function UserCard({
+export const UserCard = ({
     user,
-    onViewDetails,
-    moreInfoLabel
-}: UserCardProps) {
+    onViewDetailsHref,
+}: UserCardProps) => {
+
     return (
         <Card className="flex items-center gap-4 p-4">
             <Avatar>
@@ -32,14 +27,15 @@ export const UserCard = memo(function UserCard({
                     {user.email}
                 </p>
             </div>
-            <Button onClick={onViewDetails}>
-                {moreInfoLabel}
-            </Button>
+            <ButtonLink href={onViewDetailsHref}  >
+                + d'info
+            </ButtonLink>
         </Card>
     );
-});
+};
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { ButtonLink } from "../ButtonLink";
 
 export const UsersSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -1,11 +1,10 @@
-"use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Euro, Pencil, Percent } from 'lucide-react';
 import { useTranslations } from "next-intl";
-import { memo, useMemo } from "react";
 import { FormuleDetailRow } from "./FormuleDetailRow";
+import { FormuleDTO } from "@infrastructure/types/formule";
 
 type FormuleDetail = {
     label: string;
@@ -14,59 +13,40 @@ type FormuleDetail = {
 };
 
 interface FormuleCardProps {
-    formule: {
-        id: string;
-        label: string;
-        type: string;
-        description: string;
-        interestRate: number;
-        insuranceRate: number;
-        minAmount?: number;
-        maxAmount?: number;
-        isActive: boolean;
-        createdAt: string;
-    };
+    formule: FormuleDTO
     onUpdate: () => void;
     t: ReturnType<typeof useTranslations>;
 }
 
-export const FormuleCard = memo(({ formule, onUpdate, t }: FormuleCardProps) => {
-    const details = useMemo<FormuleDetail[]>(() => {
-        const baseDetails: FormuleDetail[] = [
-            {
-                label: t("type"),
-                value: formule.type
-            },
-            {
-                label: t("description"),
-                value: formule.description
-            },
-            {
-                label: t("interestRate"),
-                value: `${formule.interestRate}%`,
-                icon: <Percent className="h-4 w-4 text-muted-foreground" />
-            },
-            {
-                label: t("insuranceRate"),
-                value: `${formule.insuranceRate}%`,
-                icon: <Percent className="h-4 w-4 text-muted-foreground" />
-            },
-        ];
-
-        if (formule.minAmount !== undefined && formule.maxAmount !== undefined) {
-            baseDetails.push({
-                label: t("amount"),
-                value: `${formule.minAmount.toLocaleString('fr-FR')}€ - ${formule.maxAmount.toLocaleString('fr-FR')}€`,
-                icon: <Euro className="h-4 w-4 text-muted-foreground" />
-            });
-        }
-
-        return baseDetails;
-    }, [formule, t]);
-
-    const formattedDate = useMemo(() => {
-        return new Date(formule.createdAt).toLocaleDateString('fr-FR');
-    }, [formule.createdAt]);
+export const FormuleCard = ({ formule, onUpdate, t }: FormuleCardProps) => {
+    const details: FormuleDetail[] = [
+        {
+            label: t("type"),
+            value: formule.type
+        },
+        {
+            label: t("description"),
+            value: formule.description
+        },
+        {
+            label: t("interestRate"),
+            value: `${formule.interestRate}%`,
+            icon: <Percent className="h-4 w-4 text-muted-foreground" />
+        },
+        {
+            label: t("insuranceRate"),
+            value: `${formule.insuranceRate}%`,
+            icon: <Percent className="h-4 w-4 text-muted-foreground" />
+        },
+    ];
+    if (formule.minAmount !== undefined && formule.maxAmount !== undefined) {
+        details.push({
+            label: t("amount"),
+            value: `${formule.minAmount.toLocaleString('fr-FR')}€ - ${formule.maxAmount.toLocaleString('fr-FR')}€`,
+            icon: <Euro className="h-4 w-4 text-muted-foreground" />
+        });
+    }
+    const formattedDate = new Date(formule.createdAt).toLocaleDateString('fr-FR')
 
     return (
         <div className="p-2 space-y-4">
@@ -112,6 +92,5 @@ export const FormuleCard = memo(({ formule, onUpdate, t }: FormuleCardProps) => 
             </div>
         </div>
     );
-});
+};
 
-FormuleCard.displayName = 'FormuleCard';

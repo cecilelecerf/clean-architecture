@@ -1,12 +1,10 @@
-"use client"
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Percent, Plus } from "lucide-react";
 import Link from "next/link";
-import { memo } from "react";
 import { useTranslations } from "next-intl";
 
-export const EmptyState = memo(({
+export const EmptyState = ({
     t
 }: {
     t: ReturnType<typeof useTranslations>
@@ -28,6 +26,5 @@ export const EmptyState = memo(({
             </Link>
         </CardContent>
     </Card>
-));
+);
 
-EmptyState.displayName = 'EmptyState';

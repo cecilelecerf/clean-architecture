@@ -5,18 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { memo, useCallback } from "react";
 import { useTranslations } from "next-intl";
+import { FormuleDTO } from "@infrastructure/types/formule";
 
 interface FormuleCardProps {
-    formule: {
-        id: string;
-        label: string;
-        description: string;
-        isActive: boolean;
-        interestRate: number;
-        insuranceRate: number;
-        minAmount?: number;
-        maxAmount?: number;
-    };
+    formule: FormuleDTO;
     t: ReturnType<typeof useTranslations>;
 }
 

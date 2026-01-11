@@ -1,5 +1,3 @@
-
-"use client"
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { memo } from "react";
@@ -14,7 +12,7 @@ interface FormulesStatsProps {
     t: ReturnType<typeof useTranslations>;
 }
 
-export const FormulesStats = memo(({ stats, t }: FormulesStatsProps) => (
+export const FormulesStats = ({ stats, t }: FormulesStatsProps) => (
     <Card>
         <CardContent className="py-4">
             <div className="flex items-center justify-between">
@@ -35,6 +33,4 @@ export const FormulesStats = memo(({ stats, t }: FormulesStatsProps) => (
             </div>
         </CardContent>
     </Card>
-));
-
-FormulesStats.displayName = 'FormulesStats';
+) 

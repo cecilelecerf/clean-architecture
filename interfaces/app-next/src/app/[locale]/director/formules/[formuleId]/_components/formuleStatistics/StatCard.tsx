@@ -1,7 +1,3 @@
-"use client";
-
-import { memo, useMemo } from "react";
-
 interface StatCardProps {
     icon: React.ElementType;
     label: string;
@@ -9,20 +5,20 @@ interface StatCardProps {
     color: "blue" | "green" | "purple" | "orange";
 }
 
-export const StatCard = memo(({ icon: Icon, label, value, color }: StatCardProps) => {
-    const colorClasses = useMemo(() => ({
+export const StatCard = ({ icon: Icon, label, value, color }: StatCardProps) => {
+    const colorClasses = {
         blue: "bg-blue-50 text-blue-600 dark:bg-blue-50/10",
         green: "bg-green-50 text-green-600 dark:bg-green-50/10",
         purple: "bg-purple-50 text-purple-600 dark:bg-purple-50/10",
         orange: "bg-orange-50 text-orange-600 dark:bg-orange-50/10",
-    }), []);
+    };
 
-    const textColorClasses = useMemo(() => ({
+    const textColorClasses = {
         blue: "text-blue-700",
         green: "text-green-700",
         purple: "text-purple-700",
         orange: "text-orange-700",
-    }), []);
+    };
 
     return (
         <div className="p-4 bg-gray-50 dark:bg-gray-500/10 rounded-lg">
@@ -35,6 +31,4 @@ export const StatCard = memo(({ icon: Icon, label, value, color }: StatCardProps
             <p className="text-xs text-gray-500 mt-1">{label}</p>
         </div>
     );
-});
-
-StatCard.displayName = 'StatCard';
+};

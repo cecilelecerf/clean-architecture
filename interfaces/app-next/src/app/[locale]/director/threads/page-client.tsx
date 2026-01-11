@@ -7,7 +7,6 @@ import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
-import { useCallback } from "react";
 import { useThreadSocket } from "@/app/hooks/useThreadSocket";
 import { ThreadsList } from "@/components/threads/ThreadList";
 
@@ -24,12 +23,9 @@ export default function ClientsThreadsPageClientOptimized({ translations }: Prop
 
     useThreadSocket(query.data);
 
-    const handleThreadClick = useCallback(
-        (threadId: string) => {
-            router.push(`/director/threads/${threadId}`);
-        },
-        [router]
-    );
+    const handleThreadClick = (threadId: string) => {
+        router.push(`/director/threads/${threadId}`);
+    }
 
     return (
         <>

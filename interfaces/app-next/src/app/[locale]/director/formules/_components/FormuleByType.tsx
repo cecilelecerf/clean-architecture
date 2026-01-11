@@ -1,6 +1,4 @@
-"use client"
 import { Badge } from "@/components/ui/badge";
-import { memo } from "react";
 import { useTranslations } from "next-intl";
 import { FormuleCard } from "./FormuleCard";
 
@@ -10,7 +8,7 @@ interface FormulesByTypeProps {
     t: ReturnType<typeof useTranslations>;
 }
 
-export const FormulesByType = memo(({
+export const FormulesByType = ({
     availableTypes,
     formulesByType,
     t
@@ -38,6 +36,4 @@ export const FormulesByType = memo(({
             </div>
         ))}
     </>
-));
-
-FormulesByType.displayName = 'FormulesByType';
+);

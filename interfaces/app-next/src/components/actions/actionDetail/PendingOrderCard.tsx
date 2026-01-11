@@ -61,8 +61,8 @@ export const PendingOrderCard = memo(({
     }, []);
 
 
-    const handleCancelOrder = useCallback(() => {
-        cancelOrderMutation.mutate({}, {
+    const handleCancelOrder = () => {
+        cancelOrderMutation.mutate(undefined, {
             onSuccess: () => {
                 toast.success("Ordre annulé avec succès");
                 setShowCancelDialog(false);
@@ -70,8 +70,8 @@ export const PendingOrderCard = memo(({
             onError: () => {
                 toast.error("Erreur lors de l'annulation de l'ordre");
             },
-        },)
-    }, [cancelOrderMutation])
+        })
+    }
 
     return (
         <>

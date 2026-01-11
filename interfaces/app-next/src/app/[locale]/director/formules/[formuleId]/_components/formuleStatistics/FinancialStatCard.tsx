@@ -1,6 +1,3 @@
-"use client";
-
-import { memo, useMemo } from "react";
 
 interface FinancialStatCardProps {
     icon: React.ElementType;
@@ -9,27 +6,25 @@ interface FinancialStatCardProps {
     color: "blue" | "green" | "purple" | "orange";
 }
 
-export const FinancialStatCard = memo(({ icon: Icon, label, value, color }: FinancialStatCardProps) => {
-    const colorClasses = useMemo(() => ({
+export const FinancialStatCard = ({ icon: Icon, label, value, color }: FinancialStatCardProps) => {
+    const colorClasses = {
         blue: "bg-blue-50 text-blue-600 dark:bg-blue-500/10",
         green: "bg-green-50 text-green-600 dark:bg-green-500/10",
         purple: "bg-purple-50 text-purple-600 dark:bg-purple-500/10",
         orange: "bg-orange-50 text-orange-600 dark:bg-orange-500/10",
-    }), []);
+    };
 
-    const textColorClasses = useMemo(() => ({
+    const textColorClasses = {
         blue: "text-blue-700",
         green: "text-green-700",
         purple: "text-purple-700",
         orange: "text-orange-700",
-    }), []);
+    };
 
-    const formattedValue = useMemo(() => {
-        return value.toLocaleString('fr-FR', {
-            style: 'currency',
-            currency: 'EUR'
-        });
-    }, [value]);
+    const formattedValue = value.toLocaleString('fr-FR', {
+        style: 'currency',
+        currency: 'EUR'
+    });
 
     return (
         <div className="p-4 bg-gray-50 dark:bg-gray-500/10 rounded-lg border">
@@ -44,6 +39,5 @@ export const FinancialStatCard = memo(({ icon: Icon, label, value, color }: Fina
             <p className="text-xs text-gray-500 mt-1">{label}</p>
         </div>
     );
-});
+};
 
-FinancialStatCard.displayName = 'FinancialStatCard';

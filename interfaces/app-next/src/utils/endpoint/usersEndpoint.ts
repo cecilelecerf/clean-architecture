@@ -1,12 +1,10 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { get, patch, post } from '@/lib/apiClient';
 import {
-  baseUserSchema,
   RegisterAdminPayload,
   ReqBanUser,
   UpdateClientPayload,
   User,
-  UserDto,
   userDtoSchema,
   UserId,
   userSchema,

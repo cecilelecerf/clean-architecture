@@ -1,9 +1,6 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { memo } from "react";
 import { useTranslations } from "next-intl";
 
 interface EmptyActionsStateProps {
@@ -13,7 +10,7 @@ interface EmptyActionsStateProps {
     t: ReturnType<typeof useTranslations>;
 }
 
-export const EmptyActionsState = memo(({
+export const EmptyActionsState = ({
     hasSearch,
     isAdmin,
     onAddNew,
@@ -37,6 +34,5 @@ export const EmptyActionsState = memo(({
             )}
         </CardContent>
     </Card>
-));
+);
 
-EmptyActionsState.displayName = 'EmptyActionsState';

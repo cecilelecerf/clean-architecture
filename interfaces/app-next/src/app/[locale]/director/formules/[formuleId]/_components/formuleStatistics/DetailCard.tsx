@@ -1,7 +1,3 @@
-"use client";
-
-import { memo, useMemo } from "react";
-
 interface DetailCardProps {
     icon: React.ElementType;
     label: string;
@@ -10,22 +6,20 @@ interface DetailCardProps {
     color: "green" | "red" | "orange";
 }
 
-export const DetailCard = memo(({ icon: Icon, label, value, total, color }: DetailCardProps) => {
-    const percentage = useMemo(() => {
-        return total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-    }, [value, total]);
+export const DetailCard = ({ icon: Icon, label, value, total, color }: DetailCardProps) => {
+    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
 
-    const colorClasses = useMemo(() => ({
+    const colorClasses = {
         green: "bg-green-50 text-green-600 border-green-200 dark:bg-green-500/10 dark:border-green-200/10",
         red: "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:border-red-200/10",
         orange: "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-500/10 dark:border-orange-200/10",
-    }), []);
+    }
 
-    const textColorClasses = useMemo(() => ({
+    const textColorClasses = {
         green: "text-green-700",
         red: "text-red-700",
         orange: "text-orange-700",
-    }), []);
+    }
 
     return (
         <div className={`p-4 rounded-lg border-2 ${colorClasses[color]}`}>
@@ -39,6 +33,4 @@ export const DetailCard = memo(({ icon: Icon, label, value, total, color }: Deta
             <p className="text-xs opacity-75 mt-1">{label}</p>
         </div>
     );
-});
-
-DetailCard.displayName = 'DetailCard';
+};

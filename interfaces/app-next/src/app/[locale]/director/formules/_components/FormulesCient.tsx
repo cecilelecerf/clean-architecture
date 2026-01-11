@@ -7,7 +7,7 @@ import { match } from "ts-pattern";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, memo } from "react";
+import { useMemo } from "react";
 import { FormulesStats } from "./FormuleStats";
 import { EmptyState } from "./EmptyState";
 import { FormulesByType } from "./FormuleByType";
@@ -23,7 +23,6 @@ export function FormulesClient() {
 
     const t = useTranslations("director.credits");
 
-    // ✅ Mémoisation des données transformées
     const { formulesByType, availableTypes, stats } = useMemo(() => {
         if (queries[0].status !== "success" || queries[1].status !== "success") {
             return { formulesByType: {}, availableTypes: [], stats: null };
@@ -32,7 +31,6 @@ export function FormulesClient() {
         const formules = queries[0].data;
         const types = queries[1].data;
 
-        // Grouper par type
         const formulesByType = formules.reduce(
             (acc: Record<string, typeof formules>, formule) => {
                 if (!acc[formule.type]) acc[formule.type] = [];
@@ -42,10 +40,8 @@ export function FormulesClient() {
             {}
         );
 
-        // Ordre de tri des types
         const typeOrder = ["CONSOMMATION", "PROFESSIONNEL", "IMMOBILIER", "AUTO", "AUTRE"];
 
-        // Types disponibles triés
         const availableTypes = types
             .filter((type) => formulesByType[type.value]?.length > 0)
             .sort((a, b) => {
@@ -62,7 +58,6 @@ export function FormulesClient() {
                 return a.label.localeCompare(b.label);
             });
 
-        // Statistiques
         const stats = {
             total: formules.length,
             active: formules.filter((f) => f.isActive).length,

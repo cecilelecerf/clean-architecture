@@ -1,28 +1,28 @@
 "use client"
 import { ButtonLoading } from "@/components/buttons/ButtonLoading"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
 import { endpoints } from "@/utils/endpoint"
 import { ThreadWithUser } from "@/utils/endpoint/threadEndpoints"
 import { UserId } from "@infrastructure/types/user"
 import { Flex } from "@radix-ui/themes"
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Check, Plus, Settings2, SettingsIcon, Trash2, UserRoundX, UserStar } from "lucide-react"
+import { Plus, SettingsIcon, Trash2, } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { memo, useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { match } from "ts-pattern"
-import { Skeleton } from "../ui/skeleton"
+import { Skeleton } from "../../ui/skeleton"
 import { useRouter } from "next/navigation"
+import { ParticipantRow } from "./ParticipantRow"
+import { UserCommandItem } from "./UserCommandItem"
+import { SkeletonAddParticipant } from "./SkeletonAddParticipant"
 
 type Props = {} & ThreadWithUser
 
 export const Settings = ({ administrator, participants, participantsId, isClose, id, type }: Props) => {
     const { data: session } = useSession();
-    if (!session?.user?.id) return <div>Unauthorized</div>;
     const transfer = useMutation(endpoints.threads.transfer({ threadId: id }))
     const removeParticipant = useMutation(endpoints.threads.participants.remove({ threadId: id }))
     const closeThread = useMutation(endpoints.threads.close({ threadId: id }))
@@ -88,76 +88,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
     )
 }
 
-const ParticipantRow = memo(({
-    participant,
-    isAdmin,
-    isClose,
-    type,
-    currentUserRole,
-    onTransfer,
-    onRemove,
-    transferLoading,
-    removeLoading
-}: {
-    participant: ThreadWithUser['participants'][0];
-    isAdmin: boolean;
-    isClose: boolean;
-    type: ThreadWithUser['type'];
-    currentUserRole: string;
-    onTransfer: (userId: UserId) => void;
-    onRemove: (userId: UserId) => void;
-    transferLoading: boolean;
-    removeLoading: boolean;
-}) => {
-    return (
-        <Flex justify="between" className="mb-2">
-            <Flex align='center' gap="2">
-                <Avatar>
-                    <AvatarFallback>
-                        {participant.firstname[0]}{participant.lastname[0]}
-                    </AvatarFallback>
-                </Avatar>
-                <p className="ml-2">
-                    {participant.firstname} {participant.lastname}
-                </p>
-            </Flex>
 
-            {isAdmin && type === "internal" && !isClose && (
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon-sm">
-                            <Settings2 />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-60">
-                        {participant.role === currentUserRole && (
-                            <ButtonLoading
-                                variant="ghost"
-                                loading={transferLoading}
-                                onClick={() => onTransfer(participant.id)}
-                                className="w-full justify-start text-gray-500"
-                            >
-                                <UserStar className="mr-2 h-4 w-4" />
-                                Désigner admin
-                            </ButtonLoading>
-                        )}
-
-                        <ButtonLoading
-                            variant="ghost"
-                            loading={removeLoading}
-                            onClick={() => onRemove(participant.id)}
-                            className="w-full justify-start text-gray-500"
-                        >
-                            <UserRoundX className="mr-2 h-4 w-4" />
-                            Supprimer
-                        </ButtonLoading>
-                    </PopoverContent>
-                </Popover>
-            )}
-        </Flex>
-    );
-});
-ParticipantRow.displayName = 'ParticipantRow';
 
 const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "administratorId" | "participantsId" | "id">) => {
     const [selectedUserId, setSelectedUserId] = useState<UserId | null>(null);
@@ -255,41 +186,11 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
             )
         })
         .otherwise(() => <SkeletonAddParticipant />)
-
 }
 
 
-const UserCommandItem = memo(({
-    user,
-    isSelected,
-    onSelect
-}: {
-    user: { id: UserId; firstname: string; lastname: string };
-    isSelected: boolean;
-    onSelect: (id: UserId) => void;
-}) => (
-    <CommandItem
-        value={`${user.firstname} ${user.lastname}`}
-        onSelect={() => onSelect(user.id)}
-    >
-        <Flex align="center" gap="2" className="flex-1">
-            <Avatar className="h-8 w-8">
-                <AvatarFallback>
-                    {user.firstname[0]}{user.lastname[0]}
-                </AvatarFallback>
-            </Avatar>
-            <span>{user.firstname} {user.lastname}</span>
-        </Flex>
-        <Check
-            className={cn(
-                "ml-auto h-4 w-4",
-                isSelected ? "opacity-100" : "opacity-0"
-            )}
-        />
-    </CommandItem>
-));
 
-UserCommandItem.displayName = 'UserCommandItem';
+
 
 const TransferToAdvisor = ({ id }: Pick<Props, "id">) => {
     const { data: session } = useSession();
@@ -374,17 +275,8 @@ const TransferToAdvisor = ({ id }: Pick<Props, "id">) => {
                         )}
                     </PopoverContent>
                 </Popover >
-
             )
         })
         .exhaustive()
-
 }
 
-const SkeletonAddParticipant = () => {
-    return (
-        <div className="space-y-2">
-            <Skeleton className="h-10 w-full" />
-        </div>
-    );
-};

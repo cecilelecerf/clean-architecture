@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { CurrencyCode } from "@infrastructure/types/currency";
 import { useTranslations } from "next-intl";
-import { memo, useMemo } from "react";
+import { useMemo } from "react";
 
 interface CurrencyViewModeProps {
     currency: {
@@ -14,7 +14,7 @@ interface CurrencyViewModeProps {
     t: ReturnType<typeof useTranslations>;
 }
 
-export const CurrencyViewMode = memo(({
+export const CurrencyViewMode = ({
     currency,
     onEdit,
     t
@@ -43,6 +43,6 @@ export const CurrencyViewMode = memo(({
             )}
         </div>
     );
-});
+};
 
 CurrencyViewMode.displayName = 'CurrencyViewMode';

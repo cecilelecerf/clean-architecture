@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,7 +17,7 @@ interface ActionCardProps {
     withIsDispo?: boolean;
 }
 
-export const ActionCard = memo(({ action, onClick, withIsDispo }: ActionCardProps) => {
+export const ActionCard = ({ action, onClick, withIsDispo }: ActionCardProps) => {
     const formattedPrice = useMemo(() => {
         return action.price.amount.toLocaleString("fr-FR", {
             minimumFractionDigits: 2,
@@ -91,6 +89,5 @@ export const ActionCard = memo(({ action, onClick, withIsDispo }: ActionCardProp
             </CardContent>
         </Card>
     );
-});
+};
 
-ActionCard.displayName = 'ActionCard';

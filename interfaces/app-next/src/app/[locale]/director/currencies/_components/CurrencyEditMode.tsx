@@ -14,7 +14,7 @@ interface CurrencyEditModeProps {
     t: ReturnType<typeof useTranslations>;
 }
 
-export const CurrencyEditMode = memo(({
+export const CurrencyEditMode = ({
     newRate,
     onRateChange,
     onSave,
@@ -52,6 +52,6 @@ export const CurrencyEditMode = memo(({
             </div>
         </div>
     );
-});
+};
 
 CurrencyEditMode.displayName = 'CurrencyEditMode';

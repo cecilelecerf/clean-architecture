@@ -1,11 +1,9 @@
 "use client";
 
 import {
-  LogOutIcon,
   Menu,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +16,7 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { LangageSwitcher } from "@/components/LangageSwitcher";
 import { ThemeToggleSwitch } from "@/components/ThemeToogleButton";
+import { SignOutButton } from "@/components/SignOutButton";
 
 export default function AdminLayout({
   children,
@@ -90,7 +89,6 @@ function SidebarContent({ pathname }: { pathname: string }) {
 
         <Separator className="bg-gray-700" />
 
-        {/* Section Relation Client */}
         <div>
           <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
             Relation Client
@@ -112,15 +110,7 @@ function SidebarContent({ pathname }: { pathname: string }) {
         </div>
 
       </div>
-
-      <Button
-        variant="ghost"
-        className="flex items-center gap-3 w-full justify-start px-3 py-2 rounded-md transition bg-gray-800 hover:bg-gray-700 text-white"
-        onClick={() => signOut({ callbackUrl: '/' })}
-      >
-        <LogOutIcon size={18} />
-        <span>Déconnexion</span>
-      </Button>
+      <SignOutButton variant="ghost" className="flex items-center gap-3 w-full justify-start px-3 py-2 rounded-md transition bg-gray-800 hover:bg-gray-700 text-white" />
     </div>
   );
 }

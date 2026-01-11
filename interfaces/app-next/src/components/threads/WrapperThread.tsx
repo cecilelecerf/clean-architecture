@@ -1,6 +1,6 @@
 "use client"
 import { Flex } from "@radix-ui/themes";
-import { Settings } from "./Settings";
+import { Settings } from "./settings";
 import { MessageComponent } from "./Message";
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { socket } from "@/lib/socket";
