@@ -159,7 +159,7 @@ pnpm run build:infra
 pnpm run build:next
 pnpm run build:express
 pnpm run build:socket
-pnpm run build:crin
+pnpm run build:cron
 ```
 
 > ⚠️ **Important :** L'ordre de build est crucial car les packages dépendent les uns des autres.
