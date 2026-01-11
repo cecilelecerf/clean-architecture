@@ -299,14 +299,6 @@ export class CreditRepositoryMySQL implements CreditRepository {
     );
   }
 
-  /** Supprimer un crédit */
-  async delete(id: CreditEntity["id"]): Promise<void> {
-    await this.client.query<ResultSetHeader>(
-      "DELETE FROM credits WHERE id = ?",
-      [id]
-    );
-  }
-
   async findAllByUserId(
     userId: UserEntity["id"]
   ): Promise<CreditEntityWithFormule[]> {

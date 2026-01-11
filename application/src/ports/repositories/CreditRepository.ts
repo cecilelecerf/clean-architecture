@@ -31,7 +31,6 @@ export interface CreditRepository {
   ): Promise<CreditEntityWithFormule[]>;
   save(credit: CreditEntity): Promise<void>;
   update(credit: CreditEntity): Promise<void>;
-  delete(id: CreditEntity["id"]): Promise<void>;
   findAllByFormuleId(
     formuleId: FormuleCreditEntity["id"]
   ): Promise<CreditEntity[]>;
