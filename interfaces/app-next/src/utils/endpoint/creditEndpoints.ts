@@ -96,25 +96,6 @@ export const creditsEndpoint = createEndpointsNodes({
       },
     }),
 
-  // PATCH /api/credits/:creditId
-  // ApplyMonthlyCreditPaiement
-  paiement: ({ creditId }: { creditId: CreditId }) =>
-    mutationOptions({
-      mutationFn: (data: { name?: string }) => patch(`/credits/${creditId}`, data),
-      onSuccess: () => {
-        // Invalide le crédit spécifique
-        queryClient.invalidateQueries({ queryKey: ['credits', creditId] });
-        // Invalide toutes les listes de crédits
-        queryClient.invalidateQueries({ queryKey: ['credits', 'list'] });
-        // Invalide les listes par utilisateur (car le crédit pourrait appartenir à n'importe quel user)
-        queryClient.invalidateQueries({ queryKey: ['credits', 'list', 'users'] });
-        // Invalide les comptes car un paiement modifie les soldes
-        queryClient.invalidateQueries({ queryKey: ['accounts'] });
-        // Invalide les transactions liées au crédit
-        queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      },
-    }),
-
   // GET /api/credits/users/:userId
   // Liste des crédits d'un utilisateur spécifique
   getAllByClientId: ({ userId }: { userId: UserId }) =>
