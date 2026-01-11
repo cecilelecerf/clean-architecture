@@ -30,6 +30,18 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
     });
   }
 
+  async findById(
+    id: TransactionEntity["id"]
+  ): Promise<TransactionEntity | null> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      `SELECT * FROM transactions WHERE id = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) return null;
+    return this.mapRowToTransaction(rows[0]);
+  }
+
   async save(transaction: TransactionEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `
