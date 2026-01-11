@@ -9,8 +9,6 @@ export interface AccountRepository {
   findByIBAN(iban: IBAN): Promise<AccountEntity | null>;
   findAllSavingsAccounts(): Promise<AccountEntity[]>;
   findBankInterestAccount(): Promise<AccountEntity | null>;
-  findByType(type: AccountEntity["type"]): Promise<AccountEntity[]>;
-  findByTypeSection(type: "client" | "bank"): Promise<AccountEntity[]>;
   findByTypeSectionWithUser(
     type: "client" | "bank"
   ): Promise<AccountEntityWithUser[]>;
