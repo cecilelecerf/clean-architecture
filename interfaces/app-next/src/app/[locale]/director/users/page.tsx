@@ -2,21 +2,23 @@ import { UsersSkeleton } from "@/components/users/UserCard";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { AdminUsersClient } from "./users-clients";
+type SearchParams = Promise<{
+    role?: "director" | "advisor";
+}>;
 
 type Props = {
-    searchParams: { role?: string };
+    searchParams: SearchParams;
 };
 
 export default async function AdminUsersPage({ searchParams }: Props) {
+    const params = await searchParams;
     const t = await getTranslations("director.user");
-    const roleParam = searchParams.role;
-
+    const roleParam = params.role;
     const title = roleParam === "director"
         ? "Directeurs"
         : roleParam === "advisor"
             ? "Conseillers"
             : "Directeurs et Conseillers";
-
     const translations = {
         none: t("none"),
         moreInfo: "+ d'info",
