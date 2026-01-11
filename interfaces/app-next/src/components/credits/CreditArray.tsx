@@ -3,10 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { CreditCardMobile } from "./CreditCard"
 import { CreditRow } from "./CreditRow"
 import { useSession } from "next-auth/react"
+import { useTranslations } from "next-intl"
 type Props = { credits: CreditDTOWithFormule[], title: string, isAdmin?: boolean, basePath: string }
 
 export const CreditArray = ({ credits, title, isAdmin, basePath }: Props) => {
-
+    const t = useTranslations("credit.array");
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
     const thProps = "text-left p-4 text-sm font-semibold text-gray-600 dark:text-gray-300"
@@ -35,25 +36,25 @@ export const CreditArray = ({ credits, title, isAdmin, basePath }: Props) => {
                         <thead className="bg-gray-50 dark:bg-gray-200/10 border-b">
                             <tr>
                                 <th className={thProps}>
-                                    Statut
+                                    {t("status")}
                                 </th>
                                 <th className={thProps}>
-                                    Montant
+                                    {t("amount")}
                                 </th>
                                 <th className={thProps}>
-                                    Durée
+                                    {t("duration")}
                                 </th>
                                 <th className={thProps}>
-                                    Taux
+                                    {t("rate")}
                                 </th>
                                 <th className={thProps}>
-                                    Mensualité
+                                    {t("monthly")}
                                 </th>
                                 <th className={thProps}>
-                                    Date demande
+                                    {t("date")}
                                 </th>
                                 <th className={`text-right ${thProps}`}>
-                                    Actions
+                                    {t("actions")}
                                 </th>
                             </tr>
                         </thead>

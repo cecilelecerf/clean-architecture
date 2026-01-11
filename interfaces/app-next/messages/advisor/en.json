@@ -65,5 +65,10 @@
   },
   "bank": {
     "none": "No bank account at the moment."
+  },
+  "loan": {
+    "error": "Error loading loans",
+    "none": "No loan applications are pending.",
+    "all": "All loan"
   }
 }

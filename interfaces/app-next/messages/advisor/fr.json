@@ -65,5 +65,10 @@
   },
   "bank": {
     "none": "Aucun compte de la banque pour le moment."
+  },
+  "loan": {
+    "error": "Erreur lors du chargement des crédits",
+    "none": "Aucune demande de crédit en attente de traitement",
+    "all": "Tous les crédits"
   }
 }
