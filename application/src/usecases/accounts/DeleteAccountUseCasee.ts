@@ -138,7 +138,6 @@ export class DeleteAccountUseCase {
       if (debitResult instanceof Error) return debitResult;
 
       targetAccount.credit(moneyConverted);
-      console.log(moneyConverted);
       await this.transactionRepository.save(transaction);
       await this.accountRepository.update(accountToDelete);
       await this.accountRepository.update(targetAccount);

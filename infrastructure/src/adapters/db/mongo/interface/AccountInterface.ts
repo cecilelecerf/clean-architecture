@@ -4,7 +4,7 @@ export interface AccountInterface {
   _id: string;
   userId?: Types.UUID | null;
   name: string;
-  type: "courant" | "epargne";
+  type: "courant" | "epargne" | "pret";
   color:
     | "yellow"
     | "blue"

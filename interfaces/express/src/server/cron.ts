@@ -38,6 +38,17 @@ export function setupCronJobs() {
       console.error("❌ Cron job error:", error);
     }
   });
+  cron.schedule("0 0 1 * *", async () => {
+    console.log("Test cron - every minute");
+    try {
+      const result = await creditFactory().applyMonthlyPaiementCredit.execute();
+      if (!(result instanceof Error)) {
+        console.log(`✅ Test: ${result.successful} accounts`);
+      }
+    } catch (error) {
+      console.error("❌ Test error:", error);
+    }
+  });
 
   // Pour le développement : exécuter toutes les minutes (commenté)
   // cron.schedule("* * * * *", async () => {
@@ -54,16 +65,16 @@ export function setupCronJobs() {
   // });
 
   // Pour le développement : exécuter toutes les minutes (commenté)
-  cron.schedule("* * * * *", async () => {
-    console.log("Test cron - every minute");
-    try {
-      const result = await creditFactory().applyMonthlyPaiementCredit.execute();
-      if (!(result instanceof Error)) {
-        console.log(`✅ Test: ${result.successful} accounts`);
-      }
-    } catch (error) {
-      console.error("❌ Test error:", error);
-    }
-  });
+  // cron.schedule("* * * * *", async () => {
+  //   console.log("Test cron - every minute");
+  //   try {
+  //     const result = await creditFactory().applyMonthlyPaiementCredit.execute();
+  //     if (!(result instanceof Error)) {
+  //       console.log(`✅ Test: ${result.successful} accounts`);
+  //     }
+  //   } catch (error) {
+  //     console.error("❌ Test error:", error);
+  //   }
+  // });
   console.log("✅ Cron jobs scheduled");
 }
