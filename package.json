@@ -20,7 +20,7 @@
     "mongo:restart": "pnpm --filter infrastructure run mongo:restart",
     "socket": "pnpm --filter sockets run sockets",
     "express": "pnpm --filter express run express",
-    "cron": "pnpm --filter express run cron"
+    "cron": "pnpm --filter cron run start"
   },
   "workspaces": [
     "application",
