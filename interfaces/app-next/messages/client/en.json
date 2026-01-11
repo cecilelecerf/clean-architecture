@@ -51,5 +51,139 @@
             "title": "New conversation",
             "button": "Contact"
         }
+    },
+    "loan": {
+        "title": "My loans",
+        "description": "Track the status of your loan applications",
+        "none": "No loan",
+        "norequest": "You do not yet have a loan application",
+        "seeformulas": "See loan formulas",
+        "loan": "Loan",
+        "pending": {
+            "title": "Current loans",
+            "duration": "Duration",
+            "month": "month",
+            "monthly": "Monthly",
+            "startOn": "Starts on",
+            "still": "Still to pay",
+            "start": "Start"
+        },
+        "slider": {
+            "title": "Loan available",
+            "more": "See more",
+            "active": "Active",
+            "inactive": "Inactive",
+            "interest": "Interest",
+            "insurance": "Insurance",
+            "details": "See details"
+        },
+        "request":{
+            "form": {
+                "amount": "Desired amount",
+                "date": "Start date",
+                "duration": "Duration (month)"
+            },
+            "title": "Loan information",
+            "description": "Enter your loan details",
+            "button": "Send request"
+        },
+        "account": {
+            "loading": "Loading accounts...",
+            "error": "Error loading accounts",
+            "title": "Choose an account",
+            "balance": "Balance",
+            "next": "Continue"
+        },
+        "simulate": {
+            "error": "Unable to load formula",
+            "title": "Loan simulator",
+            "formula": "Formula",
+            "setting": "Settings",
+            "amount": "Loan amount",
+            "duration": "Duration",
+            "month": "month",
+            "year": "year",
+            "interest": "Interest rate",
+            "insurance": "Insurance rate",
+            "calculate": "Calculate",
+            "description": "Adjust the settings and click 'Calculate' to see the results",
+            "result": {
+                "monthly": "Your monthly payment",
+                "for": "during",
+                "month": "month",
+                "details":{
+                    "title": "Cost details",
+                    "amount": "Borrowed amount",
+                    "interest": "Total interest",
+                    "insurance": "Total insurance",
+                    "cost": "Total cost of loan"
+                },
+                "amount": {
+                    "title": "Total amount to be repaid",
+                    "rate": "Overall effective rate"
+                },
+                "cost": "Cost allocation",
+                "tabs": {
+                    "title": "Amortization table",
+                    "reduce": "Reduce",
+                    "show": "Show all"
+                },
+                "simulate": "Does this simulation suit you?",
+                "transform": "Turn your simulation into an official loan application",
+                "request": "Make a request",
+                "info": "Important information",
+                "description": "This simulation is for informational purposes only. The final amounts will be calculated when your application is reviewed and may vary depending on your personal circumstances."
+            },
+            "table": {
+                "month": "Month",
+                "interest": "Interest",
+                "insurance": "Insurance",
+                "still": "Remaining due",
+                "and": "... and",
+                "other": "other monthly payments"
+            }
+        }
+    },
+    "formulas": {
+        "title": "Loan formulas",
+        "description": "Discover all the loan options we offer.",
+        "none": "No formula available",
+        "formula": "formula",
+        "active": "Active",
+        "inactive": "Inactive",
+        "interest": "Interest",
+        "insurance": "Insurance",
+        "details": "See details",
+        "error": "Unable to load the formula.",
+        "status": {
+            "active": "Active formula",
+            "inactive": "Inactive formula"
+        },
+        "rateCard": {
+            "interest": "Interest rate",
+            "insurance": "Insurance rate"
+        },
+        "ask": "Make a request",
+        "simulate": "Simulate",
+        "conditions": {
+            "title": "Eligibility requirements",
+            "minAmount": {
+                "title": "Minimum amount",
+                "description": "Minimum amount to benefit from this plan"
+            },
+            "maxAmount": {
+                "title": "Maximum amount",
+                "description": "Maximum amount allowed for this formula"
+            },
+            "none": "There is no limit on the amount for this formula."
+        },
+        "benefits": {
+            "title": "Why choose this option?",
+            "rate": "Competitive and transparent rates",
+            "insurance": "Insurance included for your safety",
+            "fast": "Your request will be processed quickly.",
+            "support": "Personalized support"
+        },
+        "button": "Start my application"
     }
 }

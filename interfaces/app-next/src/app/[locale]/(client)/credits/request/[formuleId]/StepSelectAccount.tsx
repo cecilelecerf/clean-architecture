@@ -5,16 +5,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { AccountId } from "@infrastructure/types/account";
+import { useTranslations } from "next-intl";
 
 export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext }: { selectedAccountId: AccountId | null, onSelect: (accountId: AccountId | null, currency: string | null) => void, onNext: () => void }) => {
   const query = useQuery(endpoints.accounts.getAllByMe());
+  const t = useTranslations("client.loan.account");
 
-  if (query.isLoading) return <p>Chargement des comptes...</p>;
-  if (query.isError) return <p>Erreur lors du chargement des comptes</p>;
+  if (query.isLoading) return <p>{t("loading")}.</p>;
+  if (query.isError) return <p>{t("error")}</p>;
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Choisissez un compte</h2>
+      <h2 className="text-2xl font-bold">{t("title")}</h2>
 
       <div className="grid gap-4">
         {query.data.map((account) => {
@@ -33,7 +35,7 @@ export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext }: { sel
                 <div>
                   <p className="font-medium">{account.name}</p>
                   <p className="text-sm text-gray-500">
-                    Solde : {account.balance.amount} {account.balance.currency}
+                    {t("balance")} : {account.balance.amount} {account.balance.currency}
                   </p>
                 </div>
 
@@ -51,7 +53,7 @@ export const StepSelectAccount = ({ selectedAccountId, onSelect, onNext }: { sel
         disabled={!selectedAccountId}
         onClick={onNext}
       >
-        Continuer
+        {t("next")}
       </Button>
     </div>
   )

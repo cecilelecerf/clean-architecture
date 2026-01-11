@@ -51,5 +51,139 @@
             "title": "Nouvelle conversation",
             "button": "Contacter"
         }
+    },
+    "loan": {
+        "title": "Mes crédits",
+        "description": "Suivez l'état de vos demandes de crédit",
+        "none": "Aucun crédit",
+        "norequest": "Vous n'avez pas encore de demande de crédit",
+        "seeformulas": "Voir les formules de crédits",
+        "loan": "Crédit",
+        "pending": {
+            "title": "Crédits en cours",
+            "duration": "Durée",
+            "month": "mois",
+            "monthly": "Mensualité",
+            "startOn": "Débute le",
+            "still": "Reste à payer",
+            "start": "Début"
+        },
+        "slider": {
+            "title": "Crédits disponibles",
+            "more": "Voir +",
+            "active": "Active",
+            "inactive": "Inactive",
+            "interest": "Intérêt",
+            "insurance": "Assurance",
+            "details": "Voir détails"
+        },
+        "request":{
+            "form": {
+                "amount": "Montant souhaité",
+                "date": "Date de début",
+                "duration": "Durée (mois)"
+            },
+            "title": "Informations du crédit",
+            "description": "Renseignez les détails de votre crédit",
+            "button": "Envoyer la demande"
+        },
+        "account": {
+            "loading": "Chargement des comptes...",
+            "error": "Erreur lors du chargement des comptes",
+            "title": "Choisissez un compte",
+            "balance": "Solde",
+            "next": "Continuer"
+        },
+        "simulate": {
+            "error": "Impossible de charger la formule",
+            "title": "Simulateur de crédit",
+            "formula": "Formule",
+            "setting": "Paramètres",
+            "amount": "Montant du crédit",
+            "duration": "Durée",
+            "month": "mois",
+            "year": "ans",
+            "interest": "Taux d'intérêt",
+            "insurance": "Taux d'assurance",
+            "calculate": "Calculer",
+            "description": "Ajustez les paramètres et cliquez sur 'Calculer' pour voir les résultats",
+            "result": {
+                "monthly": "Votre mensualité",
+                "for": "pendant",
+                "month": "mois",
+                "details":{
+                    "title": "Détail des coûts",
+                    "amount": "Montant emprunté",
+                    "interest": "Intérêts totaux",
+                    "insurance": "Assurance totale",
+                    "cost": "Coût total du crédit"
+                },
+                "amount": {
+                    "title": "Montant total à rembourser",
+                    "rate": "Taux effectif global (TEG)"
+                },
+                "cost": "Répartition du coût",
+                "tabs": {
+                    "title": "Tableau d'amortissement",
+                    "reduce": "Réduire",
+                    "show": "Afficher tout"
+                },
+                "simulate": "Cette simulation vous convient ?",
+                "transform": "Transformez votre simulation en demande de crédit officielle",
+                "request": "Faire une demande",
+                "info": "Information importante",
+                "description": "Cette simulation est donnée à titre indicatif. Les montants définitifs seront calculés lors de l'étude de votre dossier et peuvent varier en fonction de votre situation personnelle."
+            },
+            "table": {
+                "month": "Mois",
+                "interest": "Intérêts",
+                "insurance": "Assurance",
+                "still": "Restant dû",
+                "and": "... et",
+                "other": "autres mensualités"
+            }
+        }
+    },
+    "formulas": {
+        "title": "Les formules de prêts",
+        "description": "Retrouvez toutes les formules de prêts que nous vous proposons",
+        "none": "Aucune formule disponible",
+        "formula": "formule",
+        "active": "Active",
+        "inactive": "Inactive",
+        "interest": "Intérêt",
+        "insurance": "Assurance",
+        "details": "Voir détails",
+        "error": "Impossible de charger la formule.",
+        "status": {
+            "active": "Formule active",
+            "inactive": "Formule suspendue"
+        },
+        "rateCard": {
+            "interest": "Taux d'interêt",
+            "insurance": "Taux d'assurance"
+        },
+        "ask": "Faire une demande",
+        "simulate": "Simuler",
+        "conditions": {
+            "title": "Conditions d'éligibilité",
+            "minAmount": {
+                "title": "Montant minimum",
+                "description": "Montant minimum pour bénéficier de cette formule"
+            },
+            "maxAmount": {
+                "title": "Montant maximum",
+                "description": "Montant maximum autorisé pour cette formule"
+            },
+            "none": "Aucune restriction de montant pour cette formule"
+        },
+        "benefits": {
+            "title": "Pourquoi choisir cette formule ?",
+            "rate": "Taux compétitifs et transparents",
+            "insurance": "Assurance incluse pour votre sécurité",
+            "fast": "Traitement rapide de votre demande",
+            "support": "Accompagnement personnalisé"
+        },
+        "button": "Commencer ma demande"
     }
 }

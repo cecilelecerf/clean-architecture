@@ -21,12 +21,10 @@ export default function RequestCreditPage() {
     .exhaustive()
 }
 
-
 const Content = ({ formule }: { formule: FormuleDTO }) => {
   const [step, setStep] = useState<0 | 1>(0);
 
   const [info, setInfo] = useState<{ accountId: AccountId | null, currency: string | null }>({ accountId: null, currency: null })
-
 
   return (
     <div className="max-w-2xl mx-auto">
