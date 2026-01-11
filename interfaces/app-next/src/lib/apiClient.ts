@@ -1,14 +1,14 @@
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getServerSession } from 'next-auth';
 import { getSession } from 'next-auth/react';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
-async function request<T>(
-  path: string,
-  options: { method?: HttpMethod; body?: any } = {},
-): Promise<T> {
+type RequestOptions<B = unknown> = {
+  method?: HttpMethod;
+  body?: B;
+};
+
+async function request<T, B = unknown>(path: string, options: RequestOptions<B>): Promise<T> {
   const session = await getSession();
   const token = session?.user?.accessToken;
   const headers: HeadersInit = {
@@ -29,7 +29,6 @@ async function request<T>(
     }
 
     const data = await res.json();
-    console.log('Response data:', data);
     return data as T;
   } catch (err) {
     console.error('API Error:', err);

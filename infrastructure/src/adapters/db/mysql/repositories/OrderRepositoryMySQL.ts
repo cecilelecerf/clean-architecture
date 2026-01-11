@@ -77,15 +77,6 @@ export class OrderRepositoryMySQL implements OrderRepository {
     );
   }
 
-  async findById(id: OrderEntity["id"]): Promise<OrderEntity | null> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM orders WHERE id = ?`,
-      [id]
-    );
-    if (rows.length === 0) return null;
-    const row = rows[0];
-    return this.mapRowToOrder(row);
-  }
   async findByIdWithAccount(
     id: OrderEntity["id"]
   ): Promise<OrderEntityWithAccount | null> {
@@ -125,13 +116,6 @@ export class OrderRepositoryMySQL implements OrderRepository {
     return rows.map((row) => this.mapRowToOrder(row));
   }
 
-  async findAllOpen(): Promise<OrderEntity[]> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM orders WHERE status = 'pending' ORDER BY created_at ASC`
-    );
-    return rows.map((row) => this.mapRowToOrder(row));
-  }
-
   async update(order: OrderEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE orders 
@@ -154,13 +138,6 @@ export class OrderRepositoryMySQL implements OrderRepository {
         order.executionPrice ? order.executionPrice.currency : null,
         order.id,
       ]
-    );
-  }
-
-  async delete(id: OrderEntity["id"]): Promise<void> {
-    await this.client.query<ResultSetHeader>(
-      `DELETE FROM orders WHERE id = ?`,
-      [id]
     );
   }
 

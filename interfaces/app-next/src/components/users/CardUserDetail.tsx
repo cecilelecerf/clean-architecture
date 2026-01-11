@@ -1,14 +1,14 @@
-"use client";
-
 import { UserDto } from "@infrastructure/types/user";
 import { CheckCircle, Mail, XCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "../ui/skeleton";
+import { useTranslations } from "next-intl";
 
 
 export const CardUserDetail = ({ user }: { user: UserDto }) => {
+    const t = useTranslations("users");
     return (
         <Card className="p-6">
             <div className="flex items-start gap-6 flex-col sm:flex-row">
@@ -27,11 +27,11 @@ export const CardUserDetail = ({ user }: { user: UserDto }) => {
 
                             <div className="flex gap-2 mb-4">
                                 <Badge variant={user.isActiveField ? "default" : "secondary"}>
-                                    {user.isActiveField ? "Actif" : "Inactif"}
+                                    {user.isActiveField ? t("active") : t("inactive")}
                                 </Badge>
                                 <Badge variant="outline">
-                                    {user.role === "conseiller" ? "Conseiller" :
-                                        user.role === "directeur" ? "Directeur" : "Client"}
+                                    {user.role === "conseiller" ? t("role.advisor") :
+                                        user.role === "directeur" ? t("role.director") : t("role.customer")}
                                 </Badge>
                             </div>
                         </div>
@@ -47,12 +47,12 @@ export const CardUserDetail = ({ user }: { user: UserDto }) => {
                             {user.confirmedAt ? (
                                 <>
                                     <CheckCircle className="h-4 w-4 text-green-500" />
-                                    <span className="text-green-700">Email confirmé</span>
+                                    <span className="text-green-700">{t("card.corfirm")}</span>
                                 </>
                             ) : (
                                 <>
                                     <XCircle className="h-4 w-4 text-orange-500" />
-                                    <span className="text-orange-700">Email non confirmé</span>
+                                    <span className="text-orange-700">{t("card.not")}</span>
                                 </>
                             )}
                         </div>

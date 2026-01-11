@@ -4,6 +4,7 @@ import {
   formuleSchema,
   formuleStatSchema,
   formuleTypesSchema,
+  NewFormule,
 } from '@infrastructure/types/formule';
 import z from 'zod';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
@@ -15,19 +16,6 @@ import { queryClient } from '@/lib/queryClient';
 // ============================================================================
 // SCHEMAS
 // ============================================================================
-
-export const newFormuleSchema = formuleSchema.pick({
-  interestRate: true,
-  insuranceRate: true,
-  type: true,
-  label: true,
-  description: true,
-  accountId: true,
-  minAmount: true,
-  maxAmount: true,
-  currency: true,
-});
-export type NewFormule = z.infer<typeof newFormuleSchema>;
 
 export const updateFormuleSchema = formuleSchema.pick({
   interestRate: true,

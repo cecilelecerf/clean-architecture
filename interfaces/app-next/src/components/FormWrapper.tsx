@@ -1,7 +1,6 @@
-"use client"
+'use client'
 
 import { Path, UseFormReturn } from "react-hook-form"
-
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -15,7 +14,6 @@ import { Input } from "@/components/ui/input"
 import { ArrowLeft, Calendar, Check, DollarSign, Eye, EyeClosed, Lock, LucideIcon, Mail, Phone, User, X } from "lucide-react"
 import { match } from "ts-pattern"
 import clsx from "clsx"
-
 import {
     Select,
     SelectContent,
@@ -80,9 +78,9 @@ export default function FormWrapper<T>({
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
-                <Card className="min-w-2/3 rounded shadow-lg border-0 bg-linear-to-br from-gray-50 to-gray-100">
+                <Card className="min-w-2/3 rounded shadow-lg border-0 bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
                     <CardHeader>
-                        <CardTitle className="capitalize flex gap-2 items-center">
+                        <CardTitle className="capitalize flex gap-2 items-center text-gray-900 dark:text-gray-100">
                             {showBackButton && (
                                 <Button variant="ghost" size="icon" onClick={() => router.back()} type="button">
                                     <ArrowLeft className="w-5 h-5" />
@@ -90,7 +88,7 @@ export default function FormWrapper<T>({
                             )}
                             {title}
                         </CardTitle>
-                        {description && <CardDescription>{description}</CardDescription>}
+                        {description && <CardDescription className="dark:text-gray-300">{description}</CardDescription>}
                     </CardHeader>
                     <CardContent className="space-y-6">
 
@@ -99,15 +97,15 @@ export default function FormWrapper<T>({
                                 {data.map((section, sectionIndex) => (
                                     <Card key={sectionIndex} className="bg-transparent shadow-none border-none p-0">
                                         {(section.title || section.description) && (
-                                            <CardHeader className="p-4 bg-gray-200/50 rounded">
+                                            <CardHeader className="p-4 bg-gray-200/50 rounded dark:bg-gray-700/50">
                                                 {section.title && (
-                                                    <CardTitle className="text-base flex items-center gap-2">
+                                                    <CardTitle className="text-base flex items-center gap-2 text-gray-900 dark:text-gray-100">
                                                         {section.icon && <section.icon className="w-5 h-5" />}
                                                         {section.title}
                                                     </CardTitle>
                                                 )}
                                                 {section.description && (
-                                                    <CardDescription className="text-sm">
+                                                    <CardDescription className="text-sm dark:text-gray-300">
                                                         {section.description}
                                                     </CardDescription>
                                                 )}
@@ -144,7 +142,7 @@ export default function FormWrapper<T>({
                         </div>
 
                         {children && (
-                            <div className="pt-4 border-t">
+                            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                                 {children}
                             </div>
                         )}
@@ -176,11 +174,13 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                 }
                 return (
                     <FormItem>
-                        <FormLabel>{info.label}
-                            {!info.notRequired && <span className="text-red-500 ml-1">*</span>}</FormLabel>
-                        <FormControl >
+                        <FormLabel className="text-gray-900 dark:text-gray-100">
+                            {info.label}
+                            {!info.notRequired && <span className="text-red-500 ml-1">*</span>}
+                        </FormLabel>
+                        <FormControl>
                             <div className="relative">
-                                {withIcon && <Icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />}
+                                {withIcon && <Icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground dark:text-gray-400" />}
                                 {match(info.type)
                                     .with("select", () => (
                                         <Select
@@ -323,6 +323,7 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                     ))
                                     .with("command", () => {
                                         const valueArray = (field.value as string[]) ?? [];
+                                        console.log(valueArray)
                                         return (
                                             <Command>
                                                 <CommandInput placeholder="Rechercher un utilisateur..." />
@@ -330,40 +331,44 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                                     <CommandEmpty>Aucun utilisateur trouvé.</CommandEmpty>
                                                     {info.commandOption.map((command) => {
                                                         if (command.infos.length === 0) return
-                                                        return <CommandGroup heading={command.name}>
-                                                            {command.infos.map((info) => (
-                                                                <CommandItem
-                                                                    key={info.id}
-                                                                    value={`${info.firstname} ${info.lastname}`}
-                                                                    onSelect={() => {
-                                                                        let newValue: string[];
-                                                                        if (valueArray.includes(info.id)) {
-                                                                            newValue = [...valueArray, info.id];
-                                                                        } else {
-                                                                            newValue = valueArray.filter((v) => v !== info.id);
-                                                                        }
-                                                                        field.onChange(newValue);
-                                                                    }}
-                                                                >
-                                                                    <Flex align="center" gap="2" className="flex-1">
-                                                                        <Avatar className="h-8 w-8">
-                                                                            <AvatarFallback>
-                                                                                {info.firstname[0]}{info.lastname[0]}
-                                                                            </AvatarFallback>
-                                                                        </Avatar>
-                                                                        <span>
-                                                                            {info.firstname} {info.lastname}
-                                                                        </span>
-                                                                    </Flex>
-                                                                    <Check
-                                                                        className={clsx(
-                                                                            "ml-auto h-4 w-4",
-                                                                            valueArray.includes(info.id) ? "opacity-100" : "opacity-0"
-                                                                        )}
-                                                                    />
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
+                                                        return (
+                                                            <CommandGroup heading={command.name} key={command.name}>
+                                                                {command.infos.map((info) => (
+                                                                    <CommandItem
+                                                                        key={info.id}
+                                                                        value={`${info.firstname} ${info.lastname}`}
+                                                                        onSelect={() => {
+                                                                            let newValue: string[];
+                                                                            console.log(info.id)
+                                                                            if (!valueArray.includes(info.id)) {
+                                                                                newValue = [...valueArray, info.id];
+                                                                            } else {
+                                                                                newValue = valueArray.filter((v) => v !== info.id);
+                                                                            }
+                                                                            console.log(newValue)
+                                                                            field.onChange(newValue);
+                                                                        }}
+                                                                    >
+                                                                        <Flex align="center" gap="2" className="flex-1">
+                                                                            <Avatar className="h-8 w-8">
+                                                                                <AvatarFallback>
+                                                                                    {info.firstname[0]}{info.lastname[0]}
+                                                                                </AvatarFallback>
+                                                                            </Avatar>
+                                                                            <span>
+                                                                                {info.firstname} {info.lastname}
+                                                                            </span>
+                                                                        </Flex>
+                                                                        <Check
+                                                                            className={clsx(
+                                                                                "ml-auto h-4 w-4",
+                                                                                valueArray.includes(info.id) ? "opacity-100" : "opacity-0"
+                                                                            )}
+                                                                        />
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        )
                                                     }
                                                     )}
                                                 </CommandList>
@@ -413,14 +418,13 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                     )}
                             </div>
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="dark:text-gray-300" />
                     </FormItem>
                 )
             }}
         />
     )
 }
-
 
 const getFieldIcon = (icon?: LucideIcon, type?: FieldType) => {
     if (icon) return icon

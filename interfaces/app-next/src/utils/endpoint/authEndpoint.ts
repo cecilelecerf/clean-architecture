@@ -2,7 +2,12 @@ import { mutationOptions } from '@tanstack/react-query';
 import { post } from '@/lib/apiClient';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
-import { LoginPayload, RegisterPayload, UserDto, userDtoSchema } from '@infrastructure/types/user';
+import {
+  CreateClientPayload,
+  LoginPayload,
+  UserDto,
+  userDtoSchema,
+} from '@infrastructure/types/user';
 import z from 'zod';
 export const tokenSchema = z.object({
   token: z.string(),
@@ -35,7 +40,7 @@ export const authEndpoint = createEndpointsNodes({
     }),
   register: () =>
     mutationOptions({
-      mutationFn: async (payload: RegisterPayload) => {
+      mutationFn: async (payload: CreateClientPayload) => {
         const data = await post('/auth/register', payload);
         return safeParseWithLog(userDtoSchema, data);
       },

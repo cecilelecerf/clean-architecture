@@ -44,13 +44,6 @@ export class UserRepositoryMySQL implements UserRepository {
     return UserMapper.mapRowToUser(rows[0]);
   }
 
-  async findAll(): Promise<UserEntity[]> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM users ORDER BY created_at DESC"
-    );
-    return rows.map((row) => UserMapper.mapRowToUser(row));
-  }
-
   async findAllByRoleAndIsActif(
     role?: UserEntity["role"]
   ): Promise<UserEntity[]> {
@@ -157,12 +150,6 @@ export class UserRepositoryMySQL implements UserRepository {
         user.id,
       ]
     );
-  }
-
-  async delete(id: UserEntity["id"]): Promise<void> {
-    await this.client.query<ResultSetHeader>("DELETE FROM users WHERE id = ?", [
-      id,
-    ]);
   }
 
   async countUserByRole(role: UserEntity["role"]): Promise<number> {

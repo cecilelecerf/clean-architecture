@@ -1,0 +1,458 @@
+{
+  "menu": {
+    "title": "Directeur",
+    "section": {
+      "general": "Général"
+    },
+    "home": "Accueil",
+    "profile": "Profil",
+    "advisors": "Conseiller",
+    "directors": "Directeurs",
+    "messages": "Messages",
+    "rates": "Taux d'intérêt",
+    "formulas": "Formules de crédit",
+    "stocks": "Actions",
+    "currencies": "Devises",
+    "logout": "Déconnexion"
+  },
+  "profile": {
+    "personal": {
+        "title": "Informations personnelles",
+        "firstname": "Prénom",
+        "lastname": "Nom",
+        "email": "Email",
+        "phone": "Téléphone",
+        "dateOfBirth": "Date de naissance",
+        "sexe": "Sexe",
+        "address": "Adresse",
+        "city": "Ville",
+        "postalCode": "Code postal",
+        "country": "Pays"
+    },
+    "overview":{
+        "title": "Vue d'ensemble",
+        "advisors": "Conseillers",
+        "client": "Clients total",
+        "stocks": "Actions",
+        "available": "Disponibles"
+    },
+    "actions": {
+        "edit": "Modifier",
+        "save": "Enregistrer",
+        "saving": "Enregistrement...",
+        "cancel": "Annuler"
+    },
+    "account": {
+        "title": "Informations du compte",
+        "createdAt": "Date de création",
+        "updatedAt": "Dernière modification",
+        "confirmedEmail": "Email confirmé"
+    },
+    "logout": {
+        "title": "Déconnexion",
+        "text": "Se déconnecter de votre compte",
+        "button": "Se déconnecter"
+    }
+  },
+  "saving": {
+    "nothing": "Aucun taux d'épargne configuré",
+    "create": "Créer un taux",
+    "history": "Historique des taux",
+    "badge": {
+        "coming": "À venir",
+        "history": "Historique"
+    },
+    "card": {
+        "year": "par an",
+        "effectiveDate": "Effectif le",
+        "createdAt": "Créer le",
+        "rate": "Ce taux sera appliqué dans",
+        "day": "jour(s)"
+    },
+    "current": {
+        "nothingTitle": "Aucun taux configuré",
+        "nothingText": "Aucun taux d'épargne n'est actuellement configuré dans le système.",
+        "configure": "Configurer un taux",
+        "noEffectTitle": "Aucun taux en vigueur",
+        "noEffectText": "Aucun taux d'épargne n'est actuellement en vigueur.",
+        "add": "Ajouter un taux",
+        "effectTitle": "Taux actuellement en vigueur",
+        "annualRate": "Taux d'intérêt annuel",
+        "effectiveDate": "Effectif depuis le",
+        "impact": "Impact",
+        "impactText": "Ce taux s'applique automatiquement à tous les comptes d'épargne. Les intérêts sont calculés quotidiennement et versés chaque jour via le système automatisé.",
+        "clientImpact": "Impact sur les clients",
+        "impactCard": {
+            "one": "Client avec 1 000 €",
+            "ten": "Client avec 10 000 €",
+            "fifty": "Client avec 50 000 €",
+            "popular": "Populaire",
+            "annual": "Annuel",
+            "monthly": "Mensuel",
+            "daily": "Journalier"
+        },
+        "new": "Nouveau taux"
+    },
+    "new": {
+        "title": "Nouveau taux d'épargne",
+        "description": "Créer un taux d'épargne",
+        "button": "Enregistrer",
+        "form": {
+            "rate": "Taux",
+            "effectiveDate": "Date d'entrée en vigueur"
+        }
+    }
+  },
+  "credits": {
+    "new": "Créer une nouvelle formule",
+    "nothing": "Aucune formule disponible",
+    "first": "Créez votre première formule de prêt",
+    "total": "Total des formules",
+    "active": "actives",
+    "inactive": "inactives",
+    "formula": "formule",
+    "interest": "Intérêt",
+    "insurance": "Assurance",
+    "details": "Voir détails",
+    "info": {
+        "type": "Type",
+        "description": "Description",
+        "interestRate": "Taux d'interêt",
+        "insuranceRate": "Taux d'assurance",
+        "amount": "Montant",
+        "createdAt": "Créée le",
+        "active": "Active",
+        "inactive": "Inactive",
+        "update": "Modifier"
+    },
+    "stats": {
+        "overview": "Vue d'ensemble",
+        "active": "Crédits actifs",
+        "customer": "Clients",
+        "accept": "Taux d'acceptation",
+        "wait": "En attente",
+        "finance": "Statistiques financières",
+        "capital": "Capital prêté total",
+        "interest": "Intérêts générés",
+        "income": "Revenus assurance",
+        "totalIncome": "Revenus totaux",
+        "details": {
+            "title": "Répartition des crédits",
+            "accept": "Acceptés",
+            "refuse": "Refusés",
+            "waiting": "En attente"
+        }
+    },
+    "formulas": {
+        "none": "Aucun crédit trouvé",
+        "nothingAssociate": "Cette formule n'a pas encore de crédits associés.",
+        "back": "Retour aux formules",
+        "badge": {
+            "accept": "Accepté",
+            "refuse": "Refusé",
+            "waiting": "En attente",
+            "end": "Terminé"
+        },
+        "loan": "Crédit",
+        "info": {
+            "amount": "Montant initial",
+            "monthly": "Mensualité",
+            "duration": "Durée",
+            "month": "mois",
+            "balance": "Solde restant",
+            "start": "Début",
+            "advisor": "Conseiller",
+            "reason": "Motif"
+        },
+        "update": {
+            "rates": {
+                "title": "Taux",
+                "description": "Paramètres financiers de la formule",
+                "fields": {
+                    "interestRate": "Taux d'intérêt",
+                    "insuranceRate": "Taux d'assurance"
+                }
+            },
+            "information": {
+                "title": "Informations",
+                "description": "Identification de la formule",
+                "fields": {
+                    "type": "Type de prêt",
+                    "label": "Label",
+                    "description": "Description"
+                }
+            },
+            "amounts": {
+                "title": "Montants",
+                "description": "Plage de montants autorisés",
+                "fields": {
+                    "minAmount": "Montant minimum",
+                    "maxAmount": "Montant maximum",
+                    "currency": "Devise"
+                }
+            },
+            "settings": {
+                "title": "Paramètres",
+                "description": "État de la formule",
+                "fields": {
+                    "isActive": "Formule active"
+                }
+            },
+            "options": {
+                "currencies": {
+                    "EUR": "Euro",
+                    "USD": "Dollar américain",
+                    "GBP": "Livre sterling"
+                }
+            },
+            "title": "Modifier la formule",
+            "description": "Mettre à jour la formule de prêt",
+            "button": "Enregistrer"
+        },
+        "new": {
+            "account": {
+                "loading": "Chargement des comptes...",
+                "error": "Erreur lors du chargement des comptes",
+                "choose": "Choisissez un compte",
+                "balance": "Solde",
+                "next": "Continuer"
+            },
+            "form": {
+                "rates": {
+                    "title": "Taux",
+                    "description": "Paramètres financiers de la formule",
+                    "fields": {
+                        "interestRate": "Taux d'intérêt",
+                        "insuranceRate": "Taux d'assurance"
+                    }
+                },
+                "information": {
+                    "title": "Informations",
+                    "description": "Identification de la formule",
+                    "fields": {
+                        "type": "Type de prêt",
+                        "label": "Label",
+                        "description": "Description"
+                    }
+                },
+                "amounts": {
+                    "title": "Montants",
+                    "description": "Plage de montants autorisés",
+                    "fields": {
+                        "minAmount": "Montant minimum",
+                        "maxAmount": "Montant maximum",
+                        "currency": "Devise"
+                    }
+                },
+                "settings": {
+                    "title": "Paramètres",
+                    "description": "État de la formule",
+                    "fields": {
+                        "isActive": "Formule active"
+                    }
+                },
+                "options": {
+                    "currencies": {
+                        "EUR": "Euro",
+                        "USD": "Dollar américain",
+                        "GBP": "Livre sterling"
+                    }
+                },
+                "title": "Nouveau prêt",
+                "description": "Créer une formule de prêt",
+                "button": "Enregistrer"
+            }
+        }
+    }
+  },
+  "currency": {
+    "success": "Taux de change mis à jour",
+    "error": "Erreur lors de la mise à jour",
+    "title": "Devises",
+    "text": "Taux de change par rapport au Dollar USD (USD = 1.0)",
+    "ref": "Référence",
+    "new": "Nouveau taux",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "usd": "1 USD =",
+    "update": "Modifier le taux"
+  },
+  "user": {
+    "none": "Aucun utilisateur associé pour le moment.",
+    "new": {
+        "form": {
+            "personal": {
+                "title": "Informations personnelles",
+                "description": "Identité de l'utilisateur",
+                "fields": {
+                    "firstname": "Prénom",
+                    "lastname": "Nom de famille"
+                }
+            },
+            "account": {
+                "title": "Compte",
+                "description": "Informations de connexion",
+                "fields": {
+                    "email": "Email"
+                }
+            },
+            "role": {
+                "title": "Rôle",
+                "description": "Permissions associées au compte",
+                "fields": {
+                    "role": {
+                        "label": "Rôle",
+                        "options": [
+                            { "advisor": "Conseiller" },
+                            { "director": "Directeur" }
+                        ]
+                    }
+                }
+            }
+        },
+        "title": "Créer un nouveau compte",
+        "button": "Générer"
+    }
+  },
+  "stocks": {
+    "list": {
+        "search": "Rechercher une action...",
+        "notfound": "Aucune action trouvée",
+        "notsave": "Aucune action enregistrée",
+        "add": "Ajouter la première action"
+    },
+    "new": {
+        "form": {
+            "identification": {
+                "title": "Identification",
+                "description": "Informations de base sur l'action",
+                "fields": {
+                    "symbol": "Symbole",
+                    "name": "Nom de l'action"
+                }
+            },
+            "market": {
+                "title": "Marché & Secteur",
+                "description": "Classification de l'action",
+                "fields": {
+                    "market": {
+                        "label": "Marché",
+                        "options": {
+                            "NASDAQ": "NASDAQ",
+                            "NYSE": "NYSE",
+                            "EURONEXT_PARIS": "Euronext Paris",
+                            "LSE": "LSE",
+                            "DAX": "DAX",
+                            "OTHER": "Autre"
+                        }
+                    },
+                    "activitySector": "Secteur d'activité"
+                }
+            },
+            "settings": {
+                "title": "Paramètres",
+                "description": "Configuration de disponibilité",
+                "fields": {
+                    "isAvailable": "Disponibilité"
+                }
+            }
+        },
+        "title" : "Nouvelle action",
+        "button": "Créer une nouvelle action"
+    },
+    "update": {
+        "form": {
+            "initialValue": {
+                "title": "Valeur initiale",
+                "description": "Informations financières de départ",
+                "fields": {
+                    "quantity": "Nombre total d'actions",
+                    "priceAmount": "Prix initial",
+                    "priceCurrency": "Devise"
+                }
+            }
+        },
+        "title" : "Modifier l'action",
+        "button": "Modifier"
+    },
+    "details": {
+        "title": "Détails",
+        "notfound": "Action introuvable",
+        "available": "Disponible",
+        "unavailable": "Indisponible",
+        "buy": "Acheter des actions",
+        "sell": "Vendre des actions",
+        "current": "Prix actuel",
+        "tabs": {
+            "overview": "Vue d'ensemble",
+            "mine": "Mes actions",
+            "graph": "Graphiques",
+            "stats": "Statistiques"
+        },
+        "overview": {
+            "market": "Marché",
+            "sector": "Secteur",
+            "title": "Informations détaillées",
+            "symbol": "Symbole",
+            "price": "Prix unitaire",
+            "createdAt": "Créée le",
+            "updatedAt": "Maj le"
+        },
+        "mine": {
+            "none": "Vous ne possédez pas d'actions",
+            "held": "Actions détenues",
+            "averagePrice": "Prix moyen d'achat",
+            "invest": "Investi",
+            "actualValue": "Valeur actuelle",
+            "value": "Plus/Moins-value",
+            "noneWaiting": "Pas d'ordre en attente",
+            "waiting": "Action en attente"
+        },
+        "chart": {
+            "unableLoading": "Impossible de charger l'historique",
+            "priceEvol": "Évolution du prix (30 jours)",
+            "volume": "Volume de transactions"
+        },
+        "stats": {
+            "unableLoading": "Impossible de charger les statistiques",
+            "perf": "Performance",
+            "variation": {
+                "24": "Variation 24h",
+                "7": "Variation 7j",
+                "30": "Variation 30j"
+            },
+            "minPrice": "Prix min (30j)",
+            "maxPrice": "Prix max (30j)",
+            "trade": "Trading",
+            "totalVolume": "Volume total (7j)",
+            "averagePrice": "Prix moyen (7j)",
+            "transactions": "Transactions (7j)"
+        }
+    }
+  },
+  "message": {
+    "not": "Pas de conversation",
+    "error": "Erreur lors du chargement des utilisateurs",
+    "form": {
+        "title": "Titre de la conversation",
+        "participants": "Participants",
+        "advisor": "Conseiller",
+        "director": "Directeurs"
+    },
+    "new": "Nouvelle conversation",
+    "button": "Démarrer",
+    "add": "Ajouter",
+    "setting": {
+        "title": "Paramètre de discution",
+        "admin": "Administrateur",
+        "choseAdmin": "Désigner admin",
+        "delete": "Supprimer",
+        "close": "Cloturer la conversation ?",
+        "noneAvailable": "Aucun participant disponible",
+        "add": "Ajouter un participant",
+        "noneFind": "Aucun utilisateur trouvé.",
+        "transfer": "Transférer la conversation",
+        "buttonTransfer": "Transférer"
+    }
+  }
+}

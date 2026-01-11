@@ -1,8 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type EndpointFunction = (...params: any[]) => any;
+
 /**
  * Type générique pour représenter un arbre d'endpoints récursif
  */
 type APIStructure = {
-  [K in string]: ((...p: any[]) => any) | APIStructure;
+  [K in string]: EndpointFunction | APIStructure;
 };
 
 /**

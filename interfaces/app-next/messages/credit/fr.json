@@ -1,0 +1,90 @@
+{
+    "array": {
+        "status": "Statut",
+        "amount": "Montant",
+        "duration": "Durée",
+        "rate": "Taux",
+        "monthly": "Mensualité",
+        "date": "Date demande",
+        "actions": "Actions"
+    },
+    "row": {
+        "accept": "Accepter",
+        "refused": "Refuser",
+        "cancel": "Annuler",
+        "dialog": {
+            "accept": {
+                "title": "Accepter la demande de crédit",
+                "description": "Êtes-vous sûr de vouloir accepter cette demande ? Le client sera notifié et le crédit sera activé.",
+                "action": "Confirmer l'acceptation"
+            },
+            "refused": {
+                "title": "Refuser la demande de crédit",
+                "description": "Veuillez indiquer la raison du refus. Le client recevra cette information.",
+                "placeholder": "Raison du refus (ex: revenus insuffisants, taux d'endettement trop élevé...)",
+                "action": "Confirmer le refus"
+            },
+            "waiting": "En cours ..."
+        }
+    },
+    "details": {
+        "request": "Demande créée le",
+        "accept": "Accepter la demande",
+        "refuse": "Refuser la demande",
+        "start": "Ce crédit débutera le",
+        "debits": "Les prélèvements automatiques commenceront à cette date.",
+        "progress": "Progression du remboursement",
+        "refund": "remboursé",
+        "amount": "Montant payé",
+        "still": "Reste à payer",
+        "monthly": "Mensualité",
+        "formula": {
+            "title": "Caractéristiques de la formule du crédit",
+            "type": "Type du crédit",
+            "label": "Label du crédit",
+            "interest": "Taux d'intérêt",
+            "insurance": "Taux d'assurance",
+            "minAmount": "Montant minimum",
+            "maxAmount": "Montant maximum"
+        },
+        "credit": {
+            "title": "Caractéristiques du crédit",
+            "amount": "Montant emprunté",
+            "duration": "Durée du crédit",
+            "month": "mois",
+            "year": "ans",
+            "start": "Date de début",
+            "monthly": "Mensualité"
+        },
+        "user": {
+            "title": "Détail sur l'utilisateur",
+            "lastname": "Nom",
+            "email": "Email",
+            "firstname": "Prénom",
+            "status": "Statut professionnel",
+            "more": "Voir le client"
+        },
+        "account": {
+            "title": "Détail du compte",
+            "name": "Nom",
+            "type": "Type",
+            "balance": "Balance actuelle",
+            "more": "Voir le compte"
+        },
+        "dialog": {
+            "accept": {
+                "title": "Accepter la demande de crédit",
+                "description": "Êtes-vous sûr de vouloir accepter cette demande ? Le client sera notifié et le crédit sera activé.",
+                "action": "Confirmer l'acceptation"
+            },
+            "refuse": {
+                "title": "Refuser la demande de crédit",
+                "description": "Veuillez indiquer la raison du refus. Le client recevra cette information.",
+                "placeholder": "Raison du refus (ex: revenus insuffisants, taux d'endettement trop élevé...)",
+                "action": "Confirmer le refus"
+            },
+            "waiting": "En cours ..."
+        },
+        "cancel": "Annuler"
+    }
+}

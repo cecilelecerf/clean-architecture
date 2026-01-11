@@ -15,6 +15,8 @@ import {
 import { InvalidPercentageError } from "@domain/errors/percentage";
 import { ClockService } from "@application/ports/services/ClockService";
 import { EffectiveDateInPastError } from "@domain/errors/savingsRate";
+import { AccountRepository } from "@application/ports/repositories/AccountRepository";
+import { EmailService } from "@application/ports/services/EmailService";
 
 interface Props {
   rate: number;
@@ -26,8 +28,10 @@ export class SetSavingsRateUsecase {
   public constructor(
     private readonly configRepository: SavingRateRepository,
     private readonly userRepository: UserRepository,
+    private readonly accountRepository: AccountRepository,
     private readonly uuidService: UuidService,
-    private readonly clockService: ClockService
+    private readonly clockService: ClockService,
+    private readonly emailService: EmailService
   ) {}
 
   public async execute({
@@ -64,6 +68,32 @@ export class SetSavingsRateUsecase {
     if (savingsRate instanceof Error) return savingsRate;
 
     await this.configRepository.save(savingsRate);
+
+    const accounts = await this.accountRepository.findAllSavingsAccounts();
+    const userIds = Array.from(
+      new Set(
+        accounts
+          .map((a) => a.userId)
+          .filter((id): id is string => typeof id === "string")
+      )
+    );
+
+    const formattedDate = new Intl.DateTimeFormat("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(effectiveDateResult);
+
+    for (const accountUserId of userIds) {
+      const accountUser = await this.userRepository.findById(accountUserId);
+      if (!accountUser || !accountUser.isActive()) continue;
+
+      await this.emailService.sendEmail({
+        to: accountUser.email,
+        subject: "Modification du taux d'épargne",
+        text: `Le taux d'épargne sera de ${percentage.value} % à partir du ${formattedDate}.`,
+      });
+    }
 
     return savingsRate.toDTO();
   }

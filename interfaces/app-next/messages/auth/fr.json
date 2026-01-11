@@ -1,0 +1,68 @@
+{
+  "buttons": {
+    "openAccount": "Ouvrir un compte",
+    "login": "Se connecter",
+    "register": "S'inscrire"
+  },
+  "login": {
+    "meta": {
+      "title": "Connexion - Banque Moderne",
+      "description": "Connectez-vous à votre espace bancaire sécurisé pour gérer vos comptes, crédits et investissements."
+    },
+    "title": "Se connecter",
+    "backToHome": "ACCUEIL",
+    "form": {
+      "email": "Email",
+      "password": "Mot de passe",
+      "submit": "Connexion"
+    },
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "signUp": "S'inscrire"
+  },
+  "register": {
+    "meta": {
+      "title": "Inscription - Banque Moderne",
+      "description": "Créez votre compte bancaire en quelques minutes et profitez de nos services financiers innovants."
+    },
+    "title": "S'inscrire",
+    "sections": {
+      "personal": {
+        "title": "Informations personnelles",
+        "description": "Renseignez vos informations de base pour créer votre compte"
+      },
+      "address": {
+        "title": "Adresse",
+        "description": "Indiquez votre adresse complète"
+      },
+      "account": {
+        "title": "Connexion",
+        "description": "Créez vos identifiants pour accéder à votre compte"
+      }
+    },
+    "form": {
+      "firstname": "Prénom",
+      "lastname": "Nom",
+      "gender": {
+        "label": "Sexe",
+        "female": "Fille",
+        "male": "Garçon",
+        "other": "Autre"
+      },
+      "phone": "Téléphone",
+      "birthdate": "Date de naissance",
+      "address": "Adresse",
+      "city": "Ville",
+      "country": "Pays",
+      "postalCode": "Code postal",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmation mot de passe",
+      "submit": "S'inscrire",
+      "success": "Email envoyé",
+      "error": "Erreur lors de l'inscription"
+    },
+    "hasAccount": "Déjà un compte ?",
+    "signIn": "Se connecter"
+  }
+}

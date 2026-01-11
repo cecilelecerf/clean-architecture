@@ -86,12 +86,6 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     );
   }
 
-  async delete(threadId: ThreadEntity["id"]): Promise<void> {
-    await this.client.connect();
-
-    await ThreadModel.deleteOne({ _id: threadId });
-  }
-
   async findById(id: ThreadEntity["id"]): Promise<ThreadEntity | null> {
     await this.client.connect();
 
@@ -99,30 +93,6 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     if (!doc) return null;
 
     return this.mapDocToThread(doc);
-  }
-
-  async findAllByParticipantId(
-    userId: UserEntity["id"]
-  ): Promise<ThreadEntity[]> {
-    await this.client.connect();
-
-    const docs = await ThreadModel.find({ participantsId: userId })
-      .sort({ updatedAt: -1 })
-      .lean();
-
-    return docs.map((doc) => this.mapDocToThread(doc));
-  }
-
-  async findAllByAdministratorId(
-    advisorId: UserEntity["id"]
-  ): Promise<ThreadEntity[]> {
-    await this.client.connect();
-
-    const docs = await ThreadModel.find({ administratorId: advisorId })
-      .sort({ updatedAt: -1 })
-      .lean();
-
-    return docs.map((doc) => this.mapDocToThread(doc));
   }
 
   async findAllWithUserByParticipantIdAndType(

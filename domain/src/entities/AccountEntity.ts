@@ -20,7 +20,7 @@ export class AccountEntity {
   private constructor(
     public iban: IBAN,
     public name: string,
-    public type: "courant" | "epargne",
+    public type: "courant" | "epargne" | "pret",
     public color: Color,
     public balance: Money,
     public createdAt: Date,

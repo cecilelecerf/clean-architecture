@@ -10,6 +10,7 @@ import { Transaction } from "@infrastructure/types/transaction";
 import { CalendarFilter } from "@/components/CalendarFilter";
 import { Flex } from "@radix-ui/themes";
 import { TransactionFilters as TTransactionFilters } from "@/utils/endpoint/transactionEndpoints";
+import { useTranslations } from "next-intl";
 ;
 
 type TransactionFiltersProps = {
@@ -20,14 +21,16 @@ type TransactionFiltersProps = {
 export const TransactionFilters = ({ filters, onChange }: TransactionFiltersProps) => {
     const [localFilters, setLocalFilters] = useState<TTransactionFilters>(filters);
 
+    const t = useTranslations("account.transactions");
+
     useEffect(() => {
         onChange(localFilters);
-    }, [localFilters]);
+    }, [localFilters, onChange]);
     return (
         <div className="flex gap-6 mb-6">
             <Input
                 className="w-full"
-                placeholder="Rechercher par nom"
+                placeholder={t("search")}
                 value={localFilters.label || ""}
                 onChange={(e) =>
                     setLocalFilters((prev) => ({ ...prev, label: e.target.value }))
@@ -42,7 +45,7 @@ export const TransactionFilters = ({ filters, onChange }: TransactionFiltersProp
                 <PopoverContent align="end" className="w-65 md:w-90">
                     <div className="flex flex-col gap-4">
                         <Flex direction="column" gap="3" >
-                            <Label>Type</Label>
+                            <Label>{t("type")}</Label>
                             <Select
                                 value={localFilters.type}
                                 onValueChange={(val) => {
@@ -56,12 +59,12 @@ export const TransactionFilters = ({ filters, onChange }: TransactionFiltersProp
                                 }
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Tous" />
+                                    <SelectValue placeholder={t("all")} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Tous</SelectItem>
-                                    <SelectItem value="credit">Crédit</SelectItem>
-                                    <SelectItem value="debit">Débit</SelectItem>
+                                    <SelectItem value="all">{t("all")}</SelectItem>
+                                    <SelectItem value="credit">{t("credit")}</SelectItem>
+                                    <SelectItem value="debit">{t("debit")}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </Flex>
@@ -71,17 +74,17 @@ export const TransactionFilters = ({ filters, onChange }: TransactionFiltersProp
                             <CalendarFilter
                                 dateIso={filters.fromDate}
                                 onDateChange={(date) => setLocalFilters((prev) => ({ ...prev, fromDate: date ? date.toISOString() : undefined }))}
-                                label="Du"
+                                label={t("calendar.from")}
                             />
                             <CalendarFilter
                                 dateIso={filters.toDate}
                                 onDateChange={(date) => setLocalFilters((prev) => ({ ...prev, toDate: date ? date.toISOString() : undefined }))}
-                                label="Au"
+                                label={t("calendar.to")}
                             />
                         </div>
                         <div className="flex flex-col gap-1">
                             <div className="flex justify-between w-full">
-                                <Label>Transaction par page</Label>
+                                <Label>{t("page")}</Label>
                                 <p>{localFilters.limit}</p>
                             </div>
                             <Slider

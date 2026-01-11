@@ -57,24 +57,14 @@ export class AccountRepositoryMySQL implements AccountRepository {
     return AccountMapper.mapRowToAccount(rows[0]);
   }
 
-  /** Trouver une liste de compte par type */
-  async findByType(type: string): Promise<AccountEntity[]> {
+    async findBankReadyAccount(): Promise<AccountEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM accounts WHERE type = ? ORDER BY created_at DESC",
-      [type]
+      "SELECT * FROM accounts WHERE type = 'pret' AND user_id IS NULL"
     );
 
-    return rows.map((row) => AccountMapper.mapRowToAccount(row));
-  }
-  /** Trouver une liste de compte par type */
-  async findByTypeSection(type: "client" | "bank"): Promise<AccountEntity[]> {
-    const conditions = type === "client" ? "NOT NULL" : "IS NULL";
+    if (rows.length === 0) return null;
 
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM accounts WHERE user_id IS ${conditions} ORDER BY created_at DESC`
-    );
-
-    return rows.map((row) => AccountMapper.mapRowToAccount(row));
+    return AccountMapper.mapRowToAccount(rows[0]);
   }
 
   /** Trouver une liste de compte par type avec les users */

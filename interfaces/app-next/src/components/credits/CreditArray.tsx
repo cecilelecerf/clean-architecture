@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { CreditCardMobile } from "./CreditCard"
 import { CreditRow } from "./CreditRow"
 import { useSession } from "next-auth/react"
+import { useTranslations } from "next-intl"
 type Props = { credits: CreditDTOWithFormule[], title: string, isAdmin?: boolean, basePath: string }
 
 export const CreditArray = ({ credits, title, isAdmin, basePath }: Props) => {
-
+    const t = useTranslations("credit.array");
     const { data: session } = useSession();
-    if (!session?.user?.id) return <div>Unauthorized</div>;
-
+    const thProps = "text-left p-4 text-sm font-semibold text-gray-600 dark:text-gray-300"
     return <>
         <div className="lg:hidden ">
             <h2 className="text-lg font-bold mb-2">{title} ({credits.length})</h2>
@@ -32,28 +32,28 @@ export const CreditArray = ({ credits, title, isAdmin, basePath }: Props) => {
             <CardContent className="p-0">
                 <div className="overflow-x-auto">
                     <table className="w-full">
-                        <thead className="bg-gray-50 border-b">
+                        <thead className="bg-gray-50 dark:bg-gray-200/10 border-b">
                             <tr>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                    Statut
+                                <th className={thProps}>
+                                    {t("status")}
                                 </th>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                    Montant
+                                <th className={thProps}>
+                                    {t("amount")}
                                 </th>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                    Durée
+                                <th className={thProps}>
+                                    {t("duration")}
                                 </th>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                    Taux
+                                <th className={thProps}>
+                                    {t("rate")}
                                 </th>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                    Mensualité
+                                <th className={thProps}>
+                                    {t("monthly")}
                                 </th>
-                                <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                                    Date demande
+                                <th className={thProps}>
+                                    {t("date")}
                                 </th>
-                                <th className="text-right p-4 text-sm font-semibold text-gray-600">
-                                    Actions
+                                <th className={`text-right ${thProps}`}>
+                                    {t("actions")}
                                 </th>
                             </tr>
                         </thead>

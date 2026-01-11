@@ -48,41 +48,6 @@ export class MessageRepositoryMongo implements MessageRepository {
     }
   }
 
-  /** 🔍 Tous les messages d'un thread */
-  async findAllByThread(
-    threadId: ThreadEntity["id"]
-  ): Promise<MessageEntity[]> {
-    await this.client.connect();
-
-    const docs = await MessageModel.find({ threadId })
-      .sort({ sentAt: 1 })
-      .lean();
-
-    return docs.map(this.mapDocToMessage);
-  }
-
-  /** 🔄 Mettre à jour un message */
-  async update(message: MessageEntity): Promise<void> {
-    await this.client.connect();
-
-    // Met à jour le contenu et la liste des lecteurs
-    await MessageModel.updateOne(
-      { _id: message.id },
-      {
-        $set: {
-          content: message.content,
-          readBy: message.readBy,
-        },
-      }
-    );
-  }
-
-  /** ❌ Supprimer un message */
-  async delete(messageId: MessageEntity["id"]): Promise<void> {
-    await this.client.connect();
-    await MessageModel.deleteOne({ _id: messageId });
-  }
-
   /** 🔍 Messages avec sender par thread */
   async findAllWithUserByThread(threadId: string): Promise<MessageWithUser[]> {
     await this.client.connect();

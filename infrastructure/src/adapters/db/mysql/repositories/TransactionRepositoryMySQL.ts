@@ -30,35 +30,6 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
     });
   }
 
-  async findByDateRange(
-    startDate: Date,
-    endDate: Date
-  ): Promise<TransactionEntity[]> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `
-      SELECT * FROM transactions 
-      WHERE date BETWEEN ? AND ? 
-      ORDER BY date DESC
-      `,
-      [startDate, endDate]
-    );
-
-    return rows.map((row) => this.mapRowToTransaction(row));
-  }
-
-  async findByIban(iban: IBAN): Promise<TransactionEntity[]> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `
-      SELECT * FROM transactions 
-      WHERE from_account_id = ? OR to_account_id = ? 
-      ORDER BY date DESC
-      `,
-      [iban.value, iban.value]
-    );
-
-    return rows.map((row) => this.mapRowToTransaction(row));
-  }
-
   async save(transaction: TransactionEntity): Promise<void> {
     console.log(transaction);
     await this.client.query<ResultSetHeader>(
@@ -85,25 +56,6 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
         transaction.date,
       ]
     );
-  }
-
-  async delete(transactionId: TransactionEntity["id"]): Promise<void> {
-    await this.client.query<ResultSetHeader>(
-      `DELETE FROM transactions WHERE id = ?`,
-      [transactionId]
-    );
-  }
-
-  async findById(
-    id: TransactionEntity["id"]
-  ): Promise<TransactionEntity | null> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM transactions WHERE id = ?`,
-      [id]
-    );
-
-    if (rows.length === 0) return null;
-    return this.mapRowToTransaction(rows[0]);
   }
 
   async findByIdWithAccountWithUser(

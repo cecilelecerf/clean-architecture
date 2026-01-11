@@ -1,0 +1,459 @@
+{
+  "menu": {
+    "title": "Director",
+    "section": {
+      "general": "General"
+    },
+    "home": "Dashboard",
+    "profile": "Profile",
+    "advisors": "Advisors",
+    "directors": "Directors",
+    "messages": "Messages",
+    "rates": "Interest Rates",
+    "formulas": "Credit Formulas",
+    "stocks": "Stocks",
+    "currencies": "Currencies",
+    "logout": "Logout"
+  },
+  "profile": {
+    "personal": {
+        "title": "Personal informations",
+        "firstname": "Firstname",
+        "lastname": "Lastname",
+        "email": "Email",
+        "phone": "Phone",
+        "dateOfBirth": "Date of birth",
+        "sexe": "Sexe",
+        "address": "Address",
+        "city": "City",
+        "postalCode": "Postal code",
+        "country": "Country"
+    },
+    "overview":{
+        "title": "Overview",
+        "advisors": "Advisors",
+        "client": "Total customer",
+        "stocks": "Stocks",
+        "available": "Available"
+    },
+    "actions": {
+        "edit": "Edit",
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel"
+    },
+    "account": {
+        "title": "Account informations",
+        "createdAt": "Creation date",
+        "updatedAt": "Last update date",
+        "confirmedEmail": "Email confirmed"
+    },
+    "logout": {
+        "title": "Logout",
+        "text": "Logout of your account",
+        "button": "Logout"
+    }
+  },
+  "saving": {
+    "nothing": "No savings rate configured",
+    "create": "Create a rate",
+    "history": "Rate history",
+    "badge": {
+        "coming": "To come",
+        "history": "History"
+    },
+    "card": {
+        "year": "per year",
+        "effectiveDate": "Effective on",
+        "createdAt": "Create the",
+        "rate": "This rate will be applied in",
+        "day": "day(s)"
+    },
+    "current": {
+        "nothingTitle": "No rates configured",
+        "nothingText": "No savings rate is currently configured in the system.",
+        "configure": "Configure a rate",
+        "noEffectTitle": "No rates in effect",
+        "noEffectText": "No savings rates are currently in effect.",
+        "add": "Add a rate",
+        "effectTitle": "Rate currently in effect",
+        "annualRate": "Annual interest rate",
+        "effectiveDate": "Effective since",
+        "impact": "Impact",
+        "impactText": "This rate is automatically applied to all savings accounts. Interest is calculated daily and paid out every day via the automated system.",
+        "clientImpact": "Impact on customers",
+        "impactCard": {
+            "one": "Customer with €1,000",
+            "ten": "Customer with 10 000 €",
+            "fifty": "Customer with 50 000 €",
+            "popular": "Popular",
+            "annual": "Annual",
+            "monthly": "Monthly",
+            "daily": "Daily"
+        },
+        "new": "New rate"
+    },
+    "new": {
+        "title": "New interest rate",
+        "description": "Create an interest rate",
+        "button": "Save",
+        "form": {
+            "rate": "Rate",
+            "effectiveDate": "Effective date"
+        }
+    }
+  },
+  "credits": {
+    "new": "Create a new formula",
+    "nothing": "No formula available",
+    "first": "Create your first loan formula",
+    "total": "Total formulas",
+    "active": "active",
+    "inactive": "inactive",
+    "formula": "formula",
+    "interest": "Interest",
+    "insurance": "Insurance",
+    "details": "See details",
+    "info": {
+        "type": "Type",
+        "description": "Description",
+        "interestRate": "Interest Rate",
+        "insuranceRate": "Insurance Rate",
+        "amount": "Amount",
+        "createdAt": "Created at",
+        "active": "Active",
+        "inactive": "Inactive",
+        "update": "Update"
+    },
+    "stats": {
+        "overview": "Overview",
+        "active": "Active loan",
+        "customer": "Clients",
+        "accept": "Acceptance rate",
+        "wait": "Waiting",
+        "finance": "Financial statistics",
+        "capital": "Total loaned capital",
+        "interest": "Interest generated",
+        "income": "Insurance income",
+        "totalIncome": "Total revenue",
+        "details": {
+            "title": "Allocation of funds",
+            "accept": "Accepted",
+            "refuse": "Refused",
+            "waiting": "Waiting"
+        }
+    },
+    "formulas": {
+        "none": "No credit found",
+        "nothingAssociate": "This formula does not yet have any associated credits.",
+        "back": "Back to formulas",
+        "badge": {
+            "accept": "Accepted",
+            "refuse": "Refused",
+            "waiting": "Waiting",
+            "end": "Finished"
+        },
+        "loan": "Loan",
+        "info": {
+            "amount": "Initial amount",
+            "monthly": "Monthly",
+            "duration": "Duration",
+            "month": "months",
+            "balance": "Remaining balance",
+            "start": "Start",
+            "advisor": "Advisor",
+            "reason": "Reason"
+        },
+        "update": {
+            "rates": {
+                "title": "Rates",
+                "description": "Financial parameters of the formula",
+                "fields": {
+                "interestRate": "Interest rate",
+                "insuranceRate": "Insurance rate"
+                }
+            },
+            "information": {
+                "title": "Information",
+                "description": "Formula identification",
+                "fields": {
+                "type": "Loan type",
+                "label": "Label",
+                "description": "Description"
+                }
+            },
+            "amounts": {
+                "title": "Amounts",
+                "description": "Allowed amount range",
+                "fields": {
+                "minAmount": "Minimum amount",
+                "maxAmount": "Maximum amount",
+                "currency": "Currency"
+                }
+            },
+            "settings": {
+                "title": "Settings",
+                "description": "Formula status",
+                "fields": {
+                "isActive": "Active formula"
+                }
+            },
+            "options": {
+                "currencies": {
+                    "EUR": "Euro",
+                    "USD": "US Dollar",
+                    "GBP": "British Pound"
+                }
+            },
+            "title": "Update formula",
+            "description": "Update the loan formula",
+            "button": "Save"
+        },
+        "new": {
+            "account": {
+                "loading": "Accounts loading...",
+                "error": "Error loading accounts",
+                "choose": "Choose an account",
+                "balance": "Balance",
+                "next": "Continue"
+            },
+            "form": {
+                "rates": {
+                    "title": "Rates",
+                    "description": "Financial parameters of the formula",
+                    "fields": {
+                    "interestRate": "Interest rate",
+                    "insuranceRate": "Insurance rate"
+                    }
+                },
+                "information": {
+                    "title": "Information",
+                    "description": "Formula identification",
+                    "fields": {
+                    "type": "Loan type",
+                    "label": "Label",
+                    "description": "Description"
+                    }
+                },
+                "amounts": {
+                    "title": "Amounts",
+                    "description": "Allowed amount range",
+                    "fields": {
+                    "minAmount": "Minimum amount",
+                    "maxAmount": "Maximum amount",
+                    "currency": "Currency"
+                    }
+                },
+                "settings": {
+                    "title": "Settings",
+                    "description": "Formula status",
+                    "fields": {
+                    "isActive": "Active formula"
+                    }
+                },
+                "options": {
+                    "currencies": {
+                        "EUR": "Euro",
+                        "USD": "US Dollar",
+                        "GBP": "British Pound"
+                    }
+                },
+                "title": "Create loan",
+                "description": "Create a loan formula",
+                "button": "Save"
+            }
+        }
+    }
+  },
+  "currency": {
+    "success": "Exchange rate updated",
+    "error": "Error updating exchange rate",
+    "title": "Currencies",
+    "text": "Exchange rate relative to the US Dollar (USD = 1.0)",
+    "ref": "Reference",
+    "new": "New rate",
+    "save": "Save",
+    "cancel": "Cancel",
+    "usd": "1 USD =",
+    "update": "Edit rate"
+  },
+  "user": {
+    "none": "No users are currently associated with any of these.",
+    "new": {
+        "form": {
+            "personal": {
+                "title": "Personal information",
+                "description": "User identity",
+                "fields": {
+                    "firstname": "Firstname",
+                    "lastname": "Lastname"
+                }
+            },
+            "account": {
+                "title": "Account",
+                "description": "Login information",
+                "fields": {
+                    "email":"Email"
+                }
+            },
+            "role": {
+                "title": "Role",
+                "description": "Permissions associated with the account",
+                "fields": {
+                    "role": {
+                    "label": "Role",
+                        "options": [
+                            { "advisor": "Advisor" },
+                            { "director": "Director" }
+                        ]
+                    }
+                }
+            }
+        },
+        "title": "Create a new account",
+        "button": "Generate"
+    }
+  },
+  "stocks": {
+    "list": {
+        "search": "Search for a stock...",
+        "notfound": "No stocks found",
+        "notsave": "No stocks saved",
+        "add": "Add the first stock"
+    },
+    "new": {
+        "form": {
+            "identification": {
+                "title": "Identification",
+                "description": "Basic information about the stock",
+                "fields": {
+                    "symbol": "Symbol",
+                    "name":  "Stock name"
+                }
+            },
+            "market": {
+                "title": "Market & Sector",
+                "description": "Stock classification",
+                "fields": {
+                    "market": {
+                        "label": "Market",
+                        "options": {
+                            "NASDAQ": "NASDAQ",
+                            "NYSE": "NYSE",
+                            "EURONEXT_PARIS": "Euronext Paris",
+                            "LSE": "LSE",
+                            "DAX": "DAX",
+                            "OTHER": "Other"
+                        }
+                    },
+                    "activitySector": "Activity sector"
+                }
+            },
+            "settings": {
+                "title": "Settings",
+                "description": "Availability configuration",
+                "fields": {
+                    "isAvailable": "Availability"
+                    
+                }
+            }
+        },
+        "title" : "New stock",
+        "button": "Create a new stock"
+    },
+    "update": {
+        "form": {
+            "initialValue": {
+                "title": "Initial value",
+                "description": "Initial financial information",
+                "fields": {
+                    "quantity": "Total number of shares",
+                    "priceAmount": "Initial price",
+                    "priceCurrency":  "Currency"
+                }
+            }
+        },
+        "title" : "Update stock",
+        "button": "Update"
+    },
+    "details": {
+        "title": "Details",
+        "notfound": "Stock not found introuvable",
+        "available": "Available",
+        "unavailable": "Unavailable",
+        "buy": "Buy Stocks",
+        "sell": "Sell stocks",
+        "current": "Current price",
+        "tabs": {
+            "overview": "Overview",
+            "mine": "My stocks",
+            "graph": "Charts",
+            "stats": "Statistics"
+        },
+        "overview": {
+            "market": "Market",
+            "sector": "Sector",
+            "title": "Detailed information",
+            "symbol": "Symbol",
+            "price": "Unit price",
+            "createdAt": "Created on",
+            "updatedAt": "Updated on"
+        },
+        "mine": {
+            "none": "You do not own any stocks",
+            "held": "Stocks held",
+            "averagePrice": "Average purchase price",
+            "invest": "Invested",
+            "actualValue": "Current value",
+            "value": "Gain/Loss",
+            "noneWaiting": "No pending orders",
+            "waiting": "Pending stock"
+        },
+        "chart": {
+            "unableLoading": "Unable to load history",
+            "priceEvol": "Price evolution (30 days)",
+            "volume": "Trading volume"
+        },
+        "stats": {
+            "unableLoading": "Unable to load statistics",
+            "perf": "Performance",
+            "variation": {
+            "24": "24h variation",
+            "7": "7d variation",
+            "30": "30d variation"
+            },
+            "minPrice": "Minimum price (30d)",
+            "maxPrice": "Maximum price (30d)",
+            "trade": "Trading",
+            "totalVolume": "Total volume (7d)",
+            "averagePrice": "Average price (7d)",
+            "transactions": "Transactions (7d)"
+        }
+    }
+  },
+  "message": {
+    "not": "No conversation",
+    "error": "Error loading users",
+    "form": {
+        "title": "Conversation title",
+        "participants": "Participants",
+        "advisor": "Advisor",
+        "director": "Director"
+    },
+    "new": "New conversation",
+    "button": "Start",
+    "add": "Add",
+    "setting": {
+        "title": "Discussion settings",
+        "admin": "Administrator",
+        "choseAdmin": "Designate admin",
+        "delete": "Delete",
+        "close": "End the conversation?",
+        "noneAvailable": "No participants available",
+        "add": "Add a participant",
+        "noneFind": "No users found.",
+        "transfer": "Transfer the conversation",
+        "buttonTransfer": "Transfer"
+    }
+  }
+}

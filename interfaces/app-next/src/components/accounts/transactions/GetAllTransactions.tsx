@@ -28,7 +28,7 @@ export const GetAllTransactions = ({ accountIban, filters, onPaginationChange, h
                         <Link
                             href={`${baseHref}/${t.id}`}
                             key={t.id}
-                            className="flex justify-between items-center rounded-lg p-2 hover:bg-gray-50"
+                            className="flex justify-between items-center rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-50/10"
                         >
                             <div className="flex items-center gap-3">
                                 <span className="text-2xl">{t.icon}</span>

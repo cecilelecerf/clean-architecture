@@ -7,6 +7,7 @@ import { feedsEndpoint } from "@/utils/endpoint/feedsEndpoint";
 import { TagId } from "@infrastructure/types/feed";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Dispatch, SetStateAction } from "react";
 import { match } from "ts-pattern";
 
@@ -33,10 +34,12 @@ export const TagsFilters = ({ selectedTagsId, setSelectedTagsId }: Props) => {
         setSelectedTagsId([]);
     };
 
+    const t = useTranslations("advisor.feeds.tags");
+
     return (
         <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-                <Label>Tags</Label>
+                <Label>{t("title")}</Label>
                 {selectedTagsId && selectedTagsId.length > 0 && (
                     <Button
                         variant="ghost"
@@ -44,22 +47,22 @@ export const TagsFilters = ({ selectedTagsId, setSelectedTagsId }: Props) => {
                         onClick={clearAllTags}
                         className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
                     >
-                        Tout effacer
+                        {t("clear")}
                     </Button>
                 )}
             </div>
 
             {match(tagsQuery)
                 .with({ status: "pending" }, () => (
-                    <div className="text-sm text-muted-foreground">Chargement...</div>
+                    <div className="text-sm text-muted-foreground">{t("loading")}</div>
                 ))
                 .with({ status: "error" }, () => (
-                    <div className="text-sm text-destructive">Erreur lors du chargement des tags</div>
+                    <div className="text-sm text-destructive">{t("error")}</div>
                 ))
                 .with({ status: "success" }, ({ data: tags }) => (
                     <div className="flex flex-wrap gap-2">
                         {tags.length === 0 ? (
-                            <div className="text-sm text-muted-foreground">Aucun tag disponible</div>
+                            <div className="text-sm text-muted-foreground">{t("unavailable")}</div>
                         ) : (
                             tags.map((tag) => {
                                 const isSelected = selectedTagsId?.includes(tag.id);

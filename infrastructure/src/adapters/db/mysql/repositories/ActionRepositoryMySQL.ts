@@ -61,30 +61,12 @@ export class ActionRepositoryMySQL implements ActionRepository {
     return this.mapRowToAction(rows[0]);
   }
 
-  async findAll(): Promise<ActionEntity[]> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM actions ORDER BY name ASC`
-    );
-    return rows.map(this.mapRowToAction);
-  }
-
   async findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM actions WHERE is_available = ? ORDER BY name ASC`,
       [isAvailable ? 1 : 0]
     );
     return rows.map(this.mapRowToAction);
-  }
-
-  async setAvailability(action: ActionEntity): Promise<void> {
-    await this.client.query<ResultSetHeader>(
-      `UPDATE actions SET is_available = ?, updated_at = ? WHERE isin = ?`,
-      [
-        action.isAvailable ? 1 : 0,
-        action.updatedAt || new Date(),
-        action.ISIN.getValue(),
-      ]
-    );
   }
 
   async update(action: ActionEntity): Promise<void> {

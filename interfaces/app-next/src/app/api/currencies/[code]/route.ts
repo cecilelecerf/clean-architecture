@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/currencies
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },
-        { status: (result as any).statusCode ?? 400 },
+        { status: result.statusCode ?? 400 },
       );
     }
 
@@ -55,7 +55,7 @@ export async function DELETE(req: NextRequest, ctx: RouteContext<'/api/currencie
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },
-        { status: (result as any).statusCode ?? 400 },
+        { status: result.statusCode ?? 400 },
       );
     }
 

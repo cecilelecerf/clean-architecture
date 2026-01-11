@@ -50,28 +50,16 @@ export class AccountRepositoryMongo implements AccountRepository {
       type: "epargne",
       userId: null,
     }).lean();
-    const account = AccountMapper.mapDocToAccount(doc);
     return doc ? AccountMapper.mapDocToAccount(doc) : null;
   }
-
-  /** Trouver une liste de comptes par type */
-  async findByType(type: string): Promise<AccountEntity[]> {
+  /** Compte d'intérêts de la banque */
+  async findBankReadyAccount(): Promise<AccountEntity | null> {
     await this.client.connect();
-    const docs = await AccountModel.find({ type })
-      .sort({ createdAt: -1 })
-      .lean();
-    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
-  }
-
-  /** Trouver une liste de comptes par section (client ou banque) */
-  async findByTypeSection(type: "client" | "bank"): Promise<AccountEntity[]> {
-    await this.client.connect();
-    const condition =
-      type === "client" ? { userId: { $ne: null } } : { userId: null };
-    const docs = await AccountModel.find(condition)
-      .sort({ createdAt: -1 })
-      .lean();
-    return docs.map((doc) => AccountMapper.mapDocToAccount(doc));
+    const doc = await AccountModel.findOne({
+      type: "pret",
+      userId: null,
+    }).lean();
+    return doc ? AccountMapper.mapDocToAccount(doc) : null;
   }
 
   /** Trouver une liste de comptes par section avec l'utilisateur */

@@ -37,13 +37,6 @@ export class UserRepositoryMongo implements UserRepository {
     return UserMapper.mapDocToUser(account.userId);
   }
 
-  /** Tous les utilisateurs */
-  async findAll(): Promise<UserEntity[]> {
-    await this.client.connect();
-    const docs = await UserModel.find().sort({ createdAt: -1 }).lean();
-    return docs.map(UserMapper.mapDocToUser);
-  }
-
   /** Utilisateurs actifs, optionnellement filtrés par rôle */
   async findAllByRoleAndIsActif(
     role?: UserEntity["role"]
@@ -112,12 +105,6 @@ export class UserRepositoryMongo implements UserRepository {
         },
       }
     );
-  }
-
-  /** Supprimer un utilisateur */
-  async delete(id: string): Promise<void> {
-    await this.client.connect();
-    await UserModel.deleteOne({ _id: id });
   }
 
   /** Compter les utilisateurs actifs par rôle */

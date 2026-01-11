@@ -1,0 +1,399 @@
+"use client";
+
+import { useMutation, useQuery, UseQueryResult } from "@tanstack/react-query";
+import { endpoints } from "@/utils/endpoint";
+import { match } from "ts-pattern";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+    TrendingUp,
+    ShoppingCart,
+    Minus,
+    Plus,
+    Wallet,
+    AlertCircle,
+    Calculator,
+    X,
+} from "lucide-react";
+import { Action } from "@infrastructure/types/action";
+import { memo, useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { AccountDTO, AccountId } from "@infrastructure/types/account";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ButtonLoading } from "@/components/buttons/ButtonLoading";
+import { BuyAction } from "@infrastructure/types/order";
+interface ActionBuyProps {
+    action: Action;
+    buyOpen: boolean;
+    closeBuy: () => void;
+}
+export const ActionBuy = memo(({
+    action,
+    buyOpen,
+    closeBuy,
+}: ActionBuyProps) => {
+    const [buyAmount, setBuyAmount] = useState<BuyAction>({
+        quantity: 1,
+        IBAN: "" as AccountId,
+        price: action.price
+    });
+
+    const accountsQuery = useQuery(endpoints.accounts.getAllByMe());
+    const buyMutation = useMutation(endpoints.orders.actions.placeOrder({ ISIN: action.ISIN, type: "buy" }));
+
+    const selectedAccount = useMemo<AccountDTO | undefined>(() => {
+        return accountsQuery.data?.find((acc) => acc.IBAN === buyAmount.IBAN);
+    }, [accountsQuery.data, buyAmount.IBAN]);
+
+
+    const totalPrice = useMemo(() => {
+        return buyAmount.price.amount * buyAmount.quantity;
+    }, [buyAmount.price.amount, buyAmount.quantity]);
+
+    const hasSufficientFunds = useMemo(() => {
+        return selectedAccount ? selectedAccount.balance.amount >= totalPrice : true;
+    }, [selectedAccount, totalPrice]);
+
+    const handleBuy = useMemo(() => {
+        if (!buyAmount.IBAN) {
+            toast.error("Veuillez sélectionner un compte");
+            return;
+        }
+        if (!hasSufficientFunds) {
+            toast.error("Solde insuffisant");
+            return;
+        }
+        buyMutation.mutate(
+            { payload: buyAmount },
+            {
+                onSuccess: (data) => {
+                    setBuyAmount({ quantity: 1, IBAN: "" as AccountId, price: data.price });
+                    closeBuy();
+                },
+                onError: (error) => {
+                    toast.error(error.message || "Erreur lors de l'achat");
+                },
+            }
+        );
+    }, [buyAmount, buyMutation, hasSufficientFunds, closeBuy]);
+
+    const incrementQuantity = useCallback(() => {
+        setBuyAmount(prev => ({ ...prev, quantity: prev.quantity + 1 }));
+    }, []);
+
+    const decrementQuantity = useCallback(() => {
+        setBuyAmount(prev => ({ ...prev, quantity: Math.max(1, prev.quantity - 1) }));
+    }, []);
+
+    const handleQuantityChange = useCallback((value: string) => {
+        const quantity = Math.max(1, parseInt(value) || 1);
+        setBuyAmount(prev => ({ ...prev, quantity }));
+    }, []);
+
+    const handlePriceChange = useCallback((value: string) => {
+        const amount = Math.max(0, parseFloat(value) || 0);
+        setBuyAmount(prev => ({
+            ...prev,
+            price: { amount, currency: prev.price.currency }
+        }));
+    }, []);
+
+    const handleAccountChange = useCallback((value: string) => {
+        setBuyAmount(prev => ({ ...prev, IBAN: value as AccountId }));
+    }, []);
+
+    if (!buyOpen) return null;
+
+    return (
+        <Card className="overflow-hidden py-0 border-none bg-linear-to-br from-blue-50/50 to-indigo-50/30 dark:from-blue-900/20 dark:to-indigo-900/20">
+            <CardHeader className="bg-linear-to-r from-blue-600 to-indigo-700 text-white dark:from-blue-800 dark:to-indigo-800 py-4">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                            <ShoppingCart className="w-5 h-5" />
+                            Acheter des actions
+                        </CardTitle>
+                        <CardDescription className="text-sm text-white/80">
+                            {action.symbol} • {action.name}
+                        </CardDescription>
+                    </div>
+                    <Button
+                        className="bg-gray-100/20 text-white hover:bg-gray-100/30 dark:bg-gray-800/30 dark:hover:bg-gray-800/50"
+                        onClick={closeBuy}
+                        variant="ghost"
+                        size="icon"
+                        disabled={buyMutation.isPending}
+                    >
+                        <X className="w-5 h-5" />
+                    </Button>
+                </div>
+            </CardHeader>
+
+            <CardContent className="space-y-5 p-4 md:p-6">
+                <PriceInput
+                    value={buyAmount.price.amount}
+                    currency={action.price.currency}
+                    onChange={handlePriceChange}
+                    disabled={buyMutation.isPending}
+                />
+
+                <QuantityInput
+                    value={buyAmount.quantity}
+                    onIncrement={incrementQuantity}
+                    onDecrement={decrementQuantity}
+                    onChange={handleQuantityChange}
+                    disabled={buyMutation.isPending}
+                />
+
+                <AccountSelect
+                    query={accountsQuery}
+                    value={buyAmount.IBAN}
+                    onChange={handleAccountChange}
+                    totalPrice={totalPrice}
+                    disabled={buyMutation.isPending}
+                />
+
+                <Separator className="border-gray-200 dark:border-gray-700" />
+
+                <OrderSummary
+                    quantity={buyAmount.quantity}
+                    price={buyAmount.price.amount}
+                    currency={buyAmount.price.currency}
+                    totalPrice={totalPrice}
+                    selectedAccount={selectedAccount}
+                    hasSufficientFunds={hasSufficientFunds}
+                />
+
+                <ButtonLoading
+                    loading={buyMutation.isPending}
+                    onClick={() => handleBuy}
+                    disabled={!buyAmount.IBAN || buyAmount.quantity <= 0 || !hasSufficientFunds}
+                    className="w-full bg-linear-to-r from-blue-600 to-indigo-700 dark:from-blue-800 dark:to-indigo-800 hover:from-blue-700 hover:to-indigo-900 h-11 text-base font-semibold dark:text-white"
+                >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Acheter maintenant
+                </ButtonLoading>
+            </CardContent>
+        </Card>
+
+    )
+}
+)
+
+
+ActionBuy.displayName = 'ActionBuy';
+
+const PriceInput = memo(({
+    value,
+    currency,
+    onChange,
+    disabled
+}: {
+    value: number;
+    currency: string;
+    onChange: (value: string) => void;
+    disabled: boolean;
+}) => (
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+        <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                <TrendingUp className="w-4 h-4" />
+                Prix unitaire
+            </div>
+
+            <div className="relative">
+                <Input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    disabled={disabled}
+                    className="w-full text-3xl font-bold text-blue-600 dark:text-blue-300 bg-white dark:bg-gray-900 border border-blue-500 dark:border-blue-700 rounded-xl px-4 py-3 pr-16 text-right focus:ring-2 focus:ring-blue-800 focus:border-blue-800 transition-all"
+                    placeholder="0.00"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl font-semibold text-blue-600 dark:text-blue-300 pointer-events-none">
+                    {currency}
+                </span>
+            </div>
+        </div>
+    </div>
+));
+
+PriceInput.displayName = 'PriceInput';
+
+const QuantityInput = memo(({
+    value,
+    onIncrement,
+    onDecrement,
+    onChange,
+    disabled
+}: {
+    value: number;
+    onIncrement: () => void;
+    onDecrement: () => void;
+    onChange: (value: string) => void;
+    disabled: boolean;
+}) => (
+    <div className="space-y-2">
+        <Label htmlFor="quantity" className="text-sm font-medium dark:text-gray-300">
+            Quantité
+        </Label>
+        <div className="flex items-center gap-2">
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={onDecrement}
+                disabled={value <= 1 || disabled}
+                className="h-10 w-10"
+            >
+                <Minus className="w-4 h-4" />
+            </Button>
+            <Input
+                id="quantity"
+                type="number"
+                min={1}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                disabled={disabled}
+                className="text-center text-lg font-semibold h-10 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-md"
+            />
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={onIncrement}
+                disabled={disabled}
+                className="h-10 w-10"
+            >
+                <Plus className="w-4 h-4" />
+            </Button>
+        </div>
+    </div>
+));
+
+QuantityInput.displayName = 'QuantityInput';
+
+const AccountSelect = memo(({
+    query,
+    value,
+    onChange,
+    totalPrice,
+    disabled
+}: {
+    query: UseQueryResult<AccountDTO[], Error>;
+    value: string;
+    onChange: (value: string) => void;
+    totalPrice: number;
+    disabled: boolean;
+}) => (
+    <div className="space-y-2">
+        <Label htmlFor="account" className="text-sm font-medium flex items-center gap-2 dark:text-gray-300">
+            <Wallet className="w-4 h-4" />
+            Compte de débit
+        </Label>
+        {match(query)
+            .with({ status: "error" }, () => (
+                <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+                    <AlertCircle className="w-4 h-4" />
+                    Erreur lors du chargement des comptes
+                </div>
+            ))
+            .with({ status: "pending" }, () => (
+                <div className="h-10 bg-gray-100 dark:bg-gray-700 animate-pulse rounded-lg" />
+            ))
+            .with({ status: "success" }, ({ data: accounts }) => (
+                <Select value={value} onValueChange={onChange} disabled={disabled}>
+                    <SelectTrigger className="h-10 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md">
+                        <SelectValue placeholder="Sélectionnez un compte" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+                        {accounts.map((account: AccountDTO) => (
+                            <SelectItem key={account.IBAN} value={account.IBAN}>
+                                <div className="flex items-center justify-between w-full gap-4">
+                                    <span className="font-medium">{account.name}</span>
+                                    <span className={`text-sm ${account.balance.amount >= totalPrice
+                                        ? "text-green-600 dark:text-green-400"
+                                        : "text-red-600 dark:text-red-400"
+                                        }`}>
+                                        {account.balance.amount.toLocaleString("fr-FR", {
+                                            minimumFractionDigits: 2,
+                                        })} {account.balance.currency}
+                                    </span>
+                                </div>
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            ))
+            .exhaustive()}
+    </div>
+));
+
+AccountSelect.displayName = 'AccountSelect';
+
+const OrderSummary = memo(({
+    quantity,
+    price,
+    currency,
+    totalPrice,
+    selectedAccount,
+    hasSufficientFunds
+}: {
+    quantity: number;
+    price: number;
+    currency: string;
+    totalPrice: number;
+    selectedAccount?: AccountDTO;
+    hasSufficientFunds: boolean;
+}) => {
+    const shortfall = useMemo(() => {
+        if (!selectedAccount || hasSufficientFunds) return 0;
+        return totalPrice - selectedAccount.balance.amount;
+    }, [selectedAccount, hasSufficientFunds, totalPrice]);
+
+    return (
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <Calculator className="w-4 h-4" />
+                Récapitulatif
+            </div>
+
+            <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                        {quantity} × {price.toFixed(2)} {currency}
+                    </span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {totalPrice.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} {currency}
+                    </span>
+                </div>
+
+                <Separator className="border-gray-200 dark:border-gray-700" />
+
+                <div className="flex justify-between items-center pt-1">
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">Total estimé</span>
+                    <span className="text-xl font-bold text-blue-600 dark:text-blue-300">
+                        {totalPrice.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} {currency}
+                    </span>
+                </div>
+            </div>
+
+            {selectedAccount && !hasSufficientFunds && (
+                <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mt-3">
+                    <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5" />
+                    <div className="text-xs text-red-600 dark:text-red-400">
+                        <p className="font-semibold">Solde insuffisant</p>
+                        <p className="mt-1">
+                            Il vous manque {shortfall.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} {currency}
+                        </p>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+});
+
+OrderSummary.displayName = 'OrderSummary';
