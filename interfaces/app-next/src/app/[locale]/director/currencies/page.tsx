@@ -2,14 +2,12 @@
 
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { CurrencyCode } from "@infrastructure/types/currency";
 import { useTranslations } from "next-intl";
+import { CurrencyCard } from "./_components/CurrencyCard";
+import { match } from "ts-pattern";
 
 export default function CurrenciesPage() {
     const query = useQuery(endpoints.currencies.getAll());
@@ -29,7 +27,6 @@ export default function CurrenciesPage() {
 
     const handleSave = () => {
         if (!editingCode) return;
-
         updateMutation.mutate(
             { exchangeRate: parseFloat(newRate) },
             {
@@ -45,6 +42,10 @@ export default function CurrenciesPage() {
         );
     };
 
+    const handleCancel = useCallback(() => {
+        setEditingCode(null);
+        setNewRate("");
+    }, []);
     return (
         <div className="space-y-6">
             <div>
@@ -53,73 +54,28 @@ export default function CurrenciesPage() {
                     {t("text")}
                 </p>
             </div>
+            {match(query)
+                .with(({ status: "error" }), () => "error")
+                .with(({ status: 'pending' }), () => "pending")
+                .with(({ status: "success" }), ({ data: currencies }) =>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {currencies.map((currency) => (
+                            <CurrencyCard
+                                key={currency.code}
+                                currency={currency}
+                                isEditing={editingCode === currency.code}
+                                newRate={newRate}
+                                onRateChange={setNewRate}
+                                onEdit={handleUpdate}
+                                onSave={handleSave}
+                                onCancel={handleCancel}
+                                isPending={updateMutation.isPending}
+                                t={t}
+                            />
+                        ))}
+                    </div>
+                ).exhaustive()}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                {query.data?.map((currency) => (
-                    <Card key={currency.code} className="justify-between">
-                        <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-2xl">{currency.symbol}</span>
-                                    <div>
-                                        <CardTitle className="text-lg">{currency.code}</CardTitle>
-                                        <p className="text-xs text-gray-600">{currency.name}</p>
-                                    </div>
-                                </div>
-                                {currency.code === "USD" && (
-                                    <Badge variant="secondary">{t("ref")}</Badge>
-                                )}
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            {editingCode === currency.code ? (
-                                <div className="space-y-2">
-                                    <Input
-                                        type="number"
-                                        step="0.000001"
-                                        value={newRate}
-                                        onChange={(e) => setNewRate(e.target.value)}
-                                        placeholder={t("new")}
-                                    />
-                                    <div className="flex gap-2">
-                                        <Button onClick={handleSave} size="sm" className="flex-1">
-                                            {t("save")}
-                                        </Button>
-                                        <Button
-                                            onClick={() => setEditingCode(null)}
-                                            variant="outline"
-                                            size="sm"
-                                        >
-                                            {t("cancel")}
-                                        </Button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    <div className="text-2xl font-bold">
-                                        {currency.exchangeRate.toFixed(6)}
-                                    </div>
-                                    <p className="text-xs text-gray-600">
-                                        {t("usd")} {currency.exchangeRate.toFixed(6)} {currency.code}
-                                    </p>
-                                    {currency.code !== "USD" && (
-                                        <Button
-                                            onClick={() =>
-                                                handleUpdate(currency.code, currency.exchangeRate)
-                                            }
-                                            variant="outline"
-                                            size="sm"
-                                            className="w-full"
-                                        >
-                                            {t("update")}
-                                        </Button>
-                                    )}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
         </div>
     );
 }

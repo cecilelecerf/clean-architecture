@@ -1,3 +1,4 @@
+"use client"
 import { ButtonLoading } from "@/components/buttons/ButtonLoading";
 import { Input } from "@/components/ui/input";
 import { socket } from "@/lib/socket";

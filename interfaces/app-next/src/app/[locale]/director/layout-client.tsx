@@ -91,7 +91,6 @@ function SidebarContent({
 
                     <nav className="space-y-1">
                         {menuItems.map((item, i) => {
-                            console.log(item.href, i);
                             const itemBasePath = item.basePath || item.href.split('?')[0];
                             const itemQueryParams = new URLSearchParams(item.href.split('?')[1] || '');
 

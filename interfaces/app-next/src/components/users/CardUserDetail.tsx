@@ -1,5 +1,3 @@
-"use client";
-
 import { UserDto } from "@infrastructure/types/user";
 import { CheckCircle, Mail, XCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";

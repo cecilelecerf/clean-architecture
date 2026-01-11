@@ -10,11 +10,18 @@ import { useQuery } from "@tanstack/react-query"
 import { Calendar, Clock, History, Percent, Plus, TrendingUp } from "lucide-react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
+import { memo, useMemo } from "react"
 import { match } from "ts-pattern"
 
 export const GetAllSavingsRate = ({ current }: { current: SavingRate | null }) => {
     const query = useQuery(endpoints.savingsRates.getAll());
     const t = useTranslations("director.saving");
+
+    const filteredRates = useMemo(() => {
+        if (query.status !== "success") return [];
+        return query.data.filter((rate) => rate.id !== current?.id);
+    }, [query.status, query.data, current?.id]);
+
 
     return match(query)
         .with({ status: "error" }, () => "error")
@@ -39,6 +46,7 @@ export const GetAllSavingsRate = ({ current }: { current: SavingRate | null }) =
                 );
             }
 
+
             return (
                 <div className="space-y-4">
                     <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -46,7 +54,7 @@ export const GetAllSavingsRate = ({ current }: { current: SavingRate | null }) =
                         {t("history")} ({rates.length})
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {rates.filter((rate) => rate.id !== current.id).map((rate) => (
+                        {filteredRates.map((rate) => (
                             <SavingsRateCard
                                 key={rate.id}
                                 rate={rate}
@@ -63,38 +71,41 @@ export const GetAllSavingsRate = ({ current }: { current: SavingRate | null }) =
 }
 
 
-const SavingsRateCard = ({
+const SavingsRateCard = memo(({
     rate,
     t
 }: {
     rate: SavingRate;
     t: ReturnType<typeof useTranslations>;
 }) => {
-    const effectiveDate = new Date(rate.effectiveDate);
-    const now = new Date();
-    const isFuture = effectiveDate > now;
-    const getBadge = () => {
-        if (isFuture) {
-            return (
-                <Badge variant="secondary">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {t("badge.coming")}
-                </Badge>
-            );
-        } else
-            return (
-                <Badge variant="outline">
-                    <History className="w-3 h-3 mr-1" />
-                    {t("badge.history")}
-                </Badge>
-            );
-    };
+    const { isFuture, daysUntilEffective, badge } = useMemo(() => {
+        const effectiveDate = new Date(rate.effectiveDate);
+        const now = new Date();
+        const isFuture = effectiveDate > now;
+        const daysUntilEffective = isFuture
+            ? Math.ceil((effectiveDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+            : 0;
+
+        const badge = isFuture ? (
+            <Badge variant="secondary">
+                <Clock className="w-3 h-3 mr-1" />
+                {t("badge.coming")}
+            </Badge>
+        ) : (
+            <Badge variant="outline">
+                <History className="w-3 h-3 mr-1" />
+                {t("badge.history")}
+            </Badge>
+        );
+
+        return { isFuture, daysUntilEffective, badge };
+    }, [rate.effectiveDate, t]);
 
 
     return (
         <Card className={`hover:shadow-md hover:scale-105 transition-all`}>
             <CardContent className="space-y-4">
-                {getBadge()}
+                {badge}
 
                 <div className="flex items-center gap-3">
                     <Percent className={`w-8 h-8 "text-gray-400`} />
@@ -123,14 +134,15 @@ const SavingsRateCard = ({
                 {isFuture && (
                     <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
                         {t("card.rate")}{" "}
-                        {Math.ceil((effectiveDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))}{" "}
+                        {daysUntilEffective}{" "}
                         {t("card.day")}
                     </div>
                 )}
             </CardContent >
         </Card >
     );
-};
+});
+SavingsRateCard.displayName = 'SavingsRateCard';
 
 
 export const SavingsRatesSkeleton = () => (
