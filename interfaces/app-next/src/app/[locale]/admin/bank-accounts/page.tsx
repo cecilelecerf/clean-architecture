@@ -9,14 +9,16 @@ import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 import { TitleAdminPage } from "@/components/TitleAdminPage";
 import { AccountCard } from "@/components/accounts/AccountCard";
+import { useTranslations } from "next-intl";
 
 export default function AccountsPage() {
     const query = useQuery(endpoints.accounts.getAll({ type: "bank" }));
     const router = useRouter();
+    const t = useTranslations("advisor.bank");
 
     return (
         <>
-            <TitleAdminPage title="Comptes clients" />
+            <TitleAdminPage title={t("title")} />
             {match(query)
                 .with({ status: "error" }, () => ("error"))
                 .with({ status: "pending" }, () => <AccountsSkeleton />)
@@ -24,7 +26,7 @@ export default function AccountsPage() {
                     if (accounts.length === 0) {
                         return (
                             <div className="text-gray-500 text-center border p-6 rounded-lg">
-                                Aucun compte client pour le moment.
+                                {t("none")}
                             </div>
                         );
                     }

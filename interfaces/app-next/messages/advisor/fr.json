@@ -1,0 +1,103 @@
+{
+  "menu": {
+    "title": "Cnseiller",
+    "section": {
+      "general": "General",
+      "relation": "Relation Client"
+    },
+    "header": {
+      "title": "Tableau de bord",
+      "text": "Bienvenue sur votre espace conseiller"
+    },
+    "home": "Accueil",
+    "profile": "Profil",
+    "messaging": "Messageries",
+    "news": "Actualités",
+    "bank": "Compte de la banque",
+    "loan": "Demandes de crédits",
+
+    "users": "Utilisateurs",
+    "conversations": "Conversations clients",
+    "account": "Comptes clients",
+    "logout": "Déconnexion"
+  },
+  "profile": {
+    "activity": {
+        "title": "Mon activité",
+        "loan": {
+            "accepted": "Crédits acceptés",
+            "refused": "Crédits refusés"
+        },
+        "thread": "Threads actifs"
+    }
+  },
+  "feeds": {
+    "add": "Ajouter",
+    "filters": {
+        "placeholder": "Rechercher par titre",
+        "publish": "Publié",
+        "all": "Tous",
+        "unpublish": "Brouillon",
+        "calendar": {
+            "from": "Du",
+            "to": "Au"
+        },
+        "page": "Post par page"
+    },
+    "post": {
+        "none": "Aucun post trouvé"
+    },
+    "update": "Modifier",
+    "tags": {
+        "title": "Tags",
+        "clear": "Tout effacer",
+        "loading": "Chargement...",
+        "error": "Erreur lors du chargement des tags",
+        "unavailable": "Aucun tag disponible"
+    },
+    "new": {
+        "form": {
+            "title": "Titre",
+            "content": "Contenu",
+            "tags": "Tags"
+        },
+        "title": "Nouveau post",
+        "button": "Publier"
+    },
+    "by": "Par",
+    "publish": "Publié le",
+    "unpublish": "Brouillon créé le"
+  },
+  "bank": {
+    "title": "Comptes de la banque",
+    "none": "Aucun compte de la banque pour le moment."
+  },
+  "loan": {
+    "title": {
+      "loan": "Crédits",
+      "accept": "acceptés",
+      "completed": "terminés",
+      "pending": "en attente de traitement",
+      "refuse": "refusés"
+    },
+    "error": "Erreur lors du chargement des crédits",
+    "none": "Aucune demande de crédit en attente de traitement",
+    "all": "Tous les crédits",
+    "details": "Détail de la demande de crédit"
+  },
+  "users": {
+    "title": "Clients",
+    "none": "Aucun utilisateur associé pour le moment.",
+    "more": "Voir +"
+  },
+  "thread": {
+    "title": "Conversation clients",
+    "none": "Pas de conversation",
+    "join": "Rejoindre la conversation",
+    "customer": "Client"
+  },
+  "account": {
+    "title": "Comptes clients",
+    "none": "Aucun compte client pour le moment."
+  }
+}

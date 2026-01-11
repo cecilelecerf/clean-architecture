@@ -9,16 +9,18 @@ import { SavingsRateHeroBanner } from '../savings-rate/GetCurrentSavingRate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AccountCard } from '@/components/accounts/AccountCard';
 import { GoToAddPage } from '@/components/GoToAddPage';
+import { useTranslations } from 'next-intl';
 
 export default function AccountsPage() {
   const router = useRouter();
-  const query = useQuery(endpoints.accounts.getAllByMe())
+  const query = useQuery(endpoints.accounts.getAllByMe());
+  const t = useTranslations("client.account");
 
   return (
     <>
       <SavingsRateHeroBanner />
 
-      <h1 className="text-2xl font-bold mb-2 mt-10">Mes comptes</h1>
+      <h1 className="text-2xl font-bold mb-2 mt-10">{t("title")}</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {match(query)
           .with({ "status": "error" }, () => "error")
@@ -36,7 +38,6 @@ export default function AccountsPage() {
     </>
   );
 }
-
 
 const SkeletonAccounts = () => {
   return (

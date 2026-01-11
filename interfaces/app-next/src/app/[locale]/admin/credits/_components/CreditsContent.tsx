@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { endpoints } from "@/utils/endpoint";
 import { CreditDTO } from "@infrastructure/types/credit";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { match } from "ts-pattern";
 
@@ -22,23 +23,25 @@ export const CreditsContent = () => {
 
     const query = useQuery(endpoints.credits.getAllByStatus({ status }));
 
+    const t = useTranslations("advisor.loan");
+
     return (
         <>
             <TitleAdminPage
-                title={`Crédits ${match(status)
-                    .with("ACCEPTED", () => "acceptés")
-                    .with("COMPLETED", () => "terminés")
-                    .with("PENDING", () => "en attente de traitement")
-                    .with("REFUSED", () => "refusés")
+                title={`${t("title.loan")} ${match(status)
+                    .with("ACCEPTED", () => t("title.accept"))
+                    .with("COMPLETED", () => t("title.completed"))
+                    .with("PENDING", () => t("title.pending"))
+                    .with("REFUSED", () => t("title.refuse"))
                     .otherwise(() => "")
-                    }`}
+                }`}
             />
             {match(query)
                 .with({ status: "error" }, () => (
                     <Card className="text-center p-8 md:p-12">
                         <CardContent>
                             <p className="text-red-500">
-                                Erreur lors du chargement des crédits
+                                {t("error")}
                             </p>
                         </CardContent>
                     </Card>
@@ -50,7 +53,7 @@ export const CreditsContent = () => {
                             <Card className="text-center p-8 md:p-12">
                                 <CardContent>
                                     <p className="text-gray-500">
-                                        Aucune demande de crédit en attente de traitement
+                                        {t("none")}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -60,7 +63,7 @@ export const CreditsContent = () => {
                     return (
                         <CreditArray
                             credits={credits}
-                            title="Tous les crédits"
+                            title={t("all")}
                             isAdmin
                             basePath="/admin"
                         />

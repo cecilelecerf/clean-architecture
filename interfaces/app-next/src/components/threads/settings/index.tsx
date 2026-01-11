@@ -13,11 +13,11 @@ import { Plus, SettingsIcon, Trash2, } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useCallback, useMemo, useState } from "react"
 import { match } from "ts-pattern"
-import { Skeleton } from "../../ui/skeleton"
 import { useRouter } from "next/navigation"
 import { ParticipantRow } from "./ParticipantRow"
 import { UserCommandItem } from "./UserCommandItem"
 import { SkeletonAddParticipant } from "./SkeletonAddParticipant"
+import { useTranslations } from "next-intl"
 
 type Props = {} & ThreadWithUser
 
@@ -34,6 +34,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
     const handleRemoveParticipant = useCallback((userId: UserId) => {
         removeParticipant.mutate({ userId });
     }, [removeParticipant, id]);
+    const t = useTranslations("director.message");
 
     return (
         <Dialog>
@@ -44,11 +45,11 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Paramètre de discution</DialogTitle>
+                    <DialogTitle>{t("setting.title")}</DialogTitle>
                     <DialogDescription>
                         {administrator && (
                             <>
-                                Administrateur : {administrator.firstname}{" "}{administrator.lastname}
+                                {t("setting.admin")} : {administrator.firstname}{" "}{administrator.lastname}
                             </>
                         )}
                     </DialogDescription>
@@ -79,7 +80,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
                 <DialogFooter >
                     {isAdmin && !isClose && (
                         <ButtonLoading loading={false} variant="destructive" onClick={() => closeThread.mutate()}>
-                            <Trash2 /> Cloturer la conversation ?
+                            <Trash2 /> {t("setting.close")}
                         </ButtonLoading>
 
                     )}</DialogFooter>
@@ -93,6 +94,7 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
 const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "administratorId" | "participantsId" | "id">) => {
     const [selectedUserId, setSelectedUserId] = useState<UserId | null>(null);
     const [open, setOpen] = useState(false);
+    const t = useTranslations("director.message");
 
     const queries = useQueries({
         queries: [
@@ -125,7 +127,7 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
                 return (
                     <Button variant="secondary" disabled>
                         <Plus className="mr-2 h-4 w-4" />
-                        Aucun participant disponible
+                        {t("setting.noneAvailable")}
                     </Button>
                 );
             }
@@ -135,14 +137,14 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
                     <PopoverTrigger asChild>
                         <Button variant="secondary">
                             <Plus className="mr-2 h-4 w-4" />
-                            Ajouter un participant
+                            {t("setting.add")}
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[300px] p-0" align="start">
                         <Command>
                             <CommandInput placeholder="Rechercher un utilisateur..." />
                             <CommandList>
-                                <CommandEmpty>Aucun utilisateur trouvé.</CommandEmpty>
+                                <CommandEmpty>{t("setting.noneFind")}</CommandEmpty>
                                 <CommandGroup heading="Conseillers">
                                     {availableUsers
                                         .filter((user) => user.role === "conseiller")
@@ -176,7 +178,7 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
                                     onClick={handleAddParticipant}
                                     className="w-full"
                                 >
-                                    Ajouter
+                                    {t("add")}
                                 </ButtonLoading>
                             </div>
                         )}

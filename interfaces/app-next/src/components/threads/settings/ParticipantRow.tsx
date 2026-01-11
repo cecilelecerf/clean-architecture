@@ -1,23 +1,13 @@
 import { ButtonLoading } from "@/components/buttons/ButtonLoading"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { endpoints } from "@/utils/endpoint"
 import { ThreadWithUser } from "@/utils/endpoint/threadEndpoints"
 import { UserId } from "@infrastructure/types/user"
 import { Flex } from "@radix-ui/themes"
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Check, Plus, Settings2, SettingsIcon, Trash2, UserRoundX, UserStar } from "lucide-react"
-import { useSession } from "next-auth/react"
-import { memo, useCallback, useMemo, useState } from "react"
-import { match } from "ts-pattern"
-import { Skeleton } from "../../ui/skeleton"
-import { useRouter } from "next/navigation"
-
-export const ParticipantRow = memo(({
+import { Settings2, UserRoundX, UserStar } from "lucide-react"
+import { useTranslations } from "next-intl"
+export const ParticipantRow = ({
     participant,
     isAdmin,
     isClose,
@@ -38,6 +28,8 @@ export const ParticipantRow = memo(({
     transferLoading: boolean;
     removeLoading: boolean;
 }) => {
+    const t = useTranslations("director.message");
+
     return (
         <Flex justify="between" className="mb-2">
             <Flex align='center' gap="2">
@@ -67,7 +59,7 @@ export const ParticipantRow = memo(({
                                 className="w-full justify-start text-gray-500"
                             >
                                 <UserStar className="mr-2 h-4 w-4" />
-                                Désigner admin
+                                {t("setting.choseAdmin")}
                             </ButtonLoading>
                         )}
 
@@ -78,11 +70,11 @@ export const ParticipantRow = memo(({
                             className="w-full justify-start text-gray-500"
                         >
                             <UserRoundX className="mr-2 h-4 w-4" />
-                            Supprimer
+                            {t("setting.delete")}
                         </ButtonLoading>
                     </PopoverContent>
                 </Popover>
             )}
         </Flex>
     );
-});
+};

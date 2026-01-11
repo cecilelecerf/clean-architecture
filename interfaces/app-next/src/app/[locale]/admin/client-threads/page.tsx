@@ -4,6 +4,7 @@ import { TitleAdminPage } from "@/components/TitleAdminPage";
 import { socket } from "@/lib/socket";
 import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { match } from "ts-pattern";
@@ -18,10 +19,11 @@ export default function ThreadsPage() {
             });
         }
     }, [query.status, query.data]);
+    const t = useTranslations("advisor.thread");
 
     return (
         <>
-            <TitleAdminPage title="Conversation clients" />
+            <TitleAdminPage title={t("title")} />
             {match(query)
                 .with({ status: "error" }, () => "error")
                 .with({ status: "pending" }, () =>
@@ -31,7 +33,7 @@ export default function ThreadsPage() {
                         ))}
                     </div>)
                 .with({ status: "success" }, ({ data: threads }) => {
-                    if (threads.length === 0) return <>Pas de conversation</>
+                    if (threads.length === 0) return <>{t("none")}</>
                     return <div className="">
                         {threads.map((thread) => (
                             <ThreadCard
@@ -44,8 +46,5 @@ export default function ThreadsPage() {
                 })
                 .exhaustive()}
         </>
-
-
     )
-
 }

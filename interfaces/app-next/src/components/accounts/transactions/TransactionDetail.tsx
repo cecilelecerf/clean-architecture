@@ -14,6 +14,7 @@ import { AccountId, AccountResumeWithUser } from '@infrastructure/types/account'
 import { match } from 'ts-pattern';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslations } from 'next-intl';
 
 
 interface TransactionDetailProps {
@@ -28,7 +29,9 @@ export function TransactionDetail({
     clickable,
 }: TransactionDetailProps) {
     const router = useRouter();
-    const query = useQuery(endpoints.accounts.transactions.get({ transactionId, accountIban }))
+    const query = useQuery(endpoints.accounts.transactions.get({ transactionId, accountIban }));
+
+    const t = useTranslations("account.transactions.details");
 
     return (
         <>
@@ -36,7 +39,7 @@ export function TransactionDetail({
                 <Button variant="ghost" size="icon" onClick={() => router.back()}>
                     <ArrowLeft className="w-5 h-5" />
                 </Button>
-                <h1 className="text-2xl font-bold">Détail de la transaction</h1>
+                <h1 className="text-2xl font-bold">{t("title")}</h1>
             </div>
             {match(query)
                 .with({ status: "pending" }, () => <TransactionDetailSkeleton />)
@@ -56,26 +59,26 @@ export function TransactionDetail({
                                     <p className="opacity-80 text-sm">{formatDateFrench(transaction.date)}</p>
                                 </div>
                                 <div>
-                                    <p className="text-xs opacity-75 mb-1">Montant</p>
+                                    <p className="text-xs opacity-75 mb-1">{t("amount")}</p>
                                     <p className="text-3xl font-bold">    {transaction.amount.amount.toLocaleString('fr-FR', { style: 'currency', currency: transaction.amount.currency })}
                                     </p>
                                 </div>
                                 <div className="mt-4 pt-4 border-t border-white/20">
-                                    <p className="text-xs opacity-75">Type de transaction</p>
+                                    <p className="text-xs opacity-75">{t("type")}</p>
                                     <p className="text-sm font-medium capitalize mt-1">{transaction.type}</p>
                                 </div>
                             </CardContent>
                         </Card>
 
                         <div className="flex flex-col md:flex-row items-center gap-4 my-6">
-                            <AccountCard clickable={clickable} account={transaction.fromAccount} />
+                            <AccountCard clickable={clickable} account={transaction.fromAccount} t={t}/>
 
                             <div className="shrink-0">
                                 <ArrowDown className="w-6 h-6 text-gray-400 md:hidden" />
                                 <ArrowRight className="w-6 h-6 text-gray-400 hidden md:block" />
                             </div>
 
-                            <AccountCard clickable={clickable} account={transaction.toAccount} />
+                            <AccountCard clickable={clickable} account={transaction.toAccount} t={t}/>
                         </div>
                     </>
                 )
@@ -85,7 +88,7 @@ export function TransactionDetail({
     );
 }
 
-const AccountCard = ({ clickable, account }: { clickable?: boolean, account: AccountResumeWithUser }) => {
+const AccountCard = ({ clickable, account, t }: { clickable?: boolean, account: AccountResumeWithUser, t: ReturnType<typeof useTranslations> }) => {
     const router = useRouter();
 
     return (
@@ -125,13 +128,13 @@ const AccountCard = ({ clickable, account }: { clickable?: boolean, account: Acc
                             onClick={() => clickable && router.push(`/admin/accounts/${account.IBAN}`)}
 
                         >
-                            <p className="text-xs text-gray-500 mb-1">Compte bénéficiaire</p>
+                            <p className="text-xs text-gray-500 mb-1">{t("account")}</p>
                             <p className="font-medium text-sm">{account.name}</p>
                             <p className="text-xs text-gray-400 mt-1">
                                 {account.type === "courant" ? "Compte courant" : "Compte épargne"}
                             </p>
                         </div></>
-                ) : <p>Banque</p>}
+                ) : <p>{t("bank")}</p>}
 
             </CardContent>
         </Card>

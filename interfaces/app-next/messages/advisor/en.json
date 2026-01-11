@@ -1,0 +1,103 @@
+{
+  "menu": {
+    "title": "Advisor",
+    "section": {
+      "general": "General",
+      "relation": "Customer Relations"
+    },
+    "header": {
+      "title": "Dashboard",
+      "text": "Welcome to your advisor area"
+    },
+    "home": "Dashboard",
+    "profile": "Profile",
+    "messaging": "Messaging",
+    "news": "Feeds",
+    "bank": "Bank Accounts",
+    "loan": "Loan applications",
+
+    "users": "Users",
+    "conversations": "Customer conversations",
+    "account": "Customer accounts",
+    "logout": "Logout"
+  },
+  "profile": {
+    "activity": {
+        "title": "My activity",
+        "loan": {
+            "accepted": "Loan accepted",
+            "refused": "Loan refused"
+        },
+        "thread": "Active threads"
+    }
+  },
+  "feeds": {
+    "add": "Add",
+    "filters": {
+        "placeholder": "Search by title",
+        "publish": "Publish",
+        "all": "All",
+        "unpublish": "Draft",
+        "calendar": {
+            "from": "From",
+            "to": "To"
+        },
+        "page": "Post per page"
+    },
+    "post": {
+        "none": "No posts found"
+    },
+    "update": "Update",
+    "tags": {
+        "title": "Tags",
+        "clear": "Clear all",
+        "loading": "Loading...",
+        "error": "Error loading tags",
+        "unavailable": "No tags available"
+    },
+    "new": {
+        "form": {
+            "title": "Title",
+            "content": "Content",
+            "tags": "Tags"
+        },
+        "title": "New post",
+        "button": "Publish"
+    },
+    "by": "By",
+    "publish": "Published on",
+    "unpublish": "Draft created on"
+  },
+  "bank": {
+    "title": "Bank accounts",
+    "none": "No bank account at the moment."
+  },
+  "loan": {
+    "title": {
+      "loan": "Loan",
+      "accept": "accepted",
+      "completed": "completed",
+      "pending": "awaiting processing",
+      "refuse": "refused"
+    },
+    "error": "Error loading loans",
+    "none": "No loan applications are pending.",
+    "all": "All loan",
+    "details": "Details of the loan application"
+  },
+  "users": {
+    "title": "Customers",
+    "none": "No users are currently associated with any of these.",
+    "more": "See more"
+  },
+  "thread": {
+    "title": "Customers conversation",
+    "none": "No conversation",
+    "join": "Join the conversation",
+    "customer": "Customer"
+  },
+  "account": {
+    "title": "Customers accounts",
+    "none": "No customer account at the moment."
+  }
+}

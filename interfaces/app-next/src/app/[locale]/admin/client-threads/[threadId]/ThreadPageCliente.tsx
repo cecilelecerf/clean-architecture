@@ -9,7 +9,7 @@ import { UserDto } from '@infrastructure/types/user';
 import { useRouter } from 'next/navigation';
 import { endpoints } from '@/utils/endpoint';
 import { SkeletonThread, WrapperThread } from '@/components/threads/WrapperThread';
-
+import { useTranslations } from 'next-intl';
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
     const queries = useQueries({
@@ -21,6 +21,7 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
     const router = useRouter()
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
+    const t = useTranslations("advisor.thread");
     return match(queries)
         .when((q) => q.some(({ status }) => status === "error"), () => "error")
         .with([{ status: "success" }, { status: "success" }], ([{ data: thread }, { data: messages }]) => (
@@ -31,7 +32,7 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
                 withSetting
                 addElementInTop={
                     <span className="text-sm text-gray-500">
-                        Client:
+                        {t("customer")}:
                         <Button
                             className='ml-2'
                             variant='outline'

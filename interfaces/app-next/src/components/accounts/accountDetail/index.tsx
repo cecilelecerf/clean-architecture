@@ -10,6 +10,7 @@ import { Separator } from '../../ui/separator';
 import { ButtonLink } from '@/components/ButtonLink';
 import { SkeletonAccount } from './SkeletonAccount';
 import { AccountHero } from './Hero';
+import { useTranslations } from 'next-intl';
 
 export const AccountDetail = ({
     accountIban,
@@ -22,12 +23,14 @@ export const AccountDetail = ({
     withUserInfo?: boolean,
     withTransferButton?: boolean
 }) => {
+    const t = useTranslations("account");
+
     const query = useQuery(endpoints.accounts.get({ accountIban }));
     return (
         <>
             {match(query)
                 .with({ status: "pending" }, () => <SkeletonAccount />)
-                .with({ status: "error" }, () => <div className="text-red-500">Erreur de chargement</div>)
+                .with({ status: "error" }, () => <div className="text-red-500">{t("error")}</div>)
                 .with({ status: "success" }, ({ data: account }) => {
                     return (
                         <div className="flex flex-col gap-6">
@@ -37,7 +40,7 @@ export const AccountDetail = ({
                                     <ButtonLink
                                         className="flex-1 mx-1 bg-gray-100 text-gray-800 hover:bg-gray-200"
                                         href={`/admin/users/${account.userId}`}>
-                                        Voir le client
+                                        {t("client")}
                                     </ButtonLink>
                                     <Separator />
                                 </>
@@ -49,7 +52,7 @@ export const AccountDetail = ({
                                     <ButtonLink
                                         className="flex-1 mx-1 bg-gray-100 text-gray-800 hover:bg-gray-200"
                                         href={`${basePath}/${account.IBAN}/transactions/new`}>
-                                        Transférer
+                                        {t("transfer")}
                                     </ButtonLink>
                                     <Separator />
                                 </>
@@ -57,7 +60,7 @@ export const AccountDetail = ({
 
                             <Flex direction="column" gap="4">
                                 <Flex justify="between">
-                                    <h2 className="font-semibold text-lg">Dernières transactions</h2>
+                                    <h2 className="font-semibold text-lg">{t("last")}</h2>
 
                                     <ButtonLink
                                         variant='link'

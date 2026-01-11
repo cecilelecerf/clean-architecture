@@ -11,6 +11,7 @@ export const UserCard = ({
     user,
     onViewDetailsHref,
 }: UserCardProps) => {
+    const t = useTranslations("advisor.users");
 
     return (
         <Card className="flex items-center gap-4 p-4">
@@ -28,7 +29,7 @@ export const UserCard = ({
                 </p>
             </div>
             <ButtonLink href={onViewDetailsHref}  >
-                + d'info
+                {t("more")}
             </ButtonLink>
         </Card>
     );
@@ -36,6 +37,7 @@ export const UserCard = ({
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonLink } from "../ButtonLink";
+import { useTranslations } from "next-intl";
 
 export const UsersSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

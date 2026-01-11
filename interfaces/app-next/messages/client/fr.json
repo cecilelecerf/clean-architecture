@@ -1,0 +1,55 @@
+{
+    "menu": {},
+    "account": {
+        "title": "Mes comptes",
+        "new": {
+            "form": {
+                "title": "Informations générales",
+                "description": "Détails principaux du compte",
+                "fields":{
+                    "name": "Nom du compte",
+                    "type": "Type de compte",
+                    "options": {
+                        "running": "Courant",
+                        "saving": "Épargne"
+                    },
+                    "currency": "Devise"
+                },
+                "color": {
+                    "title": "Apparence",
+                    "description": "Personnalisation visuelle du compte",
+                    "label": "Couleur"
+                }
+            },
+            "title": "Créer un nouveau compte",
+            "description": "Ajoutez un nouveau compte bancaire",
+            "button": "Créer"
+        }
+    },
+    "savings": {
+        "badge": "Taux actuellement en vigueur",
+        "year": "/an",
+        "interestRate": "Taux d'intérêt annuel",
+        "effectiveAt": "Effectif depuis le",
+        "description": "Vos économies travaillent pour vous ! Les intérêts sont calculés quotidiennement et versés automatiquement sur vos comptes d'épargne.",
+        "gain": "Vos gains potentiels",
+        "open": "Ouvrir un compte épargne",
+        "card": {
+            "with": "Avec",
+            "year": "par an",
+            "month": "/mois"
+        }
+    },
+    "thread": {
+        "none": "Pas de conversation",
+        "contact": "Contactez un conseillez",
+        "new": {
+            "form": {
+                "title": "Titre de la conversation",
+                "msg": "Message"
+            },
+            "title": "Nouvelle conversation",
+            "button": "Contacter"
+        }
+    }
+}

@@ -22,11 +22,13 @@ import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { statusConfig } from "./constant";
+import { useTranslations } from "next-intl";
 
 type Props = { credit: CreditDTOWithFormule, isAdmin?: boolean, basePath: string }
 
 export const CreditRow = ({ credit, isAdmin, basePath }: Props) => {
     const router = useRouter();
+    const t = useTranslations("credit.row");
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogAction, setDialogAction] = useState<"accept" | "refuse">("accept");
     const [refusalReason, setRefusalReason] = useState("");
@@ -101,7 +103,7 @@ export const CreditRow = ({ credit, isAdmin, basePath }: Props) => {
                                     disabled={grantMutation.isPending}
                                 >
                                     <Check className="w-4 h-4 mr-1" />
-                                    Accepter
+                                    {t("accept")}
                                 </Button>
                                 <Button
                                     variant="destructive"
@@ -110,7 +112,7 @@ export const CreditRow = ({ credit, isAdmin, basePath }: Props) => {
                                     disabled={grantMutation.isPending}
                                 >
                                     <X className="w-4 h-4 mr-1" />
-                                    Refuser
+                                    {t("refused")}
                                 </Button>
                             </>
                         )}
@@ -139,7 +141,7 @@ export const CreditDialog = ({
     refusalReason,
     setRefusalReason,
     onConfirm,
-    isPending,
+    isPending
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -149,25 +151,26 @@ export const CreditDialog = ({
     onConfirm: () => void;
     isPending: boolean;
 }) => {
+    const t = useTranslations("credit.row");
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
                         {action === "accept"
-                            ? "Accepter la demande de crédit"
-                            : "Refuser la demande de crédit"}
+                            ? t("dialog.accept.title")
+                            : t("dialog.refused.title")}
                     </DialogTitle>
                     <DialogDescription>
                         {action === "accept"
-                            ? "Êtes-vous sûr de vouloir accepter cette demande ? Le client sera notifié et le crédit sera activé."
-                            : "Veuillez indiquer la raison du refus. Le client recevra cette information."}
+                            ? t("dialog.accept.description")
+                            : t("dialog.refused.description")}
                     </DialogDescription>
                 </DialogHeader>
 
                 {action === "refuse" && (
                     <Textarea
-                        placeholder="Raison du refus (ex: revenus insuffisants, taux d'endettement trop élevé...)"
+                        placeholder={t("dialog.refused.placeholder")}
                         value={refusalReason}
                         onChange={(e) => setRefusalReason(e.target.value)}
                         className="min-h-[100px]"
@@ -182,7 +185,7 @@ export const CreditDialog = ({
                             setRefusalReason("");
                         }}
                     >
-                        Annuler
+                        {t("cancel")}
                     </Button>
                     <Button
                         variant={action === "accept" ? "default" : "destructive"}
@@ -190,10 +193,10 @@ export const CreditDialog = ({
                         disabled={isPending || (action === "refuse" && !refusalReason.trim())}
                     >
                         {isPending
-                            ? "En cours..."
+                            ? t("dialog.waiting")
                             : action === "accept"
-                                ? "Confirmer l'acceptation"
-                                : "Confirmer le refus"}
+                                ? t("dialog.accept.action")
+                                : t("dialog.refused.action")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

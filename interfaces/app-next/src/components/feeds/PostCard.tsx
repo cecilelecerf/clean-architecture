@@ -4,6 +4,7 @@ import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint";
 import { useRouter } from "next/navigation";
 import { Tag } from "@/components/Tag";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 
 type PostCardProps = {
     post: PostWithTagsAndUser;
@@ -13,6 +14,7 @@ type PostCardProps = {
 
 export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
     const router = useRouter();
+    const t = useTranslations("advisor.feeds");
 
     const { data: session } = useSession();
     if (!session?.user?.id) return <div>Unauthorized</div>;
@@ -30,7 +32,7 @@ export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
                     <h2 className="text-xl font-bold">{post.title}
                         {isAdmin && (
                             <Badge variant={post.publishedAt ? "secondary" : "outline"} className="h-fit ml-2">
-                                {post.publishedAt ? "Publié" : "Brouillon"}
+                                {post.publishedAt ? t("filters.publish") : t("filters.unpublish")}
                             </Badge>
                         )}
                     </h2>
@@ -48,7 +50,7 @@ export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
                 <p
                     className="text-blue-500 hover:underline text-sm"
                 >
-                    Modifier
+                    {t("update")}
                 </p>
             )}
         </div >

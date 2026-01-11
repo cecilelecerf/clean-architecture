@@ -16,6 +16,7 @@ import { PostId, TagId } from "@infrastructure/types/feed";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Edit, Save, X } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
 
@@ -41,6 +42,8 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
     if (!session?.user?.id) return <div>Unauthorized</div>;
 
     const isMine = session.user.id === postData.advisor.id;
+
+    const t = useTranslations("advisor.feeds");
 
     useEffect(() => {
         if (editValues) {
@@ -171,7 +174,7 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
                         {isMine ? (
                             <SwitchComponent
                                 id="publie"
-                                label="Publié"
+                                label={t("filters.publish")}
                                 checked={!!postData.publishedAt}
                                 onChange={toogleStatus}
                             />
@@ -180,16 +183,22 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
                                 variant={postData.publishedAt ? "secondary" : "outline"}
                                 className="h-fit ml-2"
                             >
-                                {postData.publishedAt ? "Publié" : "Brouillon"}
+                                {postData.publishedAt ? t("filters.publish") : t("filters.unpublish")}
                             </Badge>
                         )}
                     </div>
 
                     <p className="text-sm text-gray-500">
-                        Par <strong>{postData.advisor.firstname} {postData.advisor.lastname}</strong> ·{' '}
-                        {postData.publishedAt
-                            ? `Publié le ${formatDateFrench(postData.publishedAt)}`
-                            : `Brouillon créé le ${formatDateFrench(postData.createdAt)}`}
+                        {t("by")} <strong>{postData.advisor.firstname} {postData.advisor.lastname}</strong> ·{' '}
+                        {postData.publishedAt ? (
+                            <>
+                            {t("publish")} {formatDateFrench(postData.publishedAt)}
+                            </>
+                        ) : (
+                            <>
+                            {t("unpublish")} {formatDateFrench(postData.createdAt)}
+                            </>
+                        )}
                     </p>
                 </div>
 

@@ -31,6 +31,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslations } from 'next-intl';
 
 
 export const AccountDropdownMenu = ({
@@ -40,6 +41,7 @@ export const AccountDropdownMenu = ({
 }) => {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false);
+    const t = useTranslations("account");
 
     return (
         <>
@@ -52,14 +54,14 @@ export const AccountDropdownMenu = ({
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                         <Edit className="mr-2 h-4 w-4" />
-                        Modifier le nom
+                        {t("update")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                         onClick={() => setIsCloseDialogOpen(true)}
                         className="text-red-600"
                     >
                         <XCircle className="mr-2 h-4 w-4" />
-                        Fermer le compte
+                        {t("close")}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -106,35 +108,35 @@ const EditAccountDialog = ({
             }
         );
     };
+    const t = useTranslations("account.dialog");
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Modifier le nom du compte</DialogTitle>
+                    <DialogTitle>{t("update.title")}</DialogTitle>
                     <DialogDescription>
-                        Changez le nom de votre compte pour mieux l'identifier.
+                        {t("update.description")}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="name">Nom du compte</Label>
+                        <Label htmlFor="name">{t("update.label")}</Label>
                         <Input
                             id="name"
                             value={editedName}
                             onChange={(e) => setEditedName(e.target.value)}
-                            placeholder="Entrez le nouveau nom"
+                            placeholder={t("update.placeholder")}
                         />
                     </div>
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         <X className="mr-2 h-4 w-4" />
-                        Annuler
-                    </Button>
+                        {t("button.cancel")}                    </Button>
                     <Button onClick={handleSaveEdit} disabled={updateMutation.isPending}>
                         <Check className="mr-2 h-4 w-4" />
-                        Enregistrer
+                        {t("button.save")}
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -153,6 +155,8 @@ export const CloseAccountDialog = ({
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
 }) => {
+    const t = useTranslations("account.dialog");
+
     const [transferTargetAccount, setTransferTargetAccount] = useState('');
 
     const otherAccountsQuery = useQuery({
@@ -187,29 +191,28 @@ export const CloseAccountDialog = ({
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Fermer le compte</DialogTitle>
+                    <DialogTitle>{t("dialog.close.title")}</DialogTitle>
                     <DialogDescription>
-                        Cette action est irréversible. Le solde restant de{' '}
-                        <strong>
+                        {t("dialog.close.description.start")}                        <strong>
                             {currentAccount.balance.amount.toLocaleString('fr-FR', {
                                 style: 'currency',
                                 currency: currentAccount.balance.currency
                             })}
                         </strong>{' '}
-                        sera transféré vers le compte sélectionné.
+                        {t("dialog.close.description.end")}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
                         <Label htmlFor="target-account">
-                            Compte de destination pour le transfert
+                            {t("dialog.close.label")}
                         </Label>
                         <Select
                             value={transferTargetAccount}
                             onValueChange={setTransferTargetAccount}
                         >
                             <SelectTrigger id="target-account">
-                                <SelectValue placeholder="Sélectionnez un compte" />
+                                <SelectValue placeholder={t("dialog.close.placeholder")} />
                             </SelectTrigger>
                             <SelectContent>
                                 {otherAccounts.map((acc) => (
@@ -222,7 +225,7 @@ export const CloseAccountDialog = ({
                                 ))}
                                 {otherAccounts.length === 0 && (
                                     <SelectItem value="none" disabled>
-                                        Aucun autre compte disponible
+                                        {t("dialog.close.none")}
                                     </SelectItem>
                                 )}
                             </SelectContent>
@@ -231,7 +234,7 @@ export const CloseAccountDialog = ({
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
-                        Annuler
+                        {t("dialog.button.cancel")}
                     </Button>
                     <Button
                         variant="destructive"
@@ -239,7 +242,7 @@ export const CloseAccountDialog = ({
                         disabled={!transferTargetAccount || currentAccount.balance.amount <= 0 || deleteMutation.isPending}
                     >
                         <XCircle className="mr-2 h-4 w-4" />
-                        Fermer définitivement
+                        {t("dialog.button.close")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

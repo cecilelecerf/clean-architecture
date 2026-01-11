@@ -13,7 +13,7 @@ export const CardUserAction = ({ user, }: { user: UserDto }) => {
     const onBan = useMutation(endpoints.users.ban({ id: user.id }))
     const forgotPassword = useMutation(endpoints.auth.forgotPassword())
     const newThread = useMutation(endpoints.threads.create({ type: user.role === "client" ? "external" : "internal" }));
-    const t = useTranslations("director.user.action");
+    const t = useTranslations("users.action");
     return (
         <Card className="p-6">
             <h2 className="font-semibold">{t("title")}</h2>

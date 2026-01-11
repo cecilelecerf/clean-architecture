@@ -10,6 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { TagsFilters } from "./TagsFilters";
 import { CalendarFilter } from "../CalendarFilter";
 import { PostFilters as TPostFIlters } from "@/utils/endpoint/feedsEndpoint";
+import { useTranslations } from "next-intl";
 ;
 
 type PostFiltersProps = {
@@ -20,6 +21,7 @@ type PostFiltersProps = {
 
 export const PostFilters = ({ filters, onChange, isAdmin }: PostFiltersProps) => {
     const [localFilters, setLocalFilters] = useState<TPostFIlters>(filters);
+    const t = useTranslations("advisor.feeds.filters");
 
     useEffect(() => {
         onChange(localFilters);
@@ -28,7 +30,7 @@ export const PostFilters = ({ filters, onChange, isAdmin }: PostFiltersProps) =>
         <div className="flex gap-6 mb-6">
             <Input
                 className="w-full"
-                placeholder="Rechercher par titre"
+                placeholder={t("placeholder")}
                 value={localFilters.title || ""}
                 onChange={(e) =>
                     setLocalFilters((prev) => ({ ...prev, title: e.target.value }))
@@ -46,7 +48,7 @@ export const PostFilters = ({ filters, onChange, isAdmin }: PostFiltersProps) =>
                         {isAdmin && (
 
                             <div className="flex flex-col gap-1">
-                                <Label>Publié</Label>
+                                <Label>{t("publish")}</Label>
                                 <Select
                                     value={match(localFilters.status).with(true, () => "published").with(false, () => "unpublished").otherwise(() => "all")
 
@@ -62,12 +64,12 @@ export const PostFilters = ({ filters, onChange, isAdmin }: PostFiltersProps) =>
                                     }
                                 >
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Tous" />
+                                        <SelectValue placeholder={t("all")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">Tous</SelectItem>
-                                        <SelectItem value="published">Publié</SelectItem>
-                                        <SelectItem value="unpublished">Brouillon</SelectItem>
+                                        <SelectItem value="all">{t("all")}</SelectItem>
+                                        <SelectItem value="published">{t("publish")}</SelectItem>
+                                        <SelectItem value="unpublished">{t("unpublish")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -81,17 +83,17 @@ export const PostFilters = ({ filters, onChange, isAdmin }: PostFiltersProps) =>
                             <CalendarFilter
                                 dateIso={filters.fromDate}
                                 onDateChange={(date) => setLocalFilters((prev) => ({ ...prev, fromDate: date ? date.toISOString() : undefined }))}
-                                label="Du"
+                                label={t("calendar.from")}
                             />
                             <CalendarFilter
                                 dateIso={filters.toDate}
                                 onDateChange={(date) => setLocalFilters((prev) => ({ ...prev, toDate: date ? date.toISOString() : undefined }))}
-                                label="Au"
+                                label={t("calendar.to")}
                             />
                         </div>
                         <div className="flex flex-col gap-1">
                             <div className="flex justify-between w-full">
-                                <Label>Post par page</Label>
+                                <Label>{t("page")}</Label>
                                 <p>{localFilters.limit}</p>
                             </div>
                             <Slider
