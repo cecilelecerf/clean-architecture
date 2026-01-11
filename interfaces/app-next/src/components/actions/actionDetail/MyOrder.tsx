@@ -9,6 +9,7 @@ import { match } from "ts-pattern";
 import { PendingOrderCard } from "./PendingOrderCard";
 import React, { memo, useMemo } from "react";
 import { useTranslations } from "next-intl";
+import { Order, PortfolioPosition } from "@infrastructure/types/order";
 
 export function MyOrders({ action }: { action: Action }) {
     const positionsQuery = useQuery(
@@ -54,8 +55,8 @@ const PositionDetails = memo(({
     position,
     t
 }: {
-    position: any;
-    t: any;
+    position: PortfolioPosition;
+    t: ReturnType<typeof useTranslations>,
 }) => {
     const profitLossData = useMemo(() => {
         const profitLoss = position.currentValue - position.totalInvested;
@@ -146,8 +147,8 @@ const PendingOrdersList = memo(({
     orders,
     t
 }: {
-    orders: any[];
-    t: any;
+    orders: Order[];
+    t: ReturnType<typeof useTranslations>;
 }) => (
     <>
         <h2 className="mt-16 font-semibold text-2xl text-gray-900 dark:text-gray-100">

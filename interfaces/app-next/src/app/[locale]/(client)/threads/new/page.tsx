@@ -15,8 +15,6 @@ export default function NewThreadPage() {
     const router = useRouter();
     const { data: session } = useSession();
 
-    if (!session?.user?.id) return <div>Unauthorized</div>;
-
     const t = useTranslations("client.thread.new");
 
     const form = useForm<Omit<NewExternalThread, "participantsId">>({

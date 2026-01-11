@@ -119,9 +119,6 @@ export const ChartTab = ({ action }: { action: Action }) => {
                                             tick={{ fontSize: 12 }}
                                             domain={["auto", "auto"]}
                                         />
-                                        <Tooltip
-                                            content={<CustomTooltip currency={action.price.currency} />}
-                                        />
                                         <Area
                                             type="monotone"
                                             dataKey="price"
@@ -173,23 +170,6 @@ export const ChartTab = ({ action }: { action: Action }) => {
 }
 
 
-const CustomTooltip = ({ active, payload, currency }: any) => {
-    if (active && payload && payload.length) {
-        return (
-            <div className="bg-white p-3 border rounded-lg shadow-lg">
-                <p className="text-xs text-gray-600 mb-1">
-                    {format(new Date(payload[0].payload.date), "dd MMMM yyyy", {
-                        locale: fr,
-                    })}
-                </p>
-                <p className="text-sm font-bold">
-                    {payload[0].value} {currency}
-                </p>
-            </div>
-        );
-    }
-    return null;
-};
 
 function ChartSkeleton() {
     return (

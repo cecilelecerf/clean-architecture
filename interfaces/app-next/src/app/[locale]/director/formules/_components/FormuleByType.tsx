@@ -1,10 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { useTranslations } from "next-intl";
 import { FormuleCard } from "./FormuleCard";
+import { FormuleDTO } from "@infrastructure/types/formule";
 
 interface FormulesByTypeProps {
     availableTypes: Array<{ value: string; label: string }>;
-    formulesByType: Record<string, any[]>;
+    formulesByType: Record<string, FormuleDTO[]>;
     t: ReturnType<typeof useTranslations>;
 }
 

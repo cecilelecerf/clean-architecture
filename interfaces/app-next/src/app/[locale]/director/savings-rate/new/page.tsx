@@ -1,6 +1,5 @@
 "use client"
 
-import { newSavingsrateSchema } from "@/utils/endpoint/savingsrateEndpoints"
 import { endpoints } from '@/utils/endpoint';
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

@@ -3,7 +3,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-import { memo } from "react";
 
 interface CurrencyEditModeProps {
     newRate: string;

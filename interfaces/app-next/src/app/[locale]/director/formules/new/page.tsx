@@ -8,12 +8,24 @@ import { $brand } from "zod";
 import { StepFormuleForm } from "./StepFormuleForm";
 import { StepSelectAccount } from "./StepSelectAcount";
 
-export default function NewFormulePage() {
+export type FormuleFormData = {
+  accountId: string | undefined
+  interestRate: number;
+  insuranceRate: number;
+  type: string;
+  label: string;
+  description: string;
+  minAmount?: number;
+  maxAmount?: number;
+  currency: string;
+};
 
+
+export default function NewFormulePage() {
   const router = useRouter();
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormuleFormData>({
     accountId: undefined as string | undefined,
     interestRate: 0,
     insuranceRate: 0,
@@ -77,9 +89,6 @@ export default function NewFormulePage() {
       {step === 2 && (
         <StepFormuleForm
           data={formData}
-          setData={(partial) =>
-            setFormData((prev) => ({ ...prev, ...partial }))
-          }
           onSubmit={submit}
           loading={mutation.isPending}
         />

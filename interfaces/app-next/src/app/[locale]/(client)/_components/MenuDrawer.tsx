@@ -14,7 +14,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { MenuLink } from './MenuLink';
 import { SignOutButton } from '@/components/SignOutButton';
-import { CircleX, Home, Menu, MessageSquare, CreditCard, ClockFading, Newspaper, LucideIcon, User } from 'lucide-react';
+import { CircleX, Home, Menu, MessageSquare, CreditCard, ClockFading, Newspaper, User } from 'lucide-react';
 import { LangageSwitcher } from '@/components/LangageSwitcher';
 import { Flex } from '@radix-ui/themes';
 import { ThemeToggleSwitch } from '@/components/ThemeToogleButton';

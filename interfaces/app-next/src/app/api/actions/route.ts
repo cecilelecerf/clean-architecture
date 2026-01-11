@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { actionSchema, newActionSchema } from '@infrastructure/types/action';
 import { actionFactory } from '@infrastructure/adapters/db/mysql/factories/action';
-import z from 'zod';
 
 export async function GET(req: NextRequest) {
   try {

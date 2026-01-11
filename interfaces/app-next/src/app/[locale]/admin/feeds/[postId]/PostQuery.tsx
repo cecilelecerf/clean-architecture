@@ -17,7 +17,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Edit, Save, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { match } from "ts-pattern";
 
 type Props = { postId: PostId }
@@ -33,28 +33,32 @@ export const PostQuery = ({ postId }: Props) => {
 }
 
 const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
-    const [editValues, setEditValues] = useState<NewPost | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editValues, setEditValues] = useState<NewPost>({
+        title: postData.title,
+        content: postData.content,
+        tagsId: postData.tagsId
+    });
 
     const editMutation = useMutation(endpoints.feeds.posts.edit({ id: postData.id }));
     const actionMutation = useMutation(endpoints.feeds.posts.status({ id: postData.id }));
 
     const { data: session } = useSession();
-    if (!session?.user?.id) return <div>Unauthorized</div>;
 
-    const isMine = session.user.id === postData.advisor.id;
+    const isMine = session?.user?.id === postData.advisor.id;
 
     const t = useTranslations("advisor.feeds");
 
-    useEffect(() => {
-        if (editValues) {
-            console.log("✏️ Sync editValues avec postData");
-            setEditValues({
-                title: postData.title,
-                content: postData.content,
-                tagsId: postData.tagsId
-            });
+    const displayValues = useMemo(() => {
+        if (isEditing) {
+            return editValues;
         }
-    }, [postData.title, postData.content, postData.tagsId]);
+        return {
+            title: postData.title,
+            content: postData.content,
+            tagsId: postData.tagsId
+        };
+    }, [isEditing, editValues, postData.title, postData.content, postData.tagsId]);
 
     useEffect(() => {
         if (!socket) return;
@@ -70,30 +74,30 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
     }, [postData.id]);
 
     const handleChange = (field: keyof NewPost, value: string) => {
-        if (!editValues) return;
-        setEditValues({ ...editValues, [field]: value });
+        setEditValues((prev) => ({ ...prev, [field]: value }));
     };
 
     const handleSave = () => {
-        if (!editValues) return;
         editMutation.mutate(editValues, {
             onSuccess: (data) => {
                 console.log("✅ Mutation réussie, data:", data);
                 socket.emit("post:update", { post: data });
-                setEditValues(null);
+                setIsEditing(false);
             }
         });
     };
 
-    const handleEditToggle = () => {
-        setEditValues((prev) => {
-            if (prev) return null;
-            return {
-                title: postData.title,
-                content: postData.content,
-                tagsId: postData.tagsId
-            };
+    const handleEditStart = () => {
+        setEditValues({
+            title: postData.title,
+            content: postData.content,
+            tagsId: postData.tagsId
         });
+        setIsEditing(true);
+    };
+
+    const handleEditCancel = () => {
+        setIsEditing(false);
     };
 
     const toogleStatus = () => {
@@ -107,17 +111,12 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
         });
     };
 
-    const currentValues = editValues ?? {
-        title: postData.title,
-        content: postData.content
-    };
-
     return (
         <>
             <div className="flex justify-between items-center gap-3">
-                {editValues && isMine ? (
+                {isEditing && isMine ? (
                     <Input
-                        value={currentValues.title}
+                        value={displayValues.title}
                         onChange={(e) => handleChange('title', e.target.value)}
                         className="text-md font-bold"
                     />
@@ -126,7 +125,7 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
                 )}
                 {isMine && (
                     <div className="flex gap-2">
-                        {editValues ? (
+                        {isEditing ? (
                             <>
                                 <ButtonLoading
                                     loading={editMutation.isPending}
@@ -134,12 +133,12 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
                                 >
                                     <Save />
                                 </ButtonLoading>
-                                <Button variant="outline" onClick={handleEditToggle} size="icon">
+                                <Button variant="outline" onClick={handleEditCancel} size="icon">
                                     <X />
                                 </Button>
                             </>
                         ) : (
-                            <Button onClick={handleEditToggle} size="icon">
+                            <Button onClick={handleEditStart} size="icon">
                                 <Edit />
                             </Button>
                         )}
@@ -150,18 +149,17 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
             <div className="space-y-6 mt-4">
                 <div className="space-y-2">
                     <div className="flex gap-3">
-                        {editValues ? (
+                        {isEditing ? (
                             <TagsFilters
-                                setSelectedTagsId={(value) => setEditValues((prev) => {
-                                    if (!prev) return null;
-                                    return {
+                                setSelectedTagsId={(value) => {
+                                    setEditValues((prev) => ({
                                         ...prev,
                                         tagsId: typeof value === 'function'
                                             ? value(prev.tagsId as TagId[])
                                             : value
-                                    };
-                                })}
-                                selectedTagsId={editValues.tagsId as TagId[]}
+                                    }));
+                                }}
+                                selectedTagsId={displayValues.tagsId as TagId[]}
                             />
                         ) : postData.tags && postData.tags.length > 0 && (
                             <div className="flex flex-wrap gap-2">
@@ -192,19 +190,19 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
                         {t("by")} <strong>{postData.advisor.firstname} {postData.advisor.lastname}</strong> ·{' '}
                         {postData.publishedAt ? (
                             <>
-                            {t("publish")} {formatDateFrench(postData.publishedAt)}
+                                {t("publish")} {formatDateFrench(postData.publishedAt)}
                             </>
                         ) : (
                             <>
-                            {t("unpublish")} {formatDateFrench(postData.createdAt)}
+                                {t("unpublish")} {formatDateFrench(postData.createdAt)}
                             </>
                         )}
                     </p>
                 </div>
 
-                {editValues && isMine ? (
+                {isEditing && isMine ? (
                     <Textarea
-                        value={currentValues.content}
+                        value={displayValues.content}
                         onChange={(e) => handleChange('content', e.target.value)}
                         className="min-h-[200px]"
                     />

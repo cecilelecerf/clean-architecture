@@ -9,26 +9,15 @@ import { useForm } from "react-hook-form";
 import { NewFormule, newFormuleSchema } from "@/utils/endpoint/formuleEndpoints";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { FormuleFormData } from "./page";
 
-type FormuleFormData = {
-    interestRate: number;
-    insuranceRate: number;
-    type: string;
-    label: string;
-    description: string;
-    minAmount?: number;
-    maxAmount?: number;
-    currency: string;
-};
 
 export const StepFormuleForm = ({
     data,
-    setData,
     onSubmit,
     loading,
 }: {
     data: FormuleFormData;
-    setData: (data: Partial<FormuleFormData>) => void;
     onSubmit: () => void;
     loading: boolean;
 }) => {

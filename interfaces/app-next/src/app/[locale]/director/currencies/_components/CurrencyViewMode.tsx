@@ -1,15 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CurrencyCode } from "@infrastructure/types/currency";
+import { Currency, CurrencyCode } from "@infrastructure/types/currency";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
 interface CurrencyViewModeProps {
-    currency: {
-        code: CurrencyCode;
-        exchangeRate: number;
-    };
+    currency: Currency
     onEdit: (code: CurrencyCode, rate: number) => void;
     t: ReturnType<typeof useTranslations>;
 }

@@ -1,9 +1,7 @@
 "use client"
 import { ButtonLink } from "@/components/buttons/ButtonLink";
 import { ThreadCard, ThreadCardSkeleton } from "@/components/threads/ThreadCard";
-import { Card } from "@/components/ui/card";
 import { socket } from "@/lib/socket";
-import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";

@@ -28,7 +28,7 @@ export default function AccountsPage() {
           .with({ status: "success" }, ({ data }) => {
             return data.map((account) =>
             (
-              <AccountCard key={account.IBAN} account={account} onClickAccount={(iban) => router.push(`/accounts/${account.IBAN}`)} />
+              <AccountCard key={account.IBAN} account={account} onClickAccount={() => router.push(`/accounts/${account.IBAN}`)} />
             ))
 
           }

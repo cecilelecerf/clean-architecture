@@ -25,7 +25,7 @@ export const TransactionFilters = ({ filters, onChange }: TransactionFiltersProp
 
     useEffect(() => {
         onChange(localFilters);
-    }, [localFilters]);
+    }, [localFilters, onChange]);
     return (
         <div className="flex gap-6 mb-6">
             <Input

@@ -2,7 +2,6 @@
 import { useMutation, useQueries } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { endpoints } from "@/utils/endpoint";
-import { useSession } from "next-auth/react";
 import { UserDto, } from "@infrastructure/types/user";
 import { match } from "ts-pattern";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,10 +12,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 
 export default function NewThreadPage() {
-    const router = useRouter()
-    const { data: session } = useSession();
-    if (!session?.user?.id) return <div>Unauthorized</div>;
-
     const queries = useQueries({
         queries: [
             endpoints.users.getAll({ role: "conseiller" }),
@@ -37,9 +32,9 @@ export default function NewThreadPage() {
         )
         .with(
             [{ status: "success" }, { status: "success" }],
-            ([{ data: advisors }, { data: directors }]) => <Content 
-            participants={{ advisors, directors }}
-            t={t} />
+            ([{ data: advisors }, { data: directors }]) => <Content
+                participants={{ advisors, directors }}
+                t={t} />
         )
         .otherwise(() => <SkeletonAddParticipant />)
 }

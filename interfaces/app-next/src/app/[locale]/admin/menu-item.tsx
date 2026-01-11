@@ -6,7 +6,6 @@ import {
   Inbox,
   Newspaper,
   Wallet,
-  ClockFading
 } from "lucide-react";
 import { ReactNode } from "react";
 
