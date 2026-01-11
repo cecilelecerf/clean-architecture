@@ -156,7 +156,7 @@ Construisez les packages dans l'ordre suivant :
 pnpm run build:domain
 pnpm run build:app
 pnpm run build:infra
-pnpm run build:app-next
+pnpm run build:next
 pnpm run build:express
 pnpm run build:socket
 ```
