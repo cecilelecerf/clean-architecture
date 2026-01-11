@@ -56,13 +56,6 @@ export class ActionRepositoryMongo implements ActionRepository {
     return this.mapDocToAction(doc);
   }
 
-  async findAll(): Promise<ActionEntity[]> {
-    await this.client.connect();
-
-    const docs = await ActionModel.find().sort({ name: 1 }).lean();
-    return docs.map(this.mapDocToAction.bind(this));
-  }
-
   async findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]> {
     await this.client.connect();
 
@@ -71,17 +64,6 @@ export class ActionRepositoryMongo implements ActionRepository {
       .lean();
 
     return docs.map(this.mapDocToAction.bind(this));
-  }
-
-  async setAvailability(action: ActionEntity): Promise<void> {
-    await this.client.connect();
-
-    await ActionModel.findByIdAndUpdate(action.ISIN.getValue(), {
-      $set: {
-        isAvailable: action.isAvailable,
-        updatedAt: action.updatedAt ?? new Date(),
-      },
-    });
   }
 
   async update(action: ActionEntity): Promise<void> {
