@@ -1,5 +1,14 @@
 {
-    "menu": {},
+    "menu": {
+        "see": "See more",
+        "principal": "Main menu",
+        "accounts": "My accounts",
+        "messaging": "Conversations",
+        "news": "News",
+        "loan": "Loans",
+        "stocks": "Stocks",
+        "profile": "Profile"
+    },
     "account": {
         "title": "My accounts",
         "new": {

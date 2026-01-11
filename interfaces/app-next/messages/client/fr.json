@@ -1,5 +1,14 @@
 {
-    "menu": {},
+    "menu": {
+        "see": "Voir +",
+        "principal": "Menu principal",
+        "accounts": "Mes comptes",
+        "messaging": "Conversations",
+        "news": "Actualités",
+        "loan": "Crédits",
+        "stocks": "Actions",
+        "profile": "Profil"
+    },
     "account": {
         "title": "Mes comptes",
         "new": {
