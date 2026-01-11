@@ -11,7 +11,7 @@ import { UserMapper } from "../../mappers/UserMapper";
 export class ThreadRepositoryMySQL implements ThreadRepository {
   constructor(private readonly client: MySQLClient) {}
 
-  // 🔧 Méthode helper privée pour mapper les rows SQL vers ThreadEntityWithUsers
+  // Méthode helper privée pour mapper les rows SQL vers ThreadEntityWithUsers
   private mapRowsToThreadsWithUsers(
     rows: RowDataPacket[]
   ): ThreadEntityWithUsers[] {
@@ -62,7 +62,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     return Array.from(threadsMap.values());
   }
 
-  /** 📬 Sauvegarder un thread et ses participants */
+  /** Sauvegarder un thread et ses participants */
   async save(thread: ThreadEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO threads
@@ -87,7 +87,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     }
   }
 
-  /** 🔄 Mettre à jour un thread et ses participants */
+  /** Mettre à jour un thread et ses participants */
   async update(thread: ThreadEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE threads
@@ -131,15 +131,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     }
   }
 
-  /** ❌ Supprimer un thread et ses participants */
-  async delete(threadId: ThreadEntity["id"]): Promise<void> {
-    await this.client.query<ResultSetHeader>(
-      `DELETE FROM threads WHERE id = ?`,
-      [threadId]
-    );
-  }
-
-  /** 🔍 Trouver un thread par son ID avec participants */
+  /** Trouver un thread par son ID avec participants */
   async findById(id: ThreadEntity["id"]): Promise<ThreadEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM threads WHERE id = ?`,
@@ -165,72 +157,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     });
   }
 
-  /** 🔍 Tous les threads d'un user */
-  async findAllByParticipantId(
-    userId: UserEntity["id"]
-  ): Promise<ThreadEntity[]> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT t.* 
-       FROM threads t
-       JOIN thread_participant tp ON tp.thread_id = t.id
-       WHERE tp.user_id = ?`,
-      [userId]
-    );
-
-    const threads: ThreadEntity[] = [];
-    for (const row of rows) {
-      const participantRows = await this.client.query<RowDataPacket[]>(
-        `SELECT user_id FROM thread_participant WHERE thread_id = ?`,
-        [row.id]
-      );
-      const participantsId = participantRows.map((r) => r.user_id);
-      threads.push(
-        ThreadEntity.from({
-          id: row.id,
-          administratorId: row.administrator_id,
-          participantsId,
-          title: row.title,
-          createdAt: row.created_at,
-          updatedAt: row.updated_at,
-          isClose: row.is_close === 1,
-          type: row.type,
-        })
-      );
-    }
-    return threads;
-  }
-
-  /** 🔍 Tous les threads d'un conseiller */
-  async findAllByAdministratorId(
-    advisorId: UserEntity["id"]
-  ): Promise<ThreadEntity[]> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM threads WHERE administrator_id = ?`,
-      [advisorId]
-    );
-
-    return Promise.all(
-      rows.map(async (row) => {
-        const participantRows = await this.client.query<RowDataPacket[]>(
-          `SELECT user_id FROM thread_participant WHERE thread_id = ?`,
-          [row.id]
-        );
-        const participantsId = participantRows.map((r) => r.user_id);
-        return ThreadEntity.from({
-          id: row.id,
-          administratorId: row.administrator_id,
-          participantsId,
-          title: row.title,
-          createdAt: row.created_at,
-          updatedAt: row.updated_at,
-          isClose: row.is_close === 1,
-          type: row.type,
-        });
-      })
-    );
-  }
-
-  /** 🔍 Threads avec users par participant et type (refactorisé) */
+  /** Threads avec users par participant et type (refactorisé) */
   async findAllWithUserByParticipantIdAndType(
     participantId: string,
     type?: ThreadEntity["type"]
@@ -275,7 +202,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     return this.mapRowsToThreadsWithUsers(rows);
   }
 
-  /** 🔍 Thread avec users par ID (refactorisé) */
+  /** Thread avec users par ID (refactorisé) */
   async findWithUserById(
     threadId: string
   ): Promise<ThreadEntityWithUsers | null> {
@@ -312,7 +239,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     return threads[0] || null;
   }
 
-  /** 🔍 Threads avec users par administrateur et type (refactorisé) */
+  /** Threads avec users par administrateur et type (refactorisé) */
   async findAllWithUserByAdministratorIdAndType(
     administratorId: UserEntity["id"],
     type?: ThreadEntity["type"]
@@ -356,7 +283,7 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     return this.mapRowsToThreadsWithUsers(rows);
   }
 
-  /** 🔍 Threads sans administrateur avec users (refactorisé) */
+  /** Threads sans administrateur avec users (refactorisé) */
   async findAllWithUserByAdministratorNullable(): Promise<
     ThreadEntityWithUsers[]
   > {
