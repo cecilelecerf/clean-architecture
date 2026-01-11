@@ -1,31 +1,41 @@
 'use client';
-import { useMutation } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { Link } from '@/lib/i18n/navigation';
-import { User, MapPin, Mail } from 'lucide-react';
-import { endpoints } from '@/utils/endpoint';
-import FormWrapper, { DataInfo, Section } from '@/components/FormWrapper';
+import FormWrapper, { DataInfo } from '@/components/FormWrapper';
 import { useForm } from 'react-hook-form';
-import { CreateClientPayload, createClientSchema, LoginPayload, loginSchema } from '@infrastructure/types/user';
+import { LoginPayload, loginSchema } from '@infrastructure/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+import { match } from 'ts-pattern';
 
 export default function RegisterPage() {
   const t = useTranslations('auth.login');
-  const mutation = useMutation(endpoints.auth.login());
-
+  const router = useRouter()
   const form = useForm<LoginPayload>({
     resolver: zodResolver(loginSchema),
   });
 
-  const handleSubmit = (values: LoginPayload) => {
-    mutation.mutate(
-      { ...values },
-      {
-        onSuccess: () => toast.success(t('form.success')),
-        onError: () => toast.error(t('form.error')),
-      }
-    );
+  const handleSubmit = async (values: LoginPayload) => {
+    const res = await signIn('credentials', { redirect: false, email: values.email, password: values.password });
+
+    if (!res?.ok) {
+      console.error('Erreur de connexion', res?.error);
+      return;
+    }
+    const sessionRes = await fetch('/api/auth/session');
+    const session = await sessionRes.json();
+
+    if (!session?.user?.role) {
+      console.error('Session invalide ou rôle manquant');
+      return;
+    }
+
+    match(session.user.role)
+      .with('client', () => router.push('/accounts'))
+      .with('conseiller', () => router.push('/admin'))
+      .with('directeur', () => router.push('/director'))
+      .otherwise(() => router.push('/unauthorized'));
   };
   const data: DataInfo<LoginPayload> = {
     email: { label: t('form.email'), type: "email", placeholder: "votre@email.com" },
@@ -39,7 +49,7 @@ export default function RegisterPage() {
       form={form}
       data={data}
       labelButton={t('form.submit')}
-      loading={mutation.isPending}
+      loading={false}
       onSubmit={handleSubmit}
       showBackButton
     >
