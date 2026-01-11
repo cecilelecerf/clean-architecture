@@ -79,5 +79,8 @@
     "none": "Pas de conversation",
     "join": "Rejoindre la conversation",
     "customer": "Client"
+  },
+  "account": {
+    "none": "Aucun compte client pour le moment."
   }
 }

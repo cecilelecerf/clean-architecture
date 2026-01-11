@@ -11,10 +11,12 @@ import { match } from "ts-pattern";
 import { User } from "lucide-react";
 import { TitleAdminPage } from "@/components/TitleAdminPage";
 import { AccountCard } from "@/components/accounts/AccountCard";
+import { useTranslations } from "next-intl";
 
 export default function AccountsPage() {
     const query = useQuery(endpoints.accounts.getAll({ type: "client" }));
     const router = useRouter();
+    const t = useTranslations("advisor.account");
 
     return (
         <>
@@ -26,7 +28,7 @@ export default function AccountsPage() {
                     if (accounts.length === 0) {
                         return (
                             <div className="text-gray-500 text-center border p-6 rounded-lg">
-                                Aucun compte client pour le moment.
+                                {t("none")}
                             </div>
                         );
                     }

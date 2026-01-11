@@ -79,5 +79,8 @@
     "none": "No conversation",
     "join": "Join the conversation",
     "customer": "Customer"
+  },
+  "account": {
+    "none": "No customer account at the moment."
   }
 }
