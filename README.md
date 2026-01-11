@@ -29,7 +29,7 @@ Application bancaire moderne construite avec une architecture clean, Next.js et 
 ### 1. Cloner le projet
 
 ```bash
-git clone <url-du-repo>
+git clone https://github.com/cecilelecerf/clean-architecture.git banking-app
 cd banking-app
 ```
 
