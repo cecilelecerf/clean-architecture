@@ -10,6 +10,8 @@ import { SkeletonThread, WrapperThread } from '@/components/threads/WrapperThrea
 
 
 export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
+    const { data: session } = useSession();
+
     const queries = useQueries({
         queries: [
             endpoints.threads.get({ threadId }),
@@ -17,8 +19,6 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
         ]
     })
 
-    const { data: session } = useSession();
-    if (!session?.user?.id) return <div>Unauthorized</div>;
     return match(queries)
         .when((q) => q.some(({ status }) => status === "error"), () => "error")
         .with([{ status: "success" }, { status: "success" }], ([{ data: thread }, { data: messages }]) =>
