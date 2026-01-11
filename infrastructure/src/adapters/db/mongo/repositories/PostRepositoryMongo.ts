@@ -83,30 +83,6 @@ export class PostRepositoryMongo implements PostRepository {
     return this.mapDocToPost(doc);
   }
 
-  async findByIdWithTags(id: PostEntity["id"]): Promise<PostWithTags | null> {
-    await this.client.connect();
-
-    const doc = await PostModel.findById(id)
-      .populate({ path: "tagsId" })
-      .lean();
-
-    if (!doc) return null;
-
-    const tags: TagEntity[] = (doc.tagsId || [])
-      .map(this.mapDocToTag)
-      .filter((t: TagEntity | undefined): t is TagEntity => !!t);
-
-    return this.combinePostWithTags(doc, tags);
-  }
-
-  async findAllByAdvisorId(advisorId: UserEntity["id"]): Promise<PostEntity[]> {
-    await this.client.connect();
-    const docs = await PostModel.find({ advisorId })
-      .sort({ createdAt: -1 })
-      .lean();
-    return docs.map(this.mapDocToPost);
-  }
-
   async findAllRecent(limit = 10): Promise<PostEntity[]> {
     await this.client.connect();
     const docs = await PostModel.find({})
@@ -136,12 +112,6 @@ export class PostRepositoryMongo implements PostRepository {
   async delete(id: PostEntity["id"]): Promise<void> {
     await this.client.connect();
     await PostModel.deleteOne({ _id: id });
-  }
-
-  async findAllByTags(tagId: TagEntity["id"]): Promise<PostEntity[]> {
-    await this.client.connect();
-    const docs = await PostModel.find({ tagsId: tagId }).lean();
-    return docs.map(this.mapDocToPost);
   }
 
   async findWithTagsAndUserById(
