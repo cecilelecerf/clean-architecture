@@ -95,13 +95,4 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
 
     return Array.isArray(rows) && rows.length > 0;
   }
-
-  /** Récupérer tous les types existants en base */
-  async getDistinctTypes(): Promise<string[]> {
-    const rows = await this.client.queryRows<any>(
-      "SELECT DISTINCT type AS type FROM formules"
-    );
-
-    return rows.map((r: { type: string }) => r.type);
-  }
 }
