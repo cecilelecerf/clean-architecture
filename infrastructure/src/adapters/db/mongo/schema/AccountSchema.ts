@@ -6,7 +6,11 @@ export const AccountSchema = new Schema<AccountInterface>(
     _id: { type: String, required: true },
     userId: { type: Types.UUID, ref: "User", required: false, default: null },
     name: { type: String, required: true },
-    type: { type: String, enum: ["courant", "epargne"], required: true },
+    type: {
+      type: String,
+      enum: ["courant", "epargne", "pret"],
+      required: true,
+    },
     color: {
       type: String,
       enum: [
