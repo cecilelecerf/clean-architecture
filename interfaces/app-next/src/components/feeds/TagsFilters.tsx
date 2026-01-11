@@ -34,7 +34,7 @@ export const TagsFilters = ({ selectedTagsId, setSelectedTagsId }: Props) => {
         setSelectedTagsId([]);
     };
 
-    const t = useTranslations("advisor.tags");
+    const t = useTranslations("advisor.feeds.tags");
 
     return (
         <div className="flex flex-col gap-2">
