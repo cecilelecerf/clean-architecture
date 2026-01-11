@@ -1,4 +1,5 @@
 import { AccountNotFoundError } from "@application/errors/accounts";
+import { BankInterestAccountNotFoundError } from "@application/errors/accounts/BankInterestAccountNotFoundError";
 import {
   FormuleCreditAlreadyExistsError,
   NegativeInterestRateError,
@@ -44,7 +45,6 @@ type Props = {
   label: string;
   type: string;
   description: string;
-  accountId: string;
   minAmount?: number;
   maxAmount?: number;
   currency?: string;
@@ -65,7 +65,6 @@ export class CreateFormuleCreditUseCase {
     label,
     type: typeStr,
     description,
-    accountId,
     minAmount,
     maxAmount,
     currency,
@@ -86,11 +85,15 @@ export class CreateFormuleCreditUseCase {
     | IBANInvalidFormatError
     | IBANInvalidCheckDigitsError
     | InvalidFormuleTypeError
+    | BankInterestAccountNotFoundError
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
     if (!user.hasRole({ role: "directeur" }))
       return new UserRoleMismatchError(["directeur"], user.role);
+
+    const bankAccount = await this.accountRepository.findBankReadyAccount();
+    if (!bankAccount) return new BankInterestAccountNotFoundError();
 
     const exists = await this.formuleRepository.existsByLabel(label);
     if (exists) return new FormuleCreditAlreadyExistsError(label);
@@ -102,11 +105,6 @@ export class CreateFormuleCreditUseCase {
 
     const insuranceRateVO = Percentage.create(insuranceRate);
     if (insuranceRateVO instanceof Error) return insuranceRateVO;
-
-    const iban = IBAN.create(accountId);
-    if (iban instanceof Error) return iban;
-    const account = await this.accountRepository.findByIBAN(iban);
-    if (!account) return new AccountNotFoundError();
 
     let minAmountVO: Money | undefined;
     let maxAmountVO: Money | undefined;
@@ -132,7 +130,7 @@ export class CreateFormuleCreditUseCase {
       type,
       label,
       description,
-      accountId: account.iban,
+      accountId: bankAccount.iban,
       createdAt: this.clockService.now(),
       minAmount: minAmountVO,
       maxAmount: maxAmountVO,

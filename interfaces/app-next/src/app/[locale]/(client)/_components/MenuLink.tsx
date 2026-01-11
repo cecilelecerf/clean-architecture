@@ -12,10 +12,9 @@ interface MenuLinkProps {
     icon: ReactNode;
     labelKey: string;
     href: string;
-    basePath?: string 
 }
 
-export const MenuLink = ({ icon, labelKey, href, basePath }: MenuLinkProps) => {
+export const MenuLink = ({ icon, labelKey, href }: MenuLinkProps) => {
     const pathname = usePathname();
     const isActive = pathname === href;
     const t = useTranslations("client.menu");

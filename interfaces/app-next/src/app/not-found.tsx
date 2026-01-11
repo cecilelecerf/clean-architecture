@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import "./globals.css"
+
 import { Home, Search } from 'lucide-react';
 
 export default function NotFoundPage() {

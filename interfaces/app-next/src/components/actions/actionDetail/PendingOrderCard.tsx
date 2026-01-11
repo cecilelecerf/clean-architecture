@@ -264,7 +264,7 @@ const CancelOrderDialog = memo(({
             <AlertDialogHeader>
                 <AlertDialogTitle className="flex items-center gap-2">
                     <AlertCircle className="w-5 h-5 text-red-500" />
-                    Annuler l'ordre ?
+                    Annuler l&apos;ordre ?
                 </AlertDialogTitle>
                 <AlertDialogDescription className="space-y-2">
                     <p>

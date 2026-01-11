@@ -65,7 +65,7 @@ export function FormulesClient() {
         };
 
         return { formulesByType, availableTypes, stats };
-    }, [queries[0].status, queries[0].data, queries[1].status, queries[1].data]);
+    }, [queries]);
 
     return (
         <div className="space-y-6">

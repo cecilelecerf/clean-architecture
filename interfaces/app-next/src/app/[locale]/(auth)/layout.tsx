@@ -1,5 +1,6 @@
 import { ThemeToggleSwitch } from '@/components/ThemeToogleButton';
 import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -14,7 +15,8 @@ export default async function RootLayout({
 
   return (
     <main className='px-4 md:px-60 xl:px-120 py-6 xl:py-8' >
-      <div className=" flex  justify-end mb-4">
+      <div className="flex justify-between mb-4">
+        <Link href="/" className='font-bold'>Accueil</Link >
         <ThemeToggleSwitch />
       </div>
       {children}

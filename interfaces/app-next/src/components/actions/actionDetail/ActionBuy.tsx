@@ -73,12 +73,12 @@ export const ActionBuy = memo(({
                     setBuyAmount({ quantity: 1, IBAN: "" as AccountId, price: data.price });
                     closeBuy();
                 },
-                onError: (error: any) => {
+                onError: (error) => {
                     toast.error(error.message || "Erreur lors de l'achat");
                 },
             }
         );
-    }, [buyAmount, buyMutation, hasSufficientFunds]);
+    }, [buyAmount, buyMutation, hasSufficientFunds, closeBuy]);
 
     const incrementQuantity = useCallback(() => {
         setBuyAmount(prev => ({ ...prev, quantity: prev.quantity + 1 }));

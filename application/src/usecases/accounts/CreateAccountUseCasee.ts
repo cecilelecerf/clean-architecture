@@ -8,7 +8,7 @@ import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { ClockService } from "@application/ports/services/ClockService";
 import { EmailService } from "@application/ports/services/EmailService";
 import { findActiveUser } from "@application/utils/userValidators";
-import { AccountEntity } from "@domain/entities/AccountEntity";
+import { AccountDTO, AccountEntity } from "@domain/entities/AccountEntity";
 import { InvalidAccountNameError } from "@domain/errors/account";
 import { Color } from "@domain/values/Color";
 import { IBAN } from "@domain/values/IBAN";
@@ -41,7 +41,7 @@ export class CreateAccountUseCase {
     | UserNotActiveError
     | MissingOrInvalidNameError
     | InvalidAccountNameError
-    | AccountEntity
+    | AccountDTO
   > {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
@@ -83,6 +83,6 @@ export class CreateAccountUseCase {
       subject: "Compte créé",
       text: `Votre compte a été créé.`,
     });
-    return account;
+    return account.toDTO();
   }
 }

@@ -107,7 +107,7 @@ function SidebarContent({
                                     key={`${item.href}-${i}`}
                                     icon={item.icon}
                                     label={t(item.labelKey)}
-                                    href={item.href as any}
+                                    href={item.href as Pathname}
                                     active={isActive}
                                 />
                             );
@@ -141,7 +141,8 @@ function MenuLink({
 }) {
     return (
         <Link
-            href={href as any}
+            // @ts-expect-error -- href peut contenir des routes dynamiques avec query params
+            href={href}
             className={`flex items-center gap-3 px-3 py-2 rounded-md transition ${active
                 ? "bg-pink-900 text-pink-50 font-medium"
                 : "text-pink-100 hover:bg-pink-900/50 hover:text-white"

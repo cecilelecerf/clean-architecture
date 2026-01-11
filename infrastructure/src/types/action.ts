@@ -24,7 +24,6 @@ export const newActionSchema = actionSchema
     symbol: true,
     market: true,
     activitySector: true,
-    // price: true,
     isAvailable: true,
   })
   .extend({

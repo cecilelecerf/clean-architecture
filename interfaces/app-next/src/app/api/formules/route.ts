@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { formuleFactory } from '@infrastructure/adapters/db/mysql/factories/formules';
-import { formuleSchema } from '@infrastructure/types/formule';
+import { formuleSchema, newFormuleSchema } from '@infrastructure/types/formule';
 import z from 'zod';
 
 export async function GET() {
@@ -34,20 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const payload = formuleSchema
-      .pick({
-        interestRate: true,
-        insuranceRate: true,
-        label: true,
-        type: true,
-        description: true,
-        accountId: true,
-        minAmount: true,
-        maxAmount: true,
-        currency: true,
-      })
-      .partial()
-      .parse(body);
+    const payload = newFormuleSchema.parse(body);
 
     const result = await formuleFactory().createFormule.execute({
       userId: session.user.id,
@@ -56,7 +43,6 @@ export async function POST(req: NextRequest) {
       label: payload.label,
       type: payload.type,
       description: payload.description,
-      accountId: payload.accountId,
       minAmount: payload.minAmount,
       maxAmount: payload.maxAmount,
       currency: payload.currency,
@@ -69,15 +55,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(
-      formuleSchema
-        .omit({ createdAt: true, updatedAt: true })
-        .extend({
-          createdAt: z.date(),
-          updatedAt: z.date().optional(),
-        })
-        .parse(result),
-    );
+    return NextResponse.json(formuleSchema.parse(result));
   } catch (err) {
     console.error(err);
     return NextResponse.json(

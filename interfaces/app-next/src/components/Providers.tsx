@@ -3,25 +3,19 @@ import { ThemeProvider } from '@/contexts/theme/ThemeProvide';
 import { queryClient } from '@/lib/queryClient';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
-import { AbstractIntlMessages, NextIntlClientProvider, useLocale } from 'next-intl';
-
 
 type ProvidersProps = {
-  children: React.ReactNode; locale: string;
-  messages: AbstractIntlMessages;
-
+  children: React.ReactNode;
 };
 
-export const Providers = ({ children, locale, messages }: ProvidersProps) => {
+export const Providers = ({ children }: ProvidersProps) => {
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <SessionProvider>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
-        </QueryClientProvider>
-      </SessionProvider>
-    </NextIntlClientProvider>
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+      </QueryClientProvider>
+    </SessionProvider>
   );
 }

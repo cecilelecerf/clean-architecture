@@ -89,7 +89,7 @@ const ActionSell = ({
                     setSellAmount({ quantity: 1, IBAN: "" as AccountId, price: data.price });
                     closeSell();
                 },
-                onError: (error: any) => toast.error(error.message || "Erreur lors de la vente"),
+                onError: (error) => toast.error(error.message || "Erreur lors de la vente"),
             }
         );
     };

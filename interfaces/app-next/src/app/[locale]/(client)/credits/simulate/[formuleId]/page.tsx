@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { FormuleId } from "@infrastructure/types/formule";
+import { FormuleDTO, FormuleId } from "@infrastructure/types/formule";
 import { endpoints } from "@/utils/endpoint";
 import { match } from "ts-pattern";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,7 +56,7 @@ export default function SimulateCreditPage() {
     const [duration, setDuration] = useState(24);
     const [simulation, setSimulation] = useState<SimulationResult | null>(null);
 
-    const handleSimulate = (formule: any) => {
+    const handleSimulate = (formule: FormuleDTO) => {
         const monthlyInterestRate = formule.interestRate / 100 / 12;
         const monthlyInsuranceRate = formule.insuranceRate / 100 / 12;
 
@@ -126,7 +126,6 @@ export default function SimulateCreditPage() {
             return (
                 <div className="container mx-auto py-8 px-4 max-w-7xl">
                     <div className="space-y-8">
-                        {/* Header */}
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900">
                                 {t("title")}
@@ -137,7 +136,6 @@ export default function SimulateCreditPage() {
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Formulaire de simulation */}
                             <div className="lg:col-span-1">
                                 <Card className="sticky top-8">
                                     <CardHeader>
@@ -147,7 +145,6 @@ export default function SimulateCreditPage() {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
-                                        {/* Montant */}
                                         <div className="space-y-3">
                                             <div className="flex items-center justify-between">
                                                 <Label htmlFor="amount">{t("amount")}</Label>
@@ -172,7 +169,6 @@ export default function SimulateCreditPage() {
 
                                         <Separator />
 
-                                        {/* Durée */}
                                         <div className="space-y-3">
                                             <div className="flex items-center justify-between">
                                                 <Label htmlFor="duration">{t("duration")}</Label>
@@ -236,7 +232,6 @@ export default function SimulateCreditPage() {
                                 {simulation ? (
                                     <SimulationResults
                                         simulation={simulation}
-                                        formule={formule}
                                         onRequestCredit={() => router.push(`/credits/request/${formule.id}`)}
                                     />
                                 ) : (
@@ -262,18 +257,16 @@ export default function SimulateCreditPage() {
 
 interface SimulationResultsProps {
     simulation: SimulationResult;
-    formule: any;
     onRequestCredit: () => void;
 }
 
-function SimulationResults({ simulation, formule, onRequestCredit }: SimulationResultsProps) {
+function SimulationResults({ simulation, onRequestCredit }: SimulationResultsProps) {
     const [showFullSchedule, setShowFullSchedule] = useState(false);
 
     const t = useTranslations("client.loan.simulate.result");
 
     return (
         <div className="space-y-6">
-            {/* Mensualité principale */}
             <Card className=" bg-linear-to-br from-blue-50 to-indigo-50">
                 <CardContent className="p-8">
                     <div className="text-center space-y-2">
@@ -293,7 +286,6 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                 </CardContent>
             </Card>
 
-            {/* Résumé des coûts */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">

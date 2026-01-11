@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import { accountFactory as accountFactoryMongo } from "@infrastructure/adapters/db/mongo/factories/account";
 import { accountFactory as accountFactoryMysql } from "@infrastructure/adapters/db/mysql/factories/account";
+import { creditFactory } from "@infrastructure/adapters/db/mysql/factories/credit";
 
 export function setupCronJobs() {
   //   cron.schedule("0 2 * * *", async () => {
@@ -52,5 +53,17 @@ export function setupCronJobs() {
   //   }
   // });
 
+  // Pour le développement : exécuter toutes les minutes (commenté)
+  cron.schedule("* * * * *", async () => {
+    console.log("Test cron - every minute");
+    try {
+      const result = await creditFactory().applyMonthlyPaiementCredit.execute();
+      if (!(result instanceof Error)) {
+        console.log(`✅ Test: ${result.successful} accounts`);
+      }
+    } catch (error) {
+      console.error("❌ Test error:", error);
+    }
+  });
   console.log("✅ Cron jobs scheduled");
 }

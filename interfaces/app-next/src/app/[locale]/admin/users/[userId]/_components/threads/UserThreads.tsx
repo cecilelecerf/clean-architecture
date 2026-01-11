@@ -22,7 +22,7 @@ export const UserThreads = ({ userId }: { userId: UserId }) => {
                     <h2 className="text-lg font-bold mb-4">{t("title")}</h2>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {threads.map((thread) => (
-                            <ThreadCard thread={thread} haveAcceded={session.user.id === thread.administratorId}
+                            <ThreadCard key={thread.id} thread={thread} haveAcceded={session.user.id === thread.administratorId}
                             />
                         ))}
                     </div>

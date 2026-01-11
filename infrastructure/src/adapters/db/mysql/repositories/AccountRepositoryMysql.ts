@@ -57,6 +57,16 @@ export class AccountRepositoryMySQL implements AccountRepository {
     return AccountMapper.mapRowToAccount(rows[0]);
   }
 
+    async findBankReadyAccount(): Promise<AccountEntity | null> {
+    const rows = await this.client.query<RowDataPacket[]>(
+      "SELECT * FROM accounts WHERE type = 'pret' AND user_id IS NULL"
+    );
+
+    if (rows.length === 0) return null;
+
+    return AccountMapper.mapRowToAccount(rows[0]);
+  }
+
   /** Trouver une liste de compte par type avec les users */
   async findByTypeSectionWithUser(
     type: "client" | "bank"

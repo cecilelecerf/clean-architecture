@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     if (result instanceof Error) {
       return NextResponse.json(
         { name: result.name, message: result.message },
-        { status: (result as any).statusCode ?? 400 },
+        { status: result.statusCode ?? 400 },
       );
     }
 

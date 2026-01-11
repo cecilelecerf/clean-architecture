@@ -2,7 +2,7 @@
 
 import { LogOutIcon, Menu } from "lucide-react";
 import { usePathname } from "@/lib/i18n/navigation";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/i18n/navigation";
@@ -19,7 +19,6 @@ type Props = {
 export function AdvisorLayoutClient({ children }: Props) {
   const pathname = usePathname();
   const t = useTranslations("advisor.menu");
-  const currentLocale = useLocale();
 
   return (
     <div className="flex min-h-screen">
@@ -91,7 +90,6 @@ function SidebarContent({
 
         <Separator className="bg-gray-700" />
 
-        {/* Section Relation Client */}
         <div>
           <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
             {t("section.relation")}
@@ -139,7 +137,8 @@ function MenuLink({
 }) {
   return (
     <Link
-      href={href as any}
+      // @ts-expect-error -- href peut contenir des routes dynamiques avec query params
+      href={href}
       className={`flex items-center gap-3 px-3 py-2 rounded-md transition ${active
         ? "bg-gray-800 text-white"
         : "text-gray-300 hover:bg-gray-800 hover:text-white"
