@@ -76,8 +76,11 @@ export const createClientSchema = clientSchema
     confirmedAt: true,
     isActiveField: true,
     address: true,
+    dateOfBirth: true,
+    role: true,
   })
   .extend({
+    dateOfBirth: z.string(),
     confirmPassword: clientSchema.shape.passwordHash,
     ...addressSchema.shape,
   });

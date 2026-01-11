@@ -32,6 +32,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 
 
 export const AccountDropdownMenu = ({
@@ -155,6 +156,7 @@ export const CloseAccountDialog = ({
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
 }) => {
+    const router = useRouter()
     const t = useTranslations("account.dialog");
 
     const [transferTargetAccount, setTransferTargetAccount] = useState('');
@@ -164,7 +166,13 @@ export const CloseAccountDialog = ({
         enabled: isOpen,
     });
 
-    const deleteMutation = useMutation(endpoints.accounts.delete({ accountIban }));
+    const deleteMutation = useMutation({
+        ...endpoints.accounts.delete({ accountIban, }),
+        onSuccess: (data, variables, onMutateresult, context) => {
+            router.push("/accounts");
+            endpoints.accounts.delete({ accountIban }).onSuccess(data, variables, onMutateresult, context);
+        }
+    });
 
     const otherAccounts = otherAccountsQuery.data?.filter(
         acc => acc.IBAN !== currentAccount.IBAN
@@ -177,13 +185,7 @@ export const CloseAccountDialog = ({
         }
 
         deleteMutation.mutate(
-            { transferToAccountId: transferTargetAccount as AccountId },
-            {
-                onSuccess: () => {
-                    onOpenChange(false);
-                    setTransferTargetAccount('');
-                }
-            }
+            { transferToAccountId: transferTargetAccount as AccountId }
         );
     };
 
@@ -202,8 +204,10 @@ export const CloseAccountDialog = ({
                         {t("close.description.end")}
                     </DialogDescription>
                 </DialogHeader>
+
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
+
                         <Label htmlFor="target-account">
                             {t("close.label")}
                         </Label>
@@ -239,7 +243,7 @@ export const CloseAccountDialog = ({
                     <Button
                         variant="destructive"
                         onClick={handleCloseAccount}
-                        disabled={!transferTargetAccount || currentAccount.balance.amount <= 0 || deleteMutation.isPending}
+                        disabled={!transferTargetAccount || deleteMutation.isPending}
                     >
                         <XCircle className="mr-2 h-4 w-4" />
                         {t("button.close")}

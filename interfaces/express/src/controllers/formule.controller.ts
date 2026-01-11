@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { formuleFactory } from "@infrastructure/adapters/db/mongo/factories/formules";
-import { formuleSchema } from "@infrastructure/types/formule";
+import { formuleSchema, newFormuleSchema } from "@infrastructure/types/formule";
 
 export class FormuleController {
   static async getAll(req: AuthRequest, res: Response, next: NextFunction) {
@@ -29,25 +29,7 @@ export class FormuleController {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      const payload = formuleSchema
-        .pick({
-          interestRate: true,
-          insuranceRate: true,
-          label: true,
-          type: true,
-          description: true,
-          accountId: true,
-        })
-        .merge(
-          formuleSchema
-            .pick({
-              minAmount: true,
-              maxAmount: true,
-              currency: true,
-            })
-            .partial()
-        )
-        .parse(req.body);
+      const payload = newFormuleSchema.parse(req.body);
 
       const result = await formuleFactory().createFormule.execute({
         userId,
@@ -56,7 +38,6 @@ export class FormuleController {
         label: payload.label,
         type: payload.type,
         description: payload.description,
-        accountId: payload.accountId,
         minAmount: payload.minAmount,
         maxAmount: payload.maxAmount,
         currency: payload.currency,

@@ -2,7 +2,6 @@ import z from "zod";
 import { colorSchema } from "./color";
 import { userDtoSchema, userIdSchema } from "./user";
 import { moneySchema } from "./money";
-import { currencyCodeSchema } from "./currency";
 
 export const accountIdSchema = z.string().brand("account");
 export type AccountId = z.infer<typeof accountIdSchema>;

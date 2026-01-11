@@ -53,7 +53,7 @@ export const accountsEndpoint = createEndpointsNodes({
     mutationOptions({
       mutationFn: async (payload: NewAccount) => {
         const data = await post('/accounts', payload);
-        return accountSchema.parse(data);
+        return safeParseWithLog(accountDTOSchema, data);
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['accounts', 'list'] });

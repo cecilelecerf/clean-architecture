@@ -92,7 +92,6 @@ export class FormuleCreditRepositoryMySQL implements FormuleCreditRepository {
       "SELECT 1 FROM formules WHERE label = ? LIMIT 1",
       [label]
     );
-
     return Array.isArray(rows) && rows.length > 0;
   }
 

@@ -50,7 +50,15 @@ export class AccountRepositoryMongo implements AccountRepository {
       type: "epargne",
       userId: null,
     }).lean();
-    const account = AccountMapper.mapDocToAccount(doc);
+    return doc ? AccountMapper.mapDocToAccount(doc) : null;
+  }
+  /** Compte d'intérêts de la banque */
+  async findBankReadyAccount(): Promise<AccountEntity | null> {
+    await this.client.connect();
+    const doc = await AccountModel.findOne({
+      type: "pret",
+      userId: null,
+    }).lean();
     return doc ? AccountMapper.mapDocToAccount(doc) : null;
   }
 
