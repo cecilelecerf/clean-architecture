@@ -52,7 +52,7 @@ Créez un fichier `.env` **à la racine du projet** :
 ```env
 # Database MySQL
 MYSQL_HOST=localhost
-MYSQL_PORT=3306
+MYSQL_PORT=3307
 MYSQL_USER=myapp_user
 MYSQL_PASSWORD=myapp_pass
 MYSQL_DATABASE=myapp_db
@@ -138,10 +138,10 @@ pnpm run mysql:seed
 
 ```bash
 # Recréer la base de données et les collections
-pnpm --filter infrastructure mongo:restart
+pnpm run mongo:restart
 
 # Ajouter des données de test
-pnpm --filter infrastructure mongo:seed
+pnpm run mongo:seed
 ```
 
 ---
@@ -153,12 +153,12 @@ pnpm --filter infrastructure mongo:seed
 Construisez les packages dans l'ordre suivant :
 
 ```bash
-pnpm --filter domain build
-pnpm --filter application build
-pnpm --filter infrastructure build
-pnpm --filter app-next build
-pnpm --filter express build
-pnpm --filter sockets build
+pnpm run build:domain
+pnpm run build:app
+pnpm run build:infra
+pnpm run build:app-next
+pnpm run build:express
+pnpm run build:socket
 ```
 
 > ⚠️ **Important :** L'ordre de build est crucial car les packages dépendent les uns des autres.
