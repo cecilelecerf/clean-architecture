@@ -74,5 +74,10 @@
   "users": {
     "none": "Aucun utilisateur associé pour le moment.",
     "more": "Voir +"
+  },
+  "thread": {
+    "none": "Pas de conversation",
+    "join": "Rejoindre la conversation",
+    "customer": "Client"
   }
 }

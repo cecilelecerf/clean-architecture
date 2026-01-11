@@ -74,5 +74,10 @@
   "users": {
     "none": "No users are currently associated with any of these.",
     "more": "See more"
+  },
+  "thread": {
+    "none": "No conversation",
+    "join": "Join the conversation",
+    "customer": "Customer"
   }
 }
