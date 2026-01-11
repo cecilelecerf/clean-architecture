@@ -32,14 +32,11 @@ export const CreditCardMobile = ({ credit, userId, basePath }: { credit: CreditD
     const [refusalReason, setRefusalReason] = useState("");
 
     const { data: session } = useSession();
-    if (!session?.user?.id) return <div>Unauthorized</div>;
     const config = statusConfig[credit.status];
     const StatusIcon = config.icon;
     const isPending = credit.status === "PENDING";
 
-    const grantMutation = useMutation(endpoints.credits.grant({ creditId: credit.id }),
-
-    );
+    const grantMutation = useMutation(endpoints.credits.grant({ creditId: credit.id }));
 
     const handleAccept = () => {
         setDialogAction("accept");

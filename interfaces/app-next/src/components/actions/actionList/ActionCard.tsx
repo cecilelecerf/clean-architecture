@@ -6,10 +6,7 @@ import {
     XCircle,
     Building2,
 } from "lucide-react";
-import { memo, useMemo } from "react";
 import { Action } from "@infrastructure/types/action";
-
-
 
 interface ActionCardProps {
     action: Action;
@@ -18,14 +15,12 @@ interface ActionCardProps {
 }
 
 export const ActionCard = ({ action, onClick, withIsDispo }: ActionCardProps) => {
-    const formattedPrice = useMemo(() => {
-        return action.price.amount.toLocaleString("fr-FR", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
-    }, [action.price.amount]);
+    const formattedPrice = action.price.amount.toLocaleString("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
 
-    const availabilityBadge = useMemo(() => {
+    const getAvailabilityBadge = () => {
         if (!withIsDispo) return null;
 
         return action.isAvailable ? (
@@ -39,7 +34,9 @@ export const ActionCard = ({ action, onClick, withIsDispo }: ActionCardProps) =>
                 Indispo
             </Badge>
         );
-    }, [action.isAvailable, withIsDispo]);
+    }
+    const availabilityBadge = getAvailabilityBadge()
+
 
     return (
         <Card

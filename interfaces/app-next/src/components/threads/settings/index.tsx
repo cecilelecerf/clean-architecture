@@ -1,7 +1,7 @@
 "use client"
 import { ButtonLoading } from "@/components/buttons/ButtonLoading"
 import { Button } from "@/components/ui/button"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from "@/components/ui/command"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { endpoints } from "@/utils/endpoint"
@@ -27,13 +27,13 @@ export const Settings = ({ administrator, participants, participantsId, isClose,
     const removeParticipant = useMutation(endpoints.threads.participants.remove({ threadId: id }))
     const closeThread = useMutation(endpoints.threads.close({ threadId: id }))
     const isAdmin = administrator ? session.user.id === administrator.id : false
-    const handleTransfer = useCallback((newAdministratorId: UserId) => {
+    const handleTransfer = (newAdministratorId: UserId) => {
         transfer.mutate({ newAdministratorId });
-    }, [transfer, id]);
+    }
 
-    const handleRemoveParticipant = useCallback((userId: UserId) => {
+    const handleRemoveParticipant = (userId: UserId) => {
         removeParticipant.mutate({ userId });
-    }, [removeParticipant, id]);
+    }
     const t = useTranslations("director.message");
 
     return (
@@ -103,15 +103,21 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
         ]
     })
     const addParticipant = useMutation(endpoints.threads.participants.add({ threadId: id }));
-    const conseillers = queries[0].status === "success" ? queries[0].data : [];
-    const directors = queries[1].status === "success" ? queries[1].data : [];
+    const users = useMemo(() => {
+        const conseillers =
+            queries[0].status === "success" ? queries[0].data : [];
+
+        const directors =
+            queries[1].status === "success" ? queries[1].data : [];
+
+        return [...conseillers, ...directors];
+    }, [queries]);
 
     const availableUsers = useMemo(() => {
-        const allUsers = [...conseillers, ...directors];
-        return allUsers.filter(
+        return users.filter(
             (user) => !participantsId.includes(user.id) && user.id !== administratorId
         );
-    }, [conseillers, directors, participantsId, administratorId]);
+    }, [users, participantsId, administratorId]);
 
     const handleAddParticipant = useCallback(() => {
         if (selectedUserId) {
@@ -197,7 +203,6 @@ const AddParticipant = ({ participantsId, administratorId, id }: Pick<Props, "ad
 const TransferToAdvisor = ({ id }: Pick<Props, "id">) => {
     const { data: session } = useSession();
     const queryClient = useQueryClient();
-    if (!session?.user?.id) return <div>Unauthorized</div>;
     const [selectedUserId, setSelectedUserId] = useState<UserId | null>(null);
     const [open, setOpen] = useState(false);
     const router = useRouter()
@@ -205,7 +210,7 @@ const TransferToAdvisor = ({ id }: Pick<Props, "id">) => {
     const queries = useQuery(endpoints.users.getAll({ role: "conseiller" }))
     const transferTo = useMutation(endpoints.threads.transfer({ threadId: id }));
 
-    const handleTransfer = useCallback(() => {
+    const handleTransfer = () => {
         if (selectedUserId) {
             transferTo.mutate({ newAdministratorId: selectedUserId }, {
                 onSuccess: () => {
@@ -221,8 +226,7 @@ const TransferToAdvisor = ({ id }: Pick<Props, "id">) => {
                 }
             })
         }
-    }, [selectedUserId, transferTo]);
-
+    }
 
     return match(queries)
         .with({ status: "error" }, () => "error")
