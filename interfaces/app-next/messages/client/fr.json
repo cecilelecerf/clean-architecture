@@ -42,6 +42,14 @@
     },
     "thread": {
         "none": "Pas de conversation",
-        "contact": "Contactez un conseillez"
+        "contact": "Contactez un conseillez",
+        "new": {
+            "form": {
+                "title": "Titre de la conversation",
+                "msg": "Message"
+            },
+            "title": "Nouvelle conversation",
+            "button": "Contacter"
+        }
     }
 }

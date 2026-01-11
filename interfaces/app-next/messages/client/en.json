@@ -42,6 +42,14 @@
     },
     "thread": {
         "none": "No conversation",
-        "contact": "Contact an advisor"
+        "contact": "Contact an advisor",
+        "new": {
+            "form": {
+                "title": "Conversation title",
+                "msg": "Message"
+            },
+            "title": "New conversation",
+            "button": "Contact"
+        }
     }
 }
