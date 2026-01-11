@@ -3,7 +3,8 @@ import {
   MessageSquare,
   Users,
   Percent,
-  FileChartLine
+  FileChartLine,
+  BadgeDollarSign 
 } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -64,7 +65,7 @@ export const menuItems: MenuItem[] = [
     basePath: "/director/actions"
   },
   {
-    icon: <FileChartLine size={18} />,
+    icon: <BadgeDollarSign size={18} />,
     labelKey: "currencies",
     href: "/director/currencies",
     basePath: "/director/currencies"

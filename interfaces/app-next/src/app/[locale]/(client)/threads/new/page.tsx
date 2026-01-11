@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { endpoints } from "@/utils/endpoint";
 import { NewExternalThread, newExternalThreadSchema } from "@infrastructure/types/thread";
+import { useTranslations } from "next-intl";
 
 
 export default function NewThreadPage() {
@@ -15,6 +16,8 @@ export default function NewThreadPage() {
     const { data: session } = useSession();
 
     if (!session?.user?.id) return <div>Unauthorized</div>;
+
+    const t = useTranslations("client.thread.new");
 
     const form = useForm<Omit<NewExternalThread, "participantsId">>({
         resolver: zodResolver(newExternalThreadSchema.omit({ participantsId: true })),
@@ -31,17 +34,17 @@ export default function NewThreadPage() {
     };
 
     const data: DataInfo<Omit<NewExternalThread, "participantsId">> = {
-        title: { label: "Titre de la conversation", type: "text" },
-        messageContent: { label: "Message", type: "textarea" },
+        title: { label: t("form.title"), type: "text" },
+        messageContent: { label: t("form.msg"), type: "textarea" },
     };
 
     return (
         <FormWrapper<Omit<NewExternalThread, "participantsId">>
-            title="Nouvelle conversation"
+            title={t("title")}
             form={form}
             data={data}
             onSubmit={onSubmit}
-            labelButton="Contacter"
+            labelButton={t("button")}
             loading={mutate.isPending}
         />
     );

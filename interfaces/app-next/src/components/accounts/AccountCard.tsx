@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type Account = {
     IBAN: string;
@@ -33,6 +34,7 @@ export const AccountCard = ({
     onClickUser,
 }: AccountCardProps) => {
     const router = useRouter();
+    const t = useTranslations("account");
 
     const handleAccountClick = () => {
         if (onClickAccount) onClickAccount(account.IBAN);
@@ -53,12 +55,12 @@ export const AccountCard = ({
                 <div>
                     <h3 className="font-semibold text-lg">{account.name}</h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {account.type === "courant" ? "Compte courant" : "Compte épargne"}
+                        {account.type === "courant" ? t("current") : t("saving")}
                     </p>
                 </div>
 
                 <div className="py-3 px-4 bg-gray-50 dark:bg-gray-300/10 rounded-lg">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Solde</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t("balance")}</p>
                     <p className="text-2xl font-bold">
                         {account.balance.amount.toLocaleString("fr-FR", {
                             style: "currency",
@@ -95,14 +97,14 @@ export const AccountCard = ({
                             className="flex items-center"
                         >
                             <User className="w-4 h-4 mr-2" />
-                            Voir client
+                            {t("client")}
                         </Button>
                     )}
                     <Button
                         size="sm"
                         onClick={handleAccountClick}
                     >
-                        Voir compte
+                        {t("more")}
                     </Button>
                 </div>
             </CardContent>

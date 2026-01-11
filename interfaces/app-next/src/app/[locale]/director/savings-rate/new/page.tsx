@@ -7,15 +7,16 @@ import router from "next/router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormWrapper, { DataInfo } from "@/components/FormWrapper";
+import { useTranslations } from "next-intl";
 
 export default function NewSavingsRatePage() {
     const form = useForm<NewSavingsrate>({
         resolver: zodResolver(newSavingsrateSchema),
     });
     const mutation = useMutation(endpoints.savingsRates.create());
+    const t = useTranslations("director.saving.new");
 
     const handleSubmit = (values: NewSavingsrate) => {
-
         if (!values.rate || !values.effectiveDate) {
             return;
         }
@@ -27,21 +28,21 @@ export default function NewSavingsRatePage() {
 
     const fields: DataInfo<NewSavingsrate> = {
         rate: {
-            label: "Taux",
+            label: t("form.rate"),
             type: "number"
         },
         effectiveDate: {
-            label: "Date d\'entrée en vigueur",
+            label: t("form.effectiveDate"),
             type: 'date'
         }
     }
 
     return (
         <FormWrapper<NewSavingsrate>
-            title="Nouveau taux d'épargne"
-            description="Créer un taux d'épargne"
+            title={t("title")}
+            description={t("description")}
             data={fields}
-            labelButton="Enregistrer"
+            labelButton={t("button")}
             loading={mutation.isPending}
             form={form}
             onSubmit={handleSubmit}

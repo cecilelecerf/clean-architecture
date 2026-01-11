@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslations } from 'next-intl';
 
 export const AccountDetail = ({
     accountIban,
@@ -51,6 +52,8 @@ export const AccountDetail = ({
 }) => {
     const router = useRouter();
     const query = useQuery(endpoints.accounts.get({ accountIban }));
+
+    const t = useTranslations("account");
 
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false);
@@ -92,7 +95,7 @@ export const AccountDetail = ({
         <>
             {match(query)
                 .with({ status: "pending" }, () => <SkeletonAccount />)
-                .with({ status: "error" }, () => <div className="text-red-500">Erreur de chargement</div>)
+                .with({ status: "error" }, () => <div className="text-red-500">{t("error")}</div>)
                 .with({ status: "success" }, ({ data: account }) => {
                     const otherAccounts = otherAccountsQuery.data?.filter(
                         acc => acc.IBAN !== account.IBAN
@@ -115,14 +118,14 @@ export const AccountDetail = ({
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem onClick={() => handleEditClick(account.name)}>
                                                     <Edit className="mr-2 h-4 w-4" />
-                                                    Modifier le nom
+                                                    {t("update")}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => setIsCloseDialogOpen(true)}
                                                     className="text-red-600"
                                                 >
                                                     <XCircle className="mr-2 h-4 w-4" />
-                                                    Fermer le compte
+                                                    {t("close")}
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -151,7 +154,7 @@ export const AccountDetail = ({
                                         onClick={() => router.push(`/admin/users/${account.userId}`)}
                                         className="flex-1 mx-1 bg-gray-100 text-gray-800 hover:bg-gray-200"
                                     >
-                                        Voir le client
+                                        {t("client")}
                                     </Button>
                                     <Separator />
                                 </>
@@ -163,7 +166,7 @@ export const AccountDetail = ({
                                         onClick={() => router.push(`${basePath}/${account.IBAN}/transactions/new`)}
                                         className="flex-1 mx-1 bg-gray-100 text-gray-800 hover:bg-gray-200"
                                     >
-                                        Transférer
+                                        {t("transfer")}
                                     </Button>
                                     <Separator />
                                 </>
@@ -171,7 +174,7 @@ export const AccountDetail = ({
 
                             <Flex direction="column" gap="4">
                                 <Flex justify="between">
-                                    <h2 className="font-semibold text-lg">Dernières transactions</h2>
+                                    <h2 className="font-semibold text-lg">{t("last")}</h2>
                                     <Button
                                         variant="link"
                                         onClick={() => router.push(`${basePath}/${account.IBAN}/transactions`)}
@@ -194,30 +197,30 @@ export const AccountDetail = ({
                             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                                 <DialogContent>
                                     <DialogHeader>
-                                        <DialogTitle>Modifier le nom du compte</DialogTitle>
+                                        <DialogTitle>{t("dialog.update.title")}</DialogTitle>
                                         <DialogDescription>
-                                            Changez le nom de votre compte pour mieux l'identifier.
+                                            {t("dialog.update.description")}
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="grid gap-4 py-4">
                                         <div className="grid gap-2">
-                                            <Label htmlFor="name">Nom du compte</Label>
+                                            <Label htmlFor="name">{t("dialog.update.label")}</Label>
                                             <Input
                                                 id="name"
                                                 value={editedName}
                                                 onChange={(e) => setEditedName(e.target.value)}
-                                                placeholder="Entrez le nouveau nom"
+                                                placeholder={t("dialog.update.placeholder")}
                                             />
                                         </div>
                                     </div>
                                     <DialogFooter>
                                         <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
                                             <X className="mr-2 h-4 w-4" />
-                                            Annuler
+                                            {t("dialog.button.cancel")}
                                         </Button>
                                         <Button onClick={handleSaveEdit}>
                                             <Check className="mr-2 h-4 w-4" />
-                                            Enregistrer
+                                            {t("dialog.button.save")}
                                         </Button>
                                     </DialogFooter>
                                 </DialogContent>
@@ -226,29 +229,29 @@ export const AccountDetail = ({
                             <Dialog open={isCloseDialogOpen} onOpenChange={setIsCloseDialogOpen}>
                                 <DialogContent>
                                     <DialogHeader>
-                                        <DialogTitle>Fermer le compte</DialogTitle>
+                                        <DialogTitle>{t("dialog.close.title")}</DialogTitle>
                                         <DialogDescription>
-                                            Cette action est irréversible. Le solde restant de{' '}
+                                            {t("dialog.close.description.start")}{' '}
                                             <strong>
                                                 {account.balance.amount.toLocaleString('fr-FR', {
                                                     style: 'currency',
                                                     currency: account.balance.currency
                                                 })}
                                             </strong>{' '}
-                                            sera transféré vers le compte sélectionné.
+                                            {t("dialog.close.description.end")}
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="grid gap-4 py-4">
                                         <div className="grid gap-2">
                                             <Label htmlFor="target-account">
-                                                Compte de destination pour le transfert
+                                                {t("dialog.close.label")}
                                             </Label>
                                             <Select
                                                 value={transferTargetAccount}
                                                 onValueChange={setTransferTargetAccount}
                                             >
                                                 <SelectTrigger id="target-account">
-                                                    <SelectValue placeholder="Sélectionnez un compte" />
+                                                    <SelectValue placeholder={t("dialog.close.placeholder")} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {otherAccounts.map((acc) => (
@@ -261,7 +264,7 @@ export const AccountDetail = ({
                                                     ))}
                                                     {otherAccounts.length === 0 && (
                                                         <SelectItem value="none" disabled>
-                                                            Aucun autre compte disponible
+                                                            {t("dialog.close.none")}
                                                         </SelectItem>
                                                     )}
                                                 </SelectContent>
@@ -270,7 +273,7 @@ export const AccountDetail = ({
                                     </div>
                                     <DialogFooter>
                                         <Button variant="outline" onClick={() => setIsCloseDialogOpen(false)}>
-                                            Annuler
+                                            {t("dialog.button.cancel")}
                                         </Button>
                                         <Button
                                             variant="destructive"
@@ -278,7 +281,7 @@ export const AccountDetail = ({
                                             disabled={!transferTargetAccount || account.balance.amount <= 0}
                                         >
                                             <XCircle className="mr-2 h-4 w-4" />
-                                            Fermer définitivement
+                                            {t("dialog.button.close")}
                                         </Button>
                                     </DialogFooter>
                                 </DialogContent>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { match } from "ts-pattern";
 import { Euro, Pencil, Percent } from 'lucide-react';
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 type FormuleDetail = {
     label: string;
     value: string | number;
@@ -15,22 +16,23 @@ type FormuleDetail = {
 
 export const FormuleInfo = ({ formuleId }: { formuleId: FormuleId }) => {
     const query = useQuery(endpoints.formules.get({ formuleId: formuleId }))
-    const router = useRouter()
+    const router = useRouter();
+    const t = useTranslations("director.credits.info");
 
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: 'pending' }, () => "pendign")
         .with({ status: "success" }, ({ data: formule }) => {
             const details: FormuleDetail[] = [
-                { label: "Type", value: formule.type },
-                { label: "Description", value: formule.description },
+                { label: t("type"), value: formule.type },
+                { label: t("description"), value: formule.description },
                 {
-                    label: "Taux d'intérêt",
+                    label: t("interestRate"),
                     value: `${formule.interestRate}%`,
                     icon: <Percent className="h-4 w-4 text-muted-foreground" />
                 },
                 {
-                    label: "Taux d'assurance",
+                    label: t("insuranceRate"),
                     value: `${formule.insuranceRate}%`,
                     icon: <Percent className="h-4 w-4 text-muted-foreground" />
                 },
@@ -38,7 +40,7 @@ export const FormuleInfo = ({ formuleId }: { formuleId: FormuleId }) => {
 
             if (formule.minAmount !== undefined && formule.maxAmount !== undefined) {
                 details.push({
-                    label: "Montant",
+                    label: t("amount"),
                     value: `${formule.minAmount.toLocaleString('fr-FR')}€ - ${formule.maxAmount.toLocaleString('fr-FR')}€`,
                     icon: <Euro className="h-4 w-4 text-muted-foreground" />
                 });
@@ -52,14 +54,14 @@ export const FormuleInfo = ({ formuleId }: { formuleId: FormuleId }) => {
                                     {formule.label}
                                 </CardTitle>
                                 <p className="text-sm text-muted-foreground">
-                                    Créée le {new Date(formule.createdAt).toLocaleDateString('fr-FR')}
+                                    {t("createdAt")} {new Date(formule.createdAt).toLocaleDateString('fr-FR')}
                                 </p>
                             </div>
                             <Badge
                                 variant={formule.isActive ? "default" : "secondary"}
                                 className="shrink-0"
                             >
-                                {formule.isActive ? "Active" : "Inactive"}
+                                {formule.isActive ? t("active") : t("inactive")}
                             </Badge>
                         </div>
                     </CardHeader>
@@ -91,7 +93,7 @@ export const FormuleInfo = ({ formuleId }: { formuleId: FormuleId }) => {
                         onClick={() => router.push(`/director/formules/${formule.id}/update`)}
                     >
                         <Pencil size={16} className="mr-2" />
-                        Modifier
+                        {t("update")}
                     </Button>
                 </div>
             </div>

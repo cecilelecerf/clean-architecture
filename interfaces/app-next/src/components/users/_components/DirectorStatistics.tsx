@@ -9,10 +9,12 @@ import {
 import { UserId } from "@infrastructure/types/user";
 import { match } from "ts-pattern";
 import { DirectorStat } from "@infrastructure/types/stat";
+import { useTranslations } from "next-intl";
 import { StatCard } from "./StatCard";
 
 export const DirectorStatistics = ({ userId }: { userId: UserId }) => {
     const query = useQuery(endpoints.users.stats({ id: userId }));
+    const t = useTranslations("director.profile");
 
     return (
         <Card
@@ -23,7 +25,7 @@ export const DirectorStatistics = ({ userId }: { userId: UserId }) => {
         >
             <h2 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2">
                 <Briefcase className="h-5 w-5" />
-                Vue d'ensemble
+                {t("overview.title")}
             </h2>
 
             {match(query)
@@ -35,28 +37,28 @@ export const DirectorStatistics = ({ userId }: { userId: UserId }) => {
                     return (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                             <StatCard
-                                label="Conseillers"
+                                label={t("overview.advisors")}
                                 value={stats.totalAdvisors}
                                 icon={Users}
                                 color="blue"
                             />
 
                             <StatCard
-                                label="Clients total"
+                                label={t("overview.client")}
                                 value={stats.totalClients}
                                 icon={Users}
                                 color="green"
                             />
 
                             <StatCard
-                                label="Actions"
+                                label={t("overview.stocks")}
                                 value={stats.totalActions}
                                 icon={TrendingUp}
                                 color="purple"
                             />
 
                             <StatCard
-                                label="Disponibles"
+                                label={t("overview.available")}
                                 value="-"
                                 icon={TrendingUp}
                                 color="orange"

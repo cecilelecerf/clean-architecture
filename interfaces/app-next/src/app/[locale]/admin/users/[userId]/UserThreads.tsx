@@ -8,12 +8,14 @@ import { UserId } from "@infrastructure/types/user"
 import { Flex } from "@radix-ui/themes"
 import { useQuery } from "@tanstack/react-query"
 import { useSession } from "next-auth/react"
+import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { match } from "ts-pattern"
 
 export const UserThreads = ({ userId }: { userId: UserId }) => {
     const { data: session } = useSession()
     const router = useRouter()
+    const t = useTranslations("users.thread");
     const query = useQuery(endpoints.threads.getByUser({ userId }))
     return match(query)
         .with({ status: "error" }, () => "error")
@@ -22,7 +24,7 @@ export const UserThreads = ({ userId }: { userId: UserId }) => {
             if (threads.length === 0) return
             return (
                 <section>
-                    <h2 className="text-lg font-bold mb-4">Conversations clients</h2>
+                    <h2 className="text-lg font-bold mb-4">{t("title")}</h2>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {threads.map((acc) => (
                             <Card
@@ -33,12 +35,12 @@ export const UserThreads = ({ userId }: { userId: UserId }) => {
                                     <Flex justify="between" gap="2">
 
                                         <CardTitle>{acc.title}</CardTitle>
-                                        <Badge>{acc.isClose ? "Fermé" : "Ouvert"}</Badge>
+                                        <Badge>{acc.isClose ? t("close") : t("open")}</Badge>
                                     </Flex>
                                 </CardHeader>
                                 <CardContent className="flex flex-col justify-center">
 
-                                    {session.user.id === acc.administratorId && <Button variant="link" onClick={() => router.push(`/admin/client-threads/${acc.id}`)}>Accéder</Button>}
+                                    {session.user.id === acc.administratorId && <Button variant="link" onClick={() => router.push(`/admin/client-threads/${acc.id}`)}>{t("access")}</Button>}
                                     <p className="text-xs text-center">{formatDateFrench(acc.updatedAt)}</p>
                                 </CardContent>
                             </Card>

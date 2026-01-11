@@ -9,52 +9,62 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ActionId, NewAction, newActionSchema, UpdateAction, updateActionSchema } from "@infrastructure/types/action";
 import z from "zod";
+import { useTranslations } from "next-intl";
 
 export const ActionForm = ({ isin }: { isin?: ActionId }) => {
+    const tForm = useTranslations("director.stocks.new.form");
+    const tFormUpdate = useTranslations("director.stocks.update.form");
+    
     const sections = [
         {
-            title: "Identification",
-            description: "Informations de base sur l'action",
+            title: tForm("identification.title"),
+            description: tForm("identification.description"),
             icon: FileText,
             data: {
-                symbol: { label: "Symbole", type: "text" },
-                name: { label: "Nom de l'action", type: "text" },
+                symbol: { label: tForm("identification.description.fields.symbol"), type: "text" },
+                name: { label: tForm("identification.description.fields.name"), type: "text" },
             },
         },
         {
-            title: "Marché & Secteur",
-            description: "Classification de l'action",
+            title: tForm("market.title"),
+            description: tForm("market.description"),
             icon: Building2,
             data: {
                 market: {
-                    label: "Marché", type: "radio",
+                    label: tForm("identification.description.fields.market.label"), type: "radio",
                     options:
-                        [{ label: "NASDAQ", value: "NASDAQ" },
-                        { label: "NYSE", value: "NYSE" },
-                        { label: "Euronext Paris", value: "Euronext Paris" },
-                        { label: "LSE", value: "LSE" },
-                        { label: "DAX", value: "DAX" },
-                        { label: "Autre", value: "Autre" },],
+                        [{ label: tForm("identification.description.fields.market.options.NASDAQ"), value: "NASDAQ" },
+                        { label: tForm("identification.description.fields.market.options.NYSE"), value: "NYSE" },
+                        { label: tForm("identification.description.fields.market.options.EURONEXT_PARIS"), value: "Euronext Paris" },
+                        { label: tForm("identification.description.fields.market.options.LSE"), value: "LSE" },
+                        { label: tForm("identification.description.fields.market.options.DAX"), value: "DAX" },
+                        { label: tForm("identification.description.fields.market.options.OTHER"), value: "Autre" },],
                 }, activitySector:
-                    { label: "Secteur d'activité", type: "text", },
+                    { label: tForm("identification.description.fields.activitySector"), type: "text", },
             },
         },
         {
-            title: "Paramètres",
-            description: "Configuration de disponibilité",
+            title: tForm("settings.title"),
+            description: tForm("settings.description"),
             icon: Settings,
             data: {
                 isAvailable:
                 {
-                    label: "Disponibilité",
+                    label: tForm("settings.description.fields.isAvailable"),
                     type: "switch",
                 },
             },
         },];
-    return isin ? <EditActionForm isin={isin} sections={sections as Section<UpdateAction>[]} /> : <CreateActionForm sections={sections as Section<NewAction>[]} />;
+    return isin ? <EditActionForm 
+    isin={isin} 
+    sections={sections as Section<UpdateAction>[]} 
+    t={tFormUpdate}/> : <CreateActionForm
+    sections={sections as Section<NewAction>[]}
+    tForm = {tForm}
+    t={tFormUpdate}/>;
 
 };
-const CreateActionForm = ({ sections }: { sections: Section<NewAction>[] }) => {
+const CreateActionForm = ({ sections, tForm,  t }: { sections: Section<NewAction>[], tForm: ReturnType<typeof useTranslations>, t: ReturnType<typeof useTranslations>; }) => {
 
     const form = useForm<NewAction>({
         resolver: zodResolver(newActionSchema),
@@ -63,14 +73,14 @@ const CreateActionForm = ({ sections }: { sections: Section<NewAction>[] }) => {
     const currenciesQuery = useQuery(endpoints.currencies.getAll());
 
     const updateSection = [{
-        title: "Valeur initiale",
-        description: "Informations financières de départ",
+        title: t("initialValue.title"),
+        description: t("initialValue.description"),
         icon: DollarSign,
         data: {
-            quantity: { label: "Nombre total d'actions", type: "number" },
-            priceAmount: { label: "Prix initial", type: "number" },
+            quantity: { label: t("initialValue.fields.quantity"), type: "number" },
+            priceAmount: { label: t("initialValue.fields.priceAmount"), type: "number" },
             priceCurrency: {
-                label: "Devise", type: "select",
+                label: t("initialValue.fields.priceCurrency"), type: "select",
                 options:
                     currenciesQuery.status === "success" ?
                         currenciesQuery.data.map((d) => ({ label: ` ${d.code} - ${d.name}(${d.symbol})`, value: d.code, })) : [],
@@ -80,16 +90,16 @@ const CreateActionForm = ({ sections }: { sections: Section<NewAction>[] }) => {
     const createMutation = useMutation(endpoints.actions.create());
     return (
         <FormWrapper<NewAction>
-            title="Nouvelle action"
+            title={tForm("title")}
             form={form}
             data={[...updateSection, ...sections,] as Section<UpdateAction>[]}
-            labelButton="Créer une nouvelle action"
+            labelButton={tForm("button")}
             loading={createMutation.isPending}
             onSubmit={(values) => createMutation.mutate({ payload: values })}
         />
     );
 };
-const EditActionForm = ({ isin, sections }: { isin: ActionId, sections: Section<UpdateAction>[] }) => {
+const EditActionForm = ({ isin, sections, t }: { isin: ActionId, sections: Section<UpdateAction>[], t: ReturnType<typeof useTranslations>;}) => {
 
     const form = useForm<z.infer<typeof updateActionSchema>>({
         resolver: zodResolver(updateActionSchema),
@@ -101,9 +111,9 @@ const EditActionForm = ({ isin, sections }: { isin: ActionId, sections: Section<
 
     return (
         <FormWrapper<UpdateAction>
-            title="Modifier l'action"
+            title={t("title")}
             form={form}
-            labelButton="Modifier"
+            labelButton={t("button")}
             loading={updateMutation.isPending}
             data={sections}
             onSubmit={(values) => updateMutation.mutate({ payload: values })}

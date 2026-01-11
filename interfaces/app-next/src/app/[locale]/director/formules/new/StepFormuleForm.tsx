@@ -8,6 +8,7 @@ import FormWrapper, { Section } from "@/components/FormWrapper";
 import { useForm } from "react-hook-form";
 import { NewFormule, newFormuleSchema } from "@/utils/endpoint/formuleEndpoints";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 
 type FormuleFormData = {
     interestRate: number;
@@ -33,6 +34,8 @@ export const StepFormuleForm = ({
 }) => {
     const query = useQuery(endpoints.formules.getTypes());
 
+    const t = useTranslations("director.credits.formulas.new.form");
+
     const typeOptions =
         query.data?.map((t) => ({
             label: t.label,
@@ -53,36 +56,36 @@ export const StepFormuleForm = ({
     });
     const sections: Section<Omit<NewFormule, "accountId">>[] = [
         {
-            title: "Taux",
-            description: "Paramètres financiers du prêt",
+            title: t("rates.title"),
+            description: t("rates.description"),
             icon: Percent,
             data: {
                 interestRate: {
-                    label: "Taux d'intérêt",
+                    label: t("rates.fields.interestRate"),
                     type: "number",
                 },
                 insuranceRate: {
-                    label: "Taux d'assurance",
+                    label: t("rates.fields.insuranceRate"),
                     type: "number",
                 },
             },
         },
         {
-            title: "Informations",
-            description: "Identification de la formule",
+            title: t("information.title"),
+            description: t("information.description"),
             icon: FileText,
             data: {
                 type: {
-                    label: "Type de prêt",
+                    label: t("information.fields.type"),
                     type: "select",
                     options: typeOptions,
                 },
                 label: {
-                    label: "Label",
+                    label: t("information.fields.label"),
                     type: "text",
                 },
                 description: {
-                    label: "Description",
+                    label: t("information.fields.description"),
                     type: "textarea",
                 },
             },
@@ -93,20 +96,20 @@ export const StepFormuleForm = ({
             icon: Coins,
             data: {
                 minAmount: {
-                    label: "Montant minimum",
+                    label: t("amounts.fields.minAmount"),
                     type: "number",
                 },
                 maxAmount: {
-                    label: "Montant maximum",
+                    label: t("amounts.fields.maxAmount"),
                     type: "number",
                 },
                 currency: {
-                    label: "Devise",
+                    label: t("amounts.fields.currency"),
                     type: "select",
                     options: [
-                        { label: "Euro", value: "EUR" },
-                        { label: "Dollar américain", value: "USD" },
-                        { label: "Livre sterling", value: "GBP" },
+                        { label: t("options.currencies.EUR"), value: "EUR" },
+                        { label: t("options.currencies.USD"), value: "USD" },
+                        { label: t("options.currencies.GBP"), value: "GBP" },
                     ],
                 },
             },
@@ -115,10 +118,10 @@ export const StepFormuleForm = ({
 
     return (
         <FormWrapper<Omit<NewFormule, "accountId">>
-            title="Nouveau prêt"
-            description="Créer une formule de prêt"
+            title={t("title")}
+            description={t("description")}
             data={sections}
-            labelButton="Enregistrer"
+            labelButton={t("button")}
             loading={loading}
             onSubmit={onSubmit}
             form={form}

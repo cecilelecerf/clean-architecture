@@ -1,5 +1,3 @@
-import { getTranslations } from 'next-intl/server';
-import { setRequestLocale } from 'next-intl/server';
 import { DirectorLayoutClient } from './layout-client';
 
 type Props = {
@@ -8,7 +6,5 @@ type Props = {
 };
 
 export default async function DirectorLayout({ children, params }: Props) {
-
-
   return <DirectorLayoutClient >{children}</DirectorLayoutClient>;
 }

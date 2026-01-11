@@ -1,0 +1,54 @@
+{
+    "more": "See account",
+    "client": "See customer",
+    "balance": "Balance",
+    "current": "Running account",
+    "saving": "Saving account",
+    "error": "Loading error",
+    "update": "Rename account",
+    "close": "Close account",
+    "transfer": "Transfer",
+    "last": "Last transactions",
+    "dialog": {
+        "update": {
+            "title": "Change account name",
+            "description": "Change your account name to make it easier to identify.",
+            "label": "Account Name",
+            "placeholder": "Enter the new name"
+        },
+        "close": {
+            "title": "Close account",
+            "description": {
+                "start": "This action is irreversible. The remaining balance of",
+                "end": "will be transferred to the selected account."
+            },
+            "label": "Destination account for the transfer",
+            "placeholder": "Select an account",
+            "none": "No other accounts available"
+        },
+        "button": {
+            "cancel": "Cancel",
+            "save": "Save",
+            "close": "Close permanently"
+        }
+    },
+    "transactions": {
+        "search": "Search by name",
+        "type": "Type",
+        "all": "All",
+        "credit": "Credit",
+        "debit": "Debit",
+        "calendar": {
+            "from": "From",
+            "to": "To"
+        },
+        "page": "Transaction per page",
+        "details": {
+            "title": "Transaction details",
+            "amount": "Amount",
+            "type": "Transaction type",
+            "account": "Beneficiary account",
+            "bank": "Bank"
+        }
+    } 
+}

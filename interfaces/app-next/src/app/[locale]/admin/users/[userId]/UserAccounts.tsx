@@ -4,16 +4,18 @@ import { fromColorClasses, textColorClasses, toColorClasses } from "@/utils/colo
 import { endpoints } from "@/utils/endpoint"
 import { UserId } from "@infrastructure/types/user"
 import { useQuery } from "@tanstack/react-query"
+import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { match } from "ts-pattern"
 
 export const UserAccounts = ({ userId }: { userId: UserId }) => {
     const router = useRouter()
     const query = useQuery(endpoints.accounts.getAllByClient({ userId }))
+    const t = useTranslations("users.account");
 
     return (
         <section>
-            <h2 className="text-lg font-bold mb-4">Comptes bancaires</h2>
+            <h2 className="text-lg font-bold mb-4">{t("title")}</h2>
             {match(query)
                 .with({ status: "error" }, () => ("error"))
                 .with({ status: "pending" }, () => <AccountsSkeleton />)
@@ -21,7 +23,7 @@ export const UserAccounts = ({ userId }: { userId: UserId }) => {
                     if (accounts.length === 0) {
                         return (
                             <div className="text-gray-500 text-center border p-6 rounded-lg">
-                                Aucun compte bancaire pour le moment.
+                                {t("none")}
                             </div>
                         )
                     }
@@ -42,9 +44,9 @@ export const UserAccounts = ({ userId }: { userId: UserId }) => {
                                         <CardTitle>{acc.name}</CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-1 text-sm">
-                                        <p>Type : {acc.type === "courant" ? "Compte courant" : "Compte épargne"}</p>
+                                        <p>Type : {acc.type === "courant" ? t("current") : t("saving")}</p>
                                         <p>
-                                            Solde :{" "}
+                                            {t("balance")} :{" "}
                                             <span className="font-semibold">
                                                 {acc.balance.amount.toLocaleString("fr-FR", {
                                                     style: "currency",

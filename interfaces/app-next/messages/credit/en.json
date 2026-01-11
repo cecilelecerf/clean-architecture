@@ -1,0 +1,90 @@
+{
+    "array": {
+        "status": "Status",
+        "amount": "Amount",
+        "duration": "Duration",
+        "rate": "Rate",
+        "monthly": "Monthly",
+        "date": "Request date",
+        "actions": "Actions"
+    },
+    "row": {
+        "accept": "Accept",
+        "refused": "Refuse",
+        "cancel": "Cancel",
+        "dialog": {
+            "accept": {
+                "title": "Accept loan application",
+                "description": "Are you sure you want to accept this request? The customer will be notified and the loan will be activated.",
+                "action": "Confirm acceptance"
+            },
+            "refused": {
+                "title": "Reject the loan application",
+                "description": "Please state the reason for the refusal. The customer will receive this information.",
+                "placeholder": "Reason for refusal (e.g., insufficient income, excessive debt ratio...)",
+                "action": "Confirm refusal"
+            },
+            "waiting": "Loading ..."
+        }
+    },
+    "details": {
+        "request": "Request created on",
+        "accept": "Accept request",
+        "refuse": "Refuse the request",
+        "start": "This loan will begin on",
+        "debits": "Direct debits will begin on that date.",
+        "progress": "Reimbursement progress",
+        "refund": "refund",
+        "amount": "Amount borrowed",
+        "still": "Still to pay",
+        "monthly": "Monthly",
+        "formula": {
+            "title": "Loan formula details",
+            "type": "Loan type",
+            "label": "Loan label",
+            "interest": "interest rate",
+            "insurance": "Insurance rate",
+            "minAmount": "Minimum amount",
+            "maxAmount": "Maximum amount"
+        },
+        "credit": {
+            "title": "Loan details",
+            "amount": "Amount borrowed",
+            "duration": "Loan duration",
+            "month": "month",
+            "year": "year",
+            "start": "Start date",
+            "monthly": "Monthly"
+        },
+        "user": {
+            "title": "User details",
+            "lastname": "Lastname",
+            "email": "Email",
+            "firstname": "Firstname",
+            "status": "Professional status",
+            "more": "See client"
+        },
+        "account": {
+            "title": "Acount details",
+            "name": "Name",
+            "type": "Type",
+            "balance": "Current balance",
+            "more": "See account"
+        },
+        "dialog": {
+            "accept": {
+                "title": "Accept loan application",
+                "description": "Are you sure you want to accept this request? The customer will be notified and the loan will be activated.",
+                "action": "Confirm acceptance"
+            },
+            "refused": {
+                "title": "Reject the loan application",
+                "description": "Please state the reason for the refusal. The customer will receive this information.",
+                "placeholder": "Reason for refusal (e.g., insufficient income, excessive debt ratio...)",
+                "action": "Confirm refusal"
+            },
+            "waiting": "Loading ..."
+        },
+        "cancel": "Cancel"
+    }
+}

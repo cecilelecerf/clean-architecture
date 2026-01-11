@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import { Mail, User as UserIcon, Shield } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 
 export const isValidUserRole = (value: string | null): value is User["role"] => {
     return value !== null && ["client", "conseiller", "directeur"].includes(value);
@@ -18,6 +19,9 @@ function AdminNewUsersContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const roleParam = searchParams.get("role");
+
+    const t = useTranslations("director.user.new");
+    const tForm = useTranslations("director.user.new.form");
 
     const form = useForm<RegisterAdminPayload>({
         resolver: zodResolver(registerAdminPayload)
@@ -30,8 +34,6 @@ function AdminNewUsersContent() {
     };
 
     const role = getRoleFromParam(roleParam);
-
-
 
     const mutate = useMutation(endpoints.users.create());
 
@@ -57,43 +59,43 @@ function AdminNewUsersContent() {
 
     const sections: Section<RegisterAdminPayload>[] = [
         {
-            title: "Informations personnelles",
-            description: "Identité de l'utilisateur",
+            title: tForm("personal.title"),
+            description: tForm("personal.description"),
             icon: UserIcon,
             data: {
                 firstname: {
-                    label: "Prénom",
+                    label: tForm("personal.fields.firstname"),
                     type: "text",
                 },
                 lastname: {
-                    label: "Nom de famille",
+                    label: tForm("personal.fields.lastname"),
                     type: "text",
                 },
             },
         },
         {
-            title: "Compte",
-            description: "Informations de connexion",
+            title: tForm("account.title"),
+            description: tForm("account.description"),
             icon: Mail,
             data: {
                 email: {
-                    label: "Email",
+                    label: tForm("account.fields.email"),
                     type: "email",
                 },
             },
         },
 
         {
-            title: "Rôle",
-            description: "Permissions associées au compte",
+            title: tForm("role.title"),
+            description: tForm("role.description"),
             icon: Shield,
             data: {
                 role: {
-                    label: "Rôle",
+                    label: tForm("role.fields.role.label"),
                     type: "radio",
                     options: [
-                        { label: "Conseiller", value: "conseiller" },
-                        { label: "Directeur", value: "directeur" },
+                        { label: tForm("role.fields.role.options.advisor"), value: "conseiller" },
+                        { label: tForm("role.fields.role.options.director"), value: "directeur" },
                     ],
                 },
             },
@@ -102,9 +104,9 @@ function AdminNewUsersContent() {
 
     return (
         <FormWrapper<RegisterAdminPayload>
-            title="Créer un nouveau compte"
+            title={t("title")}
             data={sections}
-            labelButton="Générer"
+            labelButton={t("button")}
             loading={mutate.isPending}
             onSubmit={onSubmit}
             form={form}

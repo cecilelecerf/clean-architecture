@@ -22,9 +22,12 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Action } from "@infrastructure/types/action";
+import { useTranslations } from "next-intl";
 
 export const ChartTab = ({ action }: { action: Action }) => {
     const priceHistoryQuery = useQuery(endpoints.orders.actions.getHistory({ isin: action.ISIN }));
+
+    const t = useTranslations("director.stocks.details.chart");
 
     return (
 
@@ -34,7 +37,7 @@ export const ChartTab = ({ action }: { action: Action }) => {
                 <Card>
                     <CardContent className="p-4">
                         <p className="text-sm text-gray-500 text-center">
-                            Impossible de charger l'historique
+                            {t("unableLoading")}
                         </p>
                     </CardContent>
                 </Card>
@@ -73,13 +76,12 @@ export const ChartTab = ({ action }: { action: Action }) => {
                 );
 
                 return (
-
                     <>
                         <Card>
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base flex items-center gap-2">
                                     <TrendingUp className="w-4 h-4" />
-                                    Évolution du prix (30 jours)
+                                    {t("priceEvol")}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
@@ -137,7 +139,7 @@ export const ChartTab = ({ action }: { action: Action }) => {
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base flex items-center gap-2">
                                     <Activity className="w-4 h-4" />
-                                    Volume de transactions
+                                    {t("volume")}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>

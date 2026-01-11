@@ -7,13 +7,15 @@ import { useQuery, } from "@tanstack/react-query";
 import { match } from "ts-pattern";
 import { CreditArray } from "@/components/credits/CreditArray";
 import { CreditsSkeleton } from "@/components/credits/CreditArraySkeleton";
+import { useTranslations } from "next-intl";
 
 export const AdminUserCredits = ({ userId }: { userId: UserId }) => {
     const query = useQuery(endpoints.credits.getAllByClientId({ userId }));
+    const t = useTranslations("users.credit");
 
     return (
         <div className="space-y-6">
-            <h1 className="text-lg md:text-xl font-bold mb-4">Crédits du client</h1>
+            <h1 className="text-lg md:text-xl font-bold mb-4">{t("title")}</h1>
 
             {match(query)
                 .with({ status: "error" }, () => "error")
@@ -24,14 +26,14 @@ export const AdminUserCredits = ({ userId }: { userId: UserId }) => {
                             <Card className="text-center p-8 md:p-12">
                                 <CardContent>
                                     <p className="text-gray-500">
-                                        Ce client n'a aucune demande de crédit.
+                                        {t("none")}
                                     </p>
                                 </CardContent>
                             </Card>
                         );
                     }
 
-                    return (<CreditArray credits={credits} title="Tous les crédits" isAdmin basePath="/admin" />);
+                    return (<CreditArray credits={credits} title={t("array.title")} isAdmin basePath="/admin" />);
                 })
                 .exhaustive()}
         </div>

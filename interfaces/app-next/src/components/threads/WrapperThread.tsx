@@ -12,11 +12,13 @@ import { ButtonBack } from "../buttons/ButtonBack";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "../ui/skeleton";
 import { MessageWithUserDTO } from "@infrastructure/types/thread";
+import { useTranslations } from "next-intl";
 
 type Props = { thread: ThreadWithUser, defaultMessages: MessageWithUserDTO[], userId: UserDto["id"], withSetting?: boolean, addElementInTop?: ReactNode }
 
 export const WrapperThread = ({ thread, defaultMessages, userId, withSetting, addElementInTop }: Props) => {
     const { data: session } = useSession();
+    const t = useTranslations("thread");
 
     const [messages, setMessages] = useState<MessageWithUserDTO[]>(defaultMessages);
     const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -65,7 +67,7 @@ export const WrapperThread = ({ thread, defaultMessages, userId, withSetting, ad
                     role: session.user.role
                 })
                     .with({ isClose: true }, () =>
-                        <p className='w-full bg-red-200 text-red-900 rounded-sm text-center p-2 font-bold'>Discussion fermée</p>
+                        <p className='w-full bg-red-200 text-red-900 rounded-sm text-center p-2 font-bold'>{t("close")}</p>
                     )
                     .with({ haveAdministrator: false, role: "conseiller" }, () =>
                         <JoinThread threadId={thread.id} />

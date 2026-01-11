@@ -23,13 +23,16 @@ import { useState } from "react";
 import { ActionBuy } from "./_components/ActionBuy";
 import { ActionTabs } from "./_components/ActionTabs";
 import { ActionSellContainer } from "./_components/AciontSell";
+import { useTranslations } from "next-intl";
 
 export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: ActionId, baseHref: string, isAdmin?: boolean }) {
     const router = useRouter();
     const statsQuery = useQuery(endpoints.actions.getStats({ isin }));
 
     const actionQuery = useQuery(endpoints.actions.get({ isin }));
-    const [open, setOpen] = useState<null | "buy" | "sell">(null)
+    const [open, setOpen] = useState<null | "buy" | "sell">(null);
+
+    const t = useTranslations("director.stocks.details");
 
     return (
         <div className="space-y-4 pb-20 md:pb-8">
@@ -42,7 +45,7 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                 >
                     <ArrowLeft className="w-5 h-5" />
                 </Button>
-                <h1 className="text-lg font-semibold md:hidden">Détails</h1>
+                <h1 className="text-lg font-semibold md:hidden">{t("title")}</h1>
                 <div className="w-10 md:hidden" />
             </div>
             <div className="space-y-4">
@@ -52,7 +55,7 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                         <Card className="border-red-200 bg-red-50">
                             <CardContent className="p-4">
                                 <p className="text-sm text-red-600 font-semibold">
-                                    Action introuvable
+                                    {t("notfound")}
                                 </p>
                             </CardContent>
                         </Card>
@@ -74,12 +77,12 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                                                         {action.isAvailable ? (
                                                             <Badge className="bg-green-500 hover:bg-green-600 text-xs">
                                                                 <CheckCircle className="w-3 h-3 mr-1" />
-                                                                Disponible
+                                                                {t("available")}
                                                             </Badge>
                                                         ) : (
                                                             <Badge className="bg-red-500 hover:bg-red-600 text-xs">
                                                                 <XCircle className="w-3 h-3 mr-1" />
-                                                                Indisponible
+                                                                {t("unavailable")}
                                                             </Badge>
                                                         )}
                                                     </div>
@@ -105,20 +108,20 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                                                         className="bg-indigo-800/50 hover:bg-indigo-900/50 dark:text-white transition shadow"
                                                         onClick={(() => setOpen((prev) => prev === "buy" ? null : "buy"))}
                                                     >
-                                                        <ShoppingCart className="w-5 h-5" /> Acheter des actions
+                                                        <ShoppingCart className="w-5 h-5" /> {t("buy")}
                                                     </Button>
                                                     <Button
                                                         className="bg-indigo-800/50 hover:bg-indigo-900/50 transition shadow dark:text-white"
                                                         onClick={(() => setOpen((prev) => prev === "sell" ? null : "sell"))}
                                                     >
-                                                        <ShoppingCart className="w-5 h-5" /> Vendre des actions
+                                                        <ShoppingCart className="w-5 h-5" /> {t("sell")}
                                                     </Button>
                                                 </div>
                                             )}
                                         </div>
 
                                         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                                            <p className="text-white/70 text-xs mb-1">Prix actuel</p>
+                                            <p className="text-white/70 text-xs mb-1">{t("current")}</p>
                                             <div className="flex items-baseline gap-3 flex-wrap">
                                                 <p className="text-3xl md:text-4xl font-bold">
                                                     {action.price.amount}
@@ -165,7 +168,7 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: { isin: Action
                         <Card className="border-red-200 bg-red-50">
                             <CardContent className="p-4">
                                 <p className="text-sm text-red-600 font-semibold">
-                                    Action introuvable
+                                    {t("notfound")}
                                 </p>
                             </CardContent>
                         </Card>

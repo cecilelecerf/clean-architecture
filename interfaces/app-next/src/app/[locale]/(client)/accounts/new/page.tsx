@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormWrapper, { Section } from "@/components/FormWrapper";
 import { NewAccount, newAccountSchema } from "@infrastructure/types/account";
 import { CreditCard, Palette } from "lucide-react";
-
+import { useTranslations } from "next-intl";
 
 export default function NewAccountPage() {
   const router = useRouter();
@@ -26,26 +26,28 @@ export default function NewAccountPage() {
     });
   };
 
+  const t = useTranslations("client.account.new");
+
   const sections: Section<NewAccount>[] = [
     {
-      title: "Informations générales",
-      description: "Détails principaux du compte",
+      title: t("form.title"),
+      description: t("form.description"),
       icon: CreditCard,
       data: {
         name: {
-          label: "Nom du compte",
+          label: t("form.fields.name"),
           type: "text",
         },
         type: {
-          label: "Type de compte",
+          label: t("form.fields.type"),
           type: "radio",
           options: [
-            { label: "Courant", value: "courant" },
-            { label: "Épargne", value: "epargne" },
+            { label: t("form.fields.options.running"), value: "courant" },
+            { label: t("form.fields.options.saving"), value: "epargne" },
           ],
         },
         currency: {
-          label: "Devise",
+          label: t("form.fields.currency"),
           type: "select",
           options:
             currenciesQuery.status === "success" ?
@@ -54,12 +56,12 @@ export default function NewAccountPage() {
       },
     },
     {
-      title: "Apparence",
-      description: "Personnalisation visuelle du compte",
+      title: t("form.color.title"),
+      description: t("form.color.description"),
       icon: Palette,
       data: {
         color: {
-          label: "Couleur",
+          label: t("form.color.label"),
           type: "icon",
           options: [
             { icon: "🔴", label: "", value: "red" },
@@ -71,18 +73,16 @@ export default function NewAccountPage() {
           ],
         },
       }
-
-
     },
   ];
 
   return (
     <FormWrapper<NewAccount>
-      title="Créer un nouveau compte"
-      description="Ajoutez un nouveau compte bancaire"
+      title={t("title")}
+      description={t("description")}
       form={form}
       data={sections}
-      labelButton="Créer"
+      labelButton={t("button")}
       loading={mutation.isPending}
       onSubmit={onSubmit}
       showBackButton

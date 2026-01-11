@@ -9,6 +9,7 @@ import { endpoints } from "@/utils/endpoint";
 import { User } from "@infrastructure/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { match } from "ts-pattern";
@@ -19,7 +20,7 @@ function AdminUsersContent() {
     const router = useRouter();
     const roleParam = searchParams.get('role');
 
-
+    const t = useTranslations("director.user");
 
     const role: User["role"] | undefined = match(roleParam)
         .with("director", () => "directeur" as User["role"])
@@ -49,7 +50,7 @@ function AdminUsersContent() {
                     if (filteredUsers.length === 0) {
                         return (
                             <div className="text-gray-500 text-center border p-6 rounded-lg">
-                                Aucun utilisateur associé pour le moment.
+                                {t("none")}
                             </div>
                         );
                     }
