@@ -6,19 +6,25 @@ import { SystemClockService } from "@infrastructure/adapters/services/SystemCloc
 import { SetSavingsRateUsecase } from "@application/usecases/savingRates/SetSavingsRateUseCasee";
 import { GetAllSavingRatesUsecase } from "@application/usecases/savingRates/GetAllSavingRatesUsecase";
 import { GetCurrentSavingRateUsecase } from "@application/usecases/savingRates/GetCurrentSavingRateUsecase";
+import { NodeEmailService } from "@infrastructure/adapters/services/NodeEmailService";
+import { AccountRepositoryMongo } from "../repositories/AccountRepositoryMongo";
 
 export const savingsrateFactory = () => {
   const client = new MongoClient();
   const userRepository = new UserRepositoryMongo(client);
+  const accountRepository = new AccountRepositoryMongo(client);
   const uuidService = new NodeUuidService();
   const clockService = new SystemClockService();
+  const emailService = new NodeEmailService();
   const savingRateRepo = new SavingsRateRepositoryMongo(client);
 
   const setSavingsRate = new SetSavingsRateUsecase(
     savingRateRepo,
     userRepository,
+    accountRepository,
     uuidService,
-    clockService
+    clockService,
+    emailService
   );
 
   const getAll = new GetAllSavingRatesUsecase(savingRateRepo, userRepository);
