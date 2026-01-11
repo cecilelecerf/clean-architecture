@@ -8,6 +8,7 @@ import { User } from "@infrastructure/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { match } from "ts-pattern";
 
 type Props = {
@@ -23,16 +24,23 @@ export function AdminUsersClient({ roleParam, title, translations }: Props) {
     const { data: session } = useSession();
     const router = useRouter();
 
-    const role: User["role"] | undefined = match(roleParam)
-        .with("director", () => "directeur" as User["role"])
-        .with("advisor", () => "conseiller" as User["role"])
-        .otherwise(() => undefined);
+    const role = useMemo<User["role"] | undefined>(() => {
+        return match(roleParam)
+            .with("director", () => "directeur" as User["role"])
+            .with("advisor", () => "conseiller" as User["role"])
+            .otherwise(() => undefined);
+    }, [roleParam]);
 
     const query = useQuery(endpoints.users.getAll({ role }));
 
     if (!session?.user?.id) {
         return <div>Unauthorized</div>;
     }
+
+    const filteredUsers = useMemo(() => {
+        if (query.status !== "success" || !session?.user?.id) return [];
+        return query.data.filter((user) => user.id !== session.user.id);
+    }, [query.status, query.data, session?.user?.id]);
 
     return (
         <>
@@ -44,8 +52,7 @@ export function AdminUsersClient({ roleParam, title, translations }: Props) {
                     </div>
                 ))
                 .with({ status: "pending" }, () => <UsersSkeleton />)
-                .with({ status: "success" }, ({ data: users }) => {
-                    const filteredUsers = users.filter((user) => user.id !== session.user.id);
+                .with({ status: "success" }, () => {
 
                     if (filteredUsers.length === 0) {
                         return (

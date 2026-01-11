@@ -280,7 +280,6 @@ const ActionSell = ({
                                     </span>
                                 </div>
 
-                                {/* Plus-value estimée */}
                                 {sellAmount.quantity > 0 && (
                                     <>
                                         <Separator className="border-gray-200 dark:border-gray-700" />

@@ -1,6 +1,6 @@
 "use client"
 import { ActionId } from "@infrastructure/types/action";
-import ActionDetail from "@/components/actions/ActionDetail";
+import ActionDetail from "@/components/actions/actionDetail";
 import { useParams } from "next/navigation";
 
 export default function ActionDetailsPage() {

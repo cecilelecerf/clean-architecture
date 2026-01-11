@@ -7,7 +7,7 @@ import { ChevronRight } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Action } from "@infrastructure/types/action";
-import { ActionCard } from "@/components/actions/ActionCard";
+import { ActionCard } from "@/components/actions/actionList/ActionCard";
 
 
 

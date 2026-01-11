@@ -14,8 +14,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { GoToAddPage } from "@/components/GoToAddPage";
-import { ActionCard, ActionCardSkeleton } from "./ActionCard";
+import { ActionCard } from "./ActionCard";
 import { useTranslations } from "next-intl";
+import { ActionsListSkeleton } from "./ActionsListSkeleton";
 
 export const ActionsList = ({ isAdmin, baseHref }: { isAdmin?: boolean, baseHref: string }) => {
     const router = useRouter();
@@ -96,12 +97,3 @@ export const ActionsList = ({ isAdmin, baseHref }: { isAdmin?: boolean, baseHref
 }
 
 
-function ActionsListSkeleton() {
-    return (
-        <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-                <ActionCardSkeleton key={i} />
-            ))}
-        </div>
-    );
-}
