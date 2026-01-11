@@ -159,6 +159,7 @@ pnpm run build:infra
 pnpm run build:next
 pnpm run build:express
 pnpm run build:socket
+pnpm run build:crin
 ```
 
 > ⚠️ **Important :** L'ordre de build est crucial car les packages dépendent les uns des autres.
@@ -193,6 +194,12 @@ pnpm run express
 - **Port :** `3002`
 - **Base de données :** MongoDB
 
+#### Cron Job
+
+```bash
+pnpm run cron
+```
+
 ---
 
 ## 👥 Comptes de test
@@ -220,6 +227,7 @@ banking-app/
 │   ├── app-next/       # Application Next.js
 │   ├── express/        # API Express (MongoDB)
 │   └── sockets/            # Serveur WebSocket
+│   └── cron/            # Cron job
 ├── docker-compose.yml
 └── package.json
 ```
@@ -229,6 +237,7 @@ banking-app/
 - **Frontend :** Next.js 15, React 19, Tailwind CSS, shadcn/ui
 - **Backend :** Next.js API Routes, Express.js
 - **Base de données :** MySQL, MongoDB
+- **Cron job :** Node Cron
 - **Temps réel :** Socket.IO
 - **Authentification :** NextAuth.js
 - **Architecture :** Clean Architecture, DDD
@@ -265,6 +274,9 @@ pnpm run express
 
 # Lancer le serveur Socket
 pnpm run socket
+
+# Lancer le serveur de jobs
+pnpm run cron
 
 # Build tous les packages
 pnpm run build

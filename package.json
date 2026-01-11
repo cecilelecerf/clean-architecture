@@ -10,7 +10,8 @@
     "build:express": "pnpm --filter express build",
     "build:socket": "pnpm --filter sockets build",
     "build:next": "pnpm --filter app-next build",
-    "build": "pnpm build:domain && pnpm build:app && pnpm build:infra && pnpm build:next && pnpm build:socket && pnpm build:express",
+    "build:cron": "pnpm --filter cron build",
+    "build": "pnpm build:domain && pnpm build:app && pnpm build:infra && pnpm build:next && pnpm build:socket && pnpm build:express && pnpm build:cron",
     "lint": "pnpm -r lint",
     "mono-build": "pnpm tsc -b tsconfig.build.json",
     "mysql:seed": "pnpm --filter infrastructure run mysql:seed",
@@ -18,7 +19,8 @@
     "mongo:seed": "pnpm --filter infrastructure run mongo:seed",
     "mongo:restart": "pnpm --filter infrastructure run mongo:restart",
     "socket": "pnpm --filter sockets run sockets",
-    "express": "pnpm --filter express run express"
+    "express": "pnpm --filter express run express",
+    "cron": "pnpm --filter express run cron"
   },
   "workspaces": [
     "application",
