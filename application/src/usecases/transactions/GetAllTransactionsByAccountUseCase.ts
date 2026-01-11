@@ -38,8 +38,7 @@ export class GetAllTransactionsByAccountUsecase {
   public constructor(
     private readonly userRepository: UserRepository,
     private readonly transactionRepository: TransactionRepository,
-    private readonly accountRepository: AccountRepository,
-    private readonly clockService: ClockService
+    private readonly accountRepository: AccountRepository
   ) {}
 
   public async execute({

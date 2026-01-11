@@ -270,13 +270,6 @@ export class CreditRepositoryMongo implements CreditRepository {
     );
   }
 
-  /** Supprimer un crédit */
-  async delete(id: CreditEntity["id"]): Promise<void> {
-    await this.client.connect();
-
-    await CreditModel.deleteOne({ _id: id });
-  }
-
   // ============================================================================
   // Méthodes de statistiques
   // ============================================================================

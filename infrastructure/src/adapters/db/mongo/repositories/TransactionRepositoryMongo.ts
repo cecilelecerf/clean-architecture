@@ -33,13 +33,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     });
   }
 
-  async findById(id: string): Promise<TransactionEntity | null> {
-    await this.client.connect();
-    const doc = await TransactionModel.findById(id).lean();
-    if (!doc) return null;
-    return this.mapDocToTransaction(doc);
-  }
-
   async findByIdWithAccount(
     id: string
   ): Promise<TransactionEntityWithAccount | null> {
@@ -93,32 +86,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     return Object.assign(transaction, { fromAccount, toAccount });
   }
 
-  async findByIban(iban: IBAN): Promise<TransactionEntity[]> {
-    await this.client.connect();
-
-    const docs = await TransactionModel.find({
-      $or: [{ fromAccountId: iban.value }, { toAccountId: iban.value }],
-    })
-      .sort({ date: -1 })
-      .lean();
-    return docs.map(this.mapDocToTransaction);
-  }
-
-  async findByDateRange(
-    startDate: Date,
-    endDate: Date
-  ): Promise<TransactionEntity[]> {
-    await this.client.connect();
-
-    const docs = await TransactionModel.find({
-      date: { $gte: startDate, $lte: endDate },
-    })
-      .sort({ date: -1 })
-      .lean();
-
-    return docs.map(this.mapDocToTransaction);
-  }
-
   async save(transaction: TransactionEntity): Promise<void> {
     await this.client.connect();
 
@@ -134,11 +101,6 @@ export class TransactionRepositoryMongo implements TransactionRepository {
       },
       date: transaction.date,
     });
-  }
-
-  async delete(transactionId: string): Promise<void> {
-    await this.client.connect();
-    await TransactionModel.deleteOne({ _id: transactionId });
   }
 
   async findAllByAccountWithFilters(

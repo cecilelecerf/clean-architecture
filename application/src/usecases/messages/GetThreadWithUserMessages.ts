@@ -11,8 +11,7 @@ import {
   UserNotFoundError,
 } from "@application/errors/users";
 import {
-  MessageRepository,
-  MessageWithUser,
+  MessageRepository
 } from "@application/ports/repositories/MessageRepository";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";

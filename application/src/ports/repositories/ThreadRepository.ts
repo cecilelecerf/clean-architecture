@@ -9,12 +9,7 @@ export type ThreadEntityWithUsers = ThreadEntity & {
 export interface ThreadRepository {
   save(thread: ThreadEntity): Promise<void>;
   update(thread: ThreadEntity): Promise<void>;
-  delete(id: ThreadEntity["id"]): Promise<void>;
   findById(id: ThreadEntity["id"]): Promise<ThreadEntity | null>;
-  findAllByParticipantId(userId: UserEntity["id"]): Promise<ThreadEntity[]>;
-  findAllByAdministratorId(
-    administratorId: UserEntity["id"]
-  ): Promise<ThreadEntity[]>;
   countByAdvisor(advisorId: UserEntity["id"]): Promise<number>;
 
   // With user

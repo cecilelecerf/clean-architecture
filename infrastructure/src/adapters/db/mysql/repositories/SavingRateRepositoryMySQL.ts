@@ -42,20 +42,6 @@ export class SavingsRateRepositoryMySQL implements SavingRateRepository {
     return rows.map((row) => this.mapRowToSavingsRate(row));
   }
 
-  /** Trouver un taux par ID */
-  async findById(
-    id: SavingsRateEntity["id"]
-  ): Promise<SavingsRateEntity | null> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM savings_rates WHERE id = ?`,
-      [id]
-    );
-
-    if (rows.length === 0) return null;
-
-    return this.mapRowToSavingsRate(rows[0]);
-  }
-
   /** Sauvegarder un taux d'épargne */
   async save(savingsRate: SavingsRateEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
@@ -66,19 +52,6 @@ export class SavingsRateRepositoryMySQL implements SavingRateRepository {
         savingsRate.effectiveDate,
         savingsRate.createdAt,
         savingsRate.updatedAt,
-      ]
-    );
-  }
-
-  /** Mettre à jour un taux d'épargne */
-  async update(savingsRate: SavingsRateEntity): Promise<void> {
-    await this.client.query<ResultSetHeader>(
-      `UPDATE savings_rates SET rate = ?, effective_date = ?, updated_at = ? WHERE id = ?`,
-      [
-        savingsRate.rate.value,
-        savingsRate.effectiveDate,
-        savingsRate.updatedAt,
-        savingsRate.id,
       ]
     );
   }

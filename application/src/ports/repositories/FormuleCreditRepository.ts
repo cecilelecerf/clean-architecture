@@ -7,5 +7,4 @@ export interface FormuleCreditRepository {
     findAll(): Promise<FormuleCreditEntity[]>;
     findAllActive(): Promise<FormuleCreditEntity[]>;
     existsByLabel(label: string): Promise<boolean>;
-    getDistinctTypes(): Promise<string[]>;
 }

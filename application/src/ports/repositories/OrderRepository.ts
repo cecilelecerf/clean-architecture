@@ -6,7 +6,6 @@ import { ISIN } from "@domain/values/ISIN";
 export type OrderEntityWithAccount = OrderEntity & { account: AccountEntity };
 
 export interface OrderRepository {
-  findById(id: OrderEntity["id"]): Promise<OrderEntity | null>;
   findByIdWithAccount(
     id: OrderEntity["id"]
   ): Promise<OrderEntityWithAccount | null>;
@@ -15,7 +14,6 @@ export interface OrderRepository {
     actionISIN: ActionEntity["ISIN"],
     status?: OrderEntity["status"]
   ): Promise<OrderEntity[]>;
-
   findAllExecutedByISINAndDateRange(
     isin: ISIN,
     startDate: Date,
@@ -26,10 +24,8 @@ export interface OrderRepository {
     userId: UserEntity["id"],
     status?: OrderEntity["status"]
   ): Promise<OrderEntity[]>;
-  findAllOpen(): Promise<OrderEntity[]>;
   save(order: OrderEntity): Promise<void>;
   update(order: OrderEntity): Promise<void>;
-  delete(id: OrderEntity["id"]): Promise<void>;
   findAllByUserIdAndStatus(
     userId: UserEntity["id"],
     status: OrderEntity["status"]

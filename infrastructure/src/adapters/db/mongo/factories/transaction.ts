@@ -16,8 +16,7 @@ export const transactionFactory = () => {
   const getAllByAccount = new GetAllTransactionsByAccountUsecase(
     userRepository,
     transactionRepository,
-    accountRepository,
-    clockService
+    accountRepository
   );
   const getById = new GetTransactionByIdUseCase(
     userRepository,

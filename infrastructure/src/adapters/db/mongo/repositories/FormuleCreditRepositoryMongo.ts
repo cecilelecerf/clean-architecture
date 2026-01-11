@@ -110,12 +110,4 @@ export class FormuleCreditRepositoryMongo implements FormuleCreditRepository {
     const doc = await FormuleCreditModel.findOne({ label }).lean();
     return !!doc;
   }
-
-  /** Récupérer tous les types distincts */
-  async getDistinctTypes(): Promise<string[]> {
-    await this.client.connect();
-
-    const types = await FormuleCreditModel.distinct("type");
-    return types ?? [];
-  }
 }

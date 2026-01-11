@@ -14,7 +14,7 @@ import { UserMapper } from "../../mappers/UserMapper";
 export class PostRepositoryMySQL implements PostRepository {
   constructor(private readonly client: MySQLClient) {}
 
-  // 🔧 Méthode helper pour mapper un row SQL vers PostEntity simple
+  // Méthode helper pour mapper un row SQL vers PostEntity simple
   private mapRowToPost(
     row: RowDataPacket,
     tagsId: string[],
@@ -34,7 +34,7 @@ export class PostRepositoryMySQL implements PostRepository {
     });
   }
 
-  // 🔧 Méthode helper pour récupérer les tags d'un post
+  // Méthode helper pour récupérer les tags d'un post
   private async getPostTags(
     postId: string
   ): Promise<{ tags: TagEntity[]; tagsId: string[] }> {
@@ -58,7 +58,7 @@ export class PostRepositoryMySQL implements PostRepository {
     return { tags, tagsId };
   }
 
-  // 🔧 Méthode helper pour récupérer les user IDs qui ont lu un post
+  // Méthode helper pour récupérer les user IDs qui ont lu un post
   private async getPostReaders(postId: string): Promise<string[]> {
     const readRows = await this.client.query<RowDataPacket[]>(
       `SELECT user_id FROM post_user_read WHERE post_id = ?`,
@@ -67,7 +67,7 @@ export class PostRepositoryMySQL implements PostRepository {
     return readRows.map((r) => r.user_id);
   }
 
-  // 🔧 Méthode helper pour mettre à jour les relations many-to-many
+  // Méthode helper pour mettre à jour les relations many-to-many
   private async updateManyToMany(
     postId: string,
     newIds: string[],
@@ -100,7 +100,7 @@ export class PostRepositoryMySQL implements PostRepository {
     }
   }
 
-  /** 📬 Sauvegarder un post */
+  /** Sauvegarder un post */
   async save(post: PostEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO posts (id, advisor_id, title, content, created_at, updated_at, published_at, client_id) 
@@ -132,7 +132,7 @@ export class PostRepositoryMySQL implements PostRepository {
     }
   }
 
-  /** 🔍 Trouver un post par ID */
+  /** Trouver un post par ID */
   async findById(id: PostEntity["id"]): Promise<PostEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM posts WHERE id = ?`,
@@ -146,41 +146,7 @@ export class PostRepositoryMySQL implements PostRepository {
     return this.mapRowToPost(rows[0], tagsId, readsId);
   }
 
-  /** 🔍 Post avec tags par post ID */
-  async findByIdWithTags(id: PostEntity["id"]): Promise<PostWithTags | null> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM posts WHERE id = ?`,
-      [id]
-    );
-
-    if (rows.length === 0) return null;
-
-    const row = rows[0];
-    const { tags, tagsId } = await this.getPostTags(id);
-    const readsId = await this.getPostReaders(id);
-
-    const post = this.mapRowToPost(row, tagsId, readsId);
-
-    return Object.assign(post, { tags });
-  }
-
-  /** 🔍 Tous les posts d'un advisor */
-  async findAllByAdvisorId(advisorId: UserEntity["id"]): Promise<PostEntity[]> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT * FROM posts WHERE advisor_id = ? ORDER BY created_at DESC`,
-      [advisorId]
-    );
-
-    return Promise.all(
-      rows.map(async (row) => {
-        const { tagsId } = await this.getPostTags(row.id);
-        const readsId = await this.getPostReaders(row.id);
-        return this.mapRowToPost(row, tagsId, readsId);
-      })
-    );
-  }
-
-  /** 🔍 Posts récents */
+  /** Posts récents */
   async findAllRecent(limit = 10): Promise<PostEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM posts ORDER BY created_at DESC LIMIT ?`,
@@ -196,7 +162,7 @@ export class PostRepositoryMySQL implements PostRepository {
     );
   }
 
-  /** 🔄 Mettre à jour un post */
+  /** Mettre à jour un post */
   async update(post: PostEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE posts
@@ -223,28 +189,14 @@ export class PostRepositoryMySQL implements PostRepository {
     );
   }
 
-  /** ❌ Supprimer un post */
+  /** Supprimer un post */
   async delete(id: PostEntity["id"]): Promise<void> {
     await this.client.query<ResultSetHeader>(`DELETE FROM posts WHERE id = ?`, [
       id,
     ]);
   }
 
-  /** 🔍 Posts par tag */
-  async findAllByTags(tagId: TagEntity["id"]): Promise<PostEntity[]> {
-    const tagRows = await this.client.query<RowDataPacket[]>(
-      `SELECT post_id FROM post_tag WHERE tag_id = ?`,
-      [tagId]
-    );
-
-    const posts = await Promise.all(
-      tagRows.map((row) => this.findById(row.post_id))
-    );
-
-    return posts.filter((post): post is PostEntity => post !== null);
-  }
-
-  /** 🔍 Post avec tags et user par ID */
+  /** Post avec tags et user par ID */
   async findWithTagsAndUserById(
     id: PostEntity["id"]
   ): Promise<PostWithTagsAndUser | null> {
@@ -278,7 +230,7 @@ export class PostRepositoryMySQL implements PostRepository {
     return Object.assign(post, { tags, advisor });
   }
 
-  /** 🔍 Posts paginés avec filtres */
+  /** Posts paginés avec filtres */
   async findAllPaginatedWithTagsAndUserByFilters(
     filters: {
       dateFrom?: Date;
@@ -377,7 +329,7 @@ export class PostRepositoryMySQL implements PostRepository {
     };
   }
 
-  /** 🔍 Posts non lus avec tags */
+  /** Posts non lus avec tags */
   async findAllUnreadWithTags(
     userId: UserEntity["id"]
   ): Promise<PostWithTagsAndUser[]> {
