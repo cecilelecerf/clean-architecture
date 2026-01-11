@@ -13,33 +13,6 @@ import { UserMapper } from "../../mappers/UserMapper";
 export class MessageRepositoryMySQL implements MessageRepository {
   constructor(private readonly client: MySQLClient) {}
 
-  private async updateMessageReaders(
-    messageId: string,
-    newReaderIds: string[]
-  ): Promise<void> {
-    const existingRows = await this.client.query<RowDataPacket[]>(
-      `SELECT user_id FROM message_user_read WHERE message_id = ?`,
-      [messageId]
-    );
-    const existingIds = existingRows.map((r) => r.user_id);
-
-    const idsToAdd = newReaderIds.filter((id) => !existingIds.includes(id));
-    for (const userId of idsToAdd) {
-      await this.client.query<ResultSetHeader>(
-        `INSERT INTO message_user_read (message_id, user_id, read_at) VALUES (?, ?, NOW())`,
-        [messageId, userId]
-      );
-    }
-
-    const idsToRemove = existingIds.filter((id) => !newReaderIds.includes(id));
-    for (const userId of idsToRemove) {
-      await this.client.query<ResultSetHeader>(
-        `DELETE FROM message_user_read WHERE message_id = ? AND user_id = ?`,
-        [messageId, userId]
-      );
-    }
-  }
-
   /** Sauvegarder un message */
   async save(message: MessageEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
@@ -59,53 +32,6 @@ export class MessageRepositoryMySQL implements MessageRepository {
       `INSERT INTO message_user_read (message_id, user_id, read_at)
        VALUES (?, ?, ?)`,
       [message.id, message.senderId, message.sentAt]
-    );
-  }
-
-  /** Tous les messages d'un thread */
-  async findAllByThread(
-    threadId: ThreadEntity["id"]
-  ): Promise<MessageEntity[]> {
-    const rows = await this.client.query<RowDataPacket[]>(
-      `SELECT 
-        m.*,
-        GROUP_CONCAT(mur.user_id) as reader_ids
-       FROM messages m
-       LEFT JOIN message_user_read mur ON m.id = mur.message_id
-       WHERE m.thread_id = ?
-       GROUP BY m.id
-       ORDER BY m.sent_at ASC`,
-      [threadId]
-    );
-
-    return rows.map((row) => {
-      const readerIds = row.reader_ids ? row.reader_ids.split(",") : [];
-      return MessageEntity.from({
-        id: row.id,
-        threadId: row.thread_id,
-        senderId: row.sender_id,
-        content: row.content,
-        sentAt: new Date(row.sent_at),
-        readBy: readerIds,
-      });
-    });
-  }
-
-  /** Mettre à jour un message */
-  async update(message: MessageEntity): Promise<void> {
-    await this.client.query<ResultSetHeader>(
-      `UPDATE messages SET content = ? WHERE id = ?`,
-      [message.content, message.id]
-    );
-
-    await this.updateMessageReaders(message.id, message.readBy);
-  }
-
-  /** Supprimer un message */
-  async delete(messageId: MessageEntity["id"]): Promise<void> {
-    await this.client.query<ResultSetHeader>(
-      `DELETE FROM messages WHERE id = ?`,
-      [messageId]
     );
   }
 
