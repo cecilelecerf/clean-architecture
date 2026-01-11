@@ -15,7 +15,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
       director: (await import(`../../../messages/director/${locale}.json`)).default,
       advisor: (await import(`../../../messages/advisor/${locale}.json`)).default,
       account: (await import(`../../../messages/account/${locale}.json`)).default,
-      credit: (await import(`../../../messages/credit/${locale}.json`)).default
+      credit: (await import(`../../../messages/credit/${locale}.json`)).default,
+      users: (await import(`../../../messages/users/${locale}.json`)).default
     },
   };
 });

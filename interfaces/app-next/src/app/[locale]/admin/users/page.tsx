@@ -6,12 +6,14 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 
 export default function AdminUsersPage() {
     const query = useQuery(endpoints.users.getAll({ role: "client" }))
     const router = useRouter()
+    const t = useTranslations("advisor.users");
     return (
         <>
             <TitleAdminPage title="Clients" />
@@ -20,7 +22,7 @@ export default function AdminUsersPage() {
                 .with({ status: "pending" }, () => <UsersSkeleton />)
                 .with({ status: "success" }, ({ data: users }) => {
                     if (users.length === 0) return <div className="text-gray-500 text-center border p-6 rounded-lg">
-                        Aucun utilisateur associé pour le moment.
+                        {t("none")}
                     </div>
                     return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {users.map((user) => (
@@ -41,7 +43,7 @@ export default function AdminUsersPage() {
                                     <Button
                                         onClick={() => router.push(`users/${user.id}`)}
                                     >
-                                        + d&apos;info
+                                        {t("more")}
                                     </Button>
                                 </div>
                             </Card>
@@ -54,7 +56,6 @@ export default function AdminUsersPage() {
         </>
     )
 }
-
 
 const UsersSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

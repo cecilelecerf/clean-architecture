@@ -312,17 +312,6 @@
         },
         "title": "Créer un nouveau compte",
         "button": "Générer"
-    },
-    "card": {
-        "corfirm": "Email confirmé",
-        "not": "Email non confirmé"
-    },
-    "action": {
-        "title": "Actions",
-        "send": "Envoyer un message",
-        "reset": "Réinitialiser mot de passe",
-        "deactivate": "Désactiver le compte",
-        "activate": "Activer le compte"
     }
   },
   "stocks": {

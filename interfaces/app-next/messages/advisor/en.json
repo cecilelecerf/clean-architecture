@@ -70,5 +70,9 @@
     "error": "Error loading loans",
     "none": "No loan applications are pending.",
     "all": "All loan"
+  },
+  "users": {
+    "none": "No users are currently associated with any of these.",
+    "more": "See more"
   }
 }

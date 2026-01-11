@@ -312,17 +312,6 @@
         },
         "title": "Create a new account",
         "button": "Generate"
-    },
-    "card": {
-        "corfirm": "Confirmed Email",
-        "not": "Not confirmed Email"
-    },
-    "action": {
-        "title": "Actions",
-        "send": "Send a message",
-        "reset": "Reset password",
-        "deactivate": "Deactivate account",
-        "activate": "Activate account"
     }
   },
   "stocks": {

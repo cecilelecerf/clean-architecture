@@ -70,5 +70,9 @@
     "error": "Erreur lors du chargement des crédits",
     "none": "Aucune demande de crédit en attente de traitement",
     "all": "Tous les crédits"
+  },
+  "users": {
+    "none": "Aucun utilisateur associé pour le moment.",
+    "more": "Voir +"
   }
 }
