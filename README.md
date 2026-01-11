@@ -80,7 +80,7 @@ SMTP_FROM=no-reply@banking-app.com
 
 ### 2. Configuration Next.js
 
-Créez un fichier `.env` dans `interfaces/web/app-next/` :
+Créez un fichier `.env` dans `interfaces/app-next/` :
 
 ```env
 NEXTAUTH_SECRET=une_chaine_ultra_secrete
