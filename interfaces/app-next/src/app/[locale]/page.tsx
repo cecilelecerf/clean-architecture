@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: 'home' });
   const tCommon = await getTranslations({ locale, namespace: 'common' });
 
-  const baseUrl = process.env.NEXT_PUBLIC_CLIENT_URL || 'https://votre-banque.com';
+  const baseUrl = process.env.NEXT_PUBLIC_CLIENT_URL;
 
   return {
     title: t('meta.title'),
