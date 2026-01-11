@@ -216,11 +216,11 @@ export const AccountDetail = ({
                                     <DialogFooter>
                                         <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
                                             <X className="mr-2 h-4 w-4" />
-                                            {t("dialog.update.button.cancel")}
+                                            {t("dialog.button.cancel")}
                                         </Button>
                                         <Button onClick={handleSaveEdit}>
                                             <Check className="mr-2 h-4 w-4" />
-                                            {t("dialog.update.button.save")}
+                                            {t("dialog.button.save")}
                                         </Button>
                                     </DialogFooter>
                                 </DialogContent>
