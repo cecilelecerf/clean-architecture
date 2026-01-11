@@ -31,7 +31,7 @@ export class SetSavingsRateUsecase {
     private readonly accountRepository: AccountRepository,
     private readonly uuidService: UuidService,
     private readonly clockService: ClockService,
-    private readonly emailService: EmailService,
+    private readonly emailService: EmailService
   ) {}
 
   public async execute({
@@ -70,13 +70,13 @@ export class SetSavingsRateUsecase {
     await this.configRepository.save(savingsRate);
 
     const accounts = await this.accountRepository.findAllSavingsAccounts();
-    const userIds = [
-      ...new Set(
+    const userIds = Array.from(
+      new Set(
         accounts
-          .map(a => a.userId)
+          .map((a) => a.userId)
           .filter((id): id is string => typeof id === "string")
-      ),
-    ];
+      )
+    );
 
     const formattedDate = new Intl.DateTimeFormat("fr-FR", {
       day: "numeric",

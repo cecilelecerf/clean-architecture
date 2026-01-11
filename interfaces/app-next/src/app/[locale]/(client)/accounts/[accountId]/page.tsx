@@ -1,6 +1,6 @@
 import { AccountId } from '@infrastructure/types/account';
 import { use } from 'react';
-import { AccountDetail } from '@/components/accounts/accountDetail';
+import { AccountDetail } from '@/components/accounts/accountDetail/index';
 import { TitleAdminPage } from '@/components/TitleAdminPage';
 
 

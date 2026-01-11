@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev:api": "pnpm --filter interfaces/api/express dev",
     "dev:web": "pnpm --filter app-next dev",
     "build:domain": "pnpm --filter domain build",
     "build:app": "pnpm --filter application build",
@@ -11,7 +10,7 @@
     "build:express": "pnpm --filter express build",
     "build:socket": "pnpm --filter socket build",
     "build:next": "pnpm --filter app-next build",
-    "build": "pnpm build:domain && pnpm build:app && pnpm build:infra && pnpm build:next",
+    "build": "pnpm build:domain && pnpm build:app && pnpm build:infra && pnpm build:next && pnpm build:socket && pnpm build:express",
     "lint": "pnpm -r lint",
     "mono-build": "pnpm tsc -b tsconfig.build.json",
     "mysql:seed": "pnpm --filter infrastructure run mysql:seed",
