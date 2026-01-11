@@ -1,6 +1,9 @@
 {
     "more": "See account",
     "client": "See customer",
+    "balance": "Balance",
+    "current": "Running account",
+    "saving": "Saving account",
     "error": "Loading error",
     "update": "Rename account",
     "close": "Close account",

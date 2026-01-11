@@ -1,6 +1,9 @@
 {
     "more": "Voir compte",
     "client": "Voir client",
+    "balance": "Solde",
+    "current": "Compte courant",
+    "saving": "Compte épargne",
     "error": "Erreur de chargement",
     "update": "Modifier le nom",
     "close": "Fermer le compte",

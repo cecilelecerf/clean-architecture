@@ -1,0 +1,47 @@
+{
+    "menu": {},
+    "account": {
+        "title": "My accounts",
+        "new": {
+            "form": {
+                "title": "General information",
+                "description": "Main account details",
+                "fields":{
+                    "name": "Account name",
+                    "type": "Account type",
+                    "options": {
+                        "running": "Running",
+                        "saving": "Saving"
+                    },
+                    "currency": "Currency"
+                },
+                "color": {
+                    "title": "Appearance",
+                    "description": "Visual customization of the account",
+                    "label": "Color"
+                }
+            },
+            "title": "Create a new account",
+            "description": "Add a new bank account",
+            "button": "Create"
+        }
+    },
+    "savings": {
+        "badge": "Rate currently in effect",
+        "year": "/year",
+        "interestRate": "Annual interest rate",
+        "effectiveAt": "Effective since",
+        "description": "Your savings work for you! Interest is calculated daily and automatically paid into your savings accounts.",
+        "gain": "Your potential earnings",
+        "open": "Open a savings account",
+        "card": {
+            "with": "With",
+            "year": "per year",
+            "month": "/month"
+        }
+    },
+    "thread": {
+        "none": "No conversation",
+        "contact": "Contact an advisor"
+    }
+}

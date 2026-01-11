@@ -55,12 +55,12 @@ export const AccountCard = ({
                 <div>
                     <h3 className="font-semibold text-lg">{account.name}</h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {account.type === "courant" ? "Compte courant" : "Compte épargne"}
+                        {account.type === "courant" ? t("current") : t("saving")}
                     </p>
                 </div>
 
                 <div className="py-3 px-4 bg-gray-50 dark:bg-gray-300/10 rounded-lg">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Solde</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t("balance")}</p>
                     <p className="text-2xl font-bold">
                         {account.balance.amount.toLocaleString("fr-FR", {
                             style: "currency",

@@ -14,9 +14,12 @@ import {
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export function SavingsRateHeroBanner() {
     const query = useQuery(endpoints.savingsRates.getCurrent());
+
+    const t = useTranslations("client.savings");
 
     return match(query)
         .with({ status: "pending" }, () => <HeroBannerSkeleton />)
@@ -41,7 +44,7 @@ export function SavingsRateHeroBanner() {
                                 {/* Badge */}
                                 <Badge className="bg-white/20 hover:bg-white/25 text-white border-white/30 backdrop-blur-sm text-base px-4 py-1.5">
                                     <CheckCircle className="w-4 h-4 mr-2" />
-                                    Taux actuellement en vigueur
+                                    {t("badge")}
                                 </Badge>
 
                                 {/* Taux */}
@@ -54,11 +57,11 @@ export function SavingsRateHeroBanner() {
                                                     {currentRate.rate}%
                                                 </h1>
                                                 <span className="text-2xl md:text-3xl text-white/80 font-medium">
-                                                    /an
+                                                    {t("year")}
                                                 </span>
                                             </div>
                                             <p className="text-lg md:text-xl text-white/90 mt-2 font-medium">
-                                                Taux d'intérêt annuel
+                                                {t("interestRate")}
                                             </p>
                                         </div>
                                     </div>
@@ -67,22 +70,21 @@ export function SavingsRateHeroBanner() {
                                     <div className="flex items-center gap-2 text-white/80">
                                         <Calendar className="w-5 h-5" />
                                         <span className="text-sm md:text-base">
-                                            Effectif depuis le {formatDateFrench(currentRate.effectiveDate)}
+                                            {t("effectiveAt")} {formatDateFrench(currentRate.effectiveDate)}
                                         </span>
                                     </div>
                                 </div>
 
                                 {/* Description */}
                                 <p className="text-base md:text-lg text-white/80 max-w-xl leading-relaxed">
-                                    Vos économies travaillent pour vous ! Les intérêts sont calculés
-                                    quotidiennement et versés automatiquement sur vos comptes d'épargne.
+                                    {t("description")}
                                 </p>
                             </div>
 
                             {/* Droite : Exemples de gains */}
                             <div className="space-y-4">
                                 <h3 className="text-xl md:text-2xl font-bold text-white mb-4">
-                                    Vos gains potentiels
+                                    {t("gain")}
                                 </h3>
                                 <div className="grid grid-cols-1 gap-3">
                                     <GainCard amount={1000} rate={currentRate.rate} />
@@ -95,7 +97,7 @@ export function SavingsRateHeroBanner() {
                                         size="lg"
                                         className="bg-white text-blue-700 hover:bg-white/90 font-semibold shadow-xl"
                                     >
-                                        Ouvrir un compte épargne
+                                        {t("open")}
                                         <ArrowRight className="w-5 h-5 ml-2" />
                                     </Button>
                                 </Link>
@@ -117,6 +119,8 @@ const GainCard = ({
     rate: number;
     highlighted?: boolean;
 }) => {
+    const t = useTranslations("client.savings.card");
+
     const yearlyGain = (amount * rate) / 100;
     const monthlyGain = yearlyGain / 12;
 
@@ -130,7 +134,7 @@ const GainCard = ({
             <div className="flex items-center justify-between">
                 <div>
                     <p className="text-sm text-white/70 font-medium">
-                        Avec{" "}
+                        {t("with")}{" "}
                         {amount.toLocaleString("fr-FR", {
                             style: "currency",
                             currency: "EUR",
@@ -145,7 +149,7 @@ const GainCard = ({
                             maximumFractionDigits: 0,
                         })}
                     </p>
-                    <p className="text-xs text-white/60">par an</p>
+                    <p className="text-xs text-white/60">{t("year")}</p>
                 </div>
                 <div className="text-right">
                     <p className="text-lg font-semibold text-white/90">
@@ -155,7 +159,7 @@ const GainCard = ({
                             maximumFractionDigits: 2,
                         })}
                     </p>
-                    <p className="text-xs text-white/60">/mois</p>
+                    <p className="text-xs text-white/60">{t("month")}</p>
                 </div>
             </div>
         </div>
