@@ -9,18 +9,20 @@ import { useRouter } from "next/navigation"
 import { match } from "ts-pattern"
 import Autoplay from "embla-carousel-autoplay"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 export const SliderFormule = () => {
 
     const query = useQuery(endpoints.formules.getAllActive())
-    const router = useRouter()
+    const router = useRouter();
+    const t = useTranslations("client.loan.slider");
     return (
         <div className="mt-12 ">
             <div className="mb-2 flex justify-between">
-                <h1 className="text-xl font-semibold">Crédits disponibles</h1>
+                <h1 className="text-xl font-semibold">{t("title")}</h1>
                 <Button variant="link">
                     <Link href="/credits/formules">
-                        Voir +
+                        {t("more")}
                     </Link>
                 </Button>
             </div>
@@ -58,7 +60,7 @@ export const SliderFormule = () => {
                                                         variant={formule.isActive ? "default" : "secondary"}
                                                         className="shrink-0"
                                                     >
-                                                        {formule.isActive ? "Active" : "Inactive"}
+                                                        {formule.isActive ? t("active") : t("inactive")}
                                                     </Badge>
                                                 </div>
 
@@ -70,11 +72,11 @@ export const SliderFormule = () => {
                                                 {/* Taux */}
                                                 <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t">
                                                     <div className="space-y-1">
-                                                        <p className="text-xs text-muted-foreground">Intérêt</p>
+                                                        <p className="text-xs text-muted-foreground">{t("interest")}</p>
                                                         <p className="font-semibold">{formule.interestRate}%</p>
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <p className="text-xs text-muted-foreground">Assurance</p>
+                                                        <p className="text-xs text-muted-foreground">{t("insurance")}</p>
                                                         <p className="font-semibold">{formule.insuranceRate}%</p>
                                                     </div>
                                                 </div>
@@ -97,7 +99,7 @@ export const SliderFormule = () => {
                                                         router.push(`/credits/formules/${formule.id}`);
                                                     }}
                                                 >
-                                                    Voir détails
+                                                    {t("details")}
                                                 </Button>
                                             </CardContent>
                                         </Card>

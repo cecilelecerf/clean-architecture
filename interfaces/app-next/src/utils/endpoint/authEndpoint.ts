@@ -5,7 +5,6 @@ import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import {
   CreateClientPayload,
   LoginPayload,
-  RegisterPayload,
   UserDto,
   userDtoSchema,
 } from '@infrastructure/types/user';

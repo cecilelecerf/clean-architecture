@@ -12,6 +12,8 @@ import { match } from "ts-pattern";
 export default function ThreadsPage() {
     const router = useRouter()
     const query = useQuery(endpoints.threads.advisorGetAll())
+    const t = useTranslations("advisor.thread");
+
     useEffect(() => {
         if (query.status === "success") {
             query.data.forEach((thread) => {
@@ -19,7 +21,6 @@ export default function ThreadsPage() {
             });
         }
     }, [query.status, query.data]);
-    const t = useTranslations("advisor.thread");
 
     return (
         <>

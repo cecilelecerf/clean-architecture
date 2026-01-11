@@ -12,3 +12,10 @@ export const savingRateSchema = z.object({
 });
 
 export type SavingRate = z.infer<typeof savingRateSchema>;
+
+export const savingsRateFormSchema = z.object({
+  rate: z.number().positive(),
+  effectiveDate: z.string().min(1),
+});
+
+export type SavingsRateFormValues = z.infer<typeof savingsRateFormSchema>;

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { match } from "ts-pattern";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 
 export default function ClientFormulesPage() {
     const queries = useQueries({
@@ -18,13 +19,16 @@ export default function ClientFormulesPage() {
             endpoints.formules.getAllActive(),
             endpoints.formules.getTypes()
         ]
-    }); const router = useRouter();
+    }); 
+    const router = useRouter();
+
+    const t = useTranslations("client.formulas");
 
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold mb-2">Les formules de prêts</h1>
-                <p className="text-gray-500">Retrouvez toutes les formules de prêts que nous vous proposons</p>
+                <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
+                <p className="text-gray-500">{t("description")}</p>
             </div>
 
             {
@@ -43,7 +47,7 @@ export default function ClientFormulesPage() {
                                         <CardContent className="py-12 text-center">
                                             <Percent className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                                             <p className="text-lg font-medium mb-2">
-                                                Aucune formule disponible
+                                                {t("none")}
                                             </p>
                                         </CardContent>
                                     </Card>
@@ -85,7 +89,7 @@ export default function ClientFormulesPage() {
                                             <div className="flex items-center justify-between">
                                                 <h2 className="text-xl font-bold">{type.label}</h2>
                                                 <Badge variant="outline">
-                                                    {formulesByType[type.value].length} formule
+                                                    {formulesByType[type.value].length} {t("formula")}
                                                     {formulesByType[type.value].length > 1 ? "s" : ""}
                                                 </Badge>
                                             </div>
@@ -107,7 +111,7 @@ export default function ClientFormulesPage() {
                                                                     variant={formule.isActive ? "default" : "secondary"}
                                                                     className="shrink-0"
                                                                 >
-                                                                    {formule.isActive ? "Active" : "Inactive"}
+                                                                    {formule.isActive ? t("active") : t("inactive")}
                                                                 </Badge>
                                                             </div>
 
@@ -119,11 +123,11 @@ export default function ClientFormulesPage() {
                                                             {/* Taux */}
                                                             <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t">
                                                                 <div className="space-y-1">
-                                                                    <p className="text-xs text-muted-foreground">Intérêt</p>
+                                                                    <p className="text-xs text-muted-foreground">{t("interest")}</p>
                                                                     <p className="font-semibold">{formule.interestRate}%</p>
                                                                 </div>
                                                                 <div className="space-y-1">
-                                                                    <p className="text-xs text-muted-foreground">Assurance</p>
+                                                                    <p className="text-xs text-muted-foreground">{t("insurance")}</p>
                                                                     <p className="font-semibold">{formule.insuranceRate}%</p>
                                                                 </div>
                                                             </div>
@@ -146,7 +150,7 @@ export default function ClientFormulesPage() {
                                                                     router.push(`/credits/formules/${formule.id}`);
                                                                 }}
                                                             >
-                                                                Voir détails
+                                                                {t("details")}
                                                             </Button>
                                                         </CardContent>
                                                     </Card>

@@ -1,7 +1,8 @@
+"use client"
 import { Flex } from "@radix-ui/themes";
-import { Settings } from "./Settings";
+import { Settings } from "./settings";
 import { MessageComponent } from "./Message";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { socket } from "@/lib/socket";
 import { ThreadWithUser } from "@/utils/endpoint/threadEndpoints";
 import { UserDto } from "@infrastructure/types/user";
@@ -22,25 +23,29 @@ export const WrapperThread = ({ thread, defaultMessages, userId, withSetting, ad
 
     const [messages, setMessages] = useState<MessageWithUserDTO[]>(defaultMessages);
     const bottomRef = useRef<HTMLDivElement | null>(null);
+
+    const handleNewMessage = useCallback((msg: MessageWithUserDTO) => {
+        console.log("💬 Nouveau message reçu:", msg);
+        setMessages((prev) => [...prev, msg]);
+    }, []);
+
     useEffect(() => {
         if (!socket) return;
         socket.emit("thread:join", { threadId: thread.id });
         const eventName = `thread:${thread.id}:new_message`;
 
-        // Quand un message arrive du serveur
         socket.on(eventName, (msg) => {
             console.log("💬 Nouveau message reçu:", msg);
             setMessages((prev) => [...prev, msg]);
         });
 
-        // Nettoyage
         return () => {
             socket.off(eventName);
         };
-    }, []);
+    }, [thread.id, handleNewMessage]);
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+    }, [messages.length]);
 
     return (
         <div className="h-full">
@@ -56,9 +61,9 @@ export const WrapperThread = ({ thread, defaultMessages, userId, withSetting, ad
                     </Flex>
                 </Flex>
 
-                {/* Messages */}
                 <div className="flex-1 overflow-y-scroll space-y-3 max-h-[60vh] sm:max-h-[67vh] md:max-h-[65vh] min-h-[60vh] sm:min-h-[67vh] md:min-h-[65vh] ">
-                    {messages.map((msg) => (<MessageComponent key={msg.id} {...msg} isCurrentUser={msg.senderId === userId} />))}
+                    {messages.map((msg) => (
+                        <MessageComponent key={msg.id} {...msg} isCurrentUser={msg.senderId === userId} />))}
                     <div ref={bottomRef} />
                 </div>
                 {match({
@@ -89,14 +94,12 @@ export const SkeletonThread = () => {
                     <Skeleton className="h-9 w-9 rounded-md" />
                 </Flex>
 
-                {/* Messages skeleton */}
                 <div className="flex-1 overflow-y-scroll space-y-3 max-h-[60vh] sm:max-h-[67vh] md:max-h-[65vh] min-h-[60vh] sm:min-h-[67vh] md:min-h-[65vh]">
                     {Array.from({ length: 5 }).map((_, index) => (
                         <SkeletonMessage key={index} isRight={index % 2 === 0} />
                     ))}
                 </div>
 
-                {/* Input skeleton */}
                 <div className="mt-4 flex gap-2">
                     <Skeleton className="h-10 flex-1 rounded-lg" />
                     <Skeleton className="h-10 w-20 rounded-lg" />

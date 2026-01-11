@@ -39,7 +39,7 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
         return () => {
             socket.off(eventName);
         };
-    }, []);
+    }, [post.id]);
 
     return (
         <>

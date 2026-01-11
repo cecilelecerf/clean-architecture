@@ -23,18 +23,20 @@ import {
   Shield,
   Percent,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function FormulesPage() {
   const { formuleId } = useParams<{ formuleId: FormuleId }>();
   const formuleQuery = useQuery(endpoints.formules.get({ formuleId }));
   const router = useRouter();
+  const t = useTranslations("client.formulas");
 
   return match(formuleQuery)
     .with({ status: "pending" }, () => <FormulePageSkeleton />)
     .with({ status: "error" }, () => (
       <div className="rounded-2xl bg-red-500/20 p-8 text-center">
         <p className="text-red-600 font-semibold">
-          Impossible de charger la formule.
+          {t("error")}
         </p>
       </div>
     ))
@@ -69,12 +71,12 @@ export default function FormulesPage() {
                   {formule.isActive ? (
                     <Badge className="bg-green-500/20 text-green-100 border-green-400/30">
                       <CheckCircle className="w-4 h-4 mr-2" />
-                      Formule active
+                      {t("status.active")}
                     </Badge>
                   ) : (
                     <Badge className="bg-red-500/20 text-red-100 border-red-400/30">
                       <Clock className="w-4 h-4 mr-2" />
-                      Formule suspendue
+                      {t("status.inactive")}
                     </Badge>
                   )}
                 </div>
@@ -83,13 +85,13 @@ export default function FormulesPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <RateCard
                       icon={Percent}
-                      label="Taux d'intérêt"
+                      label={t("rateCard.interest")}
                       value={`${formule.interestRate}%`}
                       highlighted
                     />
                     <RateCard
                       icon={Shield}
-                      label="Taux d'assurance"
+                      label={t("rateCard.insurance")}
                       value={`${formule.insuranceRate}%`}
                     />
                   </div>
@@ -101,7 +103,7 @@ export default function FormulesPage() {
                       onClick={() => router.push(`/credits/request/${formule.id}`)}
                     >
                       <Plus className="w-5 h-5 mr-2" />
-                      Faire une demande
+                      {t("ask")}
                     </Button>
 
                     <Button
@@ -111,7 +113,7 @@ export default function FormulesPage() {
                       onClick={() => router.push(`/credits/simulate/${formule.id}`)}
                     >
                       <Calculator className="w-5 h-5 mr-2" />
-                      Simuler
+                      {t("simulate")}
                     </Button>
                   </div>
                 </div>
@@ -124,7 +126,7 @@ export default function FormulesPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CircleAlert className="w-5 h-5" />
-                Conditions d'éligibilité
+                {t("conditions.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -132,24 +134,24 @@ export default function FormulesPage() {
                 {formule.minAmount && (
                   <ConditionCard
                     icon={ArrowRight}
-                    title="Montant minimum"
+                    title={t("conditions.minAmount.title")}
                     value={`${formule.minAmount.toLocaleString('fr-FR')} ${formule.currency}`}
-                    description="Montant minimum pour bénéficier de cette formule"
+                    description={t("conditions.minAmount.description")}
                   />
                 )}
                 {formule.maxAmount && (
                   <ConditionCard
                     icon={ArrowRight}
-                    title="Montant maximum"
+                    title={t("conditions.maxAmount.title")}
                     value={`${formule.maxAmount.toLocaleString('fr-FR')} ${formule.currency}`}
-                    description="Montant maximum autorisé pour cette formule"
+                    description={t("conditions.maxAmount.description")}
                   />
                 )}
               </div>
 
               {!formule.minAmount && !formule.maxAmount && (
                 <p className="text-center text-gray-500 py-8">
-                  Aucune restriction de montant pour cette formule
+                  {t("conditions.none")}
                 </p>
               )}
             </CardContent>
@@ -159,26 +161,26 @@ export default function FormulesPage() {
           <Card className="bg-linear-to-br from-blue-50 to-indigo-50 border-blue-200">
             <CardHeader>
               <CardTitle className="text-blue-900">
-                Pourquoi choisir cette formule ?
+                {t("benefits.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <BenefitItem
                   icon={CheckCircle}
-                  text="Taux compétitifs et transparents"
+                  text={t("benefits.rate")}
                 />
                 <BenefitItem
                   icon={Shield}
-                  text="Assurance incluse pour votre sécurité"
+                  text={t("benefits.insurance")}
                 />
                 <BenefitItem
                   icon={Clock}
-                  text="Traitement rapide de votre demande"
+                  text={t("benefits.fast")}
                 />
                 <BenefitItem
                   icon={Users}
-                  text="Accompagnement personnalisé"
+                  text={t("benefits.support")}
                 />
               </div>
             </CardContent>
@@ -194,7 +196,7 @@ export default function FormulesPage() {
               onClick={() => router.push(`/credits/request/${formule.id}`)}
             >
               <Plus className="w-5 h-5 mr-2" />
-              Commencer ma demande
+              {t("button")}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>

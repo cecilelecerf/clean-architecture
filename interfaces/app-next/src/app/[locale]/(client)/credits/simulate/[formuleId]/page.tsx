@@ -24,6 +24,7 @@ import {
     FileText,
     AlertCircle,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface SimulationResult {
     initialAmount: number;
@@ -104,6 +105,8 @@ export default function SimulateCreditPage() {
         });
     };
 
+    const t = useTranslations("client.loan.simulate");
+
     return match(query)
         .with({ status: "pending" }, () => <SimulationPageSkeleton />)
         .with({ status: "error" }, () => (
@@ -111,7 +114,7 @@ export default function SimulateCreditPage() {
                 <Card className="border-red-200 bg-red-50">
                     <CardContent className="p-6">
                         <p className="text-red-600 font-semibold">
-                            Impossible de charger la formule
+                            {t("error")}
                         </p>
                     </CardContent>
                 </Card>
@@ -126,10 +129,10 @@ export default function SimulateCreditPage() {
                         {/* Header */}
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900">
-                                Simulateur de crédit
+                                {t("title")}
                             </h1>
                             <p className="text-gray-600 mt-2">
-                                Formule : <span className="font-semibold">{formule.label}</span>
+                                {t("formula")} : <span className="font-semibold">{formule.label}</span>
                             </p>
                         </div>
 
@@ -140,14 +143,14 @@ export default function SimulateCreditPage() {
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
                                             <Calculator className="w-5 h-5" />
-                                            Paramètres
+                                            {t("setting")}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
                                         {/* Montant */}
                                         <div className="space-y-3">
                                             <div className="flex items-center justify-between">
-                                                <Label htmlFor="amount">Montant du crédit</Label>
+                                                <Label htmlFor="amount">{t("amount")}</Label>
                                                 <Badge variant="outline">
                                                     {amount.toLocaleString('fr-FR')} €
                                                 </Badge>
@@ -172,9 +175,9 @@ export default function SimulateCreditPage() {
                                         {/* Durée */}
                                         <div className="space-y-3">
                                             <div className="flex items-center justify-between">
-                                                <Label htmlFor="duration">Durée</Label>
+                                                <Label htmlFor="duration">{t("duration")}</Label>
                                                 <Badge variant="outline">
-                                                    {duration} mois ({(duration / 12).toFixed(1)} ans)
+                                                    {duration} {t("month")} ({(duration / 12).toFixed(1)} {t("year")})
                                                 </Badge>
                                             </div>
                                             <Slider
@@ -187,8 +190,8 @@ export default function SimulateCreditPage() {
                                                 className="py-4"
                                             />
                                             <div className="flex justify-between text-xs text-gray-500">
-                                                <span>12 mois</span>
-                                                <span>120 mois</span>
+                                                <span>12 {t("month")}</span>
+                                                <span>120 {t("month")}</span>
                                             </div>
                                         </div>
 
@@ -199,7 +202,7 @@ export default function SimulateCreditPage() {
                                             <div className="flex items-center justify-between">
                                                 <span className="text-sm text-blue-900 flex items-center gap-2">
                                                     <Percent className="w-4 h-4" />
-                                                    Taux d'intérêt
+                                                    {t("interest")}
                                                 </span>
                                                 <span className="font-bold text-blue-900">
                                                     {formule.interestRate}%
@@ -208,7 +211,7 @@ export default function SimulateCreditPage() {
                                             <div className="flex items-center justify-between">
                                                 <span className="text-sm text-blue-900 flex items-center gap-2">
                                                     <Shield className="w-4 h-4" />
-                                                    Taux d'assurance
+                                                    {t("insurance")}
                                                 </span>
                                                 <span className="font-bold text-blue-900">
                                                     {formule.insuranceRate}%
@@ -222,7 +225,7 @@ export default function SimulateCreditPage() {
                                             onClick={() => handleSimulate(formule)}
                                         >
                                             <Calculator className="w-5 h-5 mr-2" />
-                                            Calculer
+                                            {t("calculate")}
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -243,7 +246,7 @@ export default function SimulateCreditPage() {
                                                 <Calculator className="w-8 h-8 text-gray-400" />
                                             </div>
                                             <p className="text-gray-500">
-                                                Ajustez les paramètres et cliquez sur "Calculer" pour voir les résultats
+                                                {t("description")}
                                             </p>
                                         </div>
                                     </Card>
@@ -266,6 +269,8 @@ interface SimulationResultsProps {
 function SimulationResults({ simulation, formule, onRequestCredit }: SimulationResultsProps) {
     const [showFullSchedule, setShowFullSchedule] = useState(false);
 
+    const t = useTranslations("client.loan.simulate.result");
+
     return (
         <div className="space-y-6">
             {/* Mensualité principale */}
@@ -273,7 +278,7 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                 <CardContent className="p-8">
                     <div className="text-center space-y-2">
                         <p className="text-sm text-blue-900 font-medium uppercase tracking-wide">
-                            Votre mensualité
+                            {t("monthly")}
                         </p>
                         <p className="text-5xl font-bold text-blue-900">
                             {simulation.monthlyPayment.toLocaleString('fr-FR', {
@@ -282,7 +287,7 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                             })} €
                         </p>
                         <p className="text-sm text-blue-700">
-                            pendant {simulation.durationMonths} mois
+                            {t("for")} {simulation.durationMonths} {t("month")}
                         </p>
                     </div>
                 </CardContent>
@@ -293,28 +298,28 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <TrendingUp className="w-5 h-5" />
-                        Détail des coûts
+                        {t("details.title")}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <CostItem
-                            label="Montant emprunté"
+                            label={t("details.amount")}
                             value={simulation.initialAmount}
                             color="gray"
                         />
                         <CostItem
-                            label="Intérêts totaux"
+                            label={t("details.interest")}
                             value={simulation.totalInterest}
                             color="orange"
                         />
                         <CostItem
-                            label="Assurance totale"
+                            label={t("details.insurance")}
                             value={simulation.totalInsurance}
                             color="purple"
                         />
                         <CostItem
-                            label="Coût total du crédit"
+                            label={t("details.cost")}
                             value={simulation.totalCost}
                             color="red"
                             highlighted
@@ -326,7 +331,7 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                     <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                         <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-gray-700">
-                                Montant total à rembourser
+                                {t("amount.title")}
                             </span>
                             <span className="text-xl font-bold text-gray-900">
                                 {simulation.totalRepayment.toLocaleString('fr-FR', {
@@ -337,7 +342,7 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">
-                                Taux effectif global (TEG)
+                                {t("amount.rate")}
                             </span>
                             <span className="text-sm font-bold text-gray-700">
                                 {simulation.effectiveRate.toFixed(2)}%
@@ -352,7 +357,7 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Euro className="w-5 h-5" />
-                        Répartition du coût
+                        {t("cost")}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -369,14 +374,14 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                 <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                         <Calendar className="w-5 h-5" />
-                        Tableau d'amortissement
+                        {t("tabs.title")}
                     </CardTitle>
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setShowFullSchedule(!showFullSchedule)}
                     >
-                        {showFullSchedule ? "Réduire" : "Afficher tout"}
+                        {showFullSchedule ? t("tabs.reduce") : t("tabs.show")}
                     </Button>
                 </CardHeader>
                 <CardContent>
@@ -393,10 +398,10 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                         <div className="space-y-1">
                             <h3 className="font-semibold text-green-900 text-lg">
-                                Cette simulation vous convient ?
+                                {t("simulate")}
                             </h3>
                             <p className="text-sm text-green-700">
-                                Transformez votre simulation en demande de crédit officielle
+                                {t("transform")}
                             </p>
                         </div>
                         <Button
@@ -405,7 +410,7 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                             onClick={onRequestCredit}
                         >
                             <FileText className="w-5 h-5 mr-2" />
-                            Faire une demande
+                            {t("request")}
                             <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
                     </div>
@@ -418,11 +423,9 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                     <div className="flex gap-3">
                         <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                         <div className="text-sm text-amber-900">
-                            <p className="font-semibold mb-1">Information importante</p>
+                            <p className="font-semibold mb-1">{t("info")}</p>
                             <p>
-                                Cette simulation est donnée à titre indicatif. Les montants définitifs
-                                seront calculés lors de l'étude de votre dossier et peuvent varier en
-                                fonction de votre situation personnelle.
+                                {t("description")}
                             </p>
                         </div>
                     </div>
@@ -480,6 +483,8 @@ function CostBreakdownChart({
     const interestPercent = (interest / total) * 100;
     const insurancePercent = (insurance / total) * 100;
 
+    const t = useTranslations("client.loan.slider");
+
     return (
         <div className="space-y-4">
             {/* Barre de progression */}
@@ -518,7 +523,7 @@ function CostBreakdownChart({
                 <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-orange-500 rounded" />
                     <div>
-                        <p className="font-medium">Intérêts</p>
+                        <p className="font-medium">{t("interest")}</p>
                         <p className="text-gray-600">
                             {interest.toLocaleString('fr-FR')} €
                         </p>
@@ -527,7 +532,7 @@ function CostBreakdownChart({
                 <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-purple-500 rounded" />
                     <div>
-                        <p className="font-medium">Assurance</p>
+                        <p className="font-medium">{t("insurance")}</p>
                         <p className="text-gray-600">
                             {insurance.toLocaleString('fr-FR')} €
                         </p>
@@ -547,17 +552,19 @@ function AmortizationTable({
 }) {
     const displaySchedule = showAll ? schedule : schedule.slice(0, 12);
 
+    const t = useTranslations("client.loan.simulate.table");
+
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-sm">
                 <thead className="bg-gray-50">
                     <tr className="border-b">
-                        <th className="px-4 py-3 text-left font-semibold">Mois</th>
+                        <th className="px-4 py-3 text-left font-semibold">{t("month")}</th>
                         <th className="px-4 py-3 text-right font-semibold">Capital</th>
-                        <th className="px-4 py-3 text-right font-semibold">Intérêts</th>
-                        <th className="px-4 py-3 text-right font-semibold">Assurance</th>
+                        <th className="px-4 py-3 text-right font-semibold">{t("interest")}</th>
+                        <th className="px-4 py-3 text-right font-semibold">{t("insurance")}</th>
                         <th className="px-4 py-3 text-right font-semibold">Total</th>
-                        <th className="px-4 py-3 text-right font-semibold">Restant dû</th>
+                        <th className="px-4 py-3 text-right font-semibold">{t("still")}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -603,7 +610,7 @@ function AmortizationTable({
             </table>
             {!showAll && schedule.length > 12 && (
                 <p className="text-center text-sm text-gray-500 mt-4">
-                    ... et {schedule.length - 12} autres mensualités
+                    {t("and")} {schedule.length - 12} {t("other")}
                 </p>
             )}
         </div>

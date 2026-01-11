@@ -10,6 +10,7 @@ import { AccountId } from '@infrastructure/types/account';
 import { FormuleDTO } from '@infrastructure/types/formule';
 import { useRouter } from 'next/navigation';
 import { requestCreditSchema } from '@/utils/endpoint/creditEndpoints';
+import { useTranslations } from 'next-intl';
 
 const formRequestCreditSchema = requestCreditSchema.pick({
   durationMonths: true,
@@ -33,26 +34,25 @@ export const StepCreditForm = ({ formule, info }: StepCreditFormProps) => {
   const form = useForm<FormRequestCredit>({
     resolver: zodResolver(formRequestCreditSchema),
   });
+  const t = useTranslations("client.loan.request");
 
   const data: DataInfo<FormRequestCredit> = {
     initialAmount: {
-      label: 'Montant souhaité',
+      label: t("form.amount"),
       type: 'number',
       placeholder: `Entre ${formule.minAmount ?? 100} et ${formule.maxAmount ?? 10000} €`,
     },
     startDate: {
-      label: 'Date de début',
+      label: t("form.date"),
       type: 'date',
       placeholder: 'YYYY-MM-DD',
     },
     durationMonths: {
-      label: 'Durée (mois)',
+      label: t("form.duration"),
       type: 'number',
       placeholder: 'Ex: 12',
     },
   };
-
-
 
   const submit = (values: FormRequestCredit) => {
     const effectiveDateISO = new Date(values.startDate).toISOString();
@@ -72,12 +72,12 @@ export const StepCreditForm = ({ formule, info }: StepCreditFormProps) => {
 
   return (
     <FormWrapper<FormRequestCredit>
-      title="Informations du crédit"
-      description="Renseignez les détails de votre crédit"
+      title={t("title")}
+      description={t("description")}
       form={form}
       data={data}
       onSubmit={submit}
-      labelButton="Envoyer la demande"
+      labelButton={t("button")}
       loading={mutation.isPending}
     />
   );

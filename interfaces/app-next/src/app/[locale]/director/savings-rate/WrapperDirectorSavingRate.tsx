@@ -1,7 +1,7 @@
 "use client"
 import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
-import { AdminSavingsRateHeroBanner } from "./GetCurrentSavingRate";
+import { AdminSavingsRateHeroBanner } from "./AdminSavingsRateHeroBanner";
 import { GetAllSavingsRate, SavingsRatesSkeleton } from "./GetAll";
 import { match } from "ts-pattern";
 

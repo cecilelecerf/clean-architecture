@@ -17,17 +17,19 @@ import {
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { CreditArray } from "@/components/credits/CreditArray";
 import { statusConfig } from "@/components/credits/constant";
+import { useTranslations } from "next-intl";
 
 
 export const ClientCredits = () => {
     const query = useQuery(endpoints.credits.getAll());
     const router = useRouter();
+    const t = useTranslations("client.loan");
 
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold mb-2">Mes crédits</h1>
-                <p className="text-gray-500">Suivez l'état de vos demandes de crédit</p>
+                <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
+                <p className="text-gray-500">{t("description")}</p>
             </div>
 
             {match(query)
@@ -40,13 +42,13 @@ export const ClientCredits = () => {
                                 <CardContent className="space-y-4">
                                     <AlertCircle className="w-16 h-16 mx-auto text-gray-400" />
                                     <div>
-                                        <h3 className="text-lg font-semibold">Aucun crédit</h3>
+                                        <h3 className="text-lg font-semibold">{t("none")}</h3>
                                         <p className="text-gray-500 mt-2">
-                                            Vous n'avez pas encore de demande de crédit
+                                            {t("norequest")}
                                         </p>
                                     </div>
                                     <Button onClick={() => router.push("/credits/formules")}>
-                                        Voir les formules de crédits
+                                        {t("seeformulas")}
                                     </Button>
                                 </CardContent>
                             </Card>
@@ -57,7 +59,7 @@ export const ClientCredits = () => {
                         <div className="space-y-8">
                             {credits.some((credit) => credit.status === "ACCEPTED") && (
                                 <section>
-                                    <h2 className="text-xl font-semibold mb-4">Crédits en cours</h2>
+                                    <h2 className="text-xl font-semibold mb-4">{t("pending.title")}</h2>
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                         {credits
                                             .filter((credit) => credit.status === "ACCEPTED")
@@ -78,7 +80,7 @@ export const ClientCredits = () => {
                                                             <div className="flex justify-between items-start">
                                                                 <CardTitle className="flex items-center gap-2">
                                                                     <StatusIcon className={`w-5 h-5 ${config.color}`} />
-                                                                    Crédit{" "}
+                                                                    {t("loan")}{" "}
                                                                     {credit.initialAmount.amount.toLocaleString("fr-FR", {
                                                                         style: "currency",
                                                                         currency: credit.initialAmount.currency,
@@ -93,14 +95,14 @@ export const ClientCredits = () => {
                                                                 <div className="space-y-1">
                                                                     <p className="text-xs text-gray-500 flex items-center gap-1">
                                                                         <Calendar className="w-3 h-3" />
-                                                                        Durée
+                                                                        {t("pending.duration")}
                                                                     </p>
-                                                                    <p className="font-semibold">{credit.durationMonths} mois</p>
+                                                                    <p className="font-semibold">{credit.durationMonths} {t("pending.month")}</p>
                                                                 </div>
                                                             </div>
 
                                                             <div className="p-3 bg-gray-50 dark:bg-gray-50/10 rounded-lg">
-                                                                <p className="text-xs text-gray-500 mb-1">Mensualité</p>
+                                                                <p className="text-xs text-gray-500 mb-1">{t("pending.monthly")}</p>
                                                                 <p className="text-2xl font-bold">
                                                                     {credit.monthlyPayment.amount.toLocaleString("fr-FR", {
                                                                         style: "currency",
@@ -114,7 +116,7 @@ export const ClientCredits = () => {
                                                                     <div className="flex items-center gap-2 mb-1">
                                                                         <CalendarClock className="w-4 h-4 text-blue-600" />
                                                                         <p className="text-xs text-blue-700 font-medium">
-                                                                            Débute le
+                                                                            {t("pending.startOn")}
                                                                         </p>
                                                                     </div>
                                                                     <p className="text-lg font-bold text-blue-700">
@@ -126,7 +128,7 @@ export const ClientCredits = () => {
                                                                     <div className="space-y-1">
                                                                         <p className="text-xs text-gray-500 flex items-center gap-1">
                                                                             <TrendingUp className="w-3 h-3" />
-                                                                            Reste à payer
+                                                                            {t("pending.still")}
                                                                         </p>
                                                                         <p className="font-semibold">
                                                                             {credit.remainingBalance.amount.toLocaleString("fr-FR", {
@@ -136,7 +138,7 @@ export const ClientCredits = () => {
                                                                         </p>
                                                                     </div>
                                                                     <div className="text-right">
-                                                                        <p className="text-xs text-gray-500">Début</p>
+                                                                        <p className="text-xs text-gray-500">{t("pending.start")}</p>
                                                                         <p className="text-sm font-medium">
                                                                             {formatDateFrench(credit.startDate)}
                                                                         </p>

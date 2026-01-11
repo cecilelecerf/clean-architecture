@@ -13,52 +13,50 @@ import { LangageSwitcher } from "@/components/LangageSwitcher";
 import { ThemeToggleSwitch } from "@/components/ThemeToogleButton";
 
 type Props = {
-    children: React.ReactNode;
+  children: React.ReactNode;
 };
 
 export function AdvisorLayoutClient({ children }: Props) {
-    const pathname = usePathname();
-    const t = useTranslations("advisor.menu");
-    const currentLocale = useLocale();
+  const pathname = usePathname();
+  const t = useTranslations("advisor.menu");
+  const currentLocale = useLocale();
 
-    return (
-        <div className="flex min-h-screen">
-        <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 bg-gray-900 text-white flex-col justify-between">
-            <SidebarContent pathname={pathname} t={t} locale={currentLocale}/>
-        </aside>
+  return (
+    <div className="flex min-h-screen">
+      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 bg-gray-900 text-white flex-col justify-between">
+        <SidebarContent pathname={pathname} t={t} />
+      </aside>
 
-        <div className="md:hidden fixed z-50 bg-linear-to-b from-gray-50 via-gray-50/90 to-gray-50/10 p-4 w-full">
-            <Sheet>
-            <SheetTrigger asChild>
-                <div className="flex items-center gap-2">
-                <Button variant="outline" size="icon" className="bg-gray-900 text-white hover:bg-gray-800">
-                    <Menu />
-                </Button>
-                <p className="font-bold text-2xl">Banque</p>
-                </div>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0 bg-gray-900 text-white w-64">
-                <SidebarContent pathname={pathname} t={t} locale={currentLocale}/>
-            </SheetContent>
-            </Sheet>
-        </div>
+      <div className="md:hidden fixed z-50 bg-linear-to-b from-gray-50 via-gray-50/90 to-gray-50/10 p-4 w-full">
+        <Sheet>
+          <SheetTrigger asChild>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="icon" className="bg-gray-900 text-white hover:bg-gray-800">
+                <Menu />
+              </Button>
+              <p className="font-bold text-2xl">Banque</p>
+            </div>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 bg-gray-900 text-white w-64">
+            <SidebarContent pathname={pathname} t={t} />
+          </SheetContent>
+        </Sheet>
+      </div>
 
-        <main className="flex-1 px-4 pt-20 md:pt-6 py-6 md:px-12 md:ml-64">
-            {children}
-        </main>
-        </div>
-    );
+      <main className="flex-1 px-4 pt-20 md:pt-6 py-6 md:px-12 md:ml-64">
+        {children}
+      </main>
+    </div>
+  );
 }
 
 function SidebarContent({
-    pathname,
-    t,
-    locale,
+  pathname,
+  t,
 }: {
-    pathname: string;
-    t: ReturnType<typeof useTranslations>;
-    locale: string;
-}){
+  pathname: string;
+  t: ReturnType<typeof useTranslations>;
+}) {
   return (
     <div className="p-6 flex flex-col justify-between h-full">
       <div className="space-y-6">

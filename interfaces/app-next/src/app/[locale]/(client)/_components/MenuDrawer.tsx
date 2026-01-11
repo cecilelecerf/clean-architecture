@@ -18,14 +18,15 @@ import { CircleX, Home, Menu, MessageSquare, CreditCard, ClockFading, Newspaper,
 import { LangageSwitcher } from '@/components/LangageSwitcher';
 import { Flex } from '@radix-ui/themes';
 import { ThemeToggleSwitch } from '@/components/ThemeToogleButton';
+import { ReactNode } from "react";
 
-const menuItems: { icon: LucideIcon, label: string, href: string }[] = [
-    { icon: Home, label: "Mes comptes", href: "/accounts" },
-    { icon: MessageSquare, label: "Conversations", href: "/threads" },
-    { icon: Newspaper, label: "Actualités", href: "/feeds" },
-    { icon: ClockFading, label: "Crédits", href: "/credits" },
-    { icon: CreditCard, label: "Actions", href: "/actions" },
-    { icon: User, label: "Profile", href: "/profil" }
+const menuItems: { icon: ReactNode, labelKey: string, href: string, basePath?: string }[] = [
+    { icon: <Home size={18} />, labelKey: "accounts", href: "/accounts", basePath: "/accounts" },
+    { icon: <MessageSquare size={18} />, labelKey: "messaging", href: "/threads", basePath: "/threads" },
+    { icon: <Newspaper size={18} />, labelKey: "news", href: "/feeds", basePath: "/feeds" },
+    { icon: <ClockFading size={18} />, labelKey: "loan", href: "/credits", basePath: "/credits" },
+    { icon: <CreditCard size={18} />, labelKey: "stocks", href: "/actions", basePath: "/actions" },
+    { icon: <User size={18} />, labelKey: "profile", href: "/profil", basePath: "/profil" }
 ];
 
 export const MenuDrawer = () => (

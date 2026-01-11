@@ -20,7 +20,6 @@ export default function ThreadPageClient({ threadId }: { threadId: ThreadId }) {
     })
     const router = useRouter()
     const { data: session } = useSession();
-    if (!session?.user?.id) return <div>Unauthorized</div>;
     const t = useTranslations("advisor.thread");
     return match(queries)
         .when((q) => q.some(({ status }) => status === "error"), () => "error")
