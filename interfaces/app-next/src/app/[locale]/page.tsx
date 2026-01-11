@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Building2, ChartLine, Lock, PiggyBank, Shield, Smartphone, TrendingUp, Users } from "lucide-react";
@@ -89,7 +88,6 @@ export default async function HomePage({ params }: Props) {
   return (
     <div className="min-h-screen">
 
-      {/* Hero Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="flex justify-center gap-15">
@@ -117,7 +115,6 @@ export default async function HomePage({ params }: Props) {
 
       <DevSection />
 
-      {/* Features Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4">{t('features.title')}</h2>

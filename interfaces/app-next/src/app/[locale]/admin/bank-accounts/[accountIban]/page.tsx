@@ -1,4 +1,3 @@
-
 import { AccountId } from '@infrastructure/types/account';
 import { use } from 'react';
 import { AccountDetail } from '@/components/accounts/accountDetail';
@@ -15,6 +14,5 @@ export default function AccountIdPage({
       <TitleAdminPage title='Compte de la banque' />
       <AccountDetail accountIban={accountIban} basePath='/admin/bank-accounts' />
     </>
-
   );
 }

@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { match } from 'ts-pattern';
 import { endpoints } from '@/utils/endpoint';
-import { SavingsRateHeroBanner } from '../savings-rate/GetCurrentSavingRate';
+import { SavingsRateHeroBanner } from '../savings-rate/SavingsRateHeroBanner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AccountCard } from '@/components/accounts/AccountCard';
 import { GoToAddPage } from '@/components/GoToAddPage';
