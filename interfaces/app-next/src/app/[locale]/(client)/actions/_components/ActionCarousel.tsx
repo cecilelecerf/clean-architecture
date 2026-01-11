@@ -14,8 +14,6 @@ import { ActionCard } from "@/components/actions/actionList/ActionCard";
 export const ActionsCarousel = ({ actions }: { actions: Action[] }) => {
     const router = useRouter();
 
-
-
     return (
         <div className="relative group">
             <Carousel
@@ -36,9 +34,6 @@ export const ActionsCarousel = ({ actions }: { actions: Action[] }) => {
                     ))}
                 </CarouselContent>
             </Carousel>
-
-
-
         </div >
     );
 }

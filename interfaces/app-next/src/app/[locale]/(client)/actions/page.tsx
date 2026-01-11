@@ -18,18 +18,21 @@ import {
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ActionsCarousel } from "./_components/ActionCarousel";
+import { useTranslations } from "next-intl";
 
 export default function ClientActionsPage() {
     const router = useRouter();
     const portfolioQuery = useQuery(endpoints.orders.portfolio.getMe());
     const suggestionsQuery = useQuery(endpoints.actions.getSuggestions());
 
+    const t = useTranslations("client.stocks");
+
     return (
         <div className="space-y-6 pb-20">
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold">Mon portefeuille</h1>
+                <h1 className="text-2xl font-bold">{t("title")}</h1>
                 <p className="text-sm text-gray-600">
-                    Gérez vos actions et découvrez de nouvelles opportunités
+                    {t("description")}
                 </p>
             </div>
 
@@ -39,7 +42,7 @@ export default function ClientActionsPage() {
                     <Card className="border-red-200 bg-red-50">
                         <CardContent className="p-4">
                             <p className="text-sm text-red-600">
-                                Erreur lors du chargement du portefeuille
+                                {t("error")}
                             </p>
                         </CardContent>
                     </Card>
@@ -54,18 +57,17 @@ export default function ClientActionsPage() {
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-semibold mb-2">
-                                            Aucune action dans votre portefeuille
+                                            {t("none")}
                                         </h3>
                                         <p className="text-sm text-gray-600 mb-4">
-                                            Commencez à investir dès aujourd'hui et construisez votre
-                                            patrimoine
+                                            {t("start")}
                                         </p>
                                         <Button
                                             onClick={() => router.push("/actions/explore")}
                                             className="bg-linear-to-r from-blue-600 to-indigo-700"
                                         >
                                             <Search className="w-4 h-4 mr-2" />
-                                            Explorer les actions
+                                            {t("explore")}
                                         </Button>
                                     </div>
                                 </CardContent>
@@ -79,7 +81,7 @@ export default function ClientActionsPage() {
                                 <div className="bg-linear-to-r from-blue-600 to-indigo-700 p-6 text-white">
                                     <div className="flex items-center gap-2 mb-2">
                                         <Wallet className="w-5 h-5" />
-                                        <p className="text-sm text-white/80">Valeur totale</p>
+                                        <p className="text-sm text-white/80">{t("value")}</p>
                                     </div>
                                     <div className="flex items-baseline gap-3">
                                         <p className="text-4xl font-bold">
@@ -128,7 +130,7 @@ export default function ClientActionsPage() {
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-lg font-semibold">
-                                        Mes actions
+                                        {t("mine")}
                                     </h2>
                                     <Badge variant="outline">
                                         {portfolio.positions.length} position{portfolio.positions.length > 1 ? "s" : ""}
@@ -150,7 +152,7 @@ export default function ClientActionsPage() {
                                                                 {position.symbol}
                                                             </h3>
                                                             <Badge variant="outline" className="text-xs">
-                                                                {position.quantity} action{position.quantity > 1 ? "s" : ""}
+                                                                {position.quantity} {t("stock")} {position.quantity > 1 ? "s" : ""}
                                                             </Badge>
                                                         </div>
                                                         <p className="text-sm text-gray-600 mb-2">
@@ -158,11 +160,11 @@ export default function ClientActionsPage() {
                                                         </p>
                                                         <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray300">
                                                             <span>
-                                                                Prix moyen: {position.averagePrice.toFixed(2)} {position.currency}
+                                                                {t("average")} {position.averagePrice.toFixed(2)} {position.currency}
                                                             </span>
                                                             <span>•</span>
                                                             <span>
-                                                                Prix actuel: {position.currentPrice.toFixed(2)} {position.currency}
+                                                                {t("current")} {position.currentPrice.toFixed(2)} {position.currency}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -210,10 +212,10 @@ export default function ClientActionsPage() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-lg font-semibold">
-                            Actions populaires
+                            {t("popular")}
                         </h2>
                         <p className="text-sm text-gray-600">
-                            Découvrez les actions les plus performantes
+                            {t("discover")}
                         </p>
                     </div>
                     <Button
@@ -221,7 +223,7 @@ export default function ClientActionsPage() {
                         onClick={() => router.push("/actions/explore")}
                         className="text-blue-600 hover:text-blue-700"
                     >
-                        Tout voir
+                        {t("see")}
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                 </div>
@@ -232,7 +234,7 @@ export default function ClientActionsPage() {
                         <Card className="border-red-200 bg-red-50">
                             <CardContent className="p-4">
                                 <p className="text-sm text-red-600">
-                                    Erreur lors du chargement des suggestions
+                                    {t("suggestError")}
                                 </p>
                             </CardContent>
                         </Card>
@@ -250,18 +252,17 @@ export default function ClientActionsPage() {
                         <Search className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="text-lg font-semibold mb-2">
-                        Envie d'investir davantage ?
+                        {t("invest")}
                     </h3>
                     <p className="text-sm text-gray-600 mb-4 dark:text-gray-400">
-                        Explorez notre catalogue complet d'actions et diversifiez votre
-                        portefeuille
+                        {t("catalog")}
                     </p>
                     <Button
                         onClick={() => router.push("/actions/explore")}
                         className="bg-linear-to-r from-blue-600 to-indigo-700"
                     >
                         <Search className="w-4 h-4 mr-2" />
-                        Explorer toutes les actions
+                        {t("explore")}
                     </Button>
                 </CardContent>
             </Card>
