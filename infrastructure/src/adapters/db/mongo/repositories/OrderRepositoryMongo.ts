@@ -62,14 +62,6 @@ export class OrderRepositoryMongo implements OrderRepository {
     });
   }
 
-  async findById(id: OrderEntity["id"]): Promise<OrderEntity | null> {
-    await this.client.connect();
-
-    const doc = await OrderModel.findById(id).lean();
-    if (!doc) return null;
-    return this.mapDocToOrder(doc);
-  }
-
   async findAllByUserId(userId: UserEntity["id"]): Promise<OrderEntity[]> {
     await this.client.connect();
 
@@ -80,14 +72,6 @@ export class OrderRepositoryMongo implements OrderRepository {
       .sort({ createdAt: -1 })
       .lean();
 
-    return docs.map(this.mapDocToOrder);
-  }
-
-  async findAllOpen(): Promise<OrderEntity[]> {
-    await this.client.connect();
-    const docs = await OrderModel.find({ status: "pending" })
-      .sort({ createdAt: 1 })
-      .lean();
     return docs.map(this.mapDocToOrder);
   }
 
@@ -119,11 +103,6 @@ export class OrderRepositoryMongo implements OrderRepository {
         },
       }
     );
-  }
-
-  async delete(id: OrderEntity["id"]): Promise<void> {
-    await this.client.connect();
-    await OrderModel.deleteOne({ _id: id });
   }
 
   async findAllByUserIdAndStatus(
