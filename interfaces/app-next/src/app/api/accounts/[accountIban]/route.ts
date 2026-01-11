@@ -4,12 +4,9 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { accountFactory } from '@infrastructure/adapters/db/mysql/factories/account';
 import {
   accountDTOSchema,
-  accountIdSchema,
-  accountSchema,
   deleteAccountSchema,
   updateAccountSchema,
 } from '@infrastructure/types/account';
-import z from 'zod';
 
 export async function GET(_req: NextRequest, ctx: RouteContext<'/api/accounts/[accountIban]'>) {
   try {

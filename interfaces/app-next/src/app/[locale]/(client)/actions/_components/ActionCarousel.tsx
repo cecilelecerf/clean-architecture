@@ -1,15 +1,10 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
-import { ChevronRight } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Action } from "@infrastructure/types/action";
 import { ActionCard } from "@/components/actions/actionList/ActionCard";
-
-
 
 export const ActionsCarousel = ({ actions }: { actions: Action[] }) => {
     const router = useRouter();

@@ -20,7 +20,6 @@ import {
   Coins,
   Settings,
 } from "lucide-react";
-import z from "zod";
 import { UpdateFormule, updateFormuleSchema } from "@/utils/endpoint/formuleEndpoints";
 import { useTranslations } from "next-intl";
 
@@ -44,7 +43,6 @@ export const UpdateFormuleForm = ({
 
   const t = useTranslations("director.credits.formulas.update");
 
-  /** 🔁 Hydratation */
   useEffect(() => {
     form.reset({
       interestRate: formule.interestRate,
@@ -57,7 +55,7 @@ export const UpdateFormuleForm = ({
       currency: formule.currency,
       isActive: formule.isActive,
     });
-  }, [formule]);
+  }, [formule, form]);
 
   const handleSubmit = (values: UpdateFormule) => {
     mutation.mutate(values, {

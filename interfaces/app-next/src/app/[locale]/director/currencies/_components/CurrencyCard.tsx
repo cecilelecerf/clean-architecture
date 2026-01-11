@@ -2,19 +2,13 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CurrencyCode } from "@infrastructure/types/currency";
+import { Currency, CurrencyCode } from "@infrastructure/types/currency";
 import { useTranslations } from "next-intl";
-import { memo } from "react";
 import { CurrencyEditMode } from "./CurrencyEditMode";
 import { CurrencyViewMode } from "./CurrencyViewMode";
 
 interface CurrencyCardProps {
-    currency: {
-        code: CurrencyCode;
-        name: string;
-        symbol: string;
-        exchangeRate: number;
-    };
+    currency: Currency
     isEditing: boolean;
     newRate: string;
     onRateChange: (value: string) => void;

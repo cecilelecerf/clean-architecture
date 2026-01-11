@@ -3,10 +3,12 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
-async function request<T>(
-  path: string,
-  options: { method?: HttpMethod; body?: any } = {},
-): Promise<T> {
+type RequestOptions<B = unknown> = {
+  method?: HttpMethod;
+  body?: B;
+};
+
+async function request<T, B = unknown>(path: string, options: RequestOptions<B>): Promise<T> {
   const session = await getSession();
   const token = session?.user?.accessToken;
   const headers: HeadersInit = {

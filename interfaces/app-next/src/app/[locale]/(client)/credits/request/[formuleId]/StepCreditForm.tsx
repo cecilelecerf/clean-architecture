@@ -8,7 +8,6 @@ import { useMutation } from '@tanstack/react-query';
 import { endpoints } from '@/utils/endpoint';
 import { AccountId } from '@infrastructure/types/account';
 import { FormuleDTO } from '@infrastructure/types/formule';
-import { useRouter } from 'next/navigation';
 import { requestCreditSchema } from '@/utils/endpoint/creditEndpoints';
 import { useTranslations } from 'next-intl';
 
@@ -30,7 +29,6 @@ type StepCreditFormProps = {
 
 export const StepCreditForm = ({ formule, info }: StepCreditFormProps) => {
   const mutation = useMutation(endpoints.credits.create());
-  const router = useRouter()
   const form = useForm<FormRequestCredit>({
     resolver: zodResolver(formRequestCreditSchema),
   });

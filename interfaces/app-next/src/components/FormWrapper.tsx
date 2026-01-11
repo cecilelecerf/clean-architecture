@@ -330,40 +330,42 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                                     <CommandEmpty>Aucun utilisateur trouvé.</CommandEmpty>
                                                     {info.commandOption.map((command) => {
                                                         if (command.infos.length === 0) return
-                                                        return <CommandGroup heading={command.name}>
-                                                            {command.infos.map((info) => (
-                                                                <CommandItem
-                                                                    key={info.id}
-                                                                    value={`${info.firstname} ${info.lastname}`}
-                                                                    onSelect={() => {
-                                                                        let newValue: string[];
-                                                                        if (valueArray.includes(info.id)) {
-                                                                            newValue = [...valueArray, info.id];
-                                                                        } else {
-                                                                            newValue = valueArray.filter((v) => v !== info.id);
-                                                                        }
-                                                                        field.onChange(newValue);
-                                                                    }}
-                                                                >
-                                                                    <Flex align="center" gap="2" className="flex-1">
-                                                                        <Avatar className="h-8 w-8">
-                                                                            <AvatarFallback>
-                                                                                {info.firstname[0]}{info.lastname[0]}
-                                                                            </AvatarFallback>
-                                                                        </Avatar>
-                                                                        <span>
-                                                                            {info.firstname} {info.lastname}
-                                                                        </span>
-                                                                    </Flex>
-                                                                    <Check
-                                                                        className={clsx(
-                                                                            "ml-auto h-4 w-4",
-                                                                            valueArray.includes(info.id) ? "opacity-100" : "opacity-0"
-                                                                        )}
-                                                                    />
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
+                                                        return (
+                                                            <CommandGroup heading={command.name} key={command.name}>
+                                                                {command.infos.map((info) => (
+                                                                    <CommandItem
+                                                                        key={info.id}
+                                                                        value={`${info.firstname} ${info.lastname}`}
+                                                                        onSelect={() => {
+                                                                            let newValue: string[];
+                                                                            if (valueArray.includes(info.id)) {
+                                                                                newValue = [...valueArray, info.id];
+                                                                            } else {
+                                                                                newValue = valueArray.filter((v) => v !== info.id);
+                                                                            }
+                                                                            field.onChange(newValue);
+                                                                        }}
+                                                                    >
+                                                                        <Flex align="center" gap="2" className="flex-1">
+                                                                            <Avatar className="h-8 w-8">
+                                                                                <AvatarFallback>
+                                                                                    {info.firstname[0]}{info.lastname[0]}
+                                                                                </AvatarFallback>
+                                                                            </Avatar>
+                                                                            <span>
+                                                                                {info.firstname} {info.lastname}
+                                                                            </span>
+                                                                        </Flex>
+                                                                        <Check
+                                                                            className={clsx(
+                                                                                "ml-auto h-4 w-4",
+                                                                                valueArray.includes(info.id) ? "opacity-100" : "opacity-0"
+                                                                            )}
+                                                                        />
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        )
                                                     }
                                                     )}
                                                 </CommandList>

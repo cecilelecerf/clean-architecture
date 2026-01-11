@@ -233,42 +233,6 @@ const RateCard = ({
   );
 };
 
-interface StatCardProps {
-  icon: React.ElementType;
-  label: string;
-  value: number | string;
-  color: "blue" | "green" | "purple" | "orange";
-}
-
-const StatCard = ({ icon: Icon, label, value, color }: StatCardProps) => {
-  const colorClasses = {
-    blue: "bg-blue-50 text-blue-600 border-blue-200",
-    green: "bg-green-50 text-green-600 border-green-200",
-    purple: "bg-purple-50 text-purple-600 border-purple-200",
-    orange: "bg-orange-50 text-orange-600 border-orange-200",
-  };
-
-  const textColorClasses = {
-    blue: "text-blue-700",
-    green: "text-green-700",
-    purple: "text-purple-700",
-    orange: "text-orange-700",
-  };
-
-  return (
-    <div className={`p-4 rounded-lg border ${colorClasses[color]}`}>
-      <div className="flex items-center gap-3 mb-2">
-        <Icon className="w-5 h-5" />
-        <p className="text-xs font-medium uppercase tracking-wide opacity-80">
-          {label}
-        </p>
-      </div>
-      <p className={`text-2xl font-bold ${textColorClasses[color]}`}>
-        {value}
-      </p>
-    </div>
-  );
-};
 
 const ConditionCard = ({
   icon: Icon,

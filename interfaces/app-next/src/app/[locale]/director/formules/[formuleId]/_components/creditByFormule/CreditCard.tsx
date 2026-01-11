@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Clock, CreditCardIcon, Euro, User } from 'lucide-react';
+import { Calendar, Clock, CreditCardIcon, Euro, LucideIcon, User } from 'lucide-react';
 import { useTranslations } from "next-intl";
 import { CreditDTO } from "@infrastructure/types/credit";
 import { StatusBadge } from "./StatusBadge";
@@ -91,7 +91,7 @@ const InfoItem = ({
     label,
     value
 }: {
-    icon: any;
+    icon: LucideIcon;
     label: string;
     value: string;
 }) => (

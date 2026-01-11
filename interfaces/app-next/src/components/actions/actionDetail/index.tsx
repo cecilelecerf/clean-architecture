@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 import { match } from "ts-pattern";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import {
     Pencil,
     ShoppingCart,
 } from "lucide-react";
-import { ActionId } from "@infrastructure/types/action";
+import { Action, ActionId, ActionStats } from "@infrastructure/types/action";
 import Link from "next/link";
 import { useState, useCallback, useMemo, memo } from "react";
 import { ActionBuy } from "./ActionBuy";
@@ -93,7 +93,7 @@ export default function ActionDetail({ isin, baseHref, isAdmin }: ActionDetailPr
     );
 }
 
-const ActionHeader = memo(({ onBack, t }: { onBack: () => void; t: any }) => (
+const ActionHeader = memo(({ onBack, t }: { onBack: () => void; t: ReturnType<typeof useTranslations> }) => (
     <div className="flex items-center justify-between sticky top-0 py-2 z-10 border-b md:border-none">
         <Button variant="ghost" size="sm" onClick={onBack} className="p-2">
             <ArrowLeft className="w-5 h-5" />
@@ -105,6 +105,16 @@ const ActionHeader = memo(({ onBack, t }: { onBack: () => void; t: any }) => (
 
 ActionHeader.displayName = 'ActionHeader';
 
+
+type ActionInfoCardProps = {
+    action: Action,
+    t: ReturnType<typeof useTranslations>,
+    onSell: () => void,
+    onBuy: () => void,
+    isAdmin?: boolean,
+    baseHref: string,
+    statsQuery: UseQueryResult<ActionStats>
+}
 const ActionInfoCard = memo(({
     action,
     statsQuery,
@@ -113,7 +123,7 @@ const ActionInfoCard = memo(({
     onBuy,
     onSell,
     t
-}: any) => {
+}: ActionInfoCardProps) => {
     const priceChange = useMemo(() => {
         if (statsQuery.status !== "success") return null;
         const change = statsQuery.data.priceChange24h;
