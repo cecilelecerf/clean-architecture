@@ -16,7 +16,7 @@ export default function AdminUsersPage() {
     const t = useTranslations("advisor.users");
     return (
         <>
-            <TitleAdminPage title="Clients" />
+            <TitleAdminPage title={t("title")} />
             {match(query)
                 .with({ status: "error" }, () => "error")
                 .with({ status: "pending" }, () => <UsersSkeleton />)

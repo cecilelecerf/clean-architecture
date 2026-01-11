@@ -28,13 +28,13 @@ export const CreditsContent = () => {
     return (
         <>
             <TitleAdminPage
-                title={`Crédits ${match(status)
-                    .with("ACCEPTED", () => "acceptés")
-                    .with("COMPLETED", () => "terminés")
-                    .with("PENDING", () => "en attente de traitement")
-                    .with("REFUSED", () => "refusés")
+                title={`${t("title.loan")} ${match(status)
+                    .with("ACCEPTED", () => t("title.accept"))
+                    .with("COMPLETED", () => t("title.completed"))
+                    .with("PENDING", () => t("title.pending"))
+                    .with("REFUSED", () => t("title.refuse"))
                     .otherwise(() => "")
-                    }`}
+                }`}
             />
             {match(query)
                 .with({ status: "error" }, () => (

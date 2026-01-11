@@ -20,7 +20,7 @@ export default function AccountsPage() {
 
     return (
         <>
-            <TitleAdminPage title="Comptes clients" />
+            <TitleAdminPage title={t("title")} />
             {match(query)
                 .with({ status: "error" }, () => ("error"))
                 .with({ status: "pending" }, () => <AccountsSkeleton />)

@@ -2,7 +2,12 @@
   "menu": {
     "title": "Cnseiller",
     "section": {
-      "general": "General"
+      "general": "General",
+      "relation": "Relation Client"
+    },
+    "header": {
+      "title": "Tableau de bord",
+      "text": "Bienvenue sur votre espace conseiller"
     },
     "home": "Accueil",
     "profile": "Profil",
@@ -64,23 +69,35 @@
     "unpublish": "Brouillon créé le"
   },
   "bank": {
+    "title": "Comptes de la banque",
     "none": "Aucun compte de la banque pour le moment."
   },
   "loan": {
+    "title": {
+      "loan": "Crédits",
+      "accept": "acceptés",
+      "completed": "terminés",
+      "pending": "en attente de traitement",
+      "refuse": "refusés"
+    },
     "error": "Erreur lors du chargement des crédits",
     "none": "Aucune demande de crédit en attente de traitement",
-    "all": "Tous les crédits"
+    "all": "Tous les crédits",
+    "details": "Détail de la demande de crédit"
   },
   "users": {
+    "title": "Clients",
     "none": "Aucun utilisateur associé pour le moment.",
     "more": "Voir +"
   },
   "thread": {
+    "title": "Conversation clients",
     "none": "Pas de conversation",
     "join": "Rejoindre la conversation",
     "customer": "Client"
   },
   "account": {
+    "title": "Comptes clients",
     "none": "Aucun compte client pour le moment."
   }
 }

@@ -23,7 +23,7 @@ export default function ThreadsPage() {
 
     return (
         <>
-            <TitleAdminPage title="Conversation clients" />
+            <TitleAdminPage title={t("title")} />
             {match(query)
                 .with({ status: "error" }, () => "error")
                 .with({ status: "pending" }, () =>

@@ -63,12 +63,12 @@ function SidebarContent({
     <div className="p-6 flex flex-col justify-between h-full">
       <div className="space-y-6">
         <Link href="/admin">
-          <h1 className="text-xl font-bold">Conseiller</h1>
+          <h1 className="text-xl font-bold">{t("title")}</h1>
         </Link>
 
         <div>
           <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
-            Général
+            {t("section.general")}
           </h2>
           <div className="flex justify-between">
             <LangageSwitcher />
@@ -96,7 +96,7 @@ function SidebarContent({
         {/* Section Relation Client */}
         <div>
           <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
-            Relation Client
+            {t("section.relation")}
           </h2>
           <nav className="space-y-1">
             {menuItemsClients.map((item, i) => (
@@ -122,7 +122,7 @@ function SidebarContent({
         onClick={() => signOut({ callbackUrl: '/' })}
       >
         <LogOutIcon size={18} />
-        <span>Déconnexion</span>
+        <span>{t("logout")}</span>
       </Button>
     </div>
   );

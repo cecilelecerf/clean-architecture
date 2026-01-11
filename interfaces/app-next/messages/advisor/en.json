@@ -2,7 +2,12 @@
   "menu": {
     "title": "Advisor",
     "section": {
-      "general": "General"
+      "general": "General",
+      "relation": "Customer Relations"
+    },
+    "header": {
+      "title": "Dashboard",
+      "text": "Welcome to your advisor area"
     },
     "home": "Dashboard",
     "profile": "Profile",
@@ -64,23 +69,35 @@
     "unpublish": "Draft created on"
   },
   "bank": {
+    "title": "Bank accounts",
     "none": "No bank account at the moment."
   },
   "loan": {
+    "title": {
+      "loan": "Loan",
+      "accept": "accepted",
+      "completed": "completed",
+      "pending": "awaiting processing",
+      "refuse": "refused"
+    },
     "error": "Error loading loans",
     "none": "No loan applications are pending.",
-    "all": "All loan"
+    "all": "All loan",
+    "details": "Details of the loan application"
   },
   "users": {
+    "title": "Customers",
     "none": "No users are currently associated with any of these.",
     "more": "See more"
   },
   "thread": {
+    "title": "Customers conversation",
     "none": "No conversation",
     "join": "Join the conversation",
     "customer": "Customer"
   },
   "account": {
+    "title": "Customers accounts",
     "none": "No customer account at the moment."
   }
 }

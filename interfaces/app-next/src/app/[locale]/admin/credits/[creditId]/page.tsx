@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { use } from "react";
 import { CreditDetails, CreditDetailSkeleton } from "@/components/credits/CreditDetails";
+import { useTranslations } from "next-intl";
 
 
 export default function AdminCreditDetailPage({
@@ -21,6 +22,7 @@ export default function AdminCreditDetailPage({
     const { creditId } = use(params);
     const router = useRouter();
     const query = useQuery(endpoints.credits.get({ creditId }));
+    const t = useTranslations("advisor.loan");
 
     return (
         <>
@@ -28,7 +30,7 @@ export default function AdminCreditDetailPage({
                 <Button variant="ghost" size="icon" onClick={() => router.back()}>
                     <ArrowLeft className="w-5 h-5" />
                 </Button>
-                <h1 className="text-2xl font-bold">Détail de la demande de crédit</h1>
+                <h1 className="text-2xl font-bold">{t("details")}</h1>
             </div>
 
             {match(query)

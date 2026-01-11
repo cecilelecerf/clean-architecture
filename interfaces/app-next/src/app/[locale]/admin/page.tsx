@@ -10,13 +10,13 @@ export default function AdminHomePage() {
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold mb-2">Tableau de bord</h1>
-                <p className="text-gray-500">Bienvenue sur votre espace conseiller</p>
+                <h1 className="text-3xl font-bold mb-2">{t("header.title")}</h1>
+                <p className="text-gray-500">{t("header.text")}</p>
             </div>
 
             {/* Section Général */}
             <section>
-                <h2 className="text-xl font-semibold mb-4 text-gray-700">Général</h2>
+                <h2 className="text-xl font-semibold mb-4 text-gray-700">{t("section.general")}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {menuItems.slice(1).map((item) => (
                         <Link href={item.href} key={item.labelKey}>
@@ -35,7 +35,7 @@ export default function AdminHomePage() {
 
             {/* Section Relation Client */}
             <section>
-                <h2 className="text-xl font-semibold mb-4 text-gray-700">Relation Client</h2>
+                <h2 className="text-xl font-semibold mb-4 text-gray-700">{t("section.relation")}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {menuItemsClients.map((item) => (
                         <Link href={item.href} key={item.labelKey}>
