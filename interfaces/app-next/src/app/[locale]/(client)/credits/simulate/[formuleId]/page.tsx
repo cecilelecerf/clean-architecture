@@ -381,7 +381,7 @@ function SimulationResults({ simulation, formule, onRequestCredit }: SimulationR
                         size="sm"
                         onClick={() => setShowFullSchedule(!showFullSchedule)}
                     >
-                        {showFullSchedule ? t("tabs.reduce") : t("amount.show")}
+                        {showFullSchedule ? t("tabs.reduce") : t("tabs.show")}
                     </Button>
                 </CardHeader>
                 <CardContent>
