@@ -62,5 +62,8 @@
     "by": "By",
     "publish": "Published on",
     "unpublish": "Draft created on"
+  },
+  "bank": {
+    "none": "No bank account at the moment."
   }
 }

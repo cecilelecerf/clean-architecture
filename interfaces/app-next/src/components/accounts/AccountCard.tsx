@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type Account = {
     IBAN: string;
@@ -33,6 +34,7 @@ export const AccountCard = ({
     onClickUser,
 }: AccountCardProps) => {
     const router = useRouter();
+    const t = useTranslations("account");
 
     const handleAccountClick = () => {
         if (onClickAccount) onClickAccount(account.IBAN);
@@ -95,14 +97,14 @@ export const AccountCard = ({
                             className="flex items-center"
                         >
                             <User className="w-4 h-4 mr-2" />
-                            Voir client
+                            {t("client")}
                         </Button>
                     )}
                     <Button
                         size="sm"
                         onClick={handleAccountClick}
                     >
-                        Voir compte
+                        {t("more")}
                     </Button>
                 </div>
             </CardContent>

@@ -14,6 +14,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       auth: (await import(`../../../messages/auth/${locale}.json`)).default,
       director: (await import(`../../../messages/director/${locale}.json`)).default,
       advisor: (await import(`../../../messages/advisor/${locale}.json`)).default,
+      account: (await import(`../../../messages/account/${locale}.json`)).default
     },
   };
 });

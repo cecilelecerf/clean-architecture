@@ -1,0 +1,51 @@
+{
+    "more": "Voir compte",
+    "client": "Voir client",
+    "error": "Erreur de chargement",
+    "update": "Modifier le nom",
+    "close": "Fermer le compte",
+    "transfer": "Transférer",
+    "last": "Dernières transactions",
+    "dialog": {
+        "update": {
+            "title": "Modifier le nom du compte",
+            "description": "Changez le nom de votre compte pour mieux l'identifier.",
+            "label": "Nom du compte",
+            "placeholder": "Entrez le nouveau nom"
+        },
+        "close": {
+            "title": "Fermer le compte",
+            "description": {
+                "start": "Cette action est irréversible. Le solde restant de",
+                "end": "sera transféré vers le compte sélectionné."
+            },
+            "label": "Compte de destination pour le transfert",
+            "placeholder": "Sélectionnez un compte",
+            "none": "Aucun autre compte disponible"
+        },
+        "button": {
+            "cancel": "Annuler",
+            "save": "Enregistrer",
+            "close": "Fermer définitivement"
+        }
+    },
+    "transactions": {
+        "search": "Rechercher par nom",
+        "type": "Type",
+        "all": "Tous",
+        "credit": "Crédit",
+        "debit": "Débit",
+        "calendar": {
+            "from": "Du",
+            "to": "Au"
+        },
+        "page": "Transaction par page",
+        "details": {
+            "title": "Détail de la transaction",
+            "amount": "Montant",
+            "type": "Type de transaction",
+            "account": "Compte bénéficiaire",
+            "bank": "Banque"
+        }
+    } 
+}

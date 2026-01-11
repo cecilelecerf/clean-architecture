@@ -62,5 +62,8 @@
     "by": "Par",
     "publish": "Publié le",
     "unpublish": "Brouillon créé le"
+  },
+  "bank": {
+    "none": "Aucun compte de la banque pour le moment."
   }
 }
