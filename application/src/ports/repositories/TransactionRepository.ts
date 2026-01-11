@@ -13,11 +13,7 @@ export type TransactionEntityWithAccountWithUser = TransactionEntity & {
   toAccount: AccountEntityWithUser;
 };
 export interface TransactionRepository {
-  findByDateRange(startDate: Date, endDate: Date): Promise<TransactionEntity[]>;
-  findByIban(iban: IBAN): Promise<TransactionEntity[]>;
-  findById(id: TransactionEntity["id"]): Promise<TransactionEntity | null>;
   save(transaction: TransactionEntity): Promise<void>;
-  delete(id: TransactionEntity["id"]): Promise<void>;
   findByIdWithAccountWithUser(
     id: TransactionEntity["id"]
   ): Promise<TransactionEntityWithAccountWithUser | null>;
