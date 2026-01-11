@@ -185,5 +185,24 @@
             "support": "Personalized support"
         },
         "button": "Start my application"
+    },
+    "stocks": {
+        "title": "My wallet",
+        "description": "Manage your stocks and discover new opportunities",
+        "error": "Error loading wallet",
+        "none": "No stocks in your portfolio",
+        "start": "Start investing today and build your wealth",
+        "explore": "Explore all stocks",
+        "value": "Total value",
+        "mine": "My stocks",
+        "stock": "stock",
+        "average": "Average price:",
+        "current": "Current price:",
+        "popular": "Popular actions",
+        "discover": "Discover the best-performing stocks",
+        "see": "See all",
+        "suggestError": "Error loading suggestions",
+        "invest": "Want to invest more?",
+        "catalog": "Explore our full catalog of stocks and diversify your portfolio"
     }
 }

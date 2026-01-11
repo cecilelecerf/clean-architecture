@@ -185,5 +185,24 @@
             "support": "Accompagnement personnalisé"
         },
         "button": "Commencer ma demande"
+    },
+    "stocks": {
+        "title": "Mon portefeuille",
+        "description": "Gérez vos actions et découvrez de nouvelles opportunités",
+        "error": "Erreur lors du chargement du portefeuille",
+        "none": "Aucune action dans votre portefeuille",
+        "start": "Commencez à investir dès aujourd'hui et construisez votre patrimoine",
+        "explore": "Explorer toutes les actions",
+        "value": "Valeur totale",
+        "mine": "Mes actions",
+        "stock": "action",
+        "average": "Prix moyen:",
+        "current": "Prix actuel:",
+        "popular": "Actions populaires",
+        "discover": "Découvrez les actions les plus performantes",
+        "see": "Tout voir",
+        "suggestError": "Erreur lors du chargement des suggestions",
+        "invest": "Envie d'investir davantage ?",
+        "catalog": "Explorez notre catalogue complet d'actions et diversifiez votre portefeuille"
     }
 }
