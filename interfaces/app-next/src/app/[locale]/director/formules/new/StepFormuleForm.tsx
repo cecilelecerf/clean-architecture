@@ -1,28 +1,20 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
-
 import { Percent, FileText, Coins } from "lucide-react";
 import FormWrapper, { Section } from "@/components/FormWrapper";
 import { useForm } from "react-hook-form";
-import { NewFormule, newFormuleSchema } from "@/utils/endpoint/formuleEndpoints";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { FormuleFormData } from "./page";
+import { useRouter } from "next/navigation";
+import { NewFormule, newFormuleSchema } from "@infrastructure/types/formule";
 
 
-export const StepFormuleForm = ({
-    data,
-    onSubmit,
-    loading,
-}: {
-    data: FormuleFormData;
-    onSubmit: () => void;
-    loading: boolean;
-}) => {
+export const StepFormuleForm = () => {
     const query = useQuery(endpoints.formules.getTypes());
-
+    const mutation = useMutation(endpoints.formules.create());
+    const router = useRouter()
     const t = useTranslations("director.credits.formulas.new.form");
 
     const typeOptions =
@@ -30,20 +22,20 @@ export const StepFormuleForm = ({
             label: t.label,
             value: t.value,
         })) ?? [];
-    const form = useForm<Omit<NewFormule, "accountId">>({
-        resolver: zodResolver(newFormuleSchema.omit({ accountId: true })),
+    const form = useForm<NewFormule>({
+        resolver: zodResolver(newFormuleSchema),
         defaultValues: {
-            maxAmount: data?.maxAmount ?? 100,
-            minAmount: data?.maxAmount ?? 100,
-            currency: data.currency,
-            description: data.description,
-            label: data.label,
-            type: data.type,
-            insuranceRate: data.insuranceRate,
-            interestRate: data.interestRate
+            maxAmount: 0,
+            minAmount: 0,
+            currency: "",
+            description: "",
+            label: "",
+            type: "",
+            insuranceRate: 0,
+            interestRate: 0
         },
     });
-    const sections: Section<Omit<NewFormule, "accountId">>[] = [
+    const sections: Section<NewFormule>[] = [
         {
             title: t("rates.title"),
             description: t("rates.description"),
@@ -104,15 +96,34 @@ export const StepFormuleForm = ({
             },
         },
     ];
+    const handleSubmit = (values) => {
+        mutation.mutate(
+            {
+                interestRate: values.interestRate,
+                insuranceRate: values.insuranceRate,
+                type: values.type,
+                label: values.label,
+                description: values.description,
+                minAmount: values.minAmount,
+                maxAmount: values.maxAmount,
+                currency: values.currency
+            },
+            {
+                onSuccess: (data) => {
+                    router.push(`/director/formules/${data.id}`);
+                },
+            }
+        );
+    }
 
     return (
-        <FormWrapper<Omit<NewFormule, "accountId">>
+        <FormWrapper<NewFormule>
             title={t("title")}
             description={t("description")}
             data={sections}
             labelButton={t("button")}
-            loading={loading}
-            onSubmit={onSubmit}
+            loading={mutation.isPending}
+            onSubmit={handleSubmit}
             form={form}
         />
     );

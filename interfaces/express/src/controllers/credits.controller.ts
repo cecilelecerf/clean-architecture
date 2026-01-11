@@ -181,35 +181,6 @@ export class CreditsController {
     }
   }
 
-  static async applyMonthlyPaiement(
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const userId = req.user?.userId;
-      if (!userId) return res.status(401).json({ message: "Unauthorized" });
-
-      const { creditId } = req.params;
-
-      const result = await creditFactory().applyMonthlyPaiementCredit.execute({
-        clientId: userId,
-        id: creditId,
-      });
-
-      if (result instanceof Error) {
-        return res.status(result.statusCode ?? 400).json({
-          name: result.name,
-          message: result.message,
-        });
-      }
-
-      return res.status(201).json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
   static async grantCredit(
     req: AuthRequest,
     res: Response,

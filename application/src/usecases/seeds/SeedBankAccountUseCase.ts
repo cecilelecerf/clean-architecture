@@ -7,7 +7,7 @@ import { ClockService } from "@application/ports/services/ClockService";
 
 export interface SeedBankAccountRequest {
   iban: string;
-  accountType: "courant" | "epargne";
+  accountType: "courant" | "epargne" | "pret";
   balance: number;
   name: string;
   currency: string;

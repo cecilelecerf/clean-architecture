@@ -323,6 +323,7 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                     ))
                                     .with("command", () => {
                                         const valueArray = (field.value as string[]) ?? [];
+                                        console.log(valueArray)
                                         return (
                                             <Command>
                                                 <CommandInput placeholder="Rechercher un utilisateur..." />
@@ -338,11 +339,13 @@ const Field = <T,>({ name, info, form, loading }: FieldProps<T>) => {
                                                                         value={`${info.firstname} ${info.lastname}`}
                                                                         onSelect={() => {
                                                                             let newValue: string[];
-                                                                            if (valueArray.includes(info.id)) {
+                                                                            console.log(info.id)
+                                                                            if (!valueArray.includes(info.id)) {
                                                                                 newValue = [...valueArray, info.id];
                                                                             } else {
                                                                                 newValue = valueArray.filter((v) => v !== info.id);
                                                                             }
+                                                                            console.log(newValue)
                                                                             field.onChange(newValue);
                                                                         }}
                                                                     >

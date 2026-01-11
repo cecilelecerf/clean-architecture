@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { endpoints } from "@/utils/endpoint";
 import { useForm } from "react-hook-form";
@@ -12,17 +12,25 @@ import { useTranslations } from "next-intl";
 
 export default function NewAccountPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const currenciesQuery = useQuery(endpoints.currencies.getAll());
+
+  const typeParam = searchParams.get("type") as "courant" | "epargne";
 
   const form = useForm<NewAccount>({
     resolver: zodResolver(newAccountSchema),
+    defaultValues: {
+      name: "",
+      color: "" as "blue",
+      type: typeParam ? typeParam : "" as "courant"
+    }
   });
 
   const mutation = useMutation(endpoints.accounts.create());
 
   const onSubmit = (values: NewAccount) => {
     mutation.mutate(values, {
-      onSuccess: (account) => router.push(`/accounts/${account.IBAN}`),
+      onSuccess: (account) => { console.log("test"); console.log(account); router.push(`/accounts/${account.IBAN}`) },
     });
   };
 

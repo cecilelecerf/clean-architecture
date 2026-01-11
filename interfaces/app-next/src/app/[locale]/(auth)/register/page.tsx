@@ -16,9 +16,25 @@ export default function RegisterPage() {
 
     const form = useForm<CreateClientPayload>({
         resolver: zodResolver(createClientSchema),
+        defaultValues: {
+            firstname: "",
+            lastname: "",
+            dateOfBirth: "",
+            sexe: "" as "boy",
+            phoneNumber: "",
+            passwordHash: "",
+            confirmPassword: "",
+            address: "",
+            postalCode: "",
+            city: "",
+            country: "",
+            email: ""
+        }
     });
 
+    console.log(form)
     const handleSubmit = (values: CreateClientPayload) => {
+        console.log("handle")
         mutation.mutate(
             { ...values, dateOfBirth: new Date(values.dateOfBirth).toISOString() },
             {

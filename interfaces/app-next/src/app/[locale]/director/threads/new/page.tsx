@@ -21,7 +21,7 @@ export default function NewThreadPage() {
 
     const t = useTranslations("director.message");
 
-    match(queries)
+    return match(queries)
         .when(
             (q) => q.some(({ status }) => status === "error"),
             () => (

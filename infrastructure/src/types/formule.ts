@@ -59,3 +59,15 @@ export const formuleStatSchema = z.object({
   acceptedCreditsCount: z.number(),
   refusedCreditsCount: z.number(),
 });
+
+export const newFormuleSchema = formuleSchema.pick({
+  interestRate: true,
+  insuranceRate: true,
+  type: true,
+  label: true,
+  description: true,
+  minAmount: true,
+  maxAmount: true,
+  currency: true,
+});
+export type NewFormule = z.infer<typeof newFormuleSchema>;

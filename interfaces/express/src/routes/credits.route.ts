@@ -22,6 +22,5 @@ creditsRouter.patch(
   CreditsController.grantCredit
 );
 creditsRouter.get("/:creditId", CreditsController.getCredit);
-creditsRouter.patch("/:creditId", CreditsController.applyMonthlyPaiement);
 
 export default creditsRouter;
