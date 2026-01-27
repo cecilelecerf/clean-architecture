@@ -29,7 +29,7 @@ Application bancaire moderne construite avec une architecture clean, Next.js et 
 ### 1. Cloner le projet
 
 ```bash
-git clone <url-du-repo>
+git clone https://github.com/cecilelecerf/clean-architecture.git banking-app
 cd banking-app
 ```
 
@@ -52,7 +52,7 @@ Créez un fichier `.env` **à la racine du projet** :
 ```env
 # Database MySQL
 MYSQL_HOST=localhost
-MYSQL_PORT=3306
+MYSQL_PORT=3307
 MYSQL_USER=myapp_user
 MYSQL_PASSWORD=myapp_pass
 MYSQL_DATABASE=myapp_db
@@ -80,7 +80,7 @@ SMTP_FROM=no-reply@banking-app.com
 
 ### 2. Configuration Next.js
 
-Créez un fichier `.env` dans `interfaces/web/app-next/` :
+Créez un fichier `.env` dans `interfaces/app-next/` :
 
 ```env
 NEXTAUTH_SECRET=une_chaine_ultra_secrete
@@ -122,10 +122,10 @@ Cela démarre :
 
 ```bash
 # Recréer la base de données et les tables
-pnpm --filter infrastructure mysql:restart
+pnpm run mysql:restart
 
 # Ajouter des données de test
-pnpm --filter infrastructure mysql:seed
+pnpm run mysql:seed
 ```
 
 ### MongoDB
@@ -138,10 +138,10 @@ pnpm --filter infrastructure mysql:seed
 
 ```bash
 # Recréer la base de données et les collections
-pnpm --filter infrastructure mongo:restart
+pnpm run mongo:restart
 
 # Ajouter des données de test
-pnpm --filter infrastructure mongo:seed
+pnpm run mongo:seed
 ```
 
 ---
@@ -153,12 +153,13 @@ pnpm --filter infrastructure mongo:seed
 Construisez les packages dans l'ordre suivant :
 
 ```bash
-pnpm --filter domain build
-pnpm --filter application build
-pnpm --filter infrastructure build
-pnpm --filter app-next build
-pnpm --filter express build
-pnpm --filter sockets build
+pnpm run build:domain
+pnpm run build:app
+pnpm run build:infra
+pnpm run build:next
+pnpm run build:express
+pnpm run build:socket
+pnpm run build:cron
 ```
 
 > ⚠️ **Important :** L'ordre de build est crucial car les packages dépendent les uns des autres.
@@ -193,6 +194,12 @@ pnpm run express
 - **Port :** `3002`
 - **Base de données :** MongoDB
 
+#### Cron Job
+
+```bash
+pnpm run cron
+```
+
 ---
 
 ## 👥 Comptes de test
@@ -220,6 +227,7 @@ banking-app/
 │   ├── app-next/       # Application Next.js
 │   ├── express/        # API Express (MongoDB)
 │   └── sockets/            # Serveur WebSocket
+│   └── cron/            # Cron job
 ├── docker-compose.yml
 └── package.json
 ```
@@ -229,6 +237,7 @@ banking-app/
 - **Frontend :** Next.js 15, React 19, Tailwind CSS, shadcn/ui
 - **Backend :** Next.js API Routes, Express.js
 - **Base de données :** MySQL, MongoDB
+- **Cron job :** Node Cron
 - **Temps réel :** Socket.IO
 - **Authentification :** NextAuth.js
 - **Architecture :** Clean Architecture, DDD
@@ -265,6 +274,9 @@ pnpm run express
 
 # Lancer le serveur Socket
 pnpm run socket
+
+# Lancer le serveur de jobs
+pnpm run cron
 
 # Build tous les packages
 pnpm run build

@@ -33,6 +33,13 @@ export class TransactionRepositoryMongo implements TransactionRepository {
     });
   }
 
+  async findById(id: string): Promise<TransactionEntity | null> {
+    await this.client.connect();
+    const doc = await TransactionModel.findById(id).lean();
+    if (!doc) return null;
+    return this.mapDocToTransaction(doc);
+  }
+
   async findByIdWithAccount(
     id: string
   ): Promise<TransactionEntityWithAccount | null> {

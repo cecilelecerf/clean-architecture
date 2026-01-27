@@ -13,7 +13,6 @@ import accountsRouter from "./routes/accounts.route";
 import postsRouter from "./routes/posts.route";
 import currenciesRouter from "./routes/currencies.route";
 import actionsRouter from "./routes/actions.route";
-import { setupCronJobs } from "./server/cron";
 
 const app = express();
 const port = 3002;
@@ -38,8 +37,6 @@ app.use("/api/accounts", authMiddleware, accountsRouter);
 app.use("/api/posts", authMiddleware, postsRouter);
 app.use("/api/currencies", authMiddleware, currenciesRouter);
 app.use("/api/actions", authMiddleware, actionsRouter);
-
-setupCronJobs();
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

@@ -15,7 +15,6 @@ import {
 import { InvalidAccountTypeError } from "@domain/errors/account/InvalidAccountType";
 import { TransactionEntity } from "./TransactionEntity";
 
-// TODO: Ajouter le RIB, CVE etc... carte? -> boolean pour savoir si le compte est lié à une carte pareil pour cheque? -> boolean
 export class AccountEntity {
   private constructor(
     public iban: IBAN,

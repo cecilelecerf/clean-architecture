@@ -1,16 +1,18 @@
 {
   "version": "0.1.0",
   "private": true,
-  "name": "express",
+  "name": "cron",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "express": "tsx watch ./src/index.ts"
+    "dev": "tsx watch ./src/index.ts",
+    "start": "tsx ./src/index.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
+    "@types/node-cron": "^3.0.11",
     "typescript": "^5.6.3"
   },
   "dependencies": {
@@ -20,6 +22,7 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "infrastructure": "workspace:*",
+    "node-cron": "^4.2.1",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.6"
   }

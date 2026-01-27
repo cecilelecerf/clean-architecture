@@ -14,6 +14,7 @@ export type TransactionEntityWithAccountWithUser = TransactionEntity & {
 };
 export interface TransactionRepository {
   save(transaction: TransactionEntity): Promise<void>;
+  findById(id: TransactionEntity["id"]): Promise<TransactionEntity | null>;
   findByIdWithAccountWithUser(
     id: TransactionEntity["id"]
   ): Promise<TransactionEntityWithAccountWithUser | null>;
