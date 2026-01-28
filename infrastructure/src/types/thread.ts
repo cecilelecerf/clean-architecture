@@ -7,6 +7,11 @@ export type MessageId = z.infer<typeof messageIdSchema>;
 export const threadIdSchema = z.uuid().brand("thread");
 export type ThreadId = z.infer<typeof threadIdSchema>;
 
+export const messageReadSchema = z.object({
+  user: userDtoSchema,
+  readAt: z.iso.datetime(),
+});
+
 export const messageSchema = z.object({
   id: messageIdSchema,
   threadId: threadIdSchema,
@@ -20,6 +25,7 @@ export type Message = z.infer<typeof messageSchema>;
 
 export const messageWithUserSchema = messageSchema.extend({
   sender: userDtoSchema,
+  readByUsers: messageReadSchema.array(),
 });
 export type MessageWithUserDTO = z.infer<typeof messageWithUserSchema>;
 

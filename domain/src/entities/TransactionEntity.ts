@@ -15,11 +15,11 @@ export class TransactionEntity {
     public fromAccountId: AccountEntity["iban"],
     public toAccountId: AccountEntity["iban"],
     public amount: Money,
-    public date: Date
+    public date: Date,
   ) {}
 
   private static validateLabel(
-    label: string
+    label: string,
   ): string | InvalidTransactionLabelError {
     const trimmed = label.trim();
 
@@ -31,7 +31,7 @@ export class TransactionEntity {
   }
 
   private static validateAmount(
-    amount: Money
+    amount: Money,
   ): Money | InvalidTransactionAmountError {
     if (amount.amount <= 0) {
       return new InvalidTransactionAmountError(amount.amount);
@@ -42,7 +42,7 @@ export class TransactionEntity {
 
   private static validateAccounts(
     fromAccountId: IBAN,
-    toAccountId: IBAN
+    toAccountId: IBAN,
   ): void | InvalidTransaction {
     if (fromAccountId.is(toAccountId)) {
       return new InvalidTransaction();
@@ -73,7 +73,7 @@ export class TransactionEntity {
     | InvalidTransactionAmountError {
     const accountsValidation = this.validateAccounts(
       fromAccountId,
-      toAccountId
+      toAccountId,
     );
     if (accountsValidation instanceof Error) return accountsValidation;
 
@@ -90,7 +90,7 @@ export class TransactionEntity {
       fromAccountId,
       toAccountId,
       validatedAmount,
-      date
+      date,
     );
   }
 
@@ -119,7 +119,7 @@ export class TransactionEntity {
       fromAccountId,
       toAccountId,
       amount,
-      date
+      date,
     );
   }
   public getTypeForAccount(accountIban: IBAN): "debit" | "credit" {

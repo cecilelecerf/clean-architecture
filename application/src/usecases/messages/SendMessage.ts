@@ -28,7 +28,7 @@ export class SendMessage {
     private readonly threadRepository: ThreadRepository,
     private readonly messageRepository: MessageRepository,
     private readonly uuidService: UuidService,
-    private readonly clockService: ClockService
+    private readonly clockService: ClockService,
   ) {}
   public async execute({
     content,
@@ -66,6 +66,9 @@ export class SendMessage {
     if (message instanceof Error) return message;
 
     this.messageRepository.save(message);
-    return Object.assign(message, { sender: user.toDTO() });
+    return Object.assign(message, {
+      sender: user.toDTO(),
+      readByUsers: [{ user: user.toDTO(), readAt: sentAt.toISOString() }],
+    });
   }
 }

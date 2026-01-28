@@ -9,11 +9,11 @@ export class MessageEntity {
     public senderId: UserEntity["id"],
     public content: string,
     public sentAt: Date,
-    public readBy: UserEntity["id"][]
+    public readBy: UserEntity["id"][],
   ) {}
 
   private static validateContent(
-    content: string
+    content: string,
   ): string | ContentEmptyError | ContentTooLongError {
     const trimmed = content.trim();
 
@@ -62,9 +62,14 @@ export class MessageEntity {
   }
 
   public userRead(userId: UserEntity["id"]): void {
-    this.readBy = [...this.readBy, userId];
+    if (!this.readBy.includes(userId)) {
+      this.readBy = [...this.readBy, userId];
+    }
   }
   public isUnread(userId: UserEntity["id"]): boolean {
+    return !this.readBy.includes(userId);
+  }
+  public isReadBy(userId: UserEntity["id"]): boolean {
     return this.readBy.includes(userId);
   }
   public isSentBy(userId: string): boolean {

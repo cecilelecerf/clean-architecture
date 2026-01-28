@@ -10,9 +10,7 @@ import {
   UserNotActiveError,
   UserNotFoundError,
 } from "@application/errors/users";
-import {
-  MessageRepository
-} from "@application/ports/repositories/MessageRepository";
+import { MessageRepository } from "@application/ports/repositories/MessageRepository";
 import { ThreadRepository } from "@application/ports/repositories/ThreadRepository";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { findActiveUser } from "@application/utils/userValidators";
@@ -26,7 +24,7 @@ export class GetThreadMessages {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly threadRepository: ThreadRepository,
-    private readonly messageRepository: MessageRepository
+    private readonly messageRepository: MessageRepository,
   ) {}
   public async execute({
     userId,
@@ -47,7 +45,7 @@ export class GetThreadMessages {
     if (thread.administratorId && !thread.hasAccess(user.id))
       return new InvalidThreadAccessError(user.id, thread.id);
     const messages = await this.messageRepository.findAllWithUserByThread(
-      thread.id
+      thread.id,
     );
     return MessageDTOMapper.maps(messages);
   }

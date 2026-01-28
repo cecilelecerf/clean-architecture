@@ -19,7 +19,7 @@ export class ApplyDailyInterestUseCase {
     private readonly savingRateRepository: SavingRateRepository,
     private readonly transactionRepository: TransactionRepository,
     private readonly clockService: ClockService,
-    private readonly uuidService: UuidService
+    private readonly uuidService: UuidService,
   ) {}
   async execute(): Promise<
     | { distributed: number; totalAmount: number; skipped: number }
@@ -32,7 +32,7 @@ export class ApplyDailyInterestUseCase {
     | BankInterestAccountNotFoundError
   > {
     const rateConfig = await this.savingRateRepository.findRateAtDate(
-      this.clockService.now()
+      this.clockService.now(),
     );
     if (!rateConfig) return new SavingsRateNotFoundError();
 
@@ -53,7 +53,7 @@ export class ApplyDailyInterestUseCase {
     for (const savingAccount of savingAccounts) {
       if (savingAccount.lastInterestTransactionId) {
         const lastTransaction = await this.transactionRepository.findById(
-          savingAccount.lastInterestTransactionId
+          savingAccount.lastInterestTransactionId,
         );
 
         if (lastTransaction) {

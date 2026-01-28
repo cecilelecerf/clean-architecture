@@ -18,7 +18,7 @@
     "mysql:restart": "pnpm --filter infrastructure run mysql:restart",
     "mongo:seed": "pnpm --filter infrastructure run mongo:seed",
     "mongo:restart": "pnpm --filter infrastructure run mongo:restart",
-    "socket": "pnpm --filter sockets run sockets",
+    "socket": "pnpm --filter sockets run socket",
     "express": "pnpm --filter express run express",
     "cron": "pnpm --filter cron run start"
   },

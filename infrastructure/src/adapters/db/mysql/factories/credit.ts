@@ -34,7 +34,7 @@ export const creditFactory = () => {
 
   const getCreditsByUser = new GetCreditsByClientUsecase(
     creditRepository,
-    userRepository
+    userRepository,
   );
 
   const getCredit = new GetCreditUsecase(creditRepository, userRepository);
@@ -42,13 +42,13 @@ export const creditFactory = () => {
   const getCreditsByAccount = new GetCreditByAccountUseCase(
     creditRepository,
     userRepository,
-    accountRepository
+    accountRepository,
   );
 
   const creditSchedule = new CreditScheduleUsecase(
     creditRepository,
     userRepository,
-    formuleRepository
+    formuleRepository,
   );
 
   const requestCredit = new RequestCreditUsecase(
@@ -57,7 +57,7 @@ export const creditFactory = () => {
     accountRepository,
     formuleRepository,
     uuidService,
-    clockService
+    clockService,
   );
 
   const applyMonthlyPaiementCredit = new ApplyMonthlyCreditsPaymentUsecase(
@@ -69,23 +69,23 @@ export const creditFactory = () => {
     clockService,
     uuidService,
     transactionRepository,
-    moneyConvertor
+    moneyConvertor,
   );
 
   const grantCredit = new GrantCreditUsecase(
     creditRepository,
     userRepository,
-    clockService
+    clockService,
   );
   const getAllByStatus = new GetAllByStatusUseCase(
     creditRepository,
-    userRepository
+    userRepository,
   );
 
   const getAllByFormule = new GetAllByFormuleUsecase(
     creditRepository,
     userRepository,
-    formuleRepository
+    formuleRepository,
   );
 
   return {

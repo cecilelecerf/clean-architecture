@@ -1,6 +1,7 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import {
+  messageIdSchema,
   messageWithUserSchema,
   NewExternalThread,
   NewThread,
@@ -183,6 +184,18 @@ export const threadsEndpoint = createEndpointsNodes({
           // Mettre à jour la liste des threads (dernier message)
           queryClient.invalidateQueries({
             queryKey: ['threads', 'list'],
+          });
+        },
+      }),
+    read: ({ threadId }: { threadId: ThreadId }) =>
+      mutationOptions({
+        mutationFn: () =>
+          patch(`/threads/${threadId}/messages`, {}).then((data) =>
+            safeParseWithLog(z.object({ messageIds: messageIdSchema.array() }), data),
+          ),
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ['threads', threadId, 'messages'],
           });
         },
       }),

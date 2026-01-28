@@ -6,12 +6,12 @@ import { CreditAlreadyPaidError } from "@domain/errors/credit";
 import { EmailService } from "@application/ports/services/EmailService";
 import { UserRepository } from "@application/ports/repositories/UserRepository";
 import { AccountRepository } from "@application/ports/repositories/AccountRepository";
-import { TransactionEntity } from "domain/entities/TransactionEntity";
 import { ClockService } from "@application/ports/services/ClockService";
 import { UuidService } from "@application/ports/services/UuidService";
 import { TransactionRepository } from "@application/ports/repositories/TransactionRepository";
 import { AccountNotFoundError } from "@application/errors/accounts";
 import { MoneyConverter } from "domain/services/MoneyConverter";
+import { TransactionEntity } from "domain/entities/TransactionEntity";
 
 type CreditPaymentResult = {
   creditId: string;
@@ -30,7 +30,7 @@ export class ApplyMonthlyCreditsPaymentUsecase {
     private readonly clockService: ClockService,
     private readonly uuidService: UuidService,
     private readonly transactionRepository: TransactionRepository,
-    private readonly moneyConvertor: MoneyConverter
+    private readonly moneyConvertor: MoneyConverter,
   ) {}
 
   public async execute(): Promise<{
@@ -40,7 +40,7 @@ export class ApplyMonthlyCreditsPaymentUsecase {
     results: CreditPaymentResult[];
   }> {
     const activeCredits = await this.creditRepository.findAllByStatus(
-      CreditStatus["ACCEPTED"]
+      CreditStatus["ACCEPTED"],
     );
     const bankAccount = await this.accountRepository.findBankReadyAccount();
     if (!bankAccount) {
@@ -69,7 +69,7 @@ export class ApplyMonthlyCreditsPaymentUsecase {
         }
 
         const formuleCredit = await this.formuleRepository.findById(
-          credit.formuleCreditId
+          credit.formuleCreditId,
         );
 
         if (!formuleCredit) {
@@ -82,7 +82,7 @@ export class ApplyMonthlyCreditsPaymentUsecase {
           continue;
         }
         const account = await this.accountRepository.findByIBAN(
-          credit.accountId
+          credit.accountId,
         );
         if (!account) {
           results.push({
@@ -96,7 +96,7 @@ export class ApplyMonthlyCreditsPaymentUsecase {
 
         const montant = await this.moneyConvertor.convert(
           credit.monthlyPayment,
-          account.balance.currency
+          account.balance.currency,
         );
         if (montant instanceof Error) {
           results.push({
@@ -138,7 +138,7 @@ export class ApplyMonthlyCreditsPaymentUsecase {
         }
         const paymentResult = credit.payMonthly(
           formuleCredit.interestRate,
-          formuleCredit.insuranceRate
+          formuleCredit.insuranceRate,
         );
 
         if (paymentResult instanceof Error) {
@@ -195,7 +195,7 @@ export class ApplyMonthlyCreditsPaymentUsecase {
     } catch (error) {
       console.error(
         `Erreur lors de l'envoi de la notification pour le crédit ${credit.id}:`,
-        error
+        error,
       );
     }
   }
