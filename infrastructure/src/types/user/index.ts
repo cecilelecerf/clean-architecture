@@ -111,6 +111,10 @@ export const userDtoSchema = z.discriminatedUnion("role", [
     role: z.literal("client"),
     isActiveField: z.boolean(),
     confirmedAt: z.iso.datetime().nullable().optional(),
+    sexe: sexeSchema,
+    address: addressSchema,
+    dateOfBirth: dateOfBirthSchema,
+    phoneNumber: phoneNumberSchema,
   }),
   z.object({
     id: userIdSchema,
@@ -133,7 +137,6 @@ export const userDtoSchema = z.discriminatedUnion("role", [
 ]);
 
 export type UserDto = z.infer<typeof userDtoSchema>;
-
 export const advisorStat = z.object({
   acceptedCreditsCount: z.number(),
   refusedCreditsCount: z.number(),

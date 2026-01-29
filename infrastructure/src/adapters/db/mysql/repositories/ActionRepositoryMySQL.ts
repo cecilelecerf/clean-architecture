@@ -47,14 +47,14 @@ export class ActionRepositoryMySQL implements ActionRepository {
         action.createdAt,
         action.updatedAt,
         action.defaultQuantity,
-      ]
+      ],
     );
   }
 
   async findByISIN(ISIN: ActionEntity["ISIN"]): Promise<ActionEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM actions WHERE isin = ?`,
-      [ISIN.getValue()]
+      [ISIN.getValue()],
     );
 
     if (!rows.length) return null;
@@ -64,7 +64,7 @@ export class ActionRepositoryMySQL implements ActionRepository {
   async findAllAvailable(isAvailable: boolean): Promise<ActionEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM actions WHERE is_available = ? ORDER BY name ASC`,
-      [isAvailable ? 1 : 0]
+      [isAvailable ? 1 : 0],
     );
     return rows.map(this.mapRowToAction);
   }
@@ -86,14 +86,14 @@ export class ActionRepositoryMySQL implements ActionRepository {
         action.updatedAt || new Date(),
         action.defaultQuantity,
         action.ISIN.getValue(),
-      ]
+      ],
     );
   }
 
   async delete(ISIN: ActionEntity["ISIN"]): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `DELETE FROM actions WHERE isin = ?`,
-      [ISIN.getValue()]
+      [ISIN.getValue()],
     );
   }
 }

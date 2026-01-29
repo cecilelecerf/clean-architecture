@@ -19,7 +19,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
         ? doc.administratorId.toString()
         : undefined,
       participantsId: doc.participantsId.map((participant: Types.UUID) =>
-        participant.toString()
+        participant.toString(),
       ),
       title: doc.title,
       createdAt: doc.createdAt,
@@ -82,7 +82,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
           administratorId: thread.administratorId,
         },
       },
-      { new: false, runValidators: true }
+      { new: false, runValidators: true },
     );
   }
 
@@ -95,9 +95,9 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     return this.mapDocToThread(doc);
   }
 
-  async findAllWithUserByParticipantIdAndType(
+  async findAllWithUserAndLastMessageByParticipantIdAndType(
     participantId: string,
-    type?: ThreadEntity["type"]
+    type?: ThreadEntity["type"],
   ): Promise<ThreadEntityWithUsers[]> {
     await this.client.connect();
 
@@ -119,7 +119,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
   }
 
   async findWithUserById(
-    threadId: string
+    threadId: string,
   ): Promise<ThreadEntityWithUsers | null> {
     await this.client.connect();
     const doc = await ThreadModel.findById(threadId)
@@ -135,9 +135,9 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     return this.mapThreadWithUsers(doc);
   }
 
-  async findAllWithUserByAdministratorIdAndType(
+  async findAllWithUserAndLastMessageByAdministratorIdAndType(
     administratorId: UserEntity["id"],
-    type?: ThreadEntity["type"]
+    type?: ThreadEntity["type"],
   ): Promise<ThreadEntityWithUsers[]> {
     await this.client.connect();
 
@@ -159,7 +159,7 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     return threadsDocs.map((doc) => this.mapThreadWithUsers(doc));
   }
 
-  async findAllWithUserByAdministratorNullable(): Promise<
+  async findAllWithUserAndLastMessageByAdministratorNullable(): Promise<
     ThreadEntityWithUsers[]
   > {
     await this.client.connect();

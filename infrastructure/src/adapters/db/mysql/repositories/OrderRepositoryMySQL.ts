@@ -73,12 +73,12 @@ export class OrderRepositoryMySQL implements OrderRepository {
         order.createdAt,
         order.updatedAt,
         order.transactionId ?? null,
-      ]
+      ],
     );
   }
 
   async findByIdWithAccount(
-    id: OrderEntity["id"]
+    id: OrderEntity["id"],
   ): Promise<OrderEntityWithAccount | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
@@ -95,7 +95,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
      FROM orders o
      LEFT JOIN accounts a ON o.account_iban = a.iban
      WHERE o.id = ?`,
-      [id]
+      [id],
     );
 
     if (rows.length === 0) return null;
@@ -111,7 +111,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
        LEFT JOIN accounts a ON o.account_iban = a.iban
        WHERE a.user_id = ?
        ORDER BY o.created_at DESC`,
-      [userId]
+      [userId],
     );
     return rows.map((row) => this.mapRowToOrder(row));
   }
@@ -137,13 +137,13 @@ export class OrderRepositoryMySQL implements OrderRepository {
         order.executionPrice ? order.executionPrice.amount : null,
         order.executionPrice ? order.executionPrice.currency : null,
         order.id,
-      ]
+      ],
     );
   }
 
   async findAllByUserIdAndStatus(
     userId: UserEntity["id"],
-    status: OrderEntity["status"]
+    status: OrderEntity["status"],
   ): Promise<OrderEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT o.* FROM orders o 
@@ -151,14 +151,14 @@ export class OrderRepositoryMySQL implements OrderRepository {
        LEFT JOIN users u ON a.user_id = u.id 
        WHERE o.status = ? AND u.id = ?
        ORDER BY o.type ASC`,
-      [status, userId]
+      [status, userId],
     );
     return rows.map((row) => this.mapRowToOrder(row));
   }
 
   async findAllByActionIdAndStatus(
     actionId: ActionEntity["ISIN"],
-    status?: OrderEntity["status"]
+    status?: OrderEntity["status"],
   ): Promise<OrderEntity[]> {
     const conditions = ["action_isin = ?"];
     const params: any[] = [actionId.getValue()];
@@ -179,7 +179,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
   async findAllExecutedByISINAndDateRange(
     actionId: ActionEntity["ISIN"],
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<OrderEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM orders 
@@ -188,7 +188,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
         AND date <= ?
         AND status = "executed"
         ORDER BY date ASC`,
-      [actionId.getValue(), startDate, endDate]
+      [actionId.getValue(), startDate, endDate],
     );
 
     return rows.map((row) => this.mapRowToOrder(row));
@@ -197,7 +197,7 @@ export class OrderRepositoryMySQL implements OrderRepository {
   async findAllByActionIdAndStatusAndUserId(
     actionId: ActionEntity["ISIN"],
     userId: UserEntity["id"],
-    status?: OrderEntity["status"]
+    status?: OrderEntity["status"],
   ): Promise<OrderEntity[]> {
     const conditions = ["o.action_isin = ?", "a.user_id = ?"];
     const params: any[] = [actionId.getValue(), userId];
@@ -219,26 +219,26 @@ export class OrderRepositoryMySQL implements OrderRepository {
   async findAllByActionIdAndStatusAndType(
     actionId: ActionEntity["ISIN"],
     status: OrderEntity["status"],
-    type: OrderEntity["type"]
+    type: OrderEntity["type"],
   ): Promise<OrderEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM orders 
        WHERE action_isin = ? AND status = ? AND type = ?
        ORDER BY created_at ASC`,
-      [actionId.getValue(), status, type]
+      [actionId.getValue(), status, type],
     );
 
     return rows.map((row) => this.mapRowToOrder(row));
   }
 
   async findPendingLimitOrders(
-    actionId: ActionEntity["ISIN"]
+    actionId: ActionEntity["ISIN"],
   ): Promise<OrderEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM orders 
        WHERE action_isin = ? AND status = 'pending' AND execution_type = 'limit'
        ORDER BY created_at ASC`,
-      [actionId.getValue()]
+      [actionId.getValue()],
     );
 
     return rows.map((row) => this.mapRowToOrder(row));

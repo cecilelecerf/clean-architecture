@@ -2,6 +2,7 @@ import { mutationOptions, queryOptions } from '@tanstack/react-query';
 import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import {
   messageIdSchema,
+  messageSchema,
   messageWithUserSchema,
   NewExternalThread,
   NewThread,
@@ -26,7 +27,8 @@ export const threadWithUserSchema = threadSchema.extend({
 });
 
 export type ThreadWithUser = z.infer<typeof threadWithUserSchema>;
-
+const threadWithUserAndLastMsgSchema = threadWithUserSchema.extend({ lastMessage: messageSchema });
+export type ThreadWithUserAndLastMsg = z.infer<typeof threadWithUserAndLastMsgSchema>;
 export const threadWithAdminOnlySchema = threadSchema.extend({
   administrator: userDtoSchema.nullable(),
 });
@@ -48,7 +50,7 @@ export const threadsEndpoint = createEndpointsNodes({
         if (type) params.set('type', type);
 
         return get(`/threads?${params.toString()}`).then((data) =>
-          safeParseWithLog(threadWithUserSchema.array(), data),
+          safeParseWithLog(threadWithUserAndLastMsgSchema.array(), data),
         );
       },
     }),
@@ -73,7 +75,7 @@ export const threadsEndpoint = createEndpointsNodes({
         ),
     }),
 
-  // GET /api/threads/users/:userI/client
+  // GET /api/threads/users/:userId/client
   // Threads d'un user spécifique (conseiller/directeur)
   getByClient: ({ clientId }: { clientId: UserId }) =>
     queryOptions({
@@ -91,7 +93,7 @@ export const threadsEndpoint = createEndpointsNodes({
       queryKey: ['threads', 'list', 'advisor'],
       queryFn: () => {
         return get(`/threads/users/advisor`).then((data) =>
-          safeParseWithLog(threadWithUserSchema.array(), data),
+          safeParseWithLog(threadWithUserAndLastMsgSchema.array(), data),
         );
       },
     }),

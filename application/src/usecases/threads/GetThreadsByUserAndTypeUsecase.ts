@@ -21,7 +21,7 @@ type Props = {
 export class GetThreadsByUserAndTypeUsecase {
   constructor(
     private readonly threadRepository: ThreadRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
   ) {}
   async execute({
     userId,
@@ -49,22 +49,22 @@ export class GetThreadsByUserAndTypeUsecase {
       if (user.hasRole({ role: "client" }))
         return new UserRoleMismatchError(
           ["conseiller", "directeur"],
-          user.role
+          user.role,
         );
     }
 
     const threadsAdmin =
-      await this.threadRepository.findAllWithUserByAdministratorIdAndType(
+      await this.threadRepository.findAllWithUserAndLastMessageByAdministratorIdAndType(
         userId,
-        type
+        type,
       );
     const threadsParticipant =
-      await this.threadRepository.findAllWithUserByParticipantIdAndType(
+      await this.threadRepository.findAllWithUserAndLastMessageByParticipantIdAndType(
         userId,
-        type
+        type,
       );
 
     const threads = [...threadsAdmin, ...threadsParticipant];
-    return ThreadDTOMapper.maps(threads);
+    return ThreadDTOMapper.mapsWithLastMessage(threads);
   }
 }

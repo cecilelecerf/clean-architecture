@@ -19,7 +19,7 @@ type Props = { advisorId: UserEntity["id"] };
 export class DirectorFindAllThreadUsecase {
   constructor(
     private readonly threadRepository: ThreadRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
   ) {}
   async execute({
     advisorId,
@@ -36,14 +36,14 @@ export class DirectorFindAllThreadUsecase {
       return new UserRoleMismatchError(["directeur"], advisor.role);
 
     const threadsParticipant =
-      await this.threadRepository.findAllWithUserByParticipantIdAndType(
+      await this.threadRepository.findAllWithUserAndLastMessageByParticipantIdAndType(
         advisor.id,
-        "internal"
+        "internal",
       );
     const threadsAdmin =
-      await this.threadRepository.findAllWithUserByAdministratorIdAndType(
+      await this.threadRepository.findAllWithUserAndLastMessageByAdministratorIdAndType(
         advisor.id,
-        "internal"
+        "internal",
       );
     return ThreadDTOMapper.maps(threadsAdmin.concat(threadsParticipant));
   }

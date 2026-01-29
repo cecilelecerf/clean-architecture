@@ -1,5 +1,6 @@
 import {
   ThreadEntityWithUsers,
+  ThreadEntityWithUsersAndLastMessage,
   ThreadRepository,
 } from "@application/ports/repositories/ThreadRepository";
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
@@ -7,19 +8,20 @@ import { UserEntity } from "@domain/entities/UserEntity";
 import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { UserMapper } from "../../mappers/UserMapper";
+import { MessageMapper } from "../../mappers/MessageMapper";
+import { getNullUserFields, getUserFields } from "../constants/userField";
+import { getMessageFields } from "../constants/messageField";
 
 export class ThreadRepositoryMySQL implements ThreadRepository {
   constructor(private readonly client: MySQLClient) {}
 
-  // Méthode helper privée pour mapper les rows SQL vers ThreadEntityWithUsers
   private mapRowsToThreadsWithUsers(
-    rows: RowDataPacket[]
+    rows: RowDataPacket[],
   ): ThreadEntityWithUsers[] {
     const threadsMap = new Map<string, ThreadEntityWithUsers>();
 
     for (const row of rows) {
       if (!threadsMap.has(row.id)) {
-        // Créer le thread
         const thread = ThreadEntity.from({
           id: row.id,
           administratorId: row.administrator_id,
@@ -31,7 +33,6 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
           type: row.type,
         }) as ThreadEntityWithUsers;
 
-        // Mapper l'administrateur si présent
         thread.administrator = row.admin_id
           ? UserMapper.mapRowToUser(row, "admin_")
           : null;
@@ -44,12 +45,12 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
       const thread = threadsMap.get(row.id)!;
       if (row.participant_id) {
         const alreadyExists = thread.participants.some(
-          (u) => u.id === row.participant_id
+          (u) => u.id === row.participant_id,
         );
 
         if (!alreadyExists) {
           thread.participants.push(
-            UserMapper.mapRowToUser(row, "participant_")
+            UserMapper.mapRowToUser(row, "participant_"),
           );
 
           if (!thread.participantsId.includes(row.participant_id)) {
@@ -62,7 +63,59 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     return Array.from(threadsMap.values());
   }
 
-  /** Sauvegarder un thread et ses participants */
+  private mapRowsToThreadsWithUsersAndLastMessage(
+    rows: RowDataPacket[],
+  ): ThreadEntityWithUsersAndLastMessage[] {
+    const threadsMap = new Map<string, ThreadEntityWithUsersAndLastMessage>();
+
+    for (const row of rows) {
+      if (!threadsMap.has(row.id)) {
+        const thread = ThreadEntity.from({
+          id: row.id,
+          administratorId: row.administrator_id,
+          participantsId: [],
+          title: row.title,
+          createdAt: new Date(row.created_at),
+          updatedAt: new Date(row.updated_at),
+          isClose: row.is_close === 1,
+          type: row.type,
+        }) as ThreadEntityWithUsersAndLastMessage;
+
+        thread.administrator = row.admin_id
+          ? UserMapper.mapRowToUser(row, "admin_")
+          : null;
+
+        thread.participants = [];
+
+        thread.lastMessage = row.message_id
+          ? MessageMapper.mapRowToMessage(row, "message_")
+          : null;
+
+        threadsMap.set(row.id, thread);
+      }
+
+      // Ajouter le participant si présent et pas déjà ajouté
+      const thread = threadsMap.get(row.id)!;
+      if (row.participant_id) {
+        const alreadyExists = thread.participants.some(
+          (u) => u.id === row.participant_id,
+        );
+
+        if (!alreadyExists) {
+          thread.participants.push(
+            UserMapper.mapRowToUser(row, "participant_"),
+          );
+
+          if (!thread.participantsId.includes(row.participant_id)) {
+            thread.participantsId.push(row.participant_id);
+          }
+        }
+      }
+    }
+
+    return Array.from(threadsMap.values());
+  }
+
   async save(thread: ThreadEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `INSERT INTO threads
@@ -76,18 +129,17 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
         thread.updatedAt,
         thread.isClose ? 1 : 0,
         thread.type,
-      ]
+      ],
     );
 
     for (const participantId of thread.participantsId) {
       await this.client.query<ResultSetHeader>(
         `INSERT INTO thread_participant (thread_id, user_id) VALUES (?, ?)`,
-        [thread.id, participantId]
+        [thread.id, participantId],
       );
     }
   }
 
-  /** Mettre à jour un thread et ses participants */
   async update(thread: ThreadEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE threads
@@ -100,49 +152,48 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
         thread.isClose ? 1 : 0,
         thread.type,
         thread.id,
-      ]
+      ],
     );
 
     const existingParticipantRows = await this.client.query<RowDataPacket[]>(
       `SELECT user_id FROM thread_participant WHERE thread_id = ?`,
-      [thread.id]
+      [thread.id],
     );
     const existingParticipantIds = existingParticipantRows.map(
-      (r) => r.user_id
+      (r) => r.user_id,
     );
     const participantsToAdd = thread.participantsId.filter(
-      (id) => !existingParticipantIds.includes(id)
+      (id) => !existingParticipantIds.includes(id),
     );
     for (const participantId of participantsToAdd) {
       await this.client.query<ResultSetHeader>(
         `INSERT INTO thread_participant (thread_id, user_id) VALUES (?, ?)`,
-        [thread.id, participantId]
+        [thread.id, participantId],
       );
     }
 
     const participantsToRemove = existingParticipantIds.filter(
-      (id) => !thread.participantsId.includes(id)
+      (id) => !thread.participantsId.includes(id),
     );
     for (const userId of participantsToRemove) {
       await this.client.query<ResultSetHeader>(
         `DELETE FROM thread_participant WHERE thread_id = ? AND user_id = ?`,
-        [thread.id, userId]
+        [thread.id, userId],
       );
     }
   }
 
-  /** Trouver un thread par son ID avec participants */
   async findById(id: ThreadEntity["id"]): Promise<ThreadEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM threads WHERE id = ?`,
-      [id]
+      [id],
     );
     if (rows.length === 0) return null;
     const threadRow = rows[0];
 
     const participantRows = await this.client.query<RowDataPacket[]>(
       `SELECT user_id FROM thread_participant WHERE thread_id = ?`,
-      [id]
+      [id],
     );
     const participantsId = participantRows.map((row) => row.user_id);
     return ThreadEntity.from({
@@ -157,11 +208,10 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     });
   }
 
-  /** Threads avec users par participant et type (refactorisé) */
-  async findAllWithUserByParticipantIdAndType(
+  async findAllWithUserAndLastMessageByParticipantIdAndType(
     participantId: string,
-    type?: ThreadEntity["type"]
-  ): Promise<ThreadEntityWithUsers[]> {
+    type?: ThreadEntity["type"],
+  ): Promise<ThreadEntityWithUsersAndLastMessage[]> {
     const conditions = ["tp.user_id = ?"];
     const params: any[] = [participantId];
 
@@ -171,66 +221,49 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     }
 
     const whereClause = conditions.join(" AND ");
+
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
         t.*,
-        admin.id AS admin_id,
-        admin.firstname AS admin_firstname,
-        admin.lastname AS admin_lastname,
-        admin.email AS admin_email,
-        admin.role AS admin_role,
-        admin.created_at AS admin_created_at,
-        admin.is_active AS admin_is_active,
-        admin.password_hash AS admin_password_hash,
-        p.id AS participant_id,
-        p.firstname AS participant_firstname,
-        p.lastname AS participant_lastname,
-        p.email AS participant_email,
-        p.role AS participant_role,
-        p.created_at AS participant_created_at,
-        p.is_active AS participant_is_active,
-        p.password_hash AS participant_password_hash
+        ${getUserFields("admin", "admin_")},
+        ${getUserFields("p", "participant_")},
+        ${getMessageFields("last_msg", "message_")}
       FROM threads t
       LEFT JOIN users admin ON t.administrator_id = admin.id
       LEFT JOIN thread_participant tp ON t.id = tp.thread_id
       LEFT JOIN users p ON tp.user_id = p.id
+      LEFT JOIN (
+        SELECT m1.*
+        FROM messages m1
+        INNER JOIN (
+          SELECT thread_id, MAX(sent_at) as max_sent_at
+          FROM messages
+          GROUP BY thread_id
+        ) m2 ON m1.thread_id = m2.thread_id 
+          AND m1.sent_at = m2.max_sent_at
+      ) last_msg ON t.id = last_msg.thread_id
       WHERE ${whereClause} 
       ORDER BY t.updated_at DESC, t.created_at DESC`,
-      params
+      params,
     );
 
-    return this.mapRowsToThreadsWithUsers(rows);
+    return this.mapRowsToThreadsWithUsersAndLastMessage(rows);
   }
 
-  /** Thread avec users par ID (refactorisé) */
   async findWithUserById(
-    threadId: string
+    threadId: string,
   ): Promise<ThreadEntityWithUsers | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
         t.*,
-        admin.id as admin_id,
-        admin.firstname as admin_firstname,
-        admin.lastname as admin_lastname,
-        admin.email as admin_email,
-        admin.role as admin_role,
-        admin.created_at as admin_created_at,
-        admin.is_active as admin_is_active,
-        admin.password_hash as admin_password_hash,
-        p.id as participant_id,
-        p.firstname as participant_firstname,
-        p.lastname as participant_lastname,
-        p.email as participant_email,
-        p.role as participant_role,
-        p.created_at as participant_created_at,
-        p.is_active as participant_is_active,
-        p.password_hash as participant_password_hash
+        ${getUserFields("admin", "admin_")},
+        ${getUserFields("p", "participant_")}
       FROM threads t
       LEFT JOIN users admin ON t.administrator_id = admin.id
       LEFT JOIN thread_participant tp ON t.id = tp.thread_id
       LEFT JOIN users p ON tp.user_id = p.id
       WHERE t.id = ?`,
-      [threadId]
+      [threadId],
     );
 
     if (rows.length === 0) return null;
@@ -239,11 +272,10 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     return threads[0] || null;
   }
 
-  /** Threads avec users par administrateur et type (refactorisé) */
-  async findAllWithUserByAdministratorIdAndType(
+  async findAllWithUserAndLastMessageByAdministratorIdAndType(
     administratorId: UserEntity["id"],
-    type?: ThreadEntity["type"]
-  ): Promise<ThreadEntityWithUsers[]> {
+    type?: ThreadEntity["type"],
+  ): Promise<ThreadEntityWithUsersAndLastMessage[]> {
     const conditions = ["t.administrator_id = ?"];
     const params: any[] = [administratorId];
     if (type) {
@@ -252,74 +284,68 @@ export class ThreadRepositoryMySQL implements ThreadRepository {
     }
 
     const whereClause = conditions.join(" AND ");
+
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
         t.*, 
-        admin.id as admin_id,
-        admin.firstname as admin_firstname,
-        admin.lastname as admin_lastname,
-        admin.email as admin_email,
-        admin.role as admin_role,
-        admin.created_at as admin_created_at,
-        admin.is_active as admin_is_active,
-        admin.password_hash as admin_password_hash,
-        p.id as participant_id,
-        p.firstname as participant_firstname,
-        p.lastname as participant_lastname,
-        p.email as participant_email,
-        p.role as participant_role,
-        p.created_at as participant_created_at,
-        p.is_active as participant_is_active,
-        p.password_hash as participant_password_hash
+        ${getUserFields("admin", "admin_")},
+        ${getUserFields("p", "participant_")},
+        ${getMessageFields("last_msg", "message_")}
       FROM threads t
       JOIN users admin ON t.administrator_id = admin.id
       JOIN thread_participant tp ON t.id = tp.thread_id
       JOIN users p ON tp.user_id = p.id AND p.is_active = 1 AND p.confirmed_at IS NOT NULL
+      LEFT JOIN (
+        SELECT m1.*
+        FROM messages m1
+        INNER JOIN (
+          SELECT thread_id, MAX(sent_at) as max_sent_at
+          FROM messages
+          GROUP BY thread_id
+        ) m2 ON m1.thread_id = m2.thread_id 
+          AND m1.sent_at = m2.max_sent_at
+      ) last_msg ON t.id = last_msg.thread_id
       WHERE ${whereClause}
       ORDER BY t.updated_at DESC, t.created_at DESC`,
-      params
+      params,
     );
 
-    return this.mapRowsToThreadsWithUsers(rows);
+    return this.mapRowsToThreadsWithUsersAndLastMessage(rows);
   }
 
-  /** Threads sans administrateur avec users (refactorisé) */
-  async findAllWithUserByAdministratorNullable(): Promise<
-    ThreadEntityWithUsers[]
+  async findAllWithUserAndLastMessageByAdministratorNullable(): Promise<
+    ThreadEntityWithUsersAndLastMessage[]
   > {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
         t.*,
-        NULL as admin_id,
-        NULL as admin_firstname,
-        NULL as admin_lastname,
-        NULL as admin_email,
-        NULL as admin_role,
-        NULL as admin_created_at,
-        NULL as admin_is_active,
-        NULL as admin_password_hash,
-        p.id as participant_id,
-        p.firstname as participant_firstname,
-        p.lastname as participant_lastname,
-        p.email as participant_email,
-        p.role as participant_role,
-        p.created_at as participant_created_at,
-        p.is_active as participant_is_active,
-        p.password_hash as participant_password_hash
+        ${getNullUserFields("admin_")},
+        ${getUserFields("p", "participant_")},
+        ${getMessageFields("last_msg", "message_")}
       FROM threads t
       JOIN thread_participant tp ON t.id = tp.thread_id
       JOIN users p ON tp.user_id = p.id AND p.is_active = 1 AND p.confirmed_at IS NOT NULL
+      LEFT JOIN (
+        SELECT m1.*
+        FROM messages m1
+        INNER JOIN (
+          SELECT thread_id, MAX(sent_at) as max_sent_at
+          FROM messages
+          GROUP BY thread_id
+        ) m2 ON m1.thread_id = m2.thread_id 
+          AND m1.sent_at = m2.max_sent_at
+      ) last_msg ON t.id = last_msg.thread_id
       WHERE t.administrator_id IS NULL
-      ORDER BY t.updated_at DESC, t.created_at DESC`
+      ORDER BY t.updated_at DESC, t.created_at DESC`,
     );
 
-    return this.mapRowsToThreadsWithUsers(rows);
+    return this.mapRowsToThreadsWithUsersAndLastMessage(rows);
   }
 
   async countByAdvisor(advisorId: UserEntity["id"]): Promise<number> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT COUNT(id) as count FROM threads WHERE administrator_id = ?`,
-      [advisorId]
+      [advisorId],
     );
     return rows[0].count;
   }

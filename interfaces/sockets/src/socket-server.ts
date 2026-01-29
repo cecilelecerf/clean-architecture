@@ -1,7 +1,12 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { PostWithTagsAndUser } from "@application/ports/repositories/PostRepository";
-import { MessageWithUserDTO } from "@infrastructure/types/thread";
+import {
+  MessageId,
+  MessageWithUserDTO,
+  ThreadId,
+} from "@infrastructure/types/thread";
+import { UserId } from "@infrastructure/types/user";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -27,9 +32,9 @@ io.on("connection", (socket) => {
     ({ message }: { message: MessageWithUserDTO }) => {
       io.to(message.threadId).emit(
         `thread:${message.threadId}:new_message`,
-        message
+        message,
       );
-    }
+    },
   );
 
   socket.on("post:update", ({ post }: { post: PostWithTagsAndUser }) => {
@@ -45,6 +50,24 @@ io.on("connection", (socket) => {
     console.log(`Nouvelle notification: ${title} - ${content}`);
     io.emit("notification:new", { title, content });
   });
+
+  // (data: { messageIds: MessageId[], userId: UserId })
+  socket.on(
+    "thread:messages_marked_read",
+    ({
+      threadId,
+      messageIds,
+      userId,
+    }: {
+      threadId: ThreadId;
+      messageIds: MessageId[];
+      userId: UserId;
+    }) => {
+      console.log("------");
+      console.log(`thread:${threadId}:messages_read`);
+      io.emit(`thread:${threadId}:messages_read`, { messageIds, userId });
+    },
+  );
 });
 
 const PORT = 3001;

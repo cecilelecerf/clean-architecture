@@ -8,6 +8,7 @@ import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { UserMapper } from "../../mappers/UserMapper";
+import { getUserFields } from "../constants/userField";
 
 export class MessageRepositoryMySQL implements MessageRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -65,34 +66,8 @@ export class MessageRepositoryMySQL implements MessageRepository {
         m.sender_id AS message_sender_id,
         m.content AS message_content,
         m.sent_at AS message_sent_at,
-         u.id AS user_id,
-        u.firstname AS user_firstname,
-        u.lastname AS user_lastname,
-        u.email AS user_email,
-        u.password_hash AS user_password_hash,
-        u.role AS user_role,
-        u.is_active AS user_is_active,
-        u.created_at AS user_created_at,
-        u.confirmed_at AS user_confirmed_at,
-        u.updated_at AS user_updated_at,
-
-      reader.id AS reader_id,
-      reader.firstname AS reader_firstname,
-      reader.lastname AS reader_lastname,
-      reader.email AS reader_email,
-      reader.password_hash AS reader_password_hash,
-      reader.role AS reader_role,
-      reader.is_active AS reader_is_active,
-      reader.created_at AS reader_created_at,
-      reader.confirmed_at AS reader_confirmed_at,
-      reader.updated_at AS reader_updated_at,
-      reader.address AS reader_address,
-      reader.city AS reader_city,
-      reader.postal_code AS reader_postal_code,
-      reader.country AS reader_country,
-      reader.date_of_birth AS reader_date_of_birth,
-      reader.sexe AS reader_sexe,
-      reader.phone_number AS reader_phone_number,
+        ${getUserFields("u", "user_")},
+        ${getUserFields("reader", "reader_")},
       mur.read_at AS reader_read_at
        FROM messages m
        JOIN users u ON m.sender_id = u.id
@@ -203,8 +178,6 @@ export class MessageRepositoryMySQL implements MessageRepository {
       );
 
       const existingReaders = existing.map((r: any) => r.user_id);
-      console.log(existingReaders);
-      console.log(message);
       const newReaders = message.readBy.filter(
         (userId) => !existingReaders.includes(userId),
       );

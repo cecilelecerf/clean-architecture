@@ -10,6 +10,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { AccountMapper } from "../../mappers/AccountMapper";
 import { UserMapper } from "../../mappers/UserMapper";
 import { TransactionFilters } from "@application/usecases/transactions/GetAllTransactionsByAccountUseCase";
+import { getUserFields } from "../constants/userField";
 
 export class TransactionRepositoryMySQL implements TransactionRepository {
   constructor(private readonly client: MySQLClient) {}
@@ -31,11 +32,11 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
   }
 
   async findById(
-    id: TransactionEntity["id"]
+    id: TransactionEntity["id"],
   ): Promise<TransactionEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM transactions WHERE id = ?`,
-      [id]
+      [id],
     );
 
     if (rows.length === 0) return null;
@@ -65,12 +66,12 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
         transaction.amount.amount,
         transaction.amount.currency,
         transaction.date,
-      ]
+      ],
     );
   }
 
   async findByIdWithAccountWithUser(
-    id: TransactionEntity["id"]
+    id: TransactionEntity["id"],
   ): Promise<TransactionEntityWithAccountWithUser | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `
@@ -94,26 +95,8 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
         to_acc.currency as to_currency,
         to_acc.created_at as to_created_at,
         to_acc.updated_at as to_updated_at,
-        from_user.id as from_user_id_full,
-        from_user.email as from_user_email,
-        from_user.password_hash as from_user_password_hash,
-        from_user.firstname as from_user_firstname,
-        from_user.lastname as from_user_lastname,
-        from_user.role as from_user_role,
-        from_user.is_active as from_user_is_active,
-        from_user.created_at as from_user_created_at,
-        from_user.updated_at as from_user_updated_at,
-        from_user.confirmed_at as from_user_confirmed_at,
-        to_user.id as to_user_id_full,
-        to_user.email as to_user_email,
-        to_user.password_hash as to_user_password_hash,
-        to_user.firstname as to_user_firstname,
-        to_user.lastname as to_user_lastname,
-        to_user.role as to_user_role,
-        to_user.is_active as to_user_is_active,
-        to_user.created_at as to_user_created_at,
-        to_user.updated_at as to_user_updated_at,
-        to_user.confirmed_at as to_user_confirmed_at
+        ${getUserFields("from_user", "from_user_")},
+        ${getUserFields("to_user", "to_user_")}
       FROM transactions t
       INNER JOIN accounts from_acc ON t.from_account_id = from_acc.iban
       INNER JOIN accounts to_acc ON t.to_account_id = to_acc.iban
@@ -121,7 +104,7 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
       LEFT JOIN users to_user ON to_acc.user_id = to_user.id
       WHERE t.id = ?
       `,
-      [id]
+      [id],
     );
 
     if (rows.length === 0) return null;
@@ -143,7 +126,7 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
 
   async findAllByAccountWithFilters(
     iban: IBAN,
-    filters?: TransactionFilters
+    filters?: TransactionFilters,
   ): Promise<{ transactions: TransactionEntity[]; total: number }> {
     const whereClauses: string[] = [];
     const params: any[] = [];
@@ -181,20 +164,20 @@ export class TransactionRepositoryMySQL implements TransactionRepository {
 
     const countRows = await this.client.query<RowDataPacket[]>(
       `SELECT COUNT(*) as total FROM transactions WHERE ${whereSQL}`,
-      params
+      params,
     );
     const total = Number(countRows[0]?.total ?? 0);
 
     const page = Math.max(1, parseInt(String(filters?.page ?? 1), 10));
     const limit = Math.max(
       1,
-      Math.min(100, parseInt(String(filters?.limit ?? 20), 10))
+      Math.min(100, parseInt(String(filters?.limit ?? 20), 10)),
     );
     const offset = (page - 1) * limit;
 
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM transactions WHERE ${whereSQL} ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`,
-      params
+      params,
     );
 
     const transactions = rows.map((row) => this.mapRowToTransaction(row));

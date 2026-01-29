@@ -10,7 +10,6 @@ import { UserModel } from "../../mongo/models/UserModel";
 export class UserRepositoryMongo implements UserRepository {
   constructor(private readonly client: MongoClient) {}
 
-  /** Trouver par ID */
   async findById(id: string): Promise<UserEntity | null> {
     await this.client.connect();
     const doc = await UserModel.findById(id).lean();
@@ -18,7 +17,6 @@ export class UserRepositoryMongo implements UserRepository {
     return UserMapper.mapDocToUser(doc);
   }
 
-  /** Trouver par email */
   async findByEmail(email: Email): Promise<UserEntity | null> {
     await this.client.connect();
     const doc = await UserModel.findOne({ email: email.value }).lean();
@@ -26,7 +24,6 @@ export class UserRepositoryMongo implements UserRepository {
     return UserMapper.mapDocToUser(doc);
   }
 
-  /** Trouver par IBAN */
   async findByIban(iban: AccountEntity["iban"]): Promise<UserEntity | null> {
     await this.client.connect();
     const account = await AccountModel.findOne({ iban: iban.value })
@@ -37,9 +34,8 @@ export class UserRepositoryMongo implements UserRepository {
     return UserMapper.mapDocToUser(account.userId);
   }
 
-  /** Utilisateurs actifs, optionnellement filtrés par rôle */
   async findAllByRoleAndIsActif(
-    role?: UserEntity["role"]
+    role?: UserEntity["role"],
   ): Promise<UserEntity[]> {
     await this.client.connect();
 
@@ -56,7 +52,6 @@ export class UserRepositoryMongo implements UserRepository {
     return docs.map(UserMapper.mapDocToUser);
   }
 
-  /** Sauvegarder un utilisateur (create) */
   async save(user: UserEntity): Promise<void> {
     await this.client.connect();
     await UserModel.create({
@@ -80,7 +75,6 @@ export class UserRepositoryMongo implements UserRepository {
     });
   }
 
-  /** Mettre à jour un utilisateur */
   async update(user: UserEntity): Promise<void> {
     await this.client.connect();
     await UserModel.updateOne(
@@ -103,7 +97,7 @@ export class UserRepositoryMongo implements UserRepository {
           confirmedAt: user.confirmedAt ?? null,
           updatedAt: user.updatedAt,
         },
-      }
+      },
     );
   }
 

@@ -1,9 +1,15 @@
 import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { UserEntity } from "@domain/entities/UserEntity";
+import { MessageEntity } from "domain/entities/MessageEntity";
 
 export type ThreadEntityWithUsers = ThreadEntity & {
   administrator: UserEntity | null;
   participants: UserEntity[];
+};
+export type ThreadEntityWithUsersAndLastMessage = ThreadEntity & {
+  administrator: UserEntity | null;
+  participants: UserEntity[];
+  lastMessage: MessageEntity | null;
 };
 
 export interface ThreadRepository {
@@ -14,15 +20,17 @@ export interface ThreadRepository {
 
   // With user
   findWithUserById(
-    id: ThreadEntity["id"]
+    id: ThreadEntity["id"],
   ): Promise<ThreadEntityWithUsers | null>;
-  findAllWithUserByAdministratorIdAndType(
+  findAllWithUserAndLastMessageByAdministratorIdAndType(
     administratorId: UserEntity["id"],
-    type?: ThreadEntity["type"]
-  ): Promise<ThreadEntityWithUsers[]>;
-  findAllWithUserByAdministratorNullable(): Promise<ThreadEntityWithUsers[]>;
-  findAllWithUserByParticipantIdAndType(
+    type?: ThreadEntity["type"],
+  ): Promise<ThreadEntityWithUsersAndLastMessage[]>;
+  findAllWithUserAndLastMessageByAdministratorNullable(): Promise<
+    ThreadEntityWithUsersAndLastMessage[]
+  >;
+  findAllWithUserAndLastMessageByParticipantIdAndType(
     participantId: UserEntity["id"],
-    type?: ThreadEntity["type"]
-  ): Promise<ThreadEntityWithUsers[]>;
+    type?: ThreadEntity["type"],
+  ): Promise<ThreadEntityWithUsersAndLastMessage[]>;
 }

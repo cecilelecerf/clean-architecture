@@ -16,13 +16,14 @@ import { IBAN } from "@domain/values/IBAN";
 import { TransactionMapper } from "../../mappers/TransactionMapper";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { FormuleCreditEntity } from "@domain/entities/FormuleCreditEntity";
+import { getUserFields } from "../constants/userField";
 
 export class CreditRepositoryMySQL implements CreditRepository {
   constructor(private readonly client: MySQLClient) {}
 
   /** Trouver un crédit par ID */
   async findById(
-    id: CreditEntity["id"]
+    id: CreditEntity["id"],
   ): Promise<CreditEntityWithFormuleAndAdvisor | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
@@ -40,18 +41,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
       f.max_amount as form_max_amount,
       f.currency as form_currency,
       f.updated_at as form_updated_at,
-
-        u.id as user_id,
-        u.email as user_email,
-        u.password_hash as user_password_hash,
-        u.firstname as user_firstname,
-        u.lastname as user_lastname,
-        u.role as user_role,
-        u.is_active as user_is_active,
-        u.created_at as user_created_at,
-        u.updated_at as user_updated_at,
-        u.confirmed_at as user_confirmed_at,
-
+      ${getUserFields("u", "user_")},
         a.iban as account_iban,
         a.name as account_name,
         a.type as account_type,
@@ -79,7 +69,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
       AND t.to_account_id   = f.account_id
       WHERE c.id = ?
       ORDER BY t.date ASC`,
-      [id]
+      [id],
     );
     if (rows.length === 0) return null;
 
@@ -105,7 +95,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
 
   /** Trouver un crédit par ID avec les détails du comptes, de l'utilisateur du compte ainsi que de la formule du crédit*/
   async findByIdWithDetails(
-    id: CreditEntity["id"]
+    id: CreditEntity["id"],
   ): Promise<CreditEntityWithFormuleAndAccount | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
@@ -134,22 +124,12 @@ export class CreditRepositoryMySQL implements CreditRepository {
         a.created_at as account_created_at,
         a.updated_at as account_updated_at,
         a.user_id as account_user_id,
-
-        u.id as user_id,
-        u.email as user_email,
-        u.password_hash as user_password_hash,
-        u.firstname as user_firstname,
-        u.lastname as user_lastname,
-        u.role as user_role,
-        u.is_active as user_is_active,
-        u.created_at as user_created_at,
-        u.updated_at as user_updated_at,
-        u.confirmed_at as user_confirmed_at
+      ${getUserFields("u", "user_")} 
       FROM credits c
       LEFT JOIN formules f ON c.formule_id = f.id
       LEFT JOIN accounts a ON c.account_id = a.iban
       LEFT JOIN users u ON a.user_id = u.id
-      WHERE c.id = '${id}'`
+      WHERE c.id = '${id}'`,
     );
 
     if (rows.length === 0) return null;
@@ -174,9 +154,8 @@ export class CreditRepositoryMySQL implements CreditRepository {
     }) as CreditEntityWithFormuleAndAccount;
   }
 
-  /** Tous les crédits d'un compte */
   async findAllByAccountIban(
-    accountId: IBAN
+    accountId: IBAN,
   ): Promise<CreditEntityWithFormule[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
@@ -198,7 +177,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
       LEFT JOIN formules f ON c.formule_id = f.id
       WHERE c.account_id = ?
       ORDER BY c.start_date DESC`,
-      [accountId.value.toString()]
+      [accountId.value.toString()],
     );
 
     return rows.map((row: RowDataPacket) => {
@@ -210,7 +189,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
 
   /** Crédits par le status */
   async findAllByStatus(
-    status?: CreditEntity["status"]
+    status?: CreditEntity["status"],
   ): Promise<CreditEntityWithFormule[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
@@ -232,7 +211,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
     LEFT JOIN formules f ON c.formule_id = f.id
     ${status ? "WHERE c.status = ?" : ""}
     ORDER BY c.start_date DESC`,
-      status ? [status] : []
+      status ? [status] : [],
     );
 
     return rows.map((row) => {
@@ -267,7 +246,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
         credit.advisorId,
         credit.updatedAt,
         credit.reason ?? null,
-      ]
+      ],
     );
   }
 
@@ -295,12 +274,12 @@ export class CreditRepositoryMySQL implements CreditRepository {
         credit.updatedAt,
         credit.reason ?? null,
         credit.id,
-      ]
+      ],
     );
   }
 
   async findAllByUserId(
-    userId: UserEntity["id"]
+    userId: UserEntity["id"],
   ): Promise<CreditEntityWithFormule[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
@@ -323,7 +302,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
     INNER JOIN accounts a ON c.account_id = a.iban
     WHERE a.user_id = ?
     ORDER BY c.start_date DESC`,
-      [userId]
+      [userId],
     );
 
     return rows.map((row: RowDataPacket) => {
@@ -334,7 +313,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
   }
 
   async findAllByFormuleId(
-    formuleId: FormuleCreditEntity["id"]
+    formuleId: FormuleCreditEntity["id"],
   ): Promise<CreditEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
@@ -342,7 +321,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
       LEFT JOIN formules f ON c.formule_id = f.id 
       WHERE f.id = ?
       ORDER BY c.updated_at ASC`,
-      [formuleId]
+      [formuleId],
     );
     return rows.map((row: RowDataPacket) => CreditMapper.mapRowToCredit(row));
   }
@@ -353,7 +332,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
       COUNT(id) as count
       FROM credits 
       WHERE advisor_id = ? AND status IN ('ACCEPTED', 'COMPLETED')`,
-      [advisorId]
+      [advisorId],
     );
     return rows[0].count;
   }
@@ -363,7 +342,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
       COUNT(id) as count
       FROM credits 
       WHERE advisor_id = ? AND status = 'REFUSED'`,
-      [advisorId]
+      [advisorId],
     );
     return rows[0].count;
   }
@@ -373,20 +352,20 @@ export class CreditRepositoryMySQL implements CreditRepository {
       `SELECT COUNT(*) as count 
        FROM credits 
        WHERE formule_id = ?`,
-      [formuleId]
+      [formuleId],
     );
     return result[0]?.count || 0;
   }
 
   async countByFormuleAndStatus(
     formuleId: string,
-    status: CreditEntity["status"]
+    status: CreditEntity["status"],
   ): Promise<number> {
     const result = await this.client.query<RowDataPacket[]>(
       `SELECT COUNT(*) as count 
        FROM credits 
        WHERE formule_id = ? AND status = ?`,
-      [formuleId, status]
+      [formuleId, status],
     );
     return result[0]?.count || 0;
   }
@@ -396,7 +375,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
       `SELECT COUNT(DISTINCT account_id) as count 
        FROM credits 
        WHERE formule_id = ?`,
-      [formuleId]
+      [formuleId],
     );
     return result[0]?.count || 0;
   }
@@ -420,7 +399,7 @@ export class CreditRepositoryMySQL implements CreditRepository {
       INNER JOIN formules f ON c.formule_id = f.id
       WHERE c.formule_id = ?
         AND c.status IN ('COMPLETED', 'ACCEPTED')`,
-      [formuleId]
+      [formuleId],
     );
 
     if (!result || result.length === 0) {

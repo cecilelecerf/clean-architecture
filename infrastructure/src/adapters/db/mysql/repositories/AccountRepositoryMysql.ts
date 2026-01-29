@@ -9,17 +9,18 @@ import { MySQLClient } from "@infrastructure/adapters/db/MySQLClient";
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { AccountMapper } from "../../mappers/AccountMapper";
 import { UserMapper } from "../../mappers/UserMapper";
+import { getUserFields } from "../constants/userField";
 
 export class AccountRepositoryMySQL implements AccountRepository {
   constructor(private readonly client: MySQLClient) {}
 
   /** Tous les comptes d'un utilisateur */
   async findByUserId(
-    userId: UserEntity["id"] | null
+    userId: UserEntity["id"] | null,
   ): Promise<AccountEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM accounts WHERE user_id = ? ORDER BY created_at DESC",
-      [userId]
+      [userId],
     );
 
     return rows.map((row) => AccountMapper.mapRowToAccount(row));
@@ -29,7 +30,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
   async findByIBAN(iban: IBAN): Promise<AccountEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       "SELECT * FROM accounts WHERE iban = ?",
-      [iban.value]
+      [iban.value],
     );
 
     if (rows.length === 0) return null;
@@ -40,7 +41,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
   /** Tous les comptes épargne */
   async findAllSavingsAccounts(): Promise<AccountEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM accounts WHERE type = 'epargne' AND user_id IS NOT NULL ORDER BY created_at DESC"
+      "SELECT * FROM accounts WHERE type = 'epargne' AND user_id IS NOT NULL ORDER BY created_at DESC",
     );
 
     return rows.map((row) => AccountMapper.mapRowToAccount(row));
@@ -49,7 +50,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
   /** Compte d'intérêts de la banque */
   async findBankInterestAccount(): Promise<AccountEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM accounts WHERE type = 'epargne' AND user_id IS NULL"
+      "SELECT * FROM accounts WHERE type = 'epargne' AND user_id IS NULL",
     );
 
     if (rows.length === 0) return null;
@@ -57,9 +58,9 @@ export class AccountRepositoryMySQL implements AccountRepository {
     return AccountMapper.mapRowToAccount(rows[0]);
   }
 
-    async findBankReadyAccount(): Promise<AccountEntity | null> {
+  async findBankReadyAccount(): Promise<AccountEntity | null> {
     const rows = await this.client.query<RowDataPacket[]>(
-      "SELECT * FROM accounts WHERE type = 'pret' AND user_id IS NULL"
+      "SELECT * FROM accounts WHERE type = 'pret' AND user_id IS NULL",
     );
 
     if (rows.length === 0) return null;
@@ -69,27 +70,18 @@ export class AccountRepositoryMySQL implements AccountRepository {
 
   /** Trouver une liste de compte par type avec les users */
   async findByTypeSectionWithUser(
-    type: "client" | "bank"
+    type: "client" | "bank",
   ): Promise<AccountEntityWithUser[]> {
     const condition = type === "client" ? "IS NOT NULL" : "IS NULL";
 
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
       a.*,
-      u.id as user_id,
-      u.email as user_email,
-      u.password_hash as user_password_hash,
-      u.firstname as user_firstname,
-      u.lastname as user_lastname,
-      u.role as user_role,
-      u.is_active as user_is_active,
-      u.created_at as user_created_at,
-      u.updated_at as user_updated_at,
-      u.confirmed_at as user_confirmed_at
+      ${getUserFields("u", "user_")}
     FROM accounts a
     LEFT JOIN users u ON a.user_id = u.id
     WHERE a.user_id ${condition}
-    ORDER BY a.created_at DESC`
+    ORDER BY a.created_at DESC`,
     );
 
     return rows.map((row) => {
@@ -116,7 +108,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
         account.balance.currency,
         account.createdAt,
         account.updatedAt,
-      ]
+      ],
     );
   }
 
@@ -135,7 +127,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
         account.balance.currency,
         account.updatedAt,
         account.iban.value,
-      ]
+      ],
     );
   }
 
@@ -143,7 +135,7 @@ export class AccountRepositoryMySQL implements AccountRepository {
   async delete(iban: IBAN): Promise<void> {
     await this.client.query<ResultSetHeader>(
       "DELETE FROM accounts WHERE iban = ?",
-      [iban.value]
+      [iban.value],
     );
   }
 }

@@ -4,26 +4,12 @@ import {
 } from "@application/ports/repositories/MessageRepository";
 import { MongoClient } from "../../MongoClient";
 import { MessageEntity } from "@domain/entities/MessageEntity";
-import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { MessageModel } from "../models/MessageModel";
 import { UserMapper } from "../../mappers/UserMapper";
+import { MessageMapper } from "../../mappers/MessageMapper";
 
 export class MessageRepositoryMongo implements MessageRepository {
   constructor(private readonly client: MongoClient) {}
-
-  private mapDocToMessage(doc: any): MessageEntity {
-    return MessageEntity.from({
-      id: doc._id.toString(),
-      threadId: doc.threadId?.toString() || doc.threadId,
-      senderId:
-        typeof doc.senderId === "string"
-          ? doc.senderId?.toString()
-          : doc.senderId._id,
-      content: doc.content,
-      sentAt: doc.sentAt,
-      readBy: doc.readBy || [],
-    });
-  }
 
   /** 📬 Sauvegarder un message */
   async save(message: MessageEntity): Promise<void> {
@@ -43,12 +29,11 @@ export class MessageRepositoryMongo implements MessageRepository {
       message.readBy.push(message.senderId);
       await MessageModel.updateOne(
         { _id: message.id },
-        { $set: { readBy: message.readBy } }
+        { $set: { readBy: message.readBy } },
       );
     }
   }
 
-  /** 🔍 Messages avec sender par thread */
   async findAllWithUserByThread(threadId: string): Promise<MessageWithUser[]> {
     await this.client.connect();
 
@@ -58,7 +43,7 @@ export class MessageRepositoryMongo implements MessageRepository {
       .lean<any[]>();
 
     return docs.map((doc): MessageWithUser => {
-      const message = this.mapDocToMessage(doc);
+      const message = MessageMapper.mapDocToMessage(doc);
       const sender = UserMapper.mapDocToUser(doc.senderId);
       return Object.assign(message, { sender });
     });

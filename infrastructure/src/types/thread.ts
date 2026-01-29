@@ -41,7 +41,6 @@ export const threadSchema = z.object({
 });
 
 export type Thread = z.infer<typeof threadSchema>;
-
 export const newThreadSchema = threadSchema.pick({ title: true }).extend({
   participantsId: z.string().array(),
 });

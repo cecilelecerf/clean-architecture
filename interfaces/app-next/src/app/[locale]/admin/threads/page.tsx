@@ -1,5 +1,6 @@
 "use client"
-import { ThreadCard, ThreadCardSkeleton } from "@/components/threads/ThreadCard";
+import { ThreadCardSkeleton } from "@/components/threads/ThreadCard";
+import { ThreadsList } from "@/components/threads/ThreadList";
 import { TitleAdminPage } from "@/components/TitleAdminPage";
 import { socket } from "@/lib/socket";
 import { endpoints } from "@/utils/endpoint";
@@ -31,18 +32,9 @@ export default function ClientsThreadsPage() {
                                 <ThreadCardSkeleton key={index} />
                             ))}
                         </div>)
-                    .with({ status: "success" }, ({ data: threads }) => {
-                        if (threads.length === 0) return <>Pas de conversation</>
-                        return <div className="">
-                            {threads.map((thread) => (
-                                <ThreadCard
-                                    thread={thread}
-                                    key={thread.id}
-                                    onClick={() => router.push(`/admin/threads/${thread.id}`)}
-                                />
-                            ))}
-                        </div>
-                    })
+                    .with({ status: "success" }, ({ data: threads }) => <ThreadsList onThreadClick={(id) => router.push(`/admin/threads/${id}`)} threads={threads} />)
+
+
                     .exhaustive()
             }
         </>

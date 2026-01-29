@@ -18,7 +18,7 @@ type Props = { administratorId: UserEntity["id"] };
 export class GetAdvisorThreadsUsecase {
   constructor(
     private readonly threadRepository: ThreadRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
   ) {}
   async execute({
     administratorId,
@@ -28,12 +28,12 @@ export class GetAdvisorThreadsUsecase {
     const user = await findActiveUser(this.userRepository, administratorId);
     if (user instanceof Error) return user;
     const administratorThread =
-      await this.threadRepository.findAllWithUserByAdministratorIdAndType(
+      await this.threadRepository.findAllWithUserAndLastMessageByAdministratorIdAndType(
         user.id,
-        "external"
+        "external",
       );
     const nullableAdministratorThread =
-      await this.threadRepository.findAllWithUserByAdministratorNullable();
+      await this.threadRepository.findAllWithUserAndLastMessageByAdministratorNullable();
     const threads: ThreadEntityWithUsers[] = [
       ...administratorThread,
       ...nullableAdministratorThread,
