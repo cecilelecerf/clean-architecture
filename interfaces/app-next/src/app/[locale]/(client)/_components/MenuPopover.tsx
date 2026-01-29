@@ -4,13 +4,15 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Skeleton } from "@/components/ui/skeleton"
+import { socket } from "@/lib/socket"
 import { endpoints } from "@/utils/endpoint"
 import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Bell } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { match } from "ts-pattern"
+import { useEffect } from "react"
+ import { match } from "ts-pattern"
 
 export const MenuPopover = () => {
     const query = useQuery(endpoints.feeds.posts.getUnread())
@@ -25,6 +27,20 @@ export const MenuPopover = () => {
 const DisplayPopover = ({ posts }: { posts: PostWithTagsAndUser[] }) => {
     const router = useRouter()
     const markAsReadMutation = useMutation(endpoints.feeds.posts.markAsRead())
+
+  useEffect(() => {
+    if (!socket) return;
+ 
+
+ 
+    socket.on("post:status", ({post})=>{
+        console.log(post)
+    });
+ 
+    return () => {
+      socket.off("post:status");
+     };
+  }, [posts]);
     const postCount = posts.length
     return (
         <Popover>

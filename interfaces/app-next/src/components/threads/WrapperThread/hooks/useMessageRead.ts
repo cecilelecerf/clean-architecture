@@ -7,24 +7,22 @@ import { UserId } from '@infrastructure/types/user';
 import { queryClient } from '@/lib/queryClient';
 
 interface UseMessageReadProps {
-  threadId: ThreadId;
+  thread: Thread;
   userId: UserId;
   messages: MessageWithUserDTO[];
-  threadType: Thread['type'];
-  onMessagesMarked: (messageIds: MessageId[]) => void;
+   onMessagesMarked: (messageIds: MessageId[], readAt : Date) => void;
 }
 
 export const useMessageRead = ({
-  threadId,
+  thread,
   userId,
-  messages,
-  threadType,
+  messages, 
   onMessagesMarked,
 }: UseMessageReadProps) => {
-  const isMarkingRef = useRef(false);
+   const isMarkingRef = useRef(false);
   const lastMarkTimeRef = useRef<number>(0);
 
-  const readMessage = useMutation(threadsEndpoint.messages.read({ threadId }));
+  const readMessage = useMutation(threadsEndpoint.messages.read({ threadId: thread.id }));
 
   const hasUnreadMessages = useCallback(() => {
     return messages.some((msg) => msg.senderId !== userId && !msg.readBy.includes(userId));
@@ -53,34 +51,35 @@ export const useMessageRead = ({
           isMarkingRef.current = false;
           return;
         }
-        console.log('on success');
-        queryClient.setQueryData(['threads', 'list', threadType], (oldData: any) => {
+         queryClient.setQueryData(['threads', 'list', thread.type], (oldData: ThreadWithUserAndLastMsg[]) => {
           if (!oldData) return oldData;
-
-          return oldData.map((thread: ThreadWithUserAndLastMsg) => {
+console.log(oldData)
+          return oldData.map((oldThread: ThreadWithUserAndLastMsg) => {
+            if(oldThread.id !==thread.id) return oldThread
             return {
-              ...thread,
+              ...oldThread,
               lastMessage: {
-                ...thread.lastMessage,
-                readBy: [...thread.lastMessage.readBy, userId],
+                ...oldThread.lastMessage,
+                readBy: [...oldThread.lastMessage.readBy, userId],
               },
             };
           });
         });
         if (socket) {
-          socket.emit('thread:messages_marked_read', {
-            threadId,
+           socket.emit('thread:messages_marked_read', {
+           threadId : thread.id,
             messageIds: data.messageIds,
             userId,
+            readAt: data.readAt
           });
         }
 
-        onMessagesMarked(data.messageIds);
+        onMessagesMarked(data.messageIds, new Date(data.readAt));
 
         isMarkingRef.current = false;
       },
     });
-  }, [readMessage, userId, threadId, hasUnreadMessages, onMessagesMarked]);
+  }, [readMessage, userId, thread.id, hasUnreadMessages, onMessagesMarked]);
 
   return {
     markMessagesAsRead,

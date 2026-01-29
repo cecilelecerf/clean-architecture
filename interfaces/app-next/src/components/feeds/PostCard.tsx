@@ -24,7 +24,7 @@ export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
         <div
             onClick={() => router.push(`${basePath}/feeds/${post.id}`)
             }
-            className="cursor-pointer border rounded-xl shadow hover:shadow-lg transition p-6 relative flex justify-between"
+            className="cursor-pointer border rounded-xl shadow hover:shadow-lg transition p-6 relative flex justify-between relative"
         >
             <div>
 
@@ -46,13 +46,15 @@ export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
                     ))}
                 </div>
             </div>
-            {isMine && (
+            {isMine && isAdmin && (
                 <p
                     className="text-blue-500 hover:underline text-sm"
                 >
                     {t("update")}
                 </p>
             )}
+                    {!isAdmin&& post.readBy.includes(session.user.id) && <div className="absolute w-3 h-3 rounded-full bg-red-700 right-1.5 top-1.5"></div>}
+
         </div >
     );
 };

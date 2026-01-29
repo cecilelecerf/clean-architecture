@@ -105,8 +105,7 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
             status: postData.publishedAt ? "unpublish" : "publish"
         }, {
             onSuccess: (dataSuccess) => {
-                console.log("✅ Status changé:", dataSuccess);
-                socket.emit("post:status", { post: dataSuccess });
+                 socket.emit("post:status", { post: dataSuccess });
             }
         });
     };

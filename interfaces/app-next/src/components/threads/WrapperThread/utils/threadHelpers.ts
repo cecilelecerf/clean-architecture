@@ -1,6 +1,7 @@
-import { MessageId, MessageWithUserDTO } from '@infrastructure/types/thread';
+import { ThreadWithUser } from '@/utils/endpoint/threadEndpoints';
+import { MessageId, MessageWithUserDTO, Thread } from '@infrastructure/types/thread';
 import { UserDto, UserId } from '@infrastructure/types/user';
-
+ 
 /**
  * Met à jour les messages en ajoutant un utilisateur dans readBy
  */
@@ -8,16 +9,22 @@ export const markMessagesAsReadInList = (
   messages: MessageWithUserDTO[],
   messageIds: MessageId[],
   userId: UserId,
-): MessageWithUserDTO[] => {
-  return messages.map((msg) => {
-    if (messageIds.includes(msg.id) && !msg.readBy.includes(userId)) {
-      return {
+  thread: ThreadWithUser,
+  readAt : Date
+): MessageWithUserDTO[]  => {
+   messages.map((msg) => {
+    if (messageIds.includes(msg.id) && !msg.readBy.includes(userId)) { 
+      const allParticipants = [...thread.participants, thread.administrator]
+      const user: UserDto = allParticipants.findLast((participant)=> participant.id === userId)
+    return messages[messages.length-1]={
         ...msg,
         readBy: [...msg.readBy, userId],
-      };
-    }
-    return msg;
+        readByUsers: [...msg.readByUsers, {user, readAt: readAt.toISOString()}]
+      }
+     }
+   else return msg;
   });
+  return messages
 };
 
 /**
@@ -45,29 +52,24 @@ export const calculateLastReadByUsers = ({
   messages: MessageWithUserDTO[];
   currentUserId: UserId;
   allParticipants: UserDto[];
-}): Map<string, UserDto[]> => {
-  const lastReadMap = new Map<string, UserDto[]>();
-
-  allParticipants
+}): Record<string, UserDto[]> => {
+    const lastReadMap : Record<MessageId, UserDto[]>= {};
+   allParticipants
     .filter((participant) => participant.id !== currentUserId)
     .forEach(({ id: participantId }) => {
       for (let i = messages.length - 1; i >= 0; i--) {
-        const msg = messages[i];
+        const msg = messages[i]; 
         const hasRead = msg.readByUsers?.some((r) => r.user.id === participantId);
-
+ 
         if (hasRead) {
           const reader = msg.readByUsers!.find((r) => r.user.id === participantId)!;
-
-          if (!lastReadMap.has(msg.id)) {
-            lastReadMap.set(msg.id, []);
-          }
-
-          lastReadMap.get(msg.id)!.push(reader.user);
-
+ 
+          if (!Object.keys(lastReadMap).includes(msg.id)) lastReadMap[msg.id]= [];
+          lastReadMap[msg.id]= [...lastReadMap[msg.id], reader.user]
+ 
           break;
         }
       }
     });
-
-  return lastReadMap;
+   return lastReadMap;
 };

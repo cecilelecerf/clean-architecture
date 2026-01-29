@@ -69,6 +69,7 @@ const Content = ({ tags }: { tags: Tag[] }) => {
             onSubmit={onSubmit}
             labelButton={t("button")}
             loading={mutate.isPending}
+            showBackButton
         />
     )
 }

@@ -19,8 +19,7 @@ export const useScrollToMarkRead = ({
     }
 
     markReadTimeoutRef.current = setTimeout(() => {
-      console.log('🖱️ Scroll stopped');
-      onScrollStopped();
+       onScrollStopped();
     }, debounceMs);
   }, [onScrollStopped, debounceMs]);
 

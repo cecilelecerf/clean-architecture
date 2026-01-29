@@ -7,7 +7,7 @@ interface UseThreadSocketProps {
   threadId: ThreadId;
   userId: UserId;
   onNewMessage: (message: MessageWithUserDTO) => void;
-  onMessagesRead: (messageIds: MessageId[], readerId: UserId) => void;
+  onMessagesRead: (messageIds: MessageId[], readerId: UserId, readAt : Date) => void;
 }
 
 export const useThreadSocket = ({
@@ -24,13 +24,10 @@ export const useThreadSocket = ({
   );
 
   const handleMessagesRead = useCallback(
-    ({ messageIds, userId: readerId }: { messageIds: MessageId[]; userId: UserId }) => {
-      console.log(messageIds);
-      console.log(readerId);
+    ({ messageIds, userId: readerId, readAt }: { messageIds: MessageId[]; userId: UserId, readAt : Date }) => { 
       if (readerId === userId) return;
-
-      onMessagesRead(messageIds, readerId);
-    },
+       onMessagesRead(messageIds, readerId, new Date(readAt) );
+     },
     [onMessagesRead, userId],
   );
 

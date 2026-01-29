@@ -19,28 +19,28 @@ export class MarkMessagesAsReadUpTo {
     threadId,
     userId,
   }: Props): Promise<
-    { messageIds: MessageEntity["id"][] } | ThreadNotFoundError
+    { messageIds: MessageEntity["id"][], readAt : string } | ThreadNotFoundError
   > {
-    console.log("MARK MESSAGE");
-    const thread = await this.threadRepository.findById(threadId);
+     const thread = await this.threadRepository.findById(threadId);
     if (!thread) return new ThreadNotFoundError();
+    const now = this.clockService.now()
     const unreadMessages = await this.messageRepository.findUnreadUpTo(
       threadId,
       userId,
-      this.clockService.now(),
+     now,
     );
 
     if (unreadMessages.length === 0) {
-      return { messageIds: [] };
+      return { messageIds: [], readAt: now.toISOString() };
     }
 
     unreadMessages.forEach((msg) => msg.userRead(userId));
 
     await this.messageRepository.updateMany(
       unreadMessages,
-      this.clockService.now(),
+     now,
     );
 
-    return { messageIds: unreadMessages.map(({ id }) => id) };
+    return { messageIds: unreadMessages.map(({ id }) => id), readAt : now.toISOString() };
   }
 }

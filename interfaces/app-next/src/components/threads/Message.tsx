@@ -17,13 +17,12 @@ export const MessageComponent = ({
     sentAt,
     sender,
     isCurrentUser,
-    readBy,
-    readByUsers,
+    readBy, 
     prevMessage,
     nextMessage,
     lastReadByUsers
-}: Props) => {
-    const isReadByOthers = readBy.length > 1;
+}: Props) => { 
+     const isReadByOthers = readBy.length > 1;
     return (
         <>
             <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} group ${prevMessage && prevMessage.senderId === sender.id ? "" : "mt-7"}`}>

@@ -1,22 +1,22 @@
-import { UserId } from "@infrastructure/types/user";
-import { ThreadCard } from "./ThreadCard"
+ import { ThreadCard } from "./ThreadCard"
 import { ThreadWithUserAndLastMsg } from "@/utils/endpoint/threadEndpoints";
 import { useCallback, useEffect } from "react";
-import { MessageId, MessageWithUserDTO } from "@infrastructure/types/thread";
+import {  MessageWithUserDTO } from "@infrastructure/types/thread";
 import { queryClient } from "@/lib/queryClient";
 import { socket } from "@/lib/socket";
+import { useSession } from "next-auth/react";
 
 type ThreadsListProps = {
     threads: ThreadWithUserAndLastMsg[];
     onThreadClick: (threadId: string) => void;
-    userId: UserId
-};
+ };
 
 export const ThreadsList = ({
     threads,
     onThreadClick,
-    userId
-}: ThreadsListProps) => {
+ }: ThreadsListProps) => {
+        const { data: session } = useSession()
+    const userId = session.user.id
     const updateThreadInCache = useCallback((threadId: string, newMessage: MessageWithUserDTO) => {
         queryClient.invalidateQueries({ queryKey: ['threads', threadId] })
         queryClient.setQueryData(
@@ -25,6 +25,7 @@ export const ThreadsList = ({
                 if (!oldData) return oldData;
 
                 return oldData.map((thread: ThreadWithUserAndLastMsg) => {
+                    console.log(threadId)
                     if (thread.id === threadId) {
                         return {
                             ...thread,

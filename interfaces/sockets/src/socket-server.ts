@@ -58,14 +58,17 @@ io.on("connection", (socket) => {
       threadId,
       messageIds,
       userId,
+      readAt
     }: {
       threadId: ThreadId;
       messageIds: MessageId[];
       userId: UserId;
+      readAt : string
     }) => {
       console.log("------");
       console.log(`thread:${threadId}:messages_read`);
-      io.emit(`thread:${threadId}:messages_read`, { messageIds, userId });
+      console.log(readAt)
+      io.emit(`thread:${threadId}:messages_read`, { messageIds, userId, readAt });
     },
   );
 });

@@ -1,19 +1,14 @@
 "use client"
 import { ButtonLink } from "@/components/buttons/ButtonLink";
 import { ThreadCardSkeleton } from "@/components/threads/ThreadCard";
-import { ThreadsList } from "@/components/threads/ThreadList";
-import { queryClient } from "@/lib/queryClient";
-import { socket } from "@/lib/socket";
+import { ThreadsList } from "@/components/threads/ThreadList"; 
 import { endpoints } from "@/utils/endpoint";
-import { MessageWithUserDTO } from "@infrastructure/types/thread";
-import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
+ import { useQuery } from "@tanstack/react-query";
+ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { match } from "ts-pattern";
 
 export default function ThreadsPage() {
-    const { data: session } = useSession()
     const router = useRouter()
     const query = useQuery(endpoints.threads.getAll({ type: "external" }))
     const t = useTranslations("client.thread");
@@ -31,8 +26,7 @@ export default function ThreadsPage() {
                     <ThreadsList
                         threads={threads}
                         onThreadClick={(id) => router.push(`/threads/${id}`)}
-                        userId={session.user.id}
-                    />
+                     />
                 )
                 )
                 .exhaustive()}

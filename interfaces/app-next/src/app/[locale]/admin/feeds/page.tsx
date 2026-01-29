@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Posts } from "@/components/feeds/Posts";
 import { PostFilters } from "@/components/feeds/PostFilters";
 import { useTranslations } from "next-intl";
+import { ButtonBack } from "@/components/buttons/ButtonBack";
 
 export default function PostsPage() {
     const router = useRouter();
@@ -21,6 +22,8 @@ export default function PostsPage() {
     })
     return (
         <>
+                <ButtonBack/>
+        
             <PostFilters filters={filters} onChange={(f) => setFilters(f)} isAdmin />
             <Posts filters={filters} onPaginationChange={(pageNumber) => setFilters((prev) => ({ ...prev, page: pageNumber }))} isAdmin basePath="/admin" />
             <Button

@@ -10,7 +10,7 @@ export const accountSchema = z.object({
   IBAN: accountIdSchema,
   name: z.string().min(1),
   balance: moneySchema,
-  type: z.enum(["courant", "epargne"]),
+  type: z.enum(["courant", "epargne", "pret"]),
   color: colorSchema,
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),

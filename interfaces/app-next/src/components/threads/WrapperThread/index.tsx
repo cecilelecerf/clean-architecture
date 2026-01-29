@@ -39,24 +39,23 @@ export const WrapperThread = ({
 }: Props) => {
     const { data: session } = useSession();
     const t = useTranslations("thread");
+     
 
     const [messages, setMessages] = useState<MessageWithUserDTO[]>(defaultMessages);
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-    const lastReadByUsersMap = useMemo(() => {
-        return calculateLastReadByUsers({ messages, currentUserId: userId, allParticipants: [...thread.participants, thread.administrator] });
-    }, [messages, userId]);
-    useEffect(() => { setMessages(defaultMessages) }, [defaultMessages])
+    const [lastReadByUsersMap, setLastReadByUsersMap]= useState<Record<MessageId, UserDto[]>>(calculateLastReadByUsers({ messages, currentUserId: userId, allParticipants: [...thread.participants, thread.administrator] }))
 
-    const handleMessagesMarked = useCallback((messageIds: MessageId[]) => {
-        setMessages((prev) => markMessagesAsReadInList(prev, messageIds, userId));
+    const handleMessagesMarked = useCallback((messageIds: MessageId[], readAt : Date) => {
+        setMessages((prev) => markMessagesAsReadInList(prev, messageIds, userId,thread, readAt ));
     }, [userId]);
+ 
+    useEffect(() => {setMessages(defaultMessages) }, [defaultMessages])
 
     const { markMessagesAsRead, hasUnreadMessages } = useMessageRead({
-        threadId: thread.id,
+        thread,
         userId,
         messages,
-        threadType: thread.type,
         onMessagesMarked: handleMessagesMarked,
     });
 
@@ -64,7 +63,10 @@ export const WrapperThread = ({
         threadId: thread.id,
         userId,
         onNewMessage: (msg) => {
-            setMessages((prev) => [...prev, msg]);
+            setMessages((prev) =>{const updated= [...prev, msg];
+                    const test = calculateLastReadByUsers({ messages:updated, currentUserId: userId, allParticipants: [...thread.participants, thread.administrator]})
+             setLastReadByUsersMap(test) ;
+                return updated});
 
             if (msg.senderId !== userId) {
                 setTimeout(() => {
@@ -72,8 +74,15 @@ export const WrapperThread = ({
                 }, 2000);
             }
         },
-        onMessagesRead: (messageIds: MessageId[], readerId: UserId) => {
-            setMessages((prev) => markMessagesAsReadInList(prev, messageIds, readerId));
+        onMessagesRead: (messageIds: MessageId[], readerId: UserId, readAt : Date) => { 
+            setMessages((prev) =>{
+               const updated =  markMessagesAsReadInList(prev, messageIds, readerId,thread, readAt);    
+                 const test = calculateLastReadByUsers({ messages:updated, currentUserId: userId, allParticipants: [...thread.participants, thread.administrator]})
+             setLastReadByUsersMap(test) ;
+                         return updated
+                        }
+                        )
+ 
         },
     });
 
@@ -118,9 +127,9 @@ export const WrapperThread = ({
                                 isCurrentUser={msg.senderId === userId}
                                 prevMessage={i !== 0 ? messages[i - 1] : undefined}
                                 nextMessage={messages.length - 1 !== i ? messages[i + 1] : undefined}
-                                lastReadByUsers={lastReadByUsersMap.get(msg.id)}
+                                lastReadByUsers={lastReadByUsersMap[msg.id]}
                             />
-                        </div>
+                         </div>
                     ))}
                     <div ref={bottomRef} />
                 </div>

@@ -193,7 +193,7 @@ export const threadsEndpoint = createEndpointsNodes({
       mutationOptions({
         mutationFn: () =>
           patch(`/threads/${threadId}/messages`, {}).then((data) =>
-            safeParseWithLog(z.object({ messageIds: messageIdSchema.array() }), data),
+            safeParseWithLog(z.object({ messageIds: messageIdSchema.array(), readAt : z.iso.datetime() }), data),
           ),
         onSuccess: () => {
           queryClient.invalidateQueries({

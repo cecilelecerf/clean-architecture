@@ -11,8 +11,7 @@ export const ThreadCard = ({ thread, onClick, userId }: Props) => (
         className={`p-4 rounded-lg shadow-md transition-all duration-200 cursor-pointer mb-3 hover:scale-105 relative`}
         onClick={onClick}
     >
-        {thread.id === "319878bf-53ce-4025-930f-b1fb379d6a4c" && console.log(thread.lastMessage.readBy)}
-        <p className={`font-semibold text-lg`}>{thread.title}</p>
+         <p className={`font-semibold text-lg`}>{thread.title}</p>
         <div className="bg-gray-100 dark:bg-gray-100/5 flex justify-between dark:text-gray-400 text-gray-800 text-sm p-2 rounded">
             <p>{thread.lastMessage.content}</p> <p className="text-xs">{formatDateFrench(thread.lastMessage.sentAt)}</p>
         </div>
