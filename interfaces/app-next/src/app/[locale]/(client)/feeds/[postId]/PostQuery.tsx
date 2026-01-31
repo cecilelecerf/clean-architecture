@@ -1,11 +1,9 @@
 "use client"
 import { Tag } from "@/components/Tag";
-import { socket } from "@/lib/socket";
 import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint";
 import { endpoints } from "@/utils/endpoint";
 import { PostId } from "@infrastructure/types/feed";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
 import { SkeletonPost } from "@/components/feeds/Posts";
 
@@ -18,32 +16,19 @@ export const PostQuery = ({ postId }: Props) => {
         .with({ status: "error" }, () => "error")
         .with({ status: "pending" }, () => <SkeletonPost />)
         .with({ status: "success" }, ({ data: post }) => (
-            <PostDisplay postData={post} />)
+            <PostDisplay post={post} />)
         ).exhaustive()
 
 }
 
-const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
-    const [post, setPost] = useState<PostWithTagsAndUser>(postData)
-    useEffect(() => {
-        if (!socket) return;
+const PostDisplay = ({ post }: { post: PostWithTagsAndUser }) => {
 
-        const eventName = `post:${post.id}:update`;
-
-        socket.on(eventName, (socketPost: PostWithTagsAndUser) => {
-            console.log("💬 Post mis à jour:", socketPost);
-            setPost(socketPost);
-        });
-
-        return () => {
-            socket.off(eventName);
-        };
-    }, [post.id]);
 
     return (
         <>
             <div className="flex justify-between items-center gap-3">
                 <h1 className="text-2xl font-bold">{post.title}</h1>
+
             </div>
             <div className="space-y-6 mt-4">
                 <div className="space-y-2">

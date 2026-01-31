@@ -1,40 +1,41 @@
 {
-    "active": "Actif",
-    "inactive": "Inactif",
-    "role": {
-        "director": "Directeur",
-        "advisor": "Conseiller",
-        "customer": "Client"
-    },
-    "card": {
-        "corfirm": "Email confirmé",
-        "not": "Email non confirmé"
-    },
-    "action": {
-        "title": "Actions",
-        "send": "Envoyer un message",
-        "reset": "Réinitialiser mot de passe",
-        "deactivate": "Désactiver le compte",
-        "activate": "Activer le compte"
-    },
-    "account": {
-        "title": "Comptes bancaires",
-        "none": "Aucun compte bancaire pour le moment.",
-        "current": "Compte courant",
-        "saving": "Compte épargne",
-        "balance": "Solde"
-    },
-    "credit": {
-        "title": "Crédits du client",
-        "none": "Ce client n'a aucune demande de crédit.",
-        "array": {
-            "title": "Tous les crédits"
-        }
-    },
-    "thread": {
-        "title": "Conversations clients",
-        "open": "Ouvert",
-        "close": "Fermé",
-        "access": "Accéder"
+  "active": "Actif",
+  "inactive": "Inactif",
+  "role": {
+    "director": "Directeur",
+    "advisor": "Conseiller",
+    "customer": "Client"
+  },
+  "card": {
+    "corfirm": "Email confirmé",
+    "not": "Email non confirmé"
+  },
+  "action": {
+    "title": "Actions",
+    "send": "Envoyer un message",
+    "notification": "Envoyer une notification",
+    "reset": "Réinitialiser mot de passe",
+    "deactivate": "Désactiver le compte",
+    "activate": "Activer le compte"
+  },
+  "account": {
+    "title": "Comptes bancaires",
+    "none": "Aucun compte bancaire pour le moment.",
+    "current": "Compte courant",
+    "saving": "Compte épargne",
+    "balance": "Solde"
+  },
+  "credit": {
+    "title": "Crédits du client",
+    "none": "Ce client n'a aucune demande de crédit.",
+    "array": {
+      "title": "Tous les crédits"
     }
+  },
+  "thread": {
+    "title": "Conversations clients",
+    "open": "Ouvert",
+    "close": "Fermé",
+    "access": "Accéder"
+  }
 }

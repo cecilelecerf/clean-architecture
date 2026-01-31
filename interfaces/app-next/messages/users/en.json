@@ -1,40 +1,41 @@
 {
-    "active": "Active",
-    "inactive": "Inactive",
-    "role": {
-        "director": "Director",
-        "advisor": "Advisor",
-        "customer": "Customer"
-    },
-    "card": {
-        "corfirm": "Confirmed Email",
-        "not": "Not confirmed Email"
-    },
-    "action": {
-        "title": "Actions",
-        "send": "Send a message",
-        "reset": "Reset password",
-        "deactivate": "Deactivate account",
-        "activate": "Activate account"
-    },
-    "account": {
-        "title": "Bank accounts",
-        "none": "No bank account at the moment.",
-        "current": "Running account",
-        "saving": "Saving account",
-        "balance": "Balance"
-    },
-    "credit": {
-        "title": "Customers loans",
-        "none": "This customer has no loan application.",
-        "array": {
-            "title": "All loans"
-        }
-    },
-    "thread": {
-        "title": "Customer conversations",
-        "open": "Open",
-        "close": "Close",
-        "access": "Access"
+  "active": "Active",
+  "inactive": "Inactive",
+  "role": {
+    "director": "Director",
+    "advisor": "Advisor",
+    "customer": "Customer"
+  },
+  "card": {
+    "corfirm": "Confirmed Email",
+    "not": "Not confirmed Email"
+  },
+  "action": {
+    "title": "Actions",
+    "send": "Send a message",
+    "notification": "Send a notification",
+    "reset": "Reset password",
+    "deactivate": "Deactivate account",
+    "activate": "Activate account"
+  },
+  "account": {
+    "title": "Bank accounts",
+    "none": "No bank account at the moment.",
+    "current": "Running account",
+    "saving": "Saving account",
+    "balance": "Balance"
+  },
+  "credit": {
+    "title": "Customers loans",
+    "none": "This customer has no loan application.",
+    "array": {
+      "title": "All loans"
     }
+  },
+  "thread": {
+    "title": "Customer conversations",
+    "open": "Open",
+    "close": "Close",
+    "access": "Access"
+  }
 }

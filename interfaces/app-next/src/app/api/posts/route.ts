@@ -2,12 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
-import { postSchema } from '@infrastructure/types/feed';
-import { newPostSchema, querySchema } from '@/utils/endpoint/feedsEndpoint';
-import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
-import { broadcastPostEvent } from './sse/route';
-import { safeParseWithLog } from '@/lib/zodUtils';
-import { clientSchema, userDtoSchema } from '@infrastructure/types/user';
+import { querySchema } from '@/utils/endpoint/feedsEndpoint';
+import { newPostSchema } from '@infrastructure/types/feed';
 
 export async function GET(req: NextRequest) {
   try {
@@ -64,6 +60,7 @@ export async function POST(req: NextRequest) {
       title: payload.title,
       content: payload.content,
       tagsId: payload.tagsId,
+      userId: payload.userId,
     });
 
     if (result instanceof Error) {
@@ -72,9 +69,8 @@ export async function POST(req: NextRequest) {
         { status: result.statusCode ?? 400 },
       );
     }
-    const postParsed = safeParseWithLog(postSchema, result);
 
-    return NextResponse.json(postParsed);
+    return NextResponse.json(result);
   } catch (err) {
     console.error(err);
     return NextResponse.json(

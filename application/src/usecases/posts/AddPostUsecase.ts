@@ -16,10 +16,12 @@ import {
   InvalidPostContentError,
   InvalidPostTitleError,
 } from "@domain/errors/posts";
-type Props = { tagsId: TagEntity["id"][]; published?: boolean } & Pick<
-  PostEntity,
-  "content" | "title" | "advisorId"
->;
+import { UserEntity } from "domain/entities/UserEntity";
+type Props = {
+  tagsId: TagEntity["id"][];
+  published?: boolean;
+  userId?: UserEntity["id"];
+} & Pick<PostEntity, "content" | "title" | "advisorId">;
 
 export class AddPostUsecase {
   constructor(
@@ -35,6 +37,7 @@ export class AddPostUsecase {
     content,
     tagsId,
     published,
+    userId,
   }: Props): Promise<
     | PostDTO
     | UserNotFoundError
@@ -59,7 +62,13 @@ export class AddPostUsecase {
       if (!tag) return new TagNotFoundError();
       tags.push(tag);
     }
+    if (userId) {
+      const user = await findActiveUser(this.userRepository, userId);
+      if (user instanceof Error) return user;
 
+      if (!user.hasRole({ role: "client" }))
+        return new UserRoleMismatchError(["client"], user.role);
+    }
     const id = this.uuidService.generate();
     const createdAt = this.clockService.now();
 
@@ -71,6 +80,7 @@ export class AddPostUsecase {
       title,
       tagsId: tags.map((tag) => tag.id),
       publishedAt: published ? createdAt : undefined,
+      clientId: userId,
     });
     if (post instanceof Error) return post;
     await this.feedRepository.save(post);

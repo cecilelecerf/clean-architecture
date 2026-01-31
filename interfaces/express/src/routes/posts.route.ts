@@ -7,6 +7,7 @@ postsRouter.get("/", PostsController.getWithFilter);
 postsRouter.post("/", PostsController.add);
 
 postsRouter.get("/unread", PostsController.getUnreadWithTag);
+postsRouter.get("/sse", PostsController.ssePost);
 
 postsRouter.get("/:postId", PostsController.getByIdWithTags);
 postsRouter.patch("/:postId", PostsController.edit);

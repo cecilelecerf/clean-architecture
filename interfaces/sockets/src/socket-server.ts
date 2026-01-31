@@ -37,38 +37,24 @@ io.on("connection", (socket) => {
     },
   );
 
-  socket.on("post:update", ({ post }: { post: PostWithTagsAndUser }) => {
-    console.log(`post:${post.id}:update`);
-    io.emit(`post:${post.id}:update`, post);
-  });
-  socket.on("post:status", ({ post }: { post: PostWithTagsAndUser }) => {
-    io.emit(`post:${post.id}:update`, post);
-    io.emit(`post:status`, post);
-  });
-
-  socket.on("notification:new", ({ title, content }) => {
-    console.log(`Nouvelle notification: ${title} - ${content}`);
-    io.emit("notification:new", { title, content });
-  });
-
-  // (data: { messageIds: MessageId[], userId: UserId })
   socket.on(
     "thread:messages_marked_read",
     ({
       threadId,
       messageIds,
       userId,
-      readAt
+      readAt,
     }: {
       threadId: ThreadId;
       messageIds: MessageId[];
       userId: UserId;
-      readAt : string
+      readAt: string;
     }) => {
-      console.log("------");
-      console.log(`thread:${threadId}:messages_read`);
-      console.log(readAt)
-      io.emit(`thread:${threadId}:messages_read`, { messageIds, userId, readAt });
+      io.emit(`thread:${threadId}:messages_read`, {
+        messageIds,
+        userId,
+        readAt,
+      });
     },
   );
 });

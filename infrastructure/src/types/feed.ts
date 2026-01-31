@@ -47,9 +47,9 @@ export const newPostSchema = postSchema
     title: true,
     content: true,
   })
-  .extend({ tagsId: z.string().array() });
+  .extend({ tagsId: z.string().array(), userId: userIdSchema.optional() });
 export type NewPost = z.infer<typeof newPostSchema>;
 
 export const publishActionSchema = z.object({
-  status: z.enum(['publish', 'unpublish']),
+  status: z.enum(["publish", "unpublish"]),
 });

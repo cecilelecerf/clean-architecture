@@ -27,24 +27,24 @@ export const PostQuery = ({ postId }: Props) => {
     return match(query)
         .with({ status: "error" }, () => "error")
         .with({ status: "pending" }, () => <SkeletonPost />)
-        .with({ status: "success" }, ({ data: post }) => <PostDisplay postData={post} />)
+        .with({ status: "success" }, ({ data: post }) => <PostDisplay post={post} />)
         .exhaustive()
 }
 
-const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
+const PostDisplay = ({ post }: { post: PostWithTagsAndUser }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editValues, setEditValues] = useState<NewPost>({
-        title: postData.title,
-        content: postData.content,
-        tagsId: postData.tagsId
+        title: post.title,
+        content: post.content,
+        tagsId: post.tagsId
     });
 
-    const editMutation = useMutation(endpoints.feeds.posts.edit({ id: postData.id }));
-    const actionMutation = useMutation(endpoints.feeds.posts.status({ id: postData.id }));
+    const editMutation = useMutation(endpoints.feeds.posts.edit({ id: post.id }));
+    const actionMutation = useMutation(endpoints.feeds.posts.status({ id: post.id }));
 
     const { data: session } = useSession();
 
-    const isMine = session?.user?.id === postData.advisor.id;
+    const isMine = session?.user?.id === post.advisor.id;
 
     const t = useTranslations("advisor.feeds");
 
@@ -53,11 +53,11 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
             return editValues;
         }
         return {
-            title: postData.title,
-            content: postData.content,
-            tagsId: postData.tagsId
+            title: post.title,
+            content: post.content,
+            tagsId: post.tagsId
         };
-    }, [isEditing, editValues, postData.title, postData.content, postData.tagsId]);
+    }, [isEditing, editValues, post.title, post.content, post.tagsId]);
 
     const handleChange = (field: keyof NewPost, value: string) => {
         setEditValues((prev) => ({ ...prev, [field]: value }));
@@ -73,9 +73,9 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
 
     const handleEditStart = () => {
         setEditValues({
-            title: postData.title,
-            content: postData.content,
-            tagsId: postData.tagsId
+            title: post.title,
+            content: post.content,
+            tagsId: post.tagsId
         });
         setIsEditing(true);
     };
@@ -86,7 +86,7 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
 
     const toogleStatus = () => {
         actionMutation.mutate({
-            status: postData.publishedAt ? "unpublish" : "publish"
+            status: post.publishedAt ? "unpublish" : "publish"
         });
     };
 
@@ -100,7 +100,7 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
                         className="text-md font-bold"
                     />
                 ) : (
-                    <h1 className="text-2xl font-bold">{postData.title}</h1>
+                    <h1 className="text-2xl font-bold">{post.title}</h1>
                 )}
                 {isMine && (
                     <div className="flex gap-2">
@@ -127,6 +127,8 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
 
             <div className="space-y-6 mt-4">
                 <div className="space-y-2">
+                    {post.client && <p className="text-gray-700 dark:text-gray-200 text-xs">Destiné à : {post.client.firstname} {post.client.lastname}</p>}
+
                     <div className="flex gap-3">
                         {isEditing ? (
                             <TagsFilters
@@ -140,9 +142,9 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
                                 }}
                                 selectedTagsId={displayValues.tagsId as TagId[]}
                             />
-                        ) : postData.tags && postData.tags.length > 0 && (
+                        ) : post.tags && post.tags.length > 0 && (
                             <div className="flex flex-wrap gap-2">
-                                {postData.tags.map((tag) => (
+                                {post.tags.map((tag) => (
                                     <Tag tag={tag} key={tag.id} />
                                 ))}
                             </div>
@@ -152,28 +154,28 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
                             <SwitchComponent
                                 id="publie"
                                 label={t("filters.publish")}
-                                checked={!!postData.publishedAt}
+                                checked={!!post.publishedAt}
                                 onChange={toogleStatus}
                             />
                         ) : (
                             <Badge
-                                variant={postData.publishedAt ? "secondary" : "outline"}
+                                variant={post.publishedAt ? "secondary" : "outline"}
                                 className="h-fit ml-2"
                             >
-                                {postData.publishedAt ? t("filters.publish") : t("filters.unpublish")}
+                                {post.publishedAt ? t("filters.publish") : t("filters.unpublish")}
                             </Badge>
                         )}
                     </div>
 
                     <p className="text-sm text-gray-500">
-                        {t("by")} <strong>{postData.advisor.firstname} {postData.advisor.lastname}</strong> ·{' '}
-                        {postData.publishedAt ? (
+                        {t("by")} <strong>{post.advisor.firstname} {post.advisor.lastname}</strong> ·{' '}
+                        {post.publishedAt ? (
                             <>
-                                {t("publish")} {formatDateFrench(postData.publishedAt)}
+                                {t("publish")} {formatDateFrench(post.publishedAt)}
                             </>
                         ) : (
                             <>
-                                {t("unpublish")} {formatDateFrench(postData.createdAt)}
+                                {t("unpublish")} {formatDateFrench(post.createdAt)}
                             </>
                         )}
                     </p>
@@ -186,7 +188,7 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
                         className="min-h-[200px]"
                     />
                 ) : (
-                    <p className="whitespace-pre-wrap">{postData.content}</p>
+                    <p className="whitespace-pre-wrap">{post.content}</p>
                 )}
             </div>
         </>

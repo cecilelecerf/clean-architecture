@@ -6,5 +6,5 @@ export interface MessageInterface {
   senderId: Types.UUID;
   content: string;
   sentAt: Date;
-  readBy: Types.UUID[];
+  readBy: { userId: Types.UUID; readAt: Date }[];
 }

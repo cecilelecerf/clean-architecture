@@ -32,25 +32,42 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/posts/[pos
         { status: result.statusCode ?? 400 },
       );
     }
-    const followers = await usersFactory().getUsersByRole.execute({
-      userId: session.user.id,
-      role: 'client',
-    });
-    if (followers instanceof Error) {
-      return NextResponse.json(
-        { name: followers.name, message: followers.message },
-        { status: followers.statusCode ?? 400 },
-      );
-    }
     const postParsed = safeParseWithLog(postSchema, result);
-
-    const followerParsed = safeParseWithLog(userDtoSchema.array(), followers);
-    followerParsed.forEach((follower) => {
-      broadcastPostEvent(follower.id, {
+    if (postParsed.clientId) {
+      const client = await usersFactory().getUser.execute({
+        clientId: postParsed.clientId,
+        advisorId: session.user.id,
+      });
+      if (client instanceof Error) {
+        return NextResponse.json(
+          { name: client.name, message: client.message },
+          { status: client.statusCode ?? 400 },
+        );
+      }
+      const clientParsed = safeParseWithLog(userDtoSchema, client);
+      broadcastPostEvent(clientParsed.id, {
         type: `${status}_post`,
         post: postParsed,
       });
-    });
+    } else {
+      const followers = await usersFactory().getUsersByRole.execute({
+        userId: session.user.id,
+        role: 'client',
+      });
+      if (followers instanceof Error) {
+        return NextResponse.json(
+          { name: followers.name, message: followers.message },
+          { status: followers.statusCode ?? 400 },
+        );
+      }
+      const followerParsed = safeParseWithLog(userDtoSchema.array(), followers);
+      followerParsed.forEach((follower) => {
+        broadcastPostEvent(follower.id, {
+          type: `${status}_post`,
+          post: postParsed,
+        });
+      });
+    }
     return NextResponse.json(result);
   } catch (err) {
     console.error(err);

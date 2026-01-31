@@ -5,9 +5,6 @@ import { useQuery } from "@tanstack/react-query"
 import { match } from "ts-pattern"
 import { PostCard } from "./PostCard"
 import { PaginationComponent } from "../PaginationComponent"
-import { useEffect, useState } from "react"
-import { socket } from "@/lib/socket"
-import { queryClient } from "@/lib/queryClient"
 import { Skeleton } from "../ui/skeleton"
 import { useTranslations } from "next-intl"
 
@@ -50,7 +47,6 @@ export const SkeletonPost = () => {
             </div>
             <div className="space-y-6 mt-4">
                 <div className="space-y-2">
-                    {/* Tags skeleton */}
                     <div className="flex flex-wrap gap-2">
                         {Array.from({ length: 3 }).map((_, index) => (
                             <Skeleton

@@ -3,6 +3,7 @@ import { deleteEntity, get, patch, post } from '@/lib/apiClient';
 import { safeParseWithLog } from '@/lib/zodUtils';
 import { createEndpointsNodes } from '@/utils/createEndpointNode';
 import {
+  NewPost,
   PostId,
   postSchema,
   postWithTagsSchema,
@@ -13,7 +14,7 @@ import {
 } from '@infrastructure/types/feed';
 import z from 'zod';
 import { queryClient } from '@/lib/queryClient';
-import { userDtoSchema } from '@infrastructure/types/user';
+import { userDtoSchema, userIdSchema } from '@infrastructure/types/user';
 import { paginationSchema } from '@infrastructure/types/pagination';
 
 // ============================================================================
@@ -23,16 +24,9 @@ import { paginationSchema } from '@infrastructure/types/pagination';
 export const postWithTagsAndUserSchema = postSchema.extend({
   tags: tagToFrontSchema.array(),
   advisor: userDtoSchema,
+  client: userDtoSchema.optional(),
 });
 export type PostWithTagsAndUser = z.infer<typeof postWithTagsAndUserSchema>;
-
-export const newPostSchema = postSchema
-  .pick({
-    title: true,
-    content: true,
-  })
-  .extend({ tagsId: z.string().array() });
-export type NewPost = z.infer<typeof newPostSchema>;
 
 export const newTagSchema = tagSchema.pick({
   color: true,

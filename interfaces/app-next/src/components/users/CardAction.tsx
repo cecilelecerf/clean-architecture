@@ -6,6 +6,8 @@ import { ButtonLoading } from "@/components/buttons/ButtonLoading";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "../ui/skeleton";
 import { useTranslations } from "next-intl";
+import { Button } from "../ui/button";
+import { ModalAddNotification } from "./_components/ModalAddNotification";
 
 
 export const CardUserAction = ({ user, }: { user: UserDto }) => {
@@ -32,6 +34,7 @@ export const CardUserAction = ({ user, }: { user: UserDto }) => {
                         })}>
                     {t("send")}
                 </ButtonLoading>
+                <ModalAddNotification user={user} />
                 <ButtonLoading loading={forgotPassword.isPending}
                     onClick={() => forgotPassword.mutate(user.email)} variant="outline">
                     {t("reset")}

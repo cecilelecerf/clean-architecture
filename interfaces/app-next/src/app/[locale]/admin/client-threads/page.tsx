@@ -4,12 +4,14 @@ import { TitleAdminPage } from "@/components/TitleAdminPage";
 import { socket } from "@/lib/socket";
 import { endpoints } from "@/utils/endpoint";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { match } from "ts-pattern";
 
 export default function ThreadsPage() {
+    const { data: session } = useSession()
     const router = useRouter()
     const query = useQuery(endpoints.threads.advisorGetAll())
     const t = useTranslations("advisor.thread");
@@ -38,6 +40,7 @@ export default function ThreadsPage() {
                     return <div className="">
                         {threads.map((thread) => (
                             <ThreadCard
+                                userId={session.user.id}
                                 thread={thread}
                                 key={thread.id}
                                 onClick={() => router.push(`/admin/client-threads/${thread.id}`)}

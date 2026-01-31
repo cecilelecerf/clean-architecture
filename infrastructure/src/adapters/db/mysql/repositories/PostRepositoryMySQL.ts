@@ -58,7 +58,6 @@ export class PostRepositoryMySQL implements PostRepository {
     return { tags, tagsId };
   }
 
-  // Méthode helper pour récupérer les user IDs qui ont lu un post
   private async getPostReaders(postId: string): Promise<string[]> {
     const readRows = await this.client.query<RowDataPacket[]>(
       `SELECT user_id FROM post_user_read WHERE post_id = ?`,
@@ -67,14 +66,12 @@ export class PostRepositoryMySQL implements PostRepository {
     return readRows.map((r) => r.user_id);
   }
 
-  // Méthode helper pour mettre à jour les relations many-to-many
   private async updateManyToMany(
     postId: string,
     newIds: string[],
     tableName: string,
     columnName: string,
   ): Promise<void> {
-    // Récupérer les IDs existants
     const existingRows = await this.client.query<RowDataPacket[]>(
       `SELECT ${columnName} FROM ${tableName} WHERE post_id = ?`,
       [postId],
@@ -114,7 +111,6 @@ export class PostRepositoryMySQL implements PostRepository {
       ],
     );
 
-    // Sauvegarder les relations
     for (const readId of post.readBy) {
       await this.client.query<ResultSetHeader>(
         `INSERT INTO post_user_read (post_id, user_id) VALUES (?, ?)`,
@@ -143,7 +139,6 @@ export class PostRepositoryMySQL implements PostRepository {
     return this.mapRowToPost(rows[0], tagsId, readsId);
   }
 
-  /** Posts récents */
   async findAllRecent(limit = 10): Promise<PostEntity[]> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT * FROM posts ORDER BY created_at DESC LIMIT ?`,
@@ -159,7 +154,6 @@ export class PostRepositoryMySQL implements PostRepository {
     );
   }
 
-  /** Mettre à jour un post */
   async update(post: PostEntity): Promise<void> {
     await this.client.query<ResultSetHeader>(
       `UPDATE posts
@@ -174,10 +168,8 @@ export class PostRepositoryMySQL implements PostRepository {
       ],
     );
 
-    // Mettre à jour les tags
     await this.updateManyToMany(post.id, post.tagsId, "post_tag", "tag_id");
 
-    // Mettre à jour les lecteurs
     await this.updateManyToMany(
       post.id,
       post.readBy,
@@ -186,23 +178,24 @@ export class PostRepositoryMySQL implements PostRepository {
     );
   }
 
-  /** Supprimer un post */
   async delete(id: PostEntity["id"]): Promise<void> {
     await this.client.query<ResultSetHeader>(`DELETE FROM posts WHERE id = ?`, [
       id,
     ]);
   }
 
-  /** Post avec tags et user par ID */
   async findWithTagsAndUserById(
     id: PostEntity["id"],
+    userId?: UserEntity["id"],
   ): Promise<PostWithTagsAndUser | null> {
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT 
         p.*,
-      ${getUserFields("u", "advisor_")} 
-       FROM posts p 
-       JOIN users u ON u.id = p.advisor_id 
+      ${getUserFields("u", "advisor_")},
+      ${getUserFields("c", "client_")} 
+      FROM posts p 
+       LEFT JOIN users u ON u.id = p.advisor_id
+       LEFT JOIN users c ON c.id = p.client_id
        WHERE p.id = ?`,
       [id],
     );
@@ -213,9 +206,14 @@ export class PostRepositoryMySQL implements PostRepository {
     const { tags, tagsId } = await this.getPostTags(id);
     const readsId = await this.getPostReaders(id);
     const advisor = UserMapper.mapRowToUser(row, "advisor_");
+    const client = UserMapper.mapRowToUser(row, "client_");
     const post = this.mapRowToPost(row, tagsId, readsId);
 
-    return Object.assign(post, { tags, advisor });
+    return Object.assign(post, {
+      tags,
+      advisor,
+      ...(client?.id && { client }),
+    });
   }
 
   async findAllPaginatedWithTagsAndUserByFilters(
@@ -225,6 +223,7 @@ export class PostRepositoryMySQL implements PostRepository {
       tagsId?: string[];
       title?: string;
       status?: boolean;
+      userId?: UserEntity["id"];
     },
     pagination: { page: number; limit: number },
   ): Promise<{ posts: PostWithTagsAndUser[]; total: number }> {
@@ -248,6 +247,10 @@ export class PostRepositoryMySQL implements PostRepository {
       );
       params.push(...filters.tagsId);
     }
+    if (filters.userId) {
+      whereClauses.push(`(p.client_id IS NULL OR p.client_id = ?)`);
+      params.push(filters.userId);
+    }
 
     if (filters.title) {
       whereClauses.push("p.title LIKE ?");
@@ -266,12 +269,13 @@ export class PostRepositoryMySQL implements PostRepository {
       ? "WHERE " + whereClauses.join(" AND ")
       : "";
     const offset = (pagination.page - 1) * pagination.limit;
-
     const rows = await this.client.query<RowDataPacket[]>(
       `SELECT DISTINCT p.*, 
-      ${getUserFields("u", "advisor_")} 
+      ${getUserFields("u", "advisor_")},
+      ${getUserFields("c", "client_")}
       FROM posts p 
-      JOIN users u ON u.id = p.advisor_id
+      LEFT JOIN users u ON u.id = p.advisor_id
+      LEFT JOIN users c ON p.client_id = c.id
       ${tagJoin}
       ${whereSQL}
       ORDER BY p.created_at DESC
@@ -279,7 +283,6 @@ export class PostRepositoryMySQL implements PostRepository {
       params,
     );
 
-    // Query pour le total
     const totalRows = await this.client.query<RowDataPacket[]>(
       `SELECT COUNT(DISTINCT p.id) as total
       FROM posts p
@@ -293,9 +296,13 @@ export class PostRepositoryMySQL implements PostRepository {
         const { tags, tagsId } = await this.getPostTags(row.id);
         const readsId = await this.getPostReaders(row.id);
         const advisor = UserMapper.mapRowToUser(row, "advisor_");
+        const client = UserMapper.mapRowToUser(row, "client_");
         const post = this.mapRowToPost(row, tagsId, readsId);
-
-        return Object.assign(post, { tags, advisor });
+        return Object.assign(post, {
+          tags,
+          advisor,
+          ...(client?.id && { client }),
+        });
       }),
     );
 

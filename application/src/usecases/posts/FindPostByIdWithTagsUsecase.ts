@@ -21,7 +21,7 @@ type Props = {
 export class FindPostByIdWithTagsUsecase {
   constructor(
     private readonly feedRepository: PostRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
   ) {}
   public async execute({
     userId,
@@ -36,7 +36,10 @@ export class FindPostByIdWithTagsUsecase {
     const user = await findActiveUser(this.userRepository, userId);
     if (user instanceof Error) return user;
 
-    const post = await this.feedRepository.findWithTagsAndUserById(postId);
+    const post = await this.feedRepository.findWithTagsAndUserById(
+      postId,
+      userId,
+    );
     if (!post) return new PostNotFoundError();
 
     if (user.hasRole({ role: "client" }) && !post.publishedAt)

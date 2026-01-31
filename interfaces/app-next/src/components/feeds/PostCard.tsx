@@ -24,11 +24,11 @@ export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
         <div
             onClick={() => router.push(`${basePath}/feeds/${post.id}`)
             }
-            className="cursor-pointer border rounded-xl shadow hover:shadow-lg transition p-6 relative flex justify-between relative"
+            className="cursor-pointer border rounded-xl shadow hover:shadow-lg transition p-6 relative flex justify-between"
         >
             <div>
 
-                <div className="flex flex-col sm:flex-row justify-between gap-1 mb-3">
+                <div className="flex flex-col sm:flex-row justify-between gap-1">
                     <h2 className="text-xl font-bold">{post.title}
                         {isAdmin && (
                             <Badge variant={post.publishedAt ? "secondary" : "outline"} className="h-fit ml-2">
@@ -38,12 +38,13 @@ export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
                     </h2>
                 </div>
 
-                <p className="text-gray-700 dark:text-gray-200 mb-4 line-clamp-3">{post.content}</p>
-
+                {post.client && isAdmin && <p className="text-gray-700 dark:text-gray-200 text-xs">Destiné à : {post.client.firstname} {post.client.lastname}</p>}
+                <p className="text-gray-700 dark:text-gray-200 my-3 line-clamp-3">{post.content}</p>
                 <div className="flex flex-wrap gap-2">
                     {post.tags.map((tag) => (
                         <Tag tag={tag} key={tag.id} />
                     ))}
+
                 </div>
             </div>
             {isMine && isAdmin && (
@@ -53,7 +54,7 @@ export const PostCard = ({ post, isAdmin, basePath }: PostCardProps) => {
                     {t("update")}
                 </p>
             )}
-                    {!isAdmin&& post.readBy.includes(session.user.id) && <div className="absolute w-3 h-3 rounded-full bg-red-700 right-1.5 top-1.5"></div>}
+            {!isAdmin && post.readBy.includes(session.user.id) && <div className="absolute w-3 h-3 rounded-full bg-red-700 right-1.5 top-1.5"></div>}
 
         </div >
     );

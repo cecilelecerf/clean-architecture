@@ -9,6 +9,7 @@ import { UserToDTO } from "@domain/entities/UserEntity";
 export type PostWithTagsAndUsersDTO = PostDTO & {
   advisor: UserToDTO;
   tags: TagDTO[];
+  client?: UserToDTO;
 };
 
 export type PostWithTagsDTO = PostDTO & {
@@ -20,10 +21,11 @@ export class PostDTOMapper {
     return Object.assign(post.toDTO(), {
       advisor: post.advisor.toDTO(),
       tags: post.tags.map((t) => t.toDTO()),
+      client: post.client ? post.client?.toDTO() : undefined,
     });
   }
   static tagsAndUserMaps(
-    posts: PostWithTagsAndUser[]
+    posts: PostWithTagsAndUser[],
   ): PostWithTagsAndUsersDTO[] {
     return posts.map((post) => this.tagsAndUserMap(post));
   }

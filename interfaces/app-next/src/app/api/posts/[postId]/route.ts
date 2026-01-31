@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
-import { newPostSchema } from '@/utils/endpoint/feedsEndpoint';
-import { postWithTagsSchema } from '@infrastructure/types/feed';
+import { newPostSchema, postWithTagsSchema } from '@infrastructure/types/feed';
 
 export async function GET(_req: NextRequest, ctx: RouteContext<'/api/posts/[postId]'>) {
   try {

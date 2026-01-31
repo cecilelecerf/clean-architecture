@@ -1,6 +1,5 @@
 import {
   PostRepository,
-  PostWithTags,
   PostWithTagsAndUser,
 } from "@application/ports/repositories/PostRepository";
 import { MongoClient } from "../../MongoClient";
@@ -24,13 +23,17 @@ export class PostRepositoryMongo implements PostRepository {
       content: doc.content,
       tagsId:
         doc.tagsId?.map((t: any) =>
-          t._id ? t._id.toString() : t.toString()
+          t._id ? t._id.toString() : t.toString(),
         ) || [],
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt ?? null,
       publishedAt: doc.publishedAt ?? null,
       readBy: doc.readBy?.map((r: any) => r.toString()) || [],
-      clientId: doc.clientId ? doc.clientId.toString() : undefined,
+      clientId: doc.clientId
+        ? doc._id
+          ? doc._id.toString()
+          : doc.clientId.id.toString()
+        : undefined,
     });
   }
 
@@ -45,18 +48,14 @@ export class PostRepositoryMongo implements PostRepository {
     });
   }
 
-  private combinePostWithTags(doc: any, tags: TagEntity[]): PostWithTags {
-    const post = this.mapDocToPost(doc);
-    return Object.assign(post, { tags });
-  }
-
   private combinePostWithTagsAndUser(
     doc: any,
     advisor: UserEntity,
-    tags: TagEntity[]
+    tags: TagEntity[],
+    client?: UserEntity,
   ): PostWithTagsAndUser {
     const post = this.mapDocToPost(doc);
-    return Object.assign(post, { advisor, tags });
+    return Object.assign(post, { advisor, tags, client });
   }
 
   async save(post: PostEntity): Promise<void> {
@@ -105,7 +104,7 @@ export class PostRepositoryMongo implements PostRepository {
           tagsId: post.tagsId,
           readBy: post.readBy,
         },
-      }
+      },
     );
   }
 
@@ -115,23 +114,27 @@ export class PostRepositoryMongo implements PostRepository {
   }
 
   async findWithTagsAndUserById(
-    id: PostEntity["id"]
+    id: PostEntity["id"],
+    userId?: UserEntity["id"],
   ): Promise<PostWithTagsAndUser | null> {
     await this.client.connect();
-
-    const doc = await PostModel.findById(id)
+    let query = PostModel.findById(id)
       .populate({ path: "advisorId" })
-      .populate({ path: "tagsId" })
-      .lean();
+      .populate({ path: "tagsId" });
+
+    if (userId) {
+      query = query.populate({ path: "clientId" });
+    }
+    const doc = await query.lean();
 
     if (!doc || !doc.advisorId) return null;
 
     const advisor = UserMapper.mapDocToUser(doc.advisorId);
-
+    const client = UserMapper.mapDocToUser(doc.clientId);
     const tags: TagEntity[] = (doc.tagsId || [])
       .map(this.mapDocToTag)
       .filter((t: any): t is TagEntity => !!t);
-    return this.combinePostWithTagsAndUser(doc, advisor, tags);
+    return this.combinePostWithTagsAndUser(doc, advisor, tags, client);
   }
 
   async findAllPaginatedWithTagsAndUserByFilters(
@@ -141,8 +144,9 @@ export class PostRepositoryMongo implements PostRepository {
       tagsId?: string[];
       title?: string;
       status?: boolean;
+      userId?: UserEntity["id"];
     },
-    pagination: { page: number; limit: number }
+    pagination: { page: number; limit: number },
   ): Promise<{ posts: PostWithTagsAndUser[]; total: number }> {
     await this.client.connect();
     const match: any = {};
@@ -155,13 +159,20 @@ export class PostRepositoryMongo implements PostRepository {
     if (typeof filters.status === "boolean")
       match.publishedAt = filters.status ? { $ne: null } : null;
     if (filters.tagsId?.length) match.tagsId = { $in: filters.tagsId };
-
+    if (filters.userId) {
+      match.$or = [{ clientId: null }, { clientId: filters.userId }];
+    }
     const skip = (pagination.page - 1) * pagination.limit;
     const limit = pagination.limit;
 
-    const docs = await PostModel.find(match)
+    let query = PostModel.find(match)
       .populate({ path: "advisorId" })
-      .populate({ path: "tagsId" })
+      .populate({ path: "tagsId" });
+
+    if (filters.userId) {
+      query = query.populate({ path: "clientId" });
+    }
+    const docs = await query
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -172,10 +183,11 @@ export class PostRepositoryMongo implements PostRepository {
       .map((doc) => {
         if (!doc.advisorId) return null;
         const advisor = UserMapper.mapDocToUser(doc.advisorId);
+        const client = UserMapper.mapDocToUser(doc.clientId);
         const tags: TagEntity[] = (doc.tagsId || [])
           .map(this.mapDocToTag)
           .filter((t: TagEntity | undefined): t is TagEntity => !!t);
-        return this.combinePostWithTagsAndUser(doc, advisor, tags);
+        return this.combinePostWithTagsAndUser(doc, advisor, tags, client);
       })
       .filter((p): p is PostWithTagsAndUser => p !== null);
 
@@ -183,7 +195,7 @@ export class PostRepositoryMongo implements PostRepository {
   }
 
   async findAllUnreadWithTags(
-    userId: UserEntity["id"]
+    userId: UserEntity["id"],
   ): Promise<PostWithTagsAndUser[]> {
     await this.client.connect();
 

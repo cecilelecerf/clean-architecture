@@ -13,7 +13,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { Bell } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useCallback, useEffect } from "react"
+import { useCallback } from "react"
 import { match } from "ts-pattern"
 
 export const MenuPopover = () => {
@@ -43,45 +43,17 @@ const DisplayPopover = ({ posts }: { posts: PostWithTagsAndUser[] }) => {
                         requireInteraction: true,
                     });
                 }
-
-                queryClient.setQueryData(
-                    ['feeds', 'posts', 'list'],
-                    (oldData: PostWithTagsAndUser[] | undefined) => {
-                        if (!oldData) return [event.post];
-                        const exists = oldData.some(p => p.id === event.post.id);
-                        if (exists) return oldData;
-                        return [event.post, ...oldData];
-                    }
-                );
-
-                // Invalider aussi les posts non lus
-                queryClient.invalidateQueries({
-                    queryKey: ['feeds', 'posts', 'unread'],
-                });
+                invalidateFeedHelpers.invalidatePostDetail(event.post.id)
+                invalidateFeedHelpers.invalidateUnreadPosts()
+                invalidateFeedHelpers.invalidateAllPostsLists()
                 break;
 
             case 'unpublish_post':
                 console.log("✅ Post unpublished");
 
-                // Notification
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification('Post retiré', {
-                        body: event.post.title,
-                    });
-                }
-
-                // Retirer du cache
-                queryClient.setQueryData(
-                    ['feeds', 'posts', 'list'],
-                    (oldData: PostWithTagsAndUser[] | undefined) => {
-                        if (!oldData) return oldData;
-                        return oldData.filter(post => post.id !== event.post.id);
-                    }
-                );
-
-                queryClient.invalidateQueries({
-                    queryKey: ['feeds', 'posts', 'unread'],
-                });
+                invalidateFeedHelpers.invalidateAllPostsLists()
+                invalidateFeedHelpers.invalidateUnreadPosts()
+                invalidateFeedHelpers.invalidatePostDetail(event.post.id)
                 break;
 
             case 'connected':
@@ -91,10 +63,9 @@ const DisplayPopover = ({ posts }: { posts: PostWithTagsAndUser[] }) => {
             default:
                 console.warn('⚠️ Unknown event type:', (event as any).type);
         }
-    }, []); // ← Pas de dépendances car on utilise des fonctions stables
+    }, []);
 
-
-    const { isConnected } = useSSE({
+    useSSE({
         url: '/api/posts/sse',
         onMessage: handleSSEMessage,
         onError: (error) => {
@@ -106,9 +77,7 @@ const DisplayPopover = ({ posts }: { posts: PostWithTagsAndUser[] }) => {
             });
         },
     });
-    useEffect(() => {
-        console.log('🔍 SSE Connection state:', isConnected);
-    }, [isConnected]);
+
     const postCount = posts.length
     return (
         <Popover>

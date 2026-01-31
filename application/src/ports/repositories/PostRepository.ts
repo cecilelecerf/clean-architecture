@@ -5,6 +5,7 @@ import { UserEntity } from "@domain/entities/UserEntity";
 export type PostWithTagsAndUser = PostEntity & {
   tags: TagEntity[];
   advisor: UserEntity;
+  client?: UserEntity;
 };
 
 export type PostWithTags = PostEntity & { tags: TagEntity[] };
@@ -21,16 +22,18 @@ export interface PostRepository {
       tagsId?: TagEntity["id"][];
       title?: PostEntity["title"];
       status?: boolean;
+      userId?: UserEntity["id"];
     },
     pagination: {
       page: number;
       limit: number;
-    }
+    },
   ): Promise<{ posts: PostWithTagsAndUser[]; total: number }>;
   findWithTagsAndUserById(
-    id: PostEntity["id"]
+    id: PostEntity["id"],
+    userId: UserEntity["id"],
   ): Promise<PostWithTagsAndUser | null>;
   findAllUnreadWithTags(
-    userId: UserEntity["id"]
+    userId: UserEntity["id"],
   ): Promise<PostWithTagsAndUser[]>;
 }

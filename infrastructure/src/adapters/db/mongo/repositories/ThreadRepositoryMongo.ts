@@ -1,5 +1,6 @@
 import {
   ThreadEntityWithUsers,
+  ThreadEntityWithUsersAndLastMessage,
   ThreadRepository,
 } from "@application/ports/repositories/ThreadRepository";
 import { MongoClient } from "../../MongoClient";
@@ -7,6 +8,7 @@ import { ThreadEntity } from "@domain/entities/ThreadEntity";
 import { ThreadModel } from "../models/ThreadModel";
 import { UserEntity } from "@domain/entities/UserEntity";
 import { UserMapper } from "../../mappers/UserMapper";
+import { MessageMapper } from "../../mappers/MessageMapper";
 import { Types } from "mongoose";
 
 export class ThreadRepositoryMongo implements ThreadRepository {
@@ -50,6 +52,35 @@ export class ThreadRepositoryMongo implements ThreadRepository {
     }) as ThreadEntityWithUsers;
 
     return Object.assign(thread, { administrator, participants });
+  }
+
+  private mapThreadWithUsersAndLastMessage(
+    doc: any,
+  ): ThreadEntityWithUsersAndLastMessage {
+    const administrator = doc.administratorId?._id
+      ? UserMapper.mapDocToUser(doc.administratorId)
+      : null;
+
+    const participants: UserEntity[] = (doc.participantsId || [])
+      .filter((p: any) => p?._id)
+      .map((p: any) => UserMapper.mapDocToUser(p));
+
+    const thread = ThreadEntity.from({
+      id: doc._id.toString(),
+      administratorId: doc.administratorId?._id?.toString() || null,
+      participantsId: participants.map((p) => p.id.toString()),
+      title: doc.title,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+      isClose: doc.isClose,
+      type: doc.type,
+    }) as ThreadEntityWithUsersAndLastMessage;
+
+    const lastMessage = doc.lastMessage
+      ? MessageMapper.mapDocToMessage(doc.lastMessage)
+      : null;
+
+    return Object.assign(thread, { administrator, participants, lastMessage });
   }
 
   async save(thread: ThreadEntity): Promise<void> {
@@ -98,81 +129,239 @@ export class ThreadRepositoryMongo implements ThreadRepository {
   async findAllWithUserAndLastMessageByParticipantIdAndType(
     participantId: string,
     type?: ThreadEntity["type"],
-  ): Promise<ThreadEntityWithUsers[]> {
+  ): Promise<ThreadEntityWithUsersAndLastMessage[]> {
     await this.client.connect();
 
-    const query: Record<string, any> = {
+    const matchStage: any = {
       participantsId: participantId,
     };
 
     if (type) {
-      query.type = type;
+      matchStage.type = type;
     }
 
-    const threadsDocs = await ThreadModel.find(query)
-      .populate("participantsId")
-      .populate("administratorId")
-      .sort({ updatedAt: -1, createdAt: -1 })
-      .lean<any[]>();
+    const docs = await ThreadModel.aggregate([
+      // Stage 1 : Match threads par participant et type
+      { $match: matchStage },
 
-    return threadsDocs.map((doc) => this.mapThreadWithUsers(doc));
+      // Stage 2 : Lookup administrator
+      {
+        $lookup: {
+          from: "users",
+          localField: "administratorId",
+          foreignField: "_id",
+          as: "administratorId",
+        },
+      },
+      {
+        $unwind: {
+          path: "$administratorId",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      // Stage 3 : Lookup participants
+      {
+        $lookup: {
+          from: "users",
+          localField: "participantsId",
+          foreignField: "_id",
+          as: "participantsId",
+        },
+      },
+
+      // Stage 4 : Lookup dernier message
+      {
+        $lookup: {
+          from: "messages",
+          let: { threadId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$threadId", "$$threadId"] } } },
+            { $sort: { sentAt: -1 } },
+            { $limit: 1 },
+          ],
+          as: "lastMessage",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lastMessage",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      // Stage 5 : Sort
+      { $sort: { updatedAt: -1, createdAt: -1 } },
+    ]);
+
+    return docs.map((doc) => this.mapThreadWithUsersAndLastMessage(doc));
   }
 
   async findWithUserById(
     threadId: string,
   ): Promise<ThreadEntityWithUsers | null> {
     await this.client.connect();
-    const doc = await ThreadModel.findById(threadId)
-      .populate({ path: "administratorId" })
-      .populate({
-        path: "participantsId",
-        match: { isActive: true, confirmedAt: { $ne: null } },
-      })
-      .lean<any>();
 
-    if (!doc) return null;
+    const docs = await ThreadModel.aggregate([
+      // Stage 1 : Match par ID
+      { $match: { _id: threadId } },
 
-    return this.mapThreadWithUsers(doc);
+      // Stage 2 : Lookup administrator
+      {
+        $lookup: {
+          from: "users",
+          localField: "administratorId",
+          foreignField: "_id",
+          as: "administratorId",
+        },
+      },
+      {
+        $unwind: {
+          path: "$administratorId",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      // Stage 3 : Lookup participants (pas de filtre ici)
+      {
+        $lookup: {
+          from: "users",
+          localField: "participantsId",
+          foreignField: "_id",
+          as: "participantsId",
+        },
+      },
+    ]);
+
+    if (!docs.length) return null;
+
+    return this.mapThreadWithUsers(docs[0]);
   }
 
   async findAllWithUserAndLastMessageByAdministratorIdAndType(
     administratorId: UserEntity["id"],
     type?: ThreadEntity["type"],
-  ): Promise<ThreadEntityWithUsers[]> {
+  ): Promise<ThreadEntityWithUsersAndLastMessage[]> {
     await this.client.connect();
 
-    const query: Record<string, any> = { administratorId };
+    const matchStage: any = { administratorId };
 
     if (type) {
-      query.type = type;
+      matchStage.type = type;
     }
 
-    const threadsDocs = await ThreadModel.find(query)
-      .populate({ path: "administratorId" })
-      .populate({
-        path: "participantsId",
-        match: { isActive: true, confirmedAt: { $ne: null } },
-      })
-      .sort({ updatedAt: -1, createdAt: -1 })
-      .lean<any[]>();
+    const docs = await ThreadModel.aggregate([
+      // Stage 1 : Match par administratorId et type
+      { $match: matchStage },
 
-    return threadsDocs.map((doc) => this.mapThreadWithUsers(doc));
+      // Stage 2 : Lookup administrator
+      {
+        $lookup: {
+          from: "users",
+          localField: "administratorId",
+          foreignField: "_id",
+          as: "administratorId",
+        },
+      },
+      { $unwind: "$administratorId" },
+
+      // Stage 3 : Lookup participants filtrés (isActive + confirmedAt)
+      {
+        $lookup: {
+          from: "users",
+          let: { participantIds: "$participantsId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $in: ["$_id", "$$participantIds"] },
+                isActive: true,
+                confirmedAt: { $ne: null },
+              },
+            },
+          ],
+          as: "participantsId",
+        },
+      },
+
+      // Stage 4 : Lookup dernier message
+      {
+        $lookup: {
+          from: "messages",
+          let: { threadId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$threadId", "$$threadId"] } } },
+            { $sort: { sentAt: -1 } },
+            { $limit: 1 },
+          ],
+          as: "lastMessage",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lastMessage",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      // Stage 5 : Sort
+      { $sort: { updatedAt: -1, createdAt: -1 } },
+    ]);
+
+    return docs.map((doc) => this.mapThreadWithUsersAndLastMessage(doc));
   }
 
   async findAllWithUserAndLastMessageByAdministratorNullable(): Promise<
-    ThreadEntityWithUsers[]
+    ThreadEntityWithUsersAndLastMessage[]
   > {
     await this.client.connect();
 
-    const threadsDocs = await ThreadModel.find({ administratorId: null })
-      .populate({
-        path: "participantsId",
-        match: { isActive: true, confirmedAt: { $ne: null } },
-      })
-      .sort({ updatedAt: -1, createdAt: -1 })
-      .lean<any[]>();
+    const docs = await ThreadModel.aggregate([
+      // Stage 1 : Match administratorId null
+      { $match: { administratorId: null } },
 
-    return threadsDocs.map((doc) => this.mapThreadWithUsers(doc));
+      // Stage 2 : Lookup participants filtrés (isActive + confirmedAt)
+      {
+        $lookup: {
+          from: "users",
+          let: { participantIds: "$participantsId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $in: ["$_id", "$$participantIds"] },
+                isActive: true,
+                confirmedAt: { $ne: null },
+              },
+            },
+          ],
+          as: "participantsId",
+        },
+      },
+
+      // Stage 3 : Lookup dernier message
+      {
+        $lookup: {
+          from: "messages",
+          let: { threadId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$threadId", "$$threadId"] } } },
+            { $sort: { sentAt: -1 } },
+            { $limit: 1 },
+          ],
+          as: "lastMessage",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lastMessage",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      // Stage 4 : Sort
+      { $sort: { updatedAt: -1, createdAt: -1 } },
+    ]);
+
+    return docs.map((doc) => this.mapThreadWithUsersAndLastMessage(doc));
   }
 
   async countByAdvisor(advisorId: UserEntity["id"]): Promise<number> {

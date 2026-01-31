@@ -28,7 +28,7 @@ type Props = {
 export class FindPostWithFilterUsecase {
   constructor(
     private postRepository: PostRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
   ) {}
 
   public async execute({
@@ -67,8 +67,9 @@ export class FindPostWithFilterUsecase {
           tagsId,
           title,
           status: effectiveStatus,
+          userId: user.hasRole({ role: "client" }) ? user.id : undefined,
         },
-        { page, limit }
+        { page, limit },
       );
     return {
       posts: PostDTOMapper.tagsAndUserMaps(posts.posts),

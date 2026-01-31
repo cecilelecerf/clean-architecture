@@ -1,8 +1,6 @@
-// app/api/posts/feed/route.ts
 import { getServerSession } from 'next-auth';
 import { Post } from '@infrastructure/types/feed';
 import { authOptions } from '../../auth/[...nextauth]/route';
-import { UserId } from '@infrastructure/types/user';
 import { sseManager } from './sse-manager';
 
 export const runtime = 'nodejs';
