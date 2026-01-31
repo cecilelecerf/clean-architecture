@@ -183,9 +183,11 @@ pnpm run socket
 ```
 
 - **Port :** `3001`
-- **Utilisation :** Notifications temps réel, chat
+- **Utilisation :** Chat
 
 #### API Express (MongoDB)
+
+Attention la partie SSE a été testé seulement sur Next
 
 ```bash
 pnpm run express
