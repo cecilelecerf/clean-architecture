@@ -6,6 +6,7 @@ import { authOptions } from '../../api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import { MenuDrawer } from './_components/MenuDrawer';
 import { MenuPopover } from './_components/MenuPopover';
+import { NotificationProvider } from './_components/providers/NotificationProvider';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -22,16 +23,18 @@ export default async function RootLayout({
   if (!session) redirect('/login');
   if (session.user.role !== 'client') redirect('/unauthorized');
   return (
-    <main className="px-4 py-6 xl:py-8 md:px-13 xl:px-30">
-      <div className="flex items-center justify-between mb-4 xl:mb-6">
-        <SessionInfo />
-        <div className='flex gap-5'>
-          <MenuPopover />
-          <MenuDrawer />
+    <NotificationProvider>
+      <main className="px-4 py-6 xl:py-8 md:px-13 xl:px-30">
+        <div className="flex items-center justify-between mb-4 xl:mb-6">
+          <SessionInfo />
+          <div className='flex gap-5'>
+            <MenuPopover />
+            <MenuDrawer />
+          </div>
         </div>
-      </div>
-      {children}
-    </main>
+        {children}
+      </main>
+    </NotificationProvider>
   );
 }
 

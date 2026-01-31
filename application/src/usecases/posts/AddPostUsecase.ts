@@ -27,7 +27,7 @@ export class AddPostUsecase {
     private readonly tagRepository: TagRepository,
     private readonly userRepository: UserRepository,
     private readonly uuidService: UuidService,
-    private readonly clockService: ClockService
+    private readonly clockService: ClockService,
   ) {}
   public async execute({
     advisorId,
@@ -50,7 +50,7 @@ export class AddPostUsecase {
     if (advisor.hasRole({ role: "client" }))
       return new UserRoleMismatchError(
         ["conseiller", "directeur"],
-        advisor.role
+        advisor.role,
       );
 
     const tags = [];

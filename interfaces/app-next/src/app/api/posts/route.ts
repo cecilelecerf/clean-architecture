@@ -4,6 +4,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { postSchema } from '@infrastructure/types/feed';
 import { newPostSchema, querySchema } from '@/utils/endpoint/feedsEndpoint';
+import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
+import { broadcastPostEvent } from './sse/route';
+import { safeParseWithLog } from '@/lib/zodUtils';
+import { clientSchema, userDtoSchema } from '@infrastructure/types/user';
 
 export async function GET(req: NextRequest) {
   try {
@@ -68,8 +72,9 @@ export async function POST(req: NextRequest) {
         { status: result.statusCode ?? 400 },
       );
     }
+    const postParsed = safeParseWithLog(postSchema, result);
 
-    return NextResponse.json(postSchema.parse(result));
+    return NextResponse.json(postParsed);
   } catch (err) {
     console.error(err);
     return NextResponse.json(

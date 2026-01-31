@@ -107,7 +107,7 @@ function buildPostsQueryParams(filters?: PostFilters): URLSearchParams {
 // INVALIDATION HELPERS
 // ============================================================================
 
-const invalidateHelpers = {
+export const invalidateFeedHelpers = {
   invalidateAllPostsLists: () =>
     queryClient.invalidateQueries({
       queryKey: feedsQueryKeys.posts.lists(),
@@ -171,9 +171,9 @@ export const feedsEndpoint = createEndpointsNodes({
         },
         onSuccess: async ({ postId }) => {
           await Promise.all([
-            invalidateHelpers.invalidatePostDetail(postId),
-            invalidateHelpers.invalidateUnreadPosts(),
-            invalidateHelpers.invalidateAllPostsLists(),
+            invalidateFeedHelpers.invalidatePostDetail(postId),
+            invalidateFeedHelpers.invalidateUnreadPosts(),
+            invalidateFeedHelpers.invalidateAllPostsLists(),
           ]);
         },
       }),
@@ -185,7 +185,7 @@ export const feedsEndpoint = createEndpointsNodes({
           return postSchema.parse(data);
         },
         onSuccess: async () => {
-          await invalidateHelpers.invalidateAllPostsLists();
+          await invalidateFeedHelpers.invalidateAllPostsLists();
         },
       }),
 
@@ -197,8 +197,8 @@ export const feedsEndpoint = createEndpointsNodes({
         },
         onSuccess: async () => {
           await Promise.all([
-            invalidateHelpers.invalidatePostDetail(id),
-            invalidateHelpers.invalidateAllPostsLists(),
+            invalidateFeedHelpers.invalidatePostDetail(id),
+            invalidateFeedHelpers.invalidateAllPostsLists(),
           ]);
         },
       }),
@@ -210,8 +210,8 @@ export const feedsEndpoint = createEndpointsNodes({
         },
         onSuccess: async () => {
           await Promise.all([
-            invalidateHelpers.invalidatePostDetail(id),
-            invalidateHelpers.invalidateAllPostsLists(),
+            invalidateFeedHelpers.invalidatePostDetail(id),
+            invalidateFeedHelpers.invalidateAllPostsLists(),
           ]);
         },
       }),
@@ -224,8 +224,8 @@ export const feedsEndpoint = createEndpointsNodes({
         },
         onSuccess: async () => {
           await Promise.all([
-            invalidateHelpers.invalidatePostDetail(id),
-            invalidateHelpers.invalidateAllPostsLists(),
+            invalidateFeedHelpers.invalidatePostDetail(id),
+            invalidateFeedHelpers.invalidateAllPostsLists(),
           ]);
         },
       }),

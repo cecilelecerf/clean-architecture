@@ -15,16 +15,7 @@ type Props = { filters: PostFilters, onPaginationChange: (pageNumber: number) =>
 
 export const Posts = ({ filters, onPaginationChange, isAdmin, basePath }: Props) => {
     const query = useQuery(endpoints.feeds.posts.getAll({ filters }))
-    useEffect(() => {
-        if (!socket) return;
-        const eventName = `post:status`;
-        socket.on(eventName, () => queryClient.invalidateQueries({
-            predicate: (query) => query.queryKey[0] === 'posts' && query.queryKey[1] === 'list',
-        }))
-        return () => {
-            socket.off(eventName);
-        };
-    }, []);
+
     const t = useTranslations("advisor.feeds.post");
     return match(query)
         .with({ status: "error" }, () => "error")
@@ -46,24 +37,8 @@ export const Posts = ({ filters, onPaginationChange, isAdmin, basePath }: Props)
 }
 
 const DisplayPost = ({ dataPost, isAdmin, basePath }: { dataPost: PostWithTagsAndUser, isAdmin?: boolean, basePath: string }) => {
-    const [post, setPost] = useState<PostWithTagsAndUser>(dataPost)
 
-    useEffect(() => {
-        if (!socket) return;
-        const eventName = `post:${post.id}:update`;
-        socket.on(eventName, (socketPost) => {
-            console.log("💬 Nouveau post reçu:", post);
-            setPost(socketPost);
-        });
-        return () => {
-            socket.off(eventName);
-        };
-    }, [post]);
-    useEffect(() => {
-        setPost(dataPost)
-    }, [dataPost])
-
-    return <PostCard post={post} key={post.id} isAdmin={isAdmin} basePath={basePath} />
+    return <PostCard post={dataPost} key={dataPost.id} isAdmin={isAdmin} basePath={basePath} />
 }
 
 

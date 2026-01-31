@@ -3,6 +3,11 @@ import { postsFactory } from '@infrastructure/adapters/db/mysql/factories/posts'
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../auth/[...nextauth]/route';
 import { publishActionSchema } from '@/utils/endpoint/feedsEndpoint';
+import { usersFactory } from '@infrastructure/adapters/db/mysql/factories/users';
+import { safeParseWithLog } from '@/lib/zodUtils';
+import { userDtoSchema } from '@infrastructure/types/user';
+import { broadcastPostEvent } from '../../sse/route';
+import { postSchema } from '@infrastructure/types/feed';
 
 export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/posts/[postId]/status'>) {
   try {
@@ -27,7 +32,25 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<'/api/posts/[pos
         { status: result.statusCode ?? 400 },
       );
     }
+    const followers = await usersFactory().getUsersByRole.execute({
+      userId: session.user.id,
+      role: 'client',
+    });
+    if (followers instanceof Error) {
+      return NextResponse.json(
+        { name: followers.name, message: followers.message },
+        { status: followers.statusCode ?? 400 },
+      );
+    }
+    const postParsed = safeParseWithLog(postSchema, result);
 
+    const followerParsed = safeParseWithLog(userDtoSchema.array(), followers);
+    followerParsed.forEach((follower) => {
+      broadcastPostEvent(follower.id, {
+        type: `${status}_post`,
+        post: postParsed,
+      });
+    });
     return NextResponse.json(result);
   } catch (err) {
     console.error(err);

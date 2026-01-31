@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { socket } from "@/lib/socket";
 import { formatDateFrench } from "@/utils/date/formatDateFrench";
 import { endpoints } from "@/utils/endpoint";
 import { NewPost, PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint";
@@ -17,7 +16,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Edit, Save, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { match } from "ts-pattern";
 
 type Props = { postId: PostId }
@@ -60,19 +59,6 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
         };
     }, [isEditing, editValues, postData.title, postData.content, postData.tagsId]);
 
-    useEffect(() => {
-        if (!socket) return;
-        const eventNameUpdate = `post:${postData.id}:update`;
-
-        socket.on(eventNameUpdate, () => {
-            console.log("💬 Post mis à jour via socket - query va se refetch");
-        });
-
-        return () => {
-            socket.off(eventNameUpdate);
-        };
-    }, [postData.id]);
-
     const handleChange = (field: keyof NewPost, value: string) => {
         setEditValues((prev) => ({ ...prev, [field]: value }));
     };
@@ -80,8 +66,6 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
     const handleSave = () => {
         editMutation.mutate(editValues, {
             onSuccess: (data) => {
-                console.log("✅ Mutation réussie, data:", data);
-                socket.emit("post:update", { post: data });
                 setIsEditing(false);
             }
         });
@@ -103,10 +87,6 @@ const PostDisplay = ({ postData }: { postData: PostWithTagsAndUser }) => {
     const toogleStatus = () => {
         actionMutation.mutate({
             status: postData.publishedAt ? "unpublish" : "publish"
-        }, {
-            onSuccess: (dataSuccess) => {
-                 socket.emit("post:status", { post: dataSuccess });
-            }
         });
     };
 

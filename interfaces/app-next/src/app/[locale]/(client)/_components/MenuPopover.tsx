@@ -1,18 +1,20 @@
 "use client"
 
+import { PostEvent } from "@/app/api/posts/sse/route"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Skeleton } from "@/components/ui/skeleton"
-import { socket } from "@/lib/socket"
+import { useSSE } from "@/hooks/useSSE"
+import { queryClient } from "@/lib/queryClient"
 import { endpoints } from "@/utils/endpoint"
-import { PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint"
+import { invalidateFeedHelpers, PostWithTagsAndUser } from "@/utils/endpoint/feedsEndpoint"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Bell } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
- import { match } from "ts-pattern"
+import { useCallback, useEffect } from "react"
+import { match } from "ts-pattern"
 
 export const MenuPopover = () => {
     const query = useQuery(endpoints.feeds.posts.getUnread())
@@ -28,19 +30,85 @@ const DisplayPopover = ({ posts }: { posts: PostWithTagsAndUser[] }) => {
     const router = useRouter()
     const markAsReadMutation = useMutation(endpoints.feeds.posts.markAsRead())
 
-  useEffect(() => {
-    if (!socket) return;
- 
+    const handleSSEMessage = useCallback((event: PostEvent) => {
+        console.log('📬 Event received:', event);
 
- 
-    socket.on("post:status", ({post})=>{
-        console.log(post)
+        switch (event.type) {
+            case 'publish_post':
+                console.log("✅ New post published");
+
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('Nouveau post', {
+                        body: event.post.title,
+                        requireInteraction: true,
+                    });
+                }
+
+                queryClient.setQueryData(
+                    ['feeds', 'posts', 'list'],
+                    (oldData: PostWithTagsAndUser[] | undefined) => {
+                        if (!oldData) return [event.post];
+                        const exists = oldData.some(p => p.id === event.post.id);
+                        if (exists) return oldData;
+                        return [event.post, ...oldData];
+                    }
+                );
+
+                // Invalider aussi les posts non lus
+                queryClient.invalidateQueries({
+                    queryKey: ['feeds', 'posts', 'unread'],
+                });
+                break;
+
+            case 'unpublish_post':
+                console.log("✅ Post unpublished");
+
+                // Notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('Post retiré', {
+                        body: event.post.title,
+                    });
+                }
+
+                // Retirer du cache
+                queryClient.setQueryData(
+                    ['feeds', 'posts', 'list'],
+                    (oldData: PostWithTagsAndUser[] | undefined) => {
+                        if (!oldData) return oldData;
+                        return oldData.filter(post => post.id !== event.post.id);
+                    }
+                );
+
+                queryClient.invalidateQueries({
+                    queryKey: ['feeds', 'posts', 'unread'],
+                });
+                break;
+
+            case 'connected':
+                console.log("✅ SSE Connected");
+                break;
+
+            default:
+                console.warn('⚠️ Unknown event type:', (event as any).type);
+        }
+    }, []); // ← Pas de dépendances car on utilise des fonctions stables
+
+
+    const { isConnected } = useSSE({
+        url: '/api/posts/sse',
+        onMessage: handleSSEMessage,
+        onError: (error) => {
+            console.error('❌ SSE Connection error:', error);
+            console.log('Error details:', {
+                type: error.type,
+                target: error.target,
+                readyState: (error.target as EventSource)?.readyState,
+            });
+        },
     });
- 
-    return () => {
-      socket.off("post:status");
-     };
-  }, [posts]);
+    useEffect(() => {
+        console.log('🔍 SSE Connection state:', isConnected);
+    }, [isConnected]);
     const postCount = posts.length
     return (
         <Popover>
